@@ -66,6 +66,7 @@ create table team (
   parents_see_video boolean not null default false,   -- "mini/børn" flag
   visibility visibility not null default 'public',   -- on the website schedule
   color text,
+  cover_path text,                  -- storage path of the team's cover photo (bucket media, private)
   sort int not null default 0,
   archived boolean not null default false
 );
@@ -200,7 +201,7 @@ create table media (
   id uuid primary key default gen_random_uuid(),
   folder_id uuid not null references folder(id) on delete cascade,
   uploader_id uuid not null references person(id),
-  storage_path text not null,       -- bucket media/<school>/<team>/<file>
+  storage_path text not null unique,  -- bucket media: <school>/folders/<folder_id>/<file>
   kind text not null default 'image',  -- image | video
   visibility visibility not null default 'private',
   created_at timestamptz not null default now()
@@ -604,3 +605,17 @@ begin
 end $$;
 
 -- bootstrap: the very first approved admin of a school is created by the service role (seed), never through the app.
+
+-- ---------------------------------------------------------------- storage (private bucket "media")
+insert into storage.buckets (id, name, public) values ('media', 'media', false) on conflict (id) do nothing;
+-- path convention: <school_slug>/teams/<team_id>/<file>  and  <school_slug>/folders/<folder_id>/<file>
+create policy media_bucket_read on storage.objects for select using (
+  bucket_id = 'media' and i_am_approved() and (
+    i_am_admin() or
+    (split_part(name,'/',2) = 'teams' and (split_part(name,'/',3)::uuid in (select my_team_ids()) or i_am_staff_of(split_part(name,'/',3)::uuid))) or
+    (split_part(name,'/',2) = 'folders' and exists (select 1 from folder f where f.id = split_part(name,'/',3)::uuid and ((f.team_id in (select my_team_ids()) and not f.staff_only) or i_am_staff_of(f.team_id))))));
+create policy media_bucket_write on storage.objects for insert with check (
+  bucket_id = 'media' and i_am_approved() and (select supervised_by from person where id = my_person_id()) is null and (
+    i_am_admin() or
+    (split_part(name,'/',2) = 'folders' and exists (select 1 from folder f where f.id = split_part(name,'/',3)::uuid and (f.team_id in (select my_team_ids()) or i_am_staff_of(f.team_id))))));
+create policy media_bucket_delete on storage.objects for delete using (bucket_id = 'media' and (i_am_admin() or owner = auth.uid()));

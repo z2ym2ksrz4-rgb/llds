@@ -59,7 +59,7 @@ from s, (values
 -- Punch card type for the two Hit Fit Dance teams (Line, 5 Nov 2026: 10 klip = 625 kr.)
 with s as (select id from school where slug = 'llds')
 insert into punch_card_type(school_id, name, punches, valid_days, price_dkk)
-select s.id, '10 klip – Hit Fit Dance', 10, 90, 625 from s;
+select s.id, '10 klip – Hit Fit Dance', 10, 365, 625 from s;
 
 -- Admin bootstrap (run once with the service role after Line has signed in the first time):
 -- update person set status='approved', is_admin=true where email='<lines-email>';
