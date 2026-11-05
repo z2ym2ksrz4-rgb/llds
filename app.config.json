@@ -9,8 +9,8 @@
   "termsUrl": "https://ilumie.com/llds/terms/",
   "siteUrl": "https://ilumie.com/llds/",
   "supabase": {
-    "url": "",
-    "anonKey": ""
+    "url": "https://pbpaojgrjtolxwbdymad.supabase.co",
+    "anonKey": "sb_publishable_SrD0r4I2I3O0J4pMAoPlYg_JwO969KZ"
   },
   "minAccountAge": 13,
   "supervisedFromAge": 10,

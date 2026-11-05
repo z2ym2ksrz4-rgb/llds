@@ -18,7 +18,7 @@ export function supabaseApi(url: string, anonKey: string): Api {
       return data.session?.user.email ?? null;
     },
     async sendCode(email) {
-      const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true, data: { lang: "da", school: schoolSlug } } });
+      const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true, emailRedirectTo: typeof window !== "undefined" ? window.location.origin + window.location.pathname : undefined, data: { lang: "da", school: schoolSlug } } });
       fail(error);
     },
     async verifyCode(email, code) {

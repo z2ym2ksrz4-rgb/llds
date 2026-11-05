@@ -35,7 +35,7 @@
     "email": "E-mail",
     "sendCode": "Send kode",
     "noAccount": "Første gang? Brug din e-mail – du opretter din profil bagefter.",
-    "codeSent": "Vi har sendt en engangskode til {{email}}. Tjek også spam.",
+    "codeSent": "Vi har sendt en mail til {{email}}. Tryk på linket i mailen – eller indtast koden her, hvis mailen indeholder en. Tjek også spam.",
     "code": "Kode fra e-mailen",
     "verify": "Log ind",
     "resend": "Send koden igen",

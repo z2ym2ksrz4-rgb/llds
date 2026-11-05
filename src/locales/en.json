@@ -35,7 +35,7 @@
     "email": "E-mail",
     "sendCode": "Send code",
     "noAccount": "First time? Use your e-mail – you create your profile afterwards.",
-    "codeSent": "We sent a one-time code to {{email}}. Check spam too.",
+    "codeSent": "We sent an e-mail to {{email}}. Tap the link in it – or enter the code here if the e-mail has one. Check spam too.",
     "code": "Code from the e-mail",
     "verify": "Sign in",
     "resend": "Resend code",

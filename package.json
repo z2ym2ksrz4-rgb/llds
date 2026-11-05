@@ -16,6 +16,8 @@
     "android:apk": "npm run cap:sync && cd android && ./gradlew assembleDebug",
     "new-app": "node scripts/new-app.mjs",
     "smoke": "node smoke.mjs && node smoke2.mjs",
+    "build:mock": "VITE_MOCK=1 vite build",
+    "dev:mock": "VITE_MOCK=1 vite",
     "build:web": "RELEASE=1 vite build --base=/llds/app/"
   },
   "dependencies": {

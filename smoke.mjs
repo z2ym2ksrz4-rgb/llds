@@ -27,6 +27,7 @@ await p.waitForSelector("text=Tak, Test"); out.pendingShown = true; await shot(2
 await p.click("text=Log ud"); await p.waitForSelector("#email");
 await p.fill("#email", "admin@demo"); await p.click("form button.cta"); await p.fill("#code", "000000"); await p.click("form button.cta");
 await p.waitForSelector("nav.tabbar"); await p.click("nav.tabbar >> text=Admin");
+await p.click(".item:has-text(\"Brugere\")");
 await p.waitForSelector("[data-testid=pending]");
 out.pendingCount = await p.$$eval("[data-testid=pending]", e => e.length);
 const card = p.locator("[data-testid=pending]", { hasText: "Test Testesen" });
