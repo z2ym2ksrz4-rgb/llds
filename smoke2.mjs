@@ -48,7 +48,7 @@ out.rosterSize = await p.$$eval(".sheet .list .item", e => e.length); await p.cl
 await shot(4); await logout();
 
 // 4. Sofie (trainer) sees substitute wanted on Home and takes it
-await login("sofie@demo"); await p.waitForSelector("text=Vikar søges"); await p.click(".card .item >> nth=0"); await p.waitForSelector(".sheet");
+await login("sofie@demo"); await p.waitForSelector("text=Vikar søges"); await p.click(".card:has-text(\"Vikar søges\") .item >> nth=0"); await p.waitForSelector(".sheet");
 await p.click("text=Jeg tager den som vikar"); await p.waitForSelector(".toast"); out.took = await p.textContent(".toast");
 await p.setViewportSize({ width: 1280, height: 800 }); await p.click("nav.tabbar >> text=Sale"); await p.waitForSelector(".cal"); await shot(5);
 out.errors = errors; console.log(JSON.stringify(out, null, 1)); await b.close(); process.exit(errors.length ? 1 : 0);

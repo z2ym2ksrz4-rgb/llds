@@ -88,7 +88,10 @@
     "dancers": "Dancers",
     "absent": "absent",
     "noPhotoConsent": "No photo consent",
-    "childAccount": "Child profile"
+    "childAccount": "Child profile",
+    "choreoSub": "Video, tempo, mirror, formations",
+    "choreoLocked": "Dancers and trainers only",
+    "foldersSub": "Photos and clips – team only"
   },
   "home": {
     "hi": "Hi {{name}}",
@@ -105,7 +108,8 @@
     "trainingsToday": "trainings today",
     "absencesToday": "absences today",
     "bookingsPending": "bookings pending",
-    "subsWanted": "substitutes wanted"
+    "subsWanted": "substitutes wanted",
+    "news": "News from the studio"
   },
   "admin": {
     "users": "Users",
@@ -152,7 +156,20 @@
     "archive": "Archive",
     "week": "Week",
     "seasonHint": "Tap a training to change time, room or trainer – pick \"this and all future\" for the whole season. A new training with \"repeat weekly\" fills the whole season at once.",
-    "noBookings": "No bookings."
+    "noBookings": "No bookings.",
+    "messages": "Messages",
+    "messagesSub": "Official messages with receipts",
+    "reports": "Reports",
+    "reportsSub": "Reported posts and comments",
+    "messagesIntro": "Messages everyone must read or accept. You can see who is missing.",
+    "reportsIntro": "Reported posts and comments land here. Hide or keep – ideally within 24 hours.",
+    "reported": "reported",
+    "reason": "Reason",
+    "hideContent": "Hide content",
+    "keepContent": "Keep",
+    "noReports": "No open reports.",
+    "resolved": "Resolved",
+    "phase3note": "Phase 3: team rooms, trainer channel, messages with receipts, folders, choreography and notes. Events, punch cards and shop come in phase 4."
   },
   "settings": {
     "language": "Language",
@@ -274,5 +291,138 @@
     "sendForApproval": "Send for approval",
     "booked": "{{room}} is booked",
     "sentForApproval": "Sent for approval – you'll be notified"
+  },
+  "feed": {
+    "title": "Posts",
+    "channel": {
+      "team": "Team",
+      "school": "Whole school",
+      "trainers": "Trainers"
+    },
+    "placeholder": "Write to the team…",
+    "placeholderTrainers": "Write to the other trainers…",
+    "addPhoto": "Photo",
+    "official": "Official",
+    "public": "Public on website",
+    "post": "Post",
+    "posted": "Posted",
+    "rules": "Be kind and respectful – the trainers and Line read along. Report anything that isn't okay.",
+    "empty": "No posts yet. Be the first!",
+    "officialChip": "Official",
+    "publicChip": "Public",
+    "hiddenChip": "Hidden",
+    "more": "More",
+    "report": "Report",
+    "reportWhy": "What's wrong? (optional)",
+    "sendReport": "Send report",
+    "reported": "Thanks – Line will look at it",
+    "hide": "Hide",
+    "unhide": "Show again",
+    "makeOfficial": "Make official",
+    "unofficial": "Remove official",
+    "deleted": "Deleted",
+    "comments": "{{n}} comments",
+    "comment": "Comment",
+    "commentsTitle": "Comments",
+    "noComments": "No comments yet.",
+    "writeComment": "Write a comment…",
+    "send": "Send"
+  },
+  "msg": {
+    "needsYou": "{{n}} message(s) need your answer",
+    "needs": {
+      "read": "To read",
+      "accept": "To accept"
+    },
+    "done": {
+      "read": "Read",
+      "accept": "Accepted"
+    },
+    "ackBtn": {
+      "read": "I have read this",
+      "accept": "I accept"
+    },
+    "acked": {
+      "read": "Marked as read",
+      "accept": "Accepted – Line can see it"
+    },
+    "all": "All messages ({{n}})",
+    "eyebrow": "Official messages",
+    "title": "Messages",
+    "none": "No messages.",
+    "status": "{{done}} of {{total}} have answered",
+    "showStatus": "Who is missing?",
+    "new": "New message",
+    "titleField": "Title",
+    "bodyField": "Message",
+    "needsField": "Recipients must",
+    "needsOpt": {
+      "read": "Read",
+      "accept": "Accept"
+    },
+    "to": "To",
+    "everyone": "Everyone in the studio",
+    "parentsToo": "Parents of dancers on the team get the message too.",
+    "sendBtn": "Send message",
+    "sent": "Message sent"
+  },
+  "folders": {
+    "new": "New folder",
+    "name": "Name",
+    "staffOnly": "Staff only",
+    "staffOnlyHint": "Only trainers and assistants can see the folder",
+    "created": "Folder created",
+    "count": "{{n}} files",
+    "empty": "No folders yet.",
+    "upload": "Upload",
+    "uploading": "Uploading {{n}} files…",
+    "uploaded": "{{n}} files uploaded",
+    "noMedia": "No photos yet.",
+    "privacy": "Photos are visible to the team, parents and trainers only – never public.",
+    "download": "Download"
+  },
+  "choreo": {
+    "upload": "New video",
+    "title": "Title",
+    "titlePh": "Competition piece – full run",
+    "file": "Video file",
+    "uploadHint": "Record in landscape. Large files take time on mobile data.",
+    "uploaded": "Video uploaded",
+    "uploading": "Uploading…",
+    "uploadBtn": "Upload video",
+    "empty": "No videos yet.",
+    "privacy": "Choreography is for the team's dancers and trainers only (parents only on mini/kids teams).",
+    "formationsN": "{{n}} formations",
+    "video": "Video",
+    "formations": "Formations",
+    "tempo": "Tempo",
+    "fullTempo": "Full tempo",
+    "mirror": "Mirror",
+    "loop": "Loop",
+    "eightCount": "8-count from here",
+    "clearLoop": "Clear loop",
+    "loopHint": "Tap A at the start and B at the end – the video repeats that part. “8-count” sets 8 seconds from now.",
+    "noFile": "No video file on this one.",
+    "front": "Front of stage / audience",
+    "noFormations": "No formations yet.",
+    "editFormations": "Edit formations",
+    "addFormation": "Add formation",
+    "formationName": "Formation name",
+    "formation": "Formation",
+    "pickDancer": "Pick a dancer, tap the stage",
+    "removeFromStage": "Remove from stage",
+    "editHint": "Pick initials and tap where the dancer stands. Tap a dot to move it."
+  },
+  "notes": {
+    "title": "Notes",
+    "sub": "The trainers' notes to you",
+    "subStaff": "Your notes per dancer",
+    "all": "All",
+    "placeholder": "Note about {{name}}…",
+    "save": "Save note",
+    "empty": "No notes for you yet.",
+    "emptyStaff": "No notes yet. Pick a dancer to write.",
+    "hint": "Notes are written by the trainers and visible only to you (and your parents).",
+    "hintStaff": "Notes are private to the team's staff – dancers and parents never see them."
   }
 }

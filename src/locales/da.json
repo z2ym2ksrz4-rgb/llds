@@ -88,7 +88,10 @@
     "dancers": "Dansere",
     "absent": "afbud",
     "noPhotoConsent": "Intet fotosamtykke",
-    "childAccount": "Børneprofil"
+    "childAccount": "Børneprofil",
+    "choreoSub": "Video, tempo, spejl, formationer",
+    "choreoLocked": "Kun for dansere og trænere på holdet",
+    "foldersSub": "Billeder og klip – kun for holdet"
   },
   "home": {
     "hi": "Hej {{name}}",
@@ -105,7 +108,8 @@
     "trainingsToday": "træninger i dag",
     "absencesToday": "afbud i dag",
     "bookingsPending": "bookinger afventer",
-    "subsWanted": "vikar søges"
+    "subsWanted": "vikar søges",
+    "news": "Nyt fra studiet"
   },
   "admin": {
     "users": "Brugere",
@@ -152,7 +156,20 @@
     "archive": "Arkivér",
     "week": "Uge",
     "seasonHint": "Tryk på en træning for at ændre tid, sal eller træner – vælg \"denne og alle fremover\" for hele sæsonen. Ny træning med \"gentag hver uge\" lægger hele sæsonen ind på én gang.",
-    "noBookings": "Ingen bookinger."
+    "noBookings": "Ingen bookinger.",
+    "messages": "Beskeder",
+    "messagesSub": "Officielle beskeder med kvittering",
+    "reports": "Anmeldelser",
+    "reportsSub": "Anmeldte opslag og kommentarer",
+    "messagesIntro": "Beskeder, som alle skal læse eller acceptere. Du kan se, hvem der mangler.",
+    "reportsIntro": "Når nogen anmelder et opslag eller en kommentar, lander det her. Skjul eller behold – helst inden 24 timer.",
+    "reported": "anmeldte",
+    "reason": "Begrundelse",
+    "hideContent": "Skjul indholdet",
+    "keepContent": "Behold",
+    "noReports": "Ingen åbne anmeldelser.",
+    "resolved": "Behandlet",
+    "phase3note": "Fase 3: holdrum, trænerkanal, beskeder med kvittering, mapper, koreografi og noter. Events, klippekort og shop kommer i fase 4."
   },
   "settings": {
     "language": "Sprog",
@@ -274,5 +291,138 @@
     "sendForApproval": "Send til godkendelse",
     "booked": "{{room}} er booket",
     "sentForApproval": "Sendt til godkendelse – du får besked"
+  },
+  "feed": {
+    "title": "Opslag",
+    "channel": {
+      "team": "Holdet",
+      "school": "Hele skolen",
+      "trainers": "Trænere"
+    },
+    "placeholder": "Skriv til holdet…",
+    "placeholderTrainers": "Skriv til de andre trænere…",
+    "addPhoto": "Billede",
+    "official": "Officiel",
+    "public": "Offentlig på website",
+    "post": "Slå op",
+    "posted": "Opslået",
+    "rules": "Vær sød og respektfuld – trænerne og Line læser med. Anmeld, hvis noget ikke er okay.",
+    "empty": "Ingen opslag endnu. Vær den første!",
+    "officialChip": "Officiel",
+    "publicChip": "Offentlig",
+    "hiddenChip": "Skjult",
+    "more": "Mere",
+    "report": "Anmeld",
+    "reportWhy": "Hvad er galt? (valgfrit)",
+    "sendReport": "Send anmeldelse",
+    "reported": "Tak – Line ser på det",
+    "hide": "Skjul",
+    "unhide": "Vis igen",
+    "makeOfficial": "Gør officiel",
+    "unofficial": "Fjern officiel",
+    "deleted": "Slettet",
+    "comments": "{{n}} kommentarer",
+    "comment": "Kommentér",
+    "commentsTitle": "Kommentarer",
+    "noComments": "Ingen kommentarer endnu.",
+    "writeComment": "Skriv en kommentar…",
+    "send": "Send"
+  },
+  "msg": {
+    "needsYou": "{{n}} besked(er) kræver dit svar",
+    "needs": {
+      "read": "Skal læses",
+      "accept": "Skal accepteres"
+    },
+    "done": {
+      "read": "Læst",
+      "accept": "Accepteret"
+    },
+    "ackBtn": {
+      "read": "Jeg har læst beskeden",
+      "accept": "Jeg accepterer"
+    },
+    "acked": {
+      "read": "Markeret som læst",
+      "accept": "Accepteret – Line kan se det"
+    },
+    "all": "Alle beskeder ({{n}})",
+    "eyebrow": "Officielle beskeder",
+    "title": "Beskeder",
+    "none": "Ingen beskeder.",
+    "status": "{{done}} af {{total}} har svaret",
+    "showStatus": "Hvem mangler?",
+    "new": "Ny besked",
+    "titleField": "Overskrift",
+    "bodyField": "Besked",
+    "needsField": "Modtagerne skal",
+    "needsOpt": {
+      "read": "Læse",
+      "accept": "Acceptere"
+    },
+    "to": "Til",
+    "everyone": "Alle i studiet",
+    "parentsToo": "Forældre til dansere på holdet får også beskeden.",
+    "sendBtn": "Send besked",
+    "sent": "Beskeden er sendt"
+  },
+  "folders": {
+    "new": "Ny mappe",
+    "name": "Navn",
+    "staffOnly": "Kun trænere",
+    "staffOnlyHint": "Kun trænere og hjælpetrænere kan se mappen",
+    "created": "Mappen er oprettet",
+    "count": "{{n}} filer",
+    "empty": "Ingen mapper endnu.",
+    "upload": "Læg op",
+    "uploading": "Lægger {{n}} filer op…",
+    "uploaded": "{{n}} filer lagt op",
+    "noMedia": "Ingen billeder endnu.",
+    "privacy": "Billederne er kun synlige for holdet, forældre og trænere – aldrig offentligt.",
+    "download": "Hent"
+  },
+  "choreo": {
+    "upload": "Ny video",
+    "title": "Titel",
+    "titlePh": "DM-nummer – fuld gennemgang",
+    "file": "Videofil",
+    "uploadHint": "Optag i liggende format. Store filer tager tid på mobilnet.",
+    "uploaded": "Videoen er lagt op",
+    "uploading": "Lægger op…",
+    "uploadBtn": "Læg video op",
+    "empty": "Ingen videoer endnu.",
+    "privacy": "Koreografi er kun for holdets dansere og trænere (forældre kun på mini/børnehold).",
+    "formationsN": "{{n}} formationer",
+    "video": "Video",
+    "formations": "Formationer",
+    "tempo": "Tempo",
+    "fullTempo": "Fuldt tempo",
+    "mirror": "Spejlvend",
+    "loop": "Loop",
+    "eightCount": "8-tæller herfra",
+    "clearLoop": "Fjern loop",
+    "loopHint": "Tryk A ved start og B ved slut – videoen gentager stykket. “8-tæller” sætter 8 sekunder fra nu.",
+    "noFile": "Ingen videofil på denne.",
+    "front": "Scenens forkant / publikum",
+    "noFormations": "Ingen formationer endnu.",
+    "editFormations": "Redigér formationer",
+    "addFormation": "Tilføj formation",
+    "formationName": "Navn på formation",
+    "formation": "Formation",
+    "pickDancer": "Vælg danser, tryk på scenen",
+    "removeFromStage": "Fjern fra scenen",
+    "editHint": "Vælg initialer og tryk, hvor danseren skal stå. Tryk på en prik for at flytte den."
+  },
+  "notes": {
+    "title": "Noter",
+    "sub": "Trænernes noter til dig",
+    "subStaff": "Dine noter pr. danser",
+    "all": "Alle",
+    "placeholder": "Note om {{name}}…",
+    "save": "Gem note",
+    "empty": "Ingen noter til dig endnu.",
+    "emptyStaff": "Ingen noter endnu. Vælg en danser for at skrive.",
+    "hint": "Noter skrives af trænerne og kan kun ses af dig (og dine forældre).",
+    "hintStaff": "Noter er private for holdets trænere – dansere og forældre ser dem aldrig."
   }
 }

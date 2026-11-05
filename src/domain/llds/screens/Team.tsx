@@ -1,24 +1,35 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { api, type Absence, type Member, type Session } from "@/core/api";
+import { api, type Absence, type Channel, type Member, type Session } from "@/core/api";
 import { useAuth } from "@/core/auth";
 import { TeamPicker } from "../components/TeamPicker";
 import { SessionSheet } from "../components/SessionSheet";
 import { Toast } from "../components/Sheet";
+import { Feed } from "../components/Feed";
+import { MessageComposer } from "../components/Messages";
+import { Folders } from "./Folders";
+import { Choreo } from "./Choreo";
+import { Notes } from "./Notes";
 import { addDays, dateLabel, hm, startOfDay } from "../lib/time";
 
-/** "Mit hold": header, upcoming trainings, roster (staff see contact details). Feed/video/folders arrive in phase 3. */
+type Page = "team" | "folders" | "choreo" | "notes";
+
+/** "Mit hold": header, choreography/folders/notes, team room feed, upcoming trainings, roster (staff see contact details). */
 export function TeamScreen() {
   const { t } = useTranslation();
   const me = useAuth((s) => s.me)!;
+  const viewing = useAuth((s) => s.viewing)!;
   const teamId = useAuth((s) => s.teamId);
   const roleOn = useAuth((s) => s.roleOn);
   const team = me.teams.find((x) => x.id === teamId);
   const staff = me.person.is_admin || (teamId != null && me.memberships.some((m) => m.person_id === me.person.id && m.team_id === teamId && m.role !== "dancer"));
+  const isStaffAnywhere = me.person.is_admin || me.memberships.some((m) => m.person_id === me.person.id && m.role !== "dancer");
+  const [page, setPage] = useState<Page>("team");
   const [sessions, setSessions] = useState<Session[]>([]);
   const [absences, setAbsences] = useState<Absence[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
   const [open, setOpen] = useState<Session | null>(null);
+  const [compose, setCompose] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
 
@@ -30,11 +41,20 @@ export function TeamScreen() {
     if (staff) setMembers((await api.listMembers()).filter((p) => p.memberships.some((m) => m.team_id === teamId)));
   }, [teamId, staff]);
   useEffect(() => { void load(); }, [load]);
+  useEffect(() => { setPage("team"); }, [teamId]);
 
   if (!team) return <section className="screen"><header className="topbar"><h1 className="display">{t("team.myTeam")}</h1></header><TeamPicker /><p className="muted">{t("team.noneYet")}</p></section>;
+  if (page === "folders") return <><Folders teamId={team.id} staff={staff} onBack={() => setPage("team")} toast={say} /><Toast msg={toast} /></>;
+  if (page === "choreo") return <><Choreo teamId={team.id} staff={staff} onBack={() => setPage("team")} toast={say} /><Toast msg={toast} /></>;
+  if (page === "notes") return <Notes teamId={team.id} staff={staff} onBack={() => setPage("team")} />;
+
   const role = roleOn(team.id);
   const dancers = members.filter((p) => p.memberships.some((m) => m.team_id === team.id && m.role === "dancer"));
   const trainers = members.filter((p) => p.memberships.some((m) => m.team_id === team.id && m.role !== "dancer"));
+  // parents on a team without parents_see_video don't get choreography (Line's rule) – except for children under 13
+  const child = viewing.isChild ? me.children.find((c) => c.id === viewing.personId) : null;
+  const seesChoreo = staff || role !== "parent" || team.parents_see_video || (!!child?.birth_year && new Date().getFullYear() - child.birth_year < 13);
+  const channels: Channel[] = isStaffAnywhere ? ["team", "school", "trainers"] : ["team", "school"];
 
   return (
     <section className="screen">
@@ -42,9 +62,14 @@ export function TeamScreen() {
       <div className="hero"><div className="hero-bg" /><div><div className="eyebrow">{team.style} · {t(`category.${team.category}`)} · {team.level}</div><h1 className="display">{team.name}</h1>
         <div className="small muted">{t(`roles.${role ?? "dancer"}`)}{team.closed ? ` · ${t("team.closed")}` : ""}{team.punch_card_open ? ` · ${t("team.punchOpen")}` : ""}</div></div></div>
 
-      <div className="grid2">
-        <div className="card tap dim"><div className="eyebrow">{t("team.choreo")}</div><div className="tiny">{t("team.phase3")}</div></div>
-        <div className="card tap dim"><div className="eyebrow">{t("team.folders")}</div><div className="tiny">{t("team.phase3")}</div></div>
+      <div className="grid3">
+        <button className={"card tap" + (seesChoreo ? "" : " dim")} disabled={!seesChoreo} onClick={() => setPage("choreo")} data-testid="go-choreo"><div className="eyebrow">{t("team.choreo")}</div><div className="tiny">{seesChoreo ? t("team.choreoSub") : t("team.choreoLocked")}</div></button>
+        <button className="card tap" onClick={() => setPage("folders")} data-testid="go-folders"><div className="eyebrow">{t("team.folders")}</div><div className="tiny">{t("team.foldersSub")}</div></button>
+        {staff && <button className="card tap" onClick={() => setPage("notes")} data-testid="go-notes"><div className="eyebrow">{t("notes.title")}</div><div className="tiny">{t("notes.subStaff")}</div></button>}
+      </div>
+
+      <div className="sec"><div className="row between"><h2>{t("feed.title")}</h2>{staff && <button className="ghost small" onClick={() => setCompose(true)}>{t("msg.new")}</button>}</div>
+        <Feed teamId={team.id} channels={channels} toast={say} />
       </div>
 
       <div className="sec"><h2>{t("team.upcoming")}</h2>
@@ -65,6 +90,7 @@ export function TeamScreen() {
       )}
 
       {open && <SessionSheet session={open} absences={absences} onClose={() => setOpen(null)} onChanged={() => void load()} toast={say} />}
+      {compose && <MessageComposer teams={me.person.is_admin ? me.teams : me.teams.filter((x) => me.memberships.some((m) => m.person_id === me.person.id && m.team_id === x.id && m.role !== "dancer"))} defaultTeam={team.id} onClose={() => setCompose(false)} toast={say} />}
       <Toast msg={toast} />
     </section>
   );

@@ -1,32 +1,37 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { api, type Booking, type Member, type Role, type Session, type Team, type TeamInput } from "@/core/api";
+import { api, type Booking, type Member, type Message, type Report, type Role, type Session, type Team, type TeamInput } from "@/core/api";
+import { MessageComposer, MessageSheet } from "../components/Messages";
+import { ago } from "../lib/time";
 import { AdminUsers } from "./Users";
 import { Sheet, Toast } from "../components/Sheet";
 import { SessionEditor } from "../components/SessionSheet";
 import { addDays, DAY_LONG, hm, mondayOf, startOfDay } from "../lib/time";
 
-type Page = "menu" | "users" | "members" | "teams" | "season" | "bookings";
+type Page = "menu" | "users" | "members" | "teams" | "season" | "bookings" | "messages" | "reports";
 const CATS = ["mini", "kids", "junior", "adult", "mixed"] as const;
 
 /** Admin: the one place Line runs the school from. Everything else in the app reads what she sets here. */
 export function Admin() {
   const { t } = useTranslation();
   const [page, setPage] = useState<Page>("menu");
-  const [counts, setCounts] = useState({ pending: 0, bookings: 0, subs: 0 });
+  const [counts, setCounts] = useState({ pending: 0, bookings: 0, subs: 0, reports: 0 });
   useEffect(() => { void (async () => {
     const from = startOfDay(new Date());
-    const [p, b, s] = await Promise.all([api.listPending(), api.listBookings(from.toISOString(), addDays(from, 60).toISOString()), api.listSessions(from.toISOString(), addDays(from, 14).toISOString())]);
-    setCounts({ pending: p.length, bookings: b.filter((x) => x.status === "pending").length, subs: s.filter((x) => x.substitute_wanted && !x.substitute_id).length });
+    const [p, b, s, r] = await Promise.all([api.listPending(), api.listBookings(from.toISOString(), addDays(from, 60).toISOString()), api.listSessions(from.toISOString(), addDays(from, 14).toISOString()), api.listReports()]);
+    setCounts({ pending: p.length, bookings: b.filter((x) => x.status === "pending").length, subs: s.filter((x) => x.substitute_wanted && !x.substitute_id).length, reports: r.filter((x) => !x.resolved_at).length });
   })(); }, [page]);
   if (page === "users") return <Back onBack={() => setPage("menu")}><AdminUsers /></Back>;
   if (page === "members") return <Back onBack={() => setPage("menu")}><Members /></Back>;
   if (page === "teams") return <Back onBack={() => setPage("menu")}><Teams /></Back>;
   if (page === "season") return <Back onBack={() => setPage("menu")}><Season /></Back>;
   if (page === "bookings") return <Back onBack={() => setPage("menu")}><Bookings /></Back>;
+  if (page === "messages") return <Back onBack={() => setPage("menu")}><Messages /></Back>;
+  if (page === "reports") return <Back onBack={() => setPage("menu")}><Reports /></Back>;
   const items: [Page, string, string, number][] = [
     ["users", t("admin.users"), t("admin.usersSub"), counts.pending], ["members", t("admin.members"), t("admin.membersSub"), 0], ["teams", t("admin.teams"), t("admin.teamsSub"), 0],
     ["season", t("admin.season"), t("admin.seasonSub"), counts.subs], ["bookings", t("admin.bookings"), t("admin.bookingsSub"), counts.bookings],
+    ["messages", t("admin.messages"), t("admin.messagesSub"), 0], ["reports", t("admin.reports"), t("admin.reportsSub"), counts.reports],
   ];
   return (
     <section className="screen">
@@ -34,7 +39,7 @@ export function Admin() {
       <div className="card list">
         {items.map(([k, label, sub, n]) => <button key={k} className="item" onClick={() => setPage(k)}><span className="grow">{label}<div className="tiny">{sub}</div></span>{n > 0 && <span className="chip warn small">{n}</span>}<span className="gold">›</span></button>)}
       </div>
-      <p className="tiny">{t("admin.phase2note")}</p>
+      <p className="tiny">{t("admin.phase3note")}</p>
     </section>
   );
 }
@@ -161,6 +166,54 @@ function Bookings() {
           {b.status === "pending" ? <div className="row"><button className="small" onClick={async () => { await api.setBookingStatus(b.id, "approved"); void load(); }}>{t("admin.approve")}</button><button className="ghost small danger" onClick={async () => { await api.setBookingStatus(b.id, "rejected"); void load(); }}>{t("admin.reject")}</button></div> : <span className="chip ok small">{t("rooms.status.approved")}</span>}</div>)}
         {!list.length && <p className="muted">{t("admin.noBookings")}</p>}
       </div>
+    </section>
+  );
+}
+
+/* ---------------- Messages: official messages with read/accept receipts ---------------- */
+function Messages() {
+  const { t } = useTranslation();
+  const [list, setList] = useState<Message[]>([]); const [teams, setTeams] = useState<Team[]>([]); const [open, setOpen] = useState<Message | null>(null); const [compose, setCompose] = useState(false);
+  const [toast, setToast] = useState<string | null>(null); const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
+  const load = useCallback(async () => { const [m, tm] = await Promise.all([api.listMessages(), api.listTeams()]); setList(m); setTeams(tm); }, []);
+  useEffect(() => { void load(); }, [load]);
+  return (
+    <section className="screen">
+      <header className="topbar"><h1 className="display">{t("admin.messages")}</h1><button className="ghost small" id="admin-new-msg" onClick={() => setCompose(true)}>+ {t("msg.new")}</button></header>
+      <p className="small muted">{t("admin.messagesIntro")}</p>
+      <div className="card list">
+        {list.map((m) => <button key={m.id} className="item" onClick={() => setOpen(m)} data-testid="admin-msg"><span className="grow">{m.title}<div className="tiny">{ago(m.created_at)} · {m.audience.all ? t("msg.everyone") : (m.audience.teams ?? []).map((id) => teams.find((x) => x.id === id)?.name ?? "?").join(", ")} · {t(`msg.needsOpt.${m.needs}`)}</div></span><span className="gold">›</span></button>)}
+        {!list.length && <p className="muted">{t("msg.none")}</p>}
+      </div>
+      {open && <MessageSheet message={open} onClose={() => { setOpen(null); void load(); }} toast={say} />}
+      {compose && <MessageComposer teams={teams} onClose={() => { setCompose(false); void load(); }} toast={say} />}
+      <Toast msg={toast} />
+    </section>
+  );
+}
+
+/* ---------------- Reports: moderation queue (Apple 1.2: act within 24 h) ---------------- */
+function Reports() {
+  const { t } = useTranslation();
+  const [list, setList] = useState<Report[]>([]); const [teams, setTeams] = useState<Team[]>([]);
+  const load = useCallback(async () => { const [r, tm] = await Promise.all([api.listReports(), api.listTeams()]); setList(r); setTeams(tm); }, []);
+  useEffect(() => { void load(); }, [load]);
+  const openOnes = list.filter((r) => !r.resolved_at), done = list.filter((r) => r.resolved_at);
+  const Row = ({ r }: { r: Report }) => (
+    <div className="card" data-testid="report">
+      <div className="row between"><span className="tiny">{r.reporter_name} {t("admin.reported")} {r.author_name} · {ago(r.created_at)}{r.team_id ? ` · ${teams.find((x) => x.id === r.team_id)?.name ?? ""}` : ""}</span>{r.hidden && <span className="chip warn small">{t("feed.hiddenChip")}</span>}</div>
+      <p className="small" style={{ margin: 0, whiteSpace: "pre-wrap" }}>“{r.excerpt}”</p>
+      {r.reason && <p className="tiny" style={{ margin: 0 }}>{t("admin.reason")}: {r.reason}</p>}
+      {!r.resolved_at && <div className="row"><button className="small" onClick={async () => { await api.resolveReport(r.id, "hide"); void load(); }}>{t("admin.hideContent")}</button><button className="ghost small" onClick={async () => { await api.resolveReport(r.id, "keep"); void load(); }}>{t("admin.keepContent")}</button></div>}
+    </div>
+  );
+  return (
+    <section className="screen">
+      <header className="topbar"><h1 className="display">{t("admin.reports")}</h1></header>
+      <p className="small muted">{t("admin.reportsIntro")}</p>
+      {openOnes.map((r) => <Row key={r.id} r={r} />)}
+      {!openOnes.length && <p className="muted">{t("admin.noReports")}</p>}
+      {done.length > 0 && <div className="sec"><h2>{t("admin.resolved")}</h2>{done.map((r) => <Row key={r.id} r={r} />)}</div>}
     </section>
   );
 }

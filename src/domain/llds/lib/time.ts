@@ -13,3 +13,8 @@ export function isoDate(d: Date) { return `${d.getFullYear()}-${String(d.getMont
 export function atTime(day: Date, hmStr: string) { const [h, m] = hmStr.split(":").map(Number); const d = new Date(day); d.setHours(h, m, 0, 0); return d; }
 export function overlaps(aS: string, aE: string, bS: string, bE: string) { return aS < bE && bS < aE; }
 export const SEASON_END = "2027-06-20";
+export function ago(iso: string) {
+  const m = Math.round((Date.now() - new Date(iso).getTime()) / 6e4);
+  if (m < 1) return "nu"; if (m < 60) return `${m} min`; const h = Math.round(m / 60); if (h < 24) return `${h} t`;
+  const d = Math.round(h / 24); if (d < 7) return `${d} d`; return new Date(iso).toLocaleDateString("da-DK", { day: "numeric", month: "short" });
+}

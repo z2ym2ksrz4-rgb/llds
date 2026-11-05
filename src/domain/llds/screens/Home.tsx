@@ -5,6 +5,8 @@ import { useAuth } from "@/core/auth";
 import { TeamPicker } from "../components/TeamPicker";
 import { SessionSheet } from "../components/SessionSheet";
 import { Toast } from "../components/Sheet";
+import { MessageBanner } from "../components/Messages";
+import { Feed } from "../components/Feed";
 import { addDays, dateLabel, hm, startOfDay } from "../lib/time";
 
 /** Home: "Din uge" for the hat you wear; trainers see their day; admin sees today's numbers. */
@@ -49,6 +51,8 @@ export function Home() {
         </div>
       )}
 
+      <MessageBanner toast={say} />
+
       {subWanted.length > 0 && isStaff && (
         <div className="card" style={{ borderColor: "var(--gold3)" }}>
           <div className="eyebrow">{t("home.subsWanted")}</div>
@@ -77,6 +81,8 @@ export function Home() {
         </div>
       )}
       {!teamIds.size && !isAdmin && <div className="card"><p className="muted">{t("team.noneYet")}</p></div>}
+
+      <div className="sec"><h2>{t("home.news")}</h2><Feed teamId={null} channels={["school"]} toast={say} limit={3} /></div>
 
       {open && <SessionSheet session={open} absences={absences} onClose={() => setOpen(null)} onChanged={() => void load()} toast={say} />}
       <Toast msg={toast} />

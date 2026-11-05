@@ -147,3 +147,61 @@ export interface Api {
   grantChildLogin(childId: string, email: string): Promise<void>;
   revokeChildLogin(childId: string): Promise<void>;
 }
+
+/* ---------------- phase 3: team rooms, messages, folders, video, notes ---------------- */
+export type Channel = "team" | "school" | "trainers";
+export type MediaRef = { path: string; kind: "image" | "video"; url?: string };
+
+export type Post = {
+  id: string; team_id: string | null; team_name: string | null; channel: Channel;
+  author_id: string; author_name: string; body: string; media: MediaRef[];
+  official: boolean; visibility: "private" | "public"; hidden: boolean; created_at: string; comment_count: number;
+};
+export type Comment = { id: string; post_id: string; author_id: string; author_name: string; body: string; hidden: boolean; created_at: string };
+export type Report = {
+  id: string; post_id: string | null; comment_id: string | null; reporter_name: string; reason: string | null;
+  excerpt: string; author_name: string; team_id: string | null; hidden: boolean; resolved_at: string | null; created_at: string;
+};
+export type Audience = { all?: boolean; teams?: string[] };
+export type Message = { id: string; author_name: string; title: string; body: string; audience: Audience; needs: "read" | "accept"; created_at: string; acted_at: string | null };
+export type MessageStatus = { person_id: string; name: string; acted_at: string | null };
+
+export type Folder = { id: string; team_id: string; name: string; staff_only: boolean; media_count: number; cover_path: string | null; cover_url?: string | null; created_at: string };
+export type MediaItem = { id: string; folder_id: string; uploader_id: string; uploader_name: string; storage_path: string; kind: "image" | "video"; url: string; created_at: string };
+export type Formation = { label: string; positions: { initials: string; x: number; y: number }[] };
+export type Video = { id: string; team_id: string; uploader_id: string; uploader_name: string; title: string; storage_path: string; url: string; duration_s: number | null; formations: Formation[]; created_at: string };
+export type Note = { id: string; team_id: string; dancer_id: string; dancer_name: string; author_id: string; author_name: string; body: string; created_at: string };
+
+export interface Api {
+  /* posts */
+  listPosts(channel: Channel, teamId?: string | null): Promise<Post[]>;
+  createPost(input: { team_id: string | null; channel: Channel; body: string; files: File[]; official?: boolean; visibility?: "private" | "public" }): Promise<void>;
+  updatePost(id: string, patch: { hidden?: boolean; official?: boolean; visibility?: "private" | "public"; body?: string }): Promise<void>;
+  deletePost(id: string): Promise<void>;
+  listComments(postId: string): Promise<Comment[]>;
+  addComment(postId: string, body: string): Promise<void>;
+  setCommentHidden(id: string, hidden: boolean): Promise<void>;
+  report(target: { post_id?: string; comment_id?: string }, reason: string | null): Promise<void>;
+  listReports(): Promise<Report[]>;
+  resolveReport(id: string, action: "hide" | "keep"): Promise<void>;
+  /* official messages */
+  listMessages(): Promise<Message[]>;
+  sendMessage(input: { title: string; body: string; audience: Audience; needs: "read" | "accept" }): Promise<void>;
+  ackMessage(id: string): Promise<void>;
+  messageStatus(id: string): Promise<MessageStatus[]>;
+  /* folders & media */
+  listFolders(teamId: string): Promise<Folder[]>;
+  createFolder(teamId: string, name: string, staffOnly: boolean): Promise<void>;
+  listMedia(folderId: string): Promise<MediaItem[]>;
+  uploadMedia(folderId: string, files: File[]): Promise<void>;
+  deleteMedia(id: string): Promise<void>;
+  /* choreography */
+  listVideos(teamId: string): Promise<Video[]>;
+  uploadVideo(teamId: string, title: string, file: File): Promise<void>;
+  updateVideo(id: string, patch: { title?: string; formations?: Formation[] }): Promise<void>;
+  deleteVideo(id: string): Promise<void>;
+  /* trainer notes */
+  listNotes(teamId: string, dancerId?: string): Promise<Note[]>;
+  addNote(teamId: string, dancerId: string, body: string): Promise<void>;
+  deleteNote(id: string): Promise<void>;
+}

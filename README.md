@@ -11,7 +11,7 @@ npm install
 npm run dev          # http://localhost:5173 – real Supabase (keys in app.config.json)
 npm run dev:mock     # in-memory mock (any 6-digit code; admin@demo = Line, parent@demo = parent)
 npm run typecheck
-npm run build:mock && npx vite preview --port 4173 && npm run smoke   # Playwright: phase 1 (signup→approve) + phase 2 (absence, booking, season, attendance, substitute)
+npm run build:mock && npx vite preview --port 4173 && npm run smoke   # Playwright: phase 1 (signup→approve) + phase 2 (absence, booking, season, attendance, substitute) + phase 3 (feed, messages, folders, reports, notes, formations)
 ```
 Set `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` (or `app.config.json → supabase`) to run against a real project.
 
