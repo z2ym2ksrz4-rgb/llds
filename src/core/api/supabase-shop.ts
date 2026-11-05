@@ -79,5 +79,6 @@ export function supabaseShop(sb: SupabaseClient, fail: Fail, schoolId: () => Pro
       let q = sb.from("notification").update({ read_at: new Date().toISOString() }).is("read_at", null); if (ids) q = q.in("id", ids);
       const { error } = await q; fail(error);
     },
+    async savePushToken(token: string, platform: "ios" | "android" | "web") { const pid = await myPersonId(); if (!pid) return; const { error } = await sb.from("push_token").upsert({ token, person_id: pid, platform, updated_at: new Date().toISOString() }); fail(error); },
   };
 }

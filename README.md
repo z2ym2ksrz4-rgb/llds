@@ -32,3 +32,13 @@ Codemagic workflows `ios-release` / `android-release` (see codemagic.yaml). `REL
 
 ## Website + hosted app (phase 5)
 `npm run site` regenerates `../ilumie-site/llds/` (public site, Danish, reads Supabase public views client-side) and copies the web build to `../ilumie-site/llds/app/` (PWA: manifest + sw.js). Commit and push `ilumie-site` → live at https://ilumie.com/llds/ and https://ilumie.com/llds/app/.
+
+## Native push (phase 6)
+- `supabase/migrations/0006_push.sql` (push_token + notification.pushed_at), client `src/core/push.ts` registers the device once approved.
+- Edge function `supabase/functions/push`: `npx supabase functions deploy push --project-ref pbpaojgrjtolxwbdymad`, then secrets
+  `npx supabase secrets set APNS_KEY_ID=… APNS_TEAM_ID=… APNS_P8=$(base64 -w0 AuthKey.p8) APNS_BUNDLE_ID=com.ilumie.llds FCM_SERVICE_ACCOUNT="$(cat firebase-sa.json)"`
+  and a schedule: `select cron.schedule('push','* * * * *', $$select net.http_post('https://pbpaojgrjtolxwbdymad.supabase.co/functions/v1/push', '{}'::jsonb, '{"Authorization":"Bearer <service-role>"}'::jsonb)$$);`
+- iOS needs the Push capability on the App ID (regenerate the profile), Android needs `google-services.json` (Codemagic secret `GOOGLE_SERVICES_JSON`, base64).
+
+## First admin
+After Line (or Steffen) has signed in once: `update person set status='approved', is_admin=true where email='<mail>';` in the SQL editor. If the person row does not exist yet (signed in but never registered), register in the app first, then run it.

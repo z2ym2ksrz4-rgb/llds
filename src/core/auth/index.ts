@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { api, type Me, type Role, type Team } from "@/core/api";
+import { registerPush } from "@/core/push";
 
 export type Phase = "loading" | "signedOut" | "register" | "pending" | "rejected" | "ready";
 
@@ -52,6 +53,7 @@ export const useAuth = create<Store>((set, get) => ({
       const teamsOf = me.memberships.filter((m) => m.person_id === viewing.personId).map((m) => m.team_id);
       if (!teamId || !teamsOf.includes(teamId)) teamId = teamsOf[0] ?? null;
       set({ phase, email, me, viewing, teamId, error: null });
+      if (phase === "ready") void registerPush();
     } catch (e) {
       set({ phase: "signedOut", error: (e as Error).message });
     }

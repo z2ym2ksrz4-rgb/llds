@@ -257,4 +257,5 @@ export interface Api {
   /* notifications */
   listNotifications(): Promise<Notification[]>;
   markNotificationsRead(ids?: string[]): Promise<void>;
+  savePushToken(token: string, platform: "ios" | "android" | "web"): Promise<void>;
 }
