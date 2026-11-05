@@ -7,7 +7,7 @@ const p = await (await b.newContext({ viewport: { width: 390, height: 844 } })).
 const errors = []; p.on("pageerror", e => errors.push(e.message)); p.on("console", m => { if (m.type() === "error" && !m.text().includes("Failed to load resource")) errors.push(m.text()); });
 const out = {}; const shot = (n) => p.screenshot({ path: `smoke3-${n}.png` });
 const login = async (email) => { await p.waitForSelector("#email"); await p.fill("#email", email); await p.click("form button.cta"); await p.fill("#code", "123456"); await p.click("form button.cta"); await p.waitForSelector("nav.tabbar"); };
-const logout = async () => { await p.click("nav.tabbar >> text=Indstillinger"); await p.click("text=Log ud"); };
+const logout = async () => { await p.click("nav.tabbar >> text=Mere"); await p.click("[data-testid=more-settings]"); await p.click("text=Log ud"); };
 // a tiny JPEG for uploads
 const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFklEQVQImWP4z8DwHwyBNAMDA5gBAFJ9BfG8w3ZpAAAAAElFTkSuQmCC", "base64"); writeFileSync("/tmp/claude-0/-home-claude/3044d1cf-5408-513b-86aa-778c465d4d10/scratchpad/t.png", png);
 const IMG = "/tmp/claude-0/-home-claude/3044d1cf-5408-513b-86aa-778c465d4d10/scratchpad/t.png";

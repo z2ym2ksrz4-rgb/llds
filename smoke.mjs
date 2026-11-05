@@ -40,7 +40,7 @@ await p.waitForSelector("text=Test er godkendt");
 out.approved = true;
 
 // 3. sign in as the new user → team picker shows both hats
-await p.click("nav.tabbar >> text=Indstillinger"); await p.click("text=Log ud"); await p.waitForSelector("#email");
+await p.click("nav.tabbar >> text=Mere"); await p.click("[data-testid=more-settings]"); await p.click("text=Log ud"); await p.waitForSelector("#email");
 await p.fill("#email", "ny@demo"); await p.click("form button.cta"); await p.fill("#code", "111111"); await p.click("form button.cta");
 try { await p.waitForSelector(".teampick", { timeout: 8000 }); } catch (e) { await shot("fail"); console.log("MAIN:", await p.evaluate(() => document.querySelector("main")?.innerText.slice(0, 400)), "STATE:", await p.evaluate(() => { const s = JSON.parse(localStorage.getItem("llds_mock") || "{}"); return JSON.stringify({ email: s.email, persons: (s.persons || []).map(x => [x.first_name, x.email, x.status]) }); })); throw e; }
 out.firstTeam = await p.textContent(".teampick strong");
