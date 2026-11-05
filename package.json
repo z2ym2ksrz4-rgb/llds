@@ -18,7 +18,8 @@
     "smoke": "node smoke.mjs && node smoke2.mjs && node smoke3.mjs && node smoke4.mjs",
     "build:mock": "VITE_MOCK=1 vite build",
     "dev:mock": "VITE_MOCK=1 vite",
-    "build:web": "RELEASE=1 vite build --base=/llds/app/"
+    "build:web": "RELEASE=1 vite build --base=/llds/app/",
+    "site": "python3 scripts/site-gen.py ../ilumie-site/llds && npm run build:web && rm -rf ../ilumie-site/llds/app && cp -r dist ../ilumie-site/llds/app"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.0",

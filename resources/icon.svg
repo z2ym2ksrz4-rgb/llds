@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f3dc9a"/><stop offset=".35" stop-color="#c9a24a"/><stop offset=".55" stop-color="#8c6c25"/><stop offset=".8" stop-color="#e6c87a"/><stop offset="1" stop-color="#a8832f"/></linearGradient>
+    <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff3c4"/><stop offset=".5" stop-color="#e6c87a"/><stop offset="1" stop-color="#b48a35"/></linearGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/></linearGradient>
+    <radialGradient id="bg" cx="50%" cy="20%" r="80%"><stop offset="0" stop-color="#1c1710"/><stop offset="1" stop-color="#0a0a0b"/></radialGradient>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <g fill="url(#g2)" transform="translate(512 150) scale(3.2) translate(-120 -6)">
+    <path d="M120 6l3.6 7.6 8.3 1.1-6.1 5.7 1.6 8.2-7.4-4.1-7.4 4.1 1.6-8.2-6.1-5.7 8.3-1.1z"/>
+    <path d="M93 12l3 6.1 6.7.9-4.9 4.6 1.3 6.6-6.1-3.3-6.1 3.3 1.3-6.6-4.9-4.6 6.7-.9z"/>
+    <path d="M147 12l3 6.1 6.7.9-4.9 4.6 1.3 6.6-6.1-3.3-6.1 3.3 1.3-6.6-4.9-4.6 6.7-.9z"/>
+    <path d="M69 24l2.5 5 5.5.8-4 3.8 1 5.4-5-2.7-5 2.7 1-5.4-4-3.8 5.5-.8z"/>
+    <path d="M171 24l2.5 5 5.5.8-4 3.8 1 5.4-5-2.7-5 2.7 1-5.4-4-3.8 5.5-.8z"/>
+  </g>
+  <circle cx="512" cy="560" r="300" fill="url(#g1)"/><circle cx="512" cy="560" r="300" fill="url(#sheen)"/>
+  <circle cx="512" cy="560" r="282" fill="none" stroke="#fff3c4" stroke-opacity=".35" stroke-width="4"/>
+  <g font-family="Cormorant Garamond,Georgia,serif" font-weight="600" font-size="340" fill="#0c0b0a">
+    <g transform="matrix(-1 0 0 1 1024 0)"><text x="530" y="676">L</text></g>
+    <text x="530" y="676">L</text>
+  </g>
+  <rect x="507" y="400" width="10" height="320" fill="#0c0b0a"/>
+</svg>

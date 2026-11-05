@@ -202,7 +202,11 @@
     "cardTypes": "Kort-typer",
     "days": "dage",
     "validDays": "Gyldig (dage)",
-    "phase4note": "Fase 4: events, shop, klippekort, milepæle og notifikationer i appen. Offentligt website kommer i fase 5."
+    "phase4note": "Fase 4: events, shop, klippekort, milepæle og notifikationer i appen. Offentligt website kommer i fase 5.",
+    "teamPublic": "Vis på website",
+    "teamPublicHint": "Holdet står på lldancestudio-sitet med stil, niveau og træningstid (aldrig navne eller billeder)",
+    "teamDescription": "Beskrivelse til website",
+    "teamDescriptionPh": "Hvem er holdet for, hvad danser I, og hvordan kommer man med?"
   },
   "settings": {
     "language": "Sprog",

@@ -31,6 +31,8 @@ export type Team = {
   punch_card_open: boolean;
   color: string | null;
   sort: number;
+  visibility?: "public" | "private";
+  description?: string | null;
 };
 
 export type Membership = { person_id: string; team_id: string; role: Role };
@@ -114,7 +116,7 @@ export type Absence = { id: string; session_id: string; person_id: string; reaso
 
 export type RosterEntry = { person_id: string; name: string; birth_year: number | null; role: Role; present: boolean | null; absence: Absence | null; via_punch: boolean };
 
-export type TeamInput = Partial<Pick<Team, "name" | "style" | "category" | "level" | "closed" | "parents_see_video" | "punch_card_open" | "color">> & { max_dancers?: number | null; visibility?: "public" | "private"; archived?: boolean };
+export type TeamInput = Partial<Pick<Team, "name" | "style" | "category" | "level" | "closed" | "parents_see_video" | "punch_card_open" | "color" | "description">> & { max_dancers?: number | null; visibility?: "public" | "private"; archived?: boolean };
 
 export type Member = Person & { memberships: Membership[]; children: Person[]; parents: Person[] };
 

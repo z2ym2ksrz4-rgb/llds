@@ -13,3 +13,8 @@ async function boot() {
   ReactDOM.createRoot(document.getElementById("root")!).render(<React.StrictMode><App /></React.StrictMode>);
 }
 void boot();
+
+// PWA: only on the hosted web build (not in the native shell, not in dev)
+if (import.meta.env.PROD && "serviceWorker" in navigator && !/capacitor/i.test(location.protocol) && location.hostname !== "localhost") {
+  window.addEventListener("load", () => { navigator.serviceWorker.register("./sw.js").catch(() => { /* ignore */ }); });
+}

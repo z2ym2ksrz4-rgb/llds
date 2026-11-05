@@ -202,7 +202,11 @@
     "cardTypes": "Card types",
     "days": "days",
     "validDays": "Valid (days)",
-    "phase4note": "Phase 4: events, shop, punch cards, milestones and in-app notifications. Public website comes in phase 5."
+    "phase4note": "Phase 4: events, shop, punch cards, milestones and in-app notifications. Public website comes in phase 5.",
+    "teamPublic": "Show on website",
+    "teamPublicHint": "The team is listed on the website with style, level and training time (never names or photos)",
+    "teamDescription": "Website description",
+    "teamDescriptionPh": "Who is the team for, what do you dance, how to join?"
   },
   "settings": {
     "language": "Language",

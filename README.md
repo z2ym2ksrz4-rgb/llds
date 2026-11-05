@@ -29,3 +29,6 @@ First admin: after Line's first sign-in, `update person set status='approved', i
 
 ## Release
 Codemagic workflows `ios-release` / `android-release` (see codemagic.yaml). `RELEASE=1` strips the dev menu. Web: `npm run build:web` → `ilumie-site/llds/app/`.
+
+## Website + hosted app (phase 5)
+`npm run site` regenerates `../ilumie-site/llds/` (public site, Danish, reads Supabase public views client-side) and copies the web build to `../ilumie-site/llds/app/` (PWA: manifest + sw.js). Commit and push `ilumie-site` → live at https://ilumie.com/llds/ and https://ilumie.com/llds/app/.
