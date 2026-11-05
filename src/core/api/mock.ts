@@ -1,4 +1,5 @@
 import type { Api, Me, Membership, PendingPerson, Person, Role, SignUpInput, Team } from "./types";
+import { scheduleOps, seedSchedule, type SchedState } from "./mock-schedule";
 
 /**
  * In-memory stand-in for Supabase. Used when app.config.json has no supabase.url (dev, smoke tests, web demo).
@@ -6,7 +7,7 @@ import type { Api, Me, Membership, PendingPerson, Person, Role, SignUpInput, Tea
  * The special address admin@demo signs in as Line (approved admin).
  */
 const KEY = "llds_mock";
-type State = { email: string | null; persons: Person[]; guardians: { parent_id: string; child_id: string }[]; memberships: Membership[] };
+type State = { email: string | null; persons: Person[]; guardians: { parent_id: string; child_id: string }[]; memberships: Membership[]; teams: Team[]; S: SchedState };
 
 const SCHOOL = "school-llds";
 const TEAMS: Team[] = [
@@ -35,20 +36,25 @@ const id = () => Math.random().toString(36).slice(2, 10);
 const now = () => new Date().toISOString();
 
 function load(): State {
-  try { const s = localStorage.getItem(KEY); if (s) return JSON.parse(s) as State; } catch { /* ignore */ }
-  const line: Person = { id: "p-line", school_id: SCHOOL, user_id: "u-line", first_name: "Line", last_name: "Lund Olesen", email: "admin@demo", phone: "+45 22 44 01 55", birth_year: 1990, status: "approved", is_admin: true, photo_consent: true, wished_roles: ["trainer"], wished_teams: null, created_at: now() };
+  try { const s = localStorage.getItem(KEY); if (s) { const st = JSON.parse(s) as State; if (st.S && st.teams) return st; } } catch { /* ignore */ }
+  const line: Person = { id: "p-line", school_id: SCHOOL, user_id: "u-line", first_name: "Line", last_name: "Lund Olesen", email: "admin@demo", phone: "+45 22 44 01 55", birth_year: 1990, status: "approved", is_admin: true, photo_consent: true, wished_roles: ["trainer"], wished_teams: null, supervised_by: null, created_at: now() };
   const maja: Person = { ...line, id: "p-maja", user_id: "u-maja", first_name: "Maja", last_name: "Kristensen", email: "maja@demo", is_admin: false, wished_roles: ["trainer"] };
+  const sofie: Person = { ...line, id: "p-sofie", user_id: "u-sofie", first_name: "Sofie", last_name: "Dahl", email: "sofie@demo", is_admin: false };
   const st: Person = { ...line, id: "p-st", user_id: "u-st", first_name: "Steffen", last_name: "Therkildsen", email: "parent@demo", is_admin: false, wished_roles: ["parent"] };
   const freja: Person = { ...line, id: "p-freja", user_id: null, first_name: "Freja", last_name: "Therkildsen", email: null, is_admin: false, birth_year: 2013, wished_roles: ["dancer"] };
   const pendingParent: Person = { ...line, id: "p-karin", user_id: "u-karin", first_name: "Karin", last_name: "Nielsen", email: "karin@demo", status: "pending", is_admin: false, wished_roles: ["parent"], wished_teams: "The AXIS (Alma)" };
   const pendingChild: Person = { ...freja, id: "p-alma", first_name: "Alma", last_name: "Nielsen", birth_year: 2012, status: "pending" };
   return {
     email: null,
-    persons: [line, maja, st, freja, pendingParent, pendingChild],
+    persons: [line, maja, sofie, st, freja, pendingParent, pendingChild],
+    teams: TEAMS,
+    S: seedSchedule(TEAMS, [line, maja, sofie]),
     guardians: [{ parent_id: "p-st", child_id: "p-freja" }, { parent_id: "p-karin", child_id: "p-alma" }],
     memberships: [
       { person_id: "p-freja", team_id: "team-0", role: "dancer" }, { person_id: "p-freja", team_id: "team-14", role: "dancer" },
       { person_id: "p-maja", team_id: "team-12", role: "trainer" }, { person_id: "p-maja", team_id: "team-15", role: "trainer" }, { person_id: "p-maja", team_id: "team-14", role: "dancer" },
+      { person_id: "p-sofie", team_id: "team-8", role: "trainer" }, { person_id: "p-sofie", team_id: "team-11", role: "trainer" }, { person_id: "p-line", team_id: "team-0", role: "trainer" }, { person_id: "p-line", team_id: "team-1", role: "trainer" },
+      { person_id: "p-alma", team_id: "team-0", role: "dancer" }, { person_id: "p-karin", team_id: "team-0", role: "dancer" },
     ],
   };
 }
@@ -58,7 +64,10 @@ const listeners = new Set<() => void>();
 const emit = () => listeners.forEach((l) => l());
 const meRow = () => S.persons.find((p) => p.email === S.email && p.user_id) ?? null;
 
+const sched = scheduleOps(() => ({ get S() { return S.S; }, get persons() { return S.persons; }, get memberships() { return S.memberships; }, set memberships(v) { S.memberships = v; }, get guardians() { return S.guardians; }, get teams() { return S.teams; }, me: meRow, save, emit }));
+
 export const mockApi: Api = {
+  ...sched,
   async sessionEmail() { return S.email; },
   async sendCode(email) { if (!email.includes("@")) throw new Error("Ugyldig e-mail"); },
   async verifyCode(email, code) {
@@ -76,16 +85,16 @@ export const mockApi: Api = {
     const children = S.persons.filter((p) => childIds.includes(p.id));
     const ids = [person.id, ...childIds];
     const memberships = S.memberships.filter((m) => ids.includes(m.person_id));
-    return { person, children, memberships, teams: person.status === "approved" ? TEAMS : [] };
+    return { person, children, memberships, teams: person.status === "approved" ? S.teams : [] };
   },
   async signUp(i: SignUpInput) {
     if (!S.email) throw new Error("not signed in");
     if (meRow()) throw new Error("already registered");
     const pid = "p-" + id();
-    S.persons.push({ id: pid, school_id: SCHOOL, user_id: "u-" + id(), first_name: i.firstName, last_name: i.lastName, email: S.email, phone: i.phone, birth_year: i.birthYear, status: "pending", is_admin: false, photo_consent: null, wished_roles: i.roles, wished_teams: i.wishedTeams, created_at: now() });
+    S.persons.push({ id: pid, school_id: SCHOOL, user_id: "u-" + id(), first_name: i.firstName, last_name: i.lastName, email: S.email, phone: i.phone, birth_year: i.birthYear, status: "pending", is_admin: false, photo_consent: null, wished_roles: i.roles, wished_teams: i.wishedTeams, supervised_by: null, created_at: now() });
     for (const c of i.children) {
       const cid = "p-" + id();
-      S.persons.push({ id: cid, school_id: SCHOOL, user_id: null, first_name: c.firstName, last_name: i.lastName, email: null, phone: null, birth_year: c.birthYear, status: "pending", is_admin: false, photo_consent: null, wished_roles: ["dancer"], wished_teams: null, created_at: now() });
+      S.persons.push({ id: cid, school_id: SCHOOL, user_id: null, first_name: c.firstName, last_name: i.lastName, email: null, phone: null, birth_year: c.birthYear, status: "pending", is_admin: false, photo_consent: null, wished_roles: ["dancer"], wished_teams: null, supervised_by: null, created_at: now() });
       S.guardians.push({ parent_id: pid, child_id: cid });
     }
     save(); emit();
@@ -96,7 +105,7 @@ export const mockApi: Api = {
       ...p, children: S.persons.filter((c) => S.guardians.some((g) => g.parent_id === p.id && g.child_id === c.id)),
     }));
   },
-  async listTeams() { return TEAMS; },
+  async listTeams() { return S.teams; },
   async approve(personId, memberships: { team_id: string; role: Role }[], isAdmin = false) {
     const p = S.persons.find((x) => x.id === personId); if (!p) return;
     p.status = "approved"; p.is_admin = isAdmin;

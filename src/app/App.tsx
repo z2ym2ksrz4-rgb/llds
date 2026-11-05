@@ -2,16 +2,18 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/core/auth";
 import { isRelease } from "@/core/release";
-import { Home, Login, Register, Pending, AdminUsers } from "@/domain";
+import { Home, Login, Register, Pending, Rooms, TeamScreen, Admin } from "@/domain";
 import { SettingsScreen } from "./SettingsScreen";
 import { TestMenu } from "./TestMenu";
 
-type Tab = "home" | "admin" | "settings";
+type Tab = "home" | "rooms" | "team" | "admin" | "settings";
 
 export default function App() {
   const { t } = useTranslation();
   const phase = useAuth((s) => s.phase);
-  const isAdmin = useAuth((s) => s.isAdmin)();
+  const me = useAuth((s) => s.me);
+  const isAdmin = !!me?.person.is_admin;
+  const hasTeams = !!me && me.memberships.length > 0;
   const [tab, setTab] = useState<Tab>("home");
   useEffect(() => { if (phase !== "ready") setTab("home"); }, [phase]); // every sign-in starts on Home
 
@@ -21,9 +23,9 @@ export default function App() {
   else if (phase === "register") body = <Register />;
   else if (phase === "pending") body = <Pending />;
   else if (phase === "rejected") body = <Pending rejected />;
-  else body = tab === "home" ? <Home /> : tab === "admin" && isAdmin ? <AdminUsers /> : <SettingsScreen />;
+  else body = tab === "home" ? <Home /> : tab === "rooms" ? <Rooms /> : tab === "team" ? <TeamScreen /> : tab === "admin" && isAdmin ? <Admin /> : <SettingsScreen />;
 
-  const tabs: [Tab, string][] = [["home", t("nav.home")], ...(isAdmin ? [["admin", t("nav.admin")] as [Tab, string]] : []), ["settings", t("nav.settings")]];
+  const tabs: [Tab, string][] = [["home", t("nav.home")], ["rooms", t("nav.rooms")], ...(hasTeams ? [["team", t("nav.team")] as [Tab, string]] : []), ...(isAdmin ? [["admin", t("nav.admin")] as [Tab, string]] : []), ["settings", t("nav.settings")]];
   return (
     <div className="app">
       <main>{body}</main>

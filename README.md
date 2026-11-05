@@ -10,7 +10,7 @@ Spec (living): Claude Docs "LL Dance Studio – produktspec v1".
 npm install
 npm run dev          # http://localhost:5173 – runs on the in-memory mock (any 6-digit code; admin@demo = Line)
 npm run typecheck
-npm run build && npx vite preview --port 4173 && npm run smoke   # Playwright: signup → pending → approve → team picker
+npm run build && npx vite preview --port 4173 && npm run smoke   # Playwright: phase 1 (signup→approve) + phase 2 (absence, booking, season, attendance, substitute)
 ```
 Set `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` (or `app.config.json → supabase`) to run against a real project.
 
@@ -21,7 +21,7 @@ First admin: after Line's first sign-in, `update person set status='approved', i
 
 ## Phases
 1. ✅ Auth (e-mail code), self-registration with children, admin approval + team/role assignment, team picker with parent/child hats.
-2. Teams, season planner, sessions, room booking, absence, attendance, substitute hand-over.
+2. ✅ Rooms calendar + booking (approval), weekly trainings (season generator, clash check, edit this/future), absence (dancer/parent), attendance, substitute request/take + lesson-plan hand-over, Admin → Members/Teams/Season/Bookings, supervised child login (10–12).
 3. Social (team rooms, trainer channel, moderation), official messages, folders/video.
 4. Events, punch cards, shop (MobilePay QR), milestones, push.
 5. Public website + `/app/` PWA on ilumie.com/llds/.

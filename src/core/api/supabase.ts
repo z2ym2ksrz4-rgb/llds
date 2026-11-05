@@ -1,14 +1,18 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import appConfig from "../../../app.config.json";
 import type { Api, Membership, PendingPerson, Person, Role, Team } from "./types";
+import { supabaseSchedule } from "./supabase-schedule";
 
 /** Real backend. Row Level Security in supabase/migrations/0001_schema.sql decides what each user may read. */
 export function supabaseApi(url: string, anonKey: string): Api {
   const sb: SupabaseClient = createClient(url, anonKey, { auth: { persistSession: true, autoRefreshToken: true } });
   const schoolSlug = appConfig.schoolSlug;
   const fail = (e: { message: string } | null) => { if (e) throw new Error(e.message); };
+  const myPersonId = async () => { const { data } = await sb.rpc("my_person_id"); return (data as string | null) ?? null; };
+  const schoolId = async () => { const { data } = await sb.rpc("my_school_id"); return data as string; };
 
   return {
+    ...supabaseSchedule(sb, fail, schoolId, myPersonId),
     async sessionEmail() {
       const { data } = await sb.auth.getSession();
       return data.session?.user.email ?? null;
@@ -30,8 +34,11 @@ export function supabaseApi(url: string, anonKey: string): Api {
     async getMe() {
       const { data: u } = await sb.auth.getUser();
       if (!u.user) return null;
-      const { data: person, error } = await sb.from("person").select("*").eq("user_id", u.user.id).maybeSingle();
-      fail(error);
+      let { data: person } = await sb.from("person").select("*").eq("user_id", u.user.id).maybeSingle();
+      if (!person) { // a parent may have pre-created this person (supervised child) with this e-mail
+        const { data: claimed } = await sb.rpc("claim_person");
+        if (claimed) ({ data: person } = await sb.from("person").select("*").eq("id", claimed).maybeSingle());
+      }
       if (!person) return null;
       const { data: g } = await sb.from("guardian").select("child_id").eq("parent_id", person.id);
       const childIds = (g ?? []).map((r) => r.child_id as string);
