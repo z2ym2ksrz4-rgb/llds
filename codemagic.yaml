@@ -1,0 +1,106 @@
+# Codemagic: one file, two workflows. Clone per app; only app.config.json and env vars change.
+# Required Codemagic env groups (Team settings -> Environment variables):
+#   iOS signing: App Store Connect API key via the account integration "Codemagic Flytteklar" and the stored
+#                distribution certificate (Code signing identities); both are per Apple team, shared by all apps.
+#   google_play : GCLOUD_SERVICE_ACCOUNT_CREDENTIALS (keystore comes from android_signing, not this group)
+workflows:
+  ios-release:
+    name: iOS release (TestFlight)
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: Codemagic Flytteklar
+    environment:
+      ios_signing:
+        provisioning_profiles: [template_app_store]       # <- change per app (Code signing identities reference)
+        certificates: [flytteklar_distribution]           # team distribution cert, shared by all apps
+      vars:
+        RELEASE: "1"
+        BUNDLE_ID: com.ilumie.llds   # <- change per app, must match app.config.json appId
+        XCODE_WORKSPACE: ios/App/App.xcworkspace
+        XCODE_SCHEME: App
+      node: 22
+      xcode: latest
+      cocoapods: default
+    triggering:
+      events: [tag]
+      branch_patterns: [{ pattern: "main" }]
+      tag_patterns: [{ pattern: "ios-v*" }]
+    scripts:
+      - name: Install
+        script: npm ci
+      - name: Build web + sync
+        script: |
+          RELEASE=1 npm run build
+          [ -d ios ] || npx cap add ios
+          bash scripts/ios-postadd.sh
+          npx @capacitor/assets generate --ios --iconBackgroundColor '#4A6B57' --iconBackgroundColorDark '#3E5C4B' --splashBackgroundColor '#F6F1E7' --splashBackgroundColorDark '#2F3F36'
+          npx cap sync ios
+      - name: Set version & build number
+        script: |
+          # Apple marketing version: "1.0.0" -> "1.0" (App Store version strings use two components)
+          VERSION=$(node -p "require('./package.json').version.replace(/\.0$/, '')")
+          LATEST=$(app-store-connect get-latest-build-number "$BUNDLE_ID" 2>/dev/null | tr -dc '0-9' || true)
+          LATEST=${LATEST:-0}
+          BUILD=$(( LATEST + 1 > PROJECT_BUILD_NUMBER + 10 ? LATEST + 1 : PROJECT_BUILD_NUMBER + 10 ))
+          cd ios/App && agvtool new-marketing-version "$VERSION" && agvtool new-version -all "$BUILD"
+      - name: Signing
+        script: xcode-project use-profiles
+      - name: Archive
+        script: xcode-project build-ipa --workspace "$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
+    artifacts: [build/ios/ipa/*.ipa, /tmp/xcodebuild_logs/*.log]
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+
+  android-release:
+    name: Android release (Play internal)
+    max_build_duration: 60
+    instance_type: mac_mini_m2   # linux_x2 not available on current Codemagic plan
+    environment:
+      groups: [google_play]
+      android_signing: [<slug>_upload]   # keystore uploaded under Code signing identities -> Android keystores
+      vars:
+        RELEASE: "1"
+        PACKAGE_NAME: com.ilumie.llds  # <- change per app
+      node: 22
+      java: 21   # Capacitor 7 Android requires JDK 21
+    triggering:
+      events: [tag]
+      branch_patterns: [{ pattern: "main" }]
+      tag_patterns: [{ pattern: "android-v*" }]
+    scripts:
+      - name: Install
+        script: npm ci
+      - name: Build web + sync
+        script: |
+          RELEASE=1 npm run build
+          [ -d android ] || npx cap add android
+          bash scripts/android-postadd.sh
+          npx @capacitor/assets generate --android --iconBackgroundColor '#4A6B57' --iconBackgroundColorDark '#3E5C4B' --splashBackgroundColor '#F6F1E7' --splashBackgroundColorDark '#2F3F36'
+          npx cap sync android
+      - name: Keystore
+        script: |
+          # CM_KEYSTORE_PATH / CM_KEYSTORE_PASSWORD / CM_KEY_ALIAS / CM_KEY_PASSWORD come from android_signing above
+          cat > android/key.properties <<EOT
+          storePassword=$CM_KEYSTORE_PASSWORD
+          keyPassword=$CM_KEY_PASSWORD
+          keyAlias=$CM_KEY_ALIAS
+          storeFile=$CM_KEYSTORE_PATH
+          EOT
+      - name: Build AAB
+        script: |
+          VERSION=$(node -p "require('./package.json').version")
+          LATEST=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --tracks alpha,internal 2>/dev/null | tr -dc '0-9' || true)
+          BUILD_NUMBER=$(( ${LATEST:-0} + 1 ))
+          # never reuse a versionCode Play has already seen (bundles can exist without a release): floor at Codemagic's own counter
+          [ "${PROJECT_BUILD_NUMBER:-0}" -gt "$BUILD_NUMBER" ] && BUILD_NUMBER=$PROJECT_BUILD_NUMBER
+          echo "versionCode=$BUILD_NUMBER versionName=$VERSION"
+          cd android && ./gradlew bundleRelease -PversionCode=$BUILD_NUMBER -PversionName=$VERSION
+    artifacts: [android/app/build/outputs/**/*.aab]
+    publishing:
+      google_play:
+        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+        track: alpha   # closed testing: triggers Google's pre-launch report on every build
+

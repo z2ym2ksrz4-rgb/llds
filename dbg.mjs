@@ -1,0 +1,11 @@
+import { chromium } from "playwright";
+const b = await chromium.launch({ executablePath: "/opt/pw-browsers/chromium" });
+const p = await b.newPage({ viewport: { width: 390, height: 844 } });
+const errors=[]; p.on("pageerror", e=>errors.push(e.message)); p.on("console", m=>{ if(m.type()==="error") errors.push(m.text()); });
+await p.goto("http://localhost:4173/", { waitUntil: "networkidle" });
+const st = await p.evaluate(() => localStorage.getItem("llds_mock"));
+const s = JSON.parse(st||"{}"); console.log("email", s.email, "persons", (s.persons||[]).map(x=>[x.first_name,x.email,x.status]));
+await p.waitForTimeout(500);
+console.log(await p.evaluate(()=>document.querySelector("main")?.innerText.slice(0,300)));
+console.log(errors);
+await b.close();

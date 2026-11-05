@@ -1,0 +1,12 @@
+node_modules
+dist
+dist-tsc
+ios/App/Pods
+ios/App/App.xcworkspace/xcuserdata
+android/.gradle
+android/app/build
+android/local.properties
+*.keystore
+.env*
+.DS_Store
+

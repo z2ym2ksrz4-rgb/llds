@@ -1,0 +1,103 @@
+{
+  "nav": {
+    "home": "Hjem",
+    "admin": "Admin",
+    "settings": "Indstillinger"
+  },
+  "common": {
+    "loading": "Indlæser…",
+    "signOut": "Log ud",
+    "remove": "Fjern",
+    "save": "Gem",
+    "cancel": "Annuller"
+  },
+  "lang": {
+    "da": "Dansk",
+    "en": "English"
+  },
+  "roles": {
+    "parent": "Forælder",
+    "dancer": "Danser",
+    "trainer": "Træner",
+    "assistant": "Hjælpetræner",
+    "admin": "Admin"
+  },
+  "login": {
+    "welcome": "Velkommen",
+    "backstage": "backstage.",
+    "tagline": "Hold, sale, koreografi og konkurrencer – ét sted for hele danseskolen.",
+    "email": "E-mail",
+    "sendCode": "Send kode",
+    "noAccount": "Første gang? Brug din e-mail – du opretter din profil bagefter.",
+    "codeSent": "Vi har sendt en engangskode til {{email}}. Tjek også spam.",
+    "code": "Kode fra e-mailen",
+    "verify": "Log ind",
+    "resend": "Send koden igen",
+    "otherEmail": "Brug en anden e-mail",
+    "demoHint": "Demo: enhver 6-cifret kode virker. admin@demo = Line, parent@demo = forælder, maja@demo = træner, ny adresse = opret profil."
+  },
+  "register": {
+    "title": "Opret profil",
+    "intro": "Fortæl os, hvem du er. Line godkender din profil og sætter dig på de rigtige hold.",
+    "iAm": "Jeg er",
+    "rolesHint": "Du kan vælge flere – fx forælder og træner.",
+    "firstName": "Fornavn",
+    "lastName": "Efternavn",
+    "phone": "Telefon",
+    "email": "E-mail",
+    "birthYear": "Fødselsår",
+    "tooYoung": "Dansere under {{age}} år får ikke egen konto – en forælder opretter sig og tilføjer barnet.",
+    "children": "Mine børn på danseskolen",
+    "childName": "Barnets fornavn",
+    "addChild": "Tilføj barn",
+    "childHint": "Børn under {{age}} år får ingen egen login – du ser og svarer på deres vegne.",
+    "wishedTeams": "Hold (hjælp til Line)",
+    "wishedTeamsPh": "Fx The AXIS, Hip Hop Mini…",
+    "terms": "Ved at oprette dig accepterer du",
+    "submit": "Send til godkendelse"
+  },
+  "pending": {
+    "title": "Tak, {{name}}",
+    "body": "Din profil er sendt til Line. Du får besked, så snart den er godkendt – typisk inden for en dag.",
+    "step1": "Line ser din anmodning",
+    "step2": "Du sættes på dine hold med den rigtige rolle",
+    "step3": "Appen åbner automatisk, når du er godkendt",
+    "refresh": "Tjek igen",
+    "rejectedTitle": "Profilen blev ikke godkendt",
+    "rejectedBody": "Kontakt LL Dance Studio, hvis du mener det er en fejl."
+  },
+  "team": {
+    "myTeam": "Mit hold",
+    "childsTeam": "{{name}}s hold",
+    "none": "Intet hold endnu",
+    "noneYet": "Line har ikke sat dig på et hold endnu.",
+    "viewAs": "Vis som",
+    "pick": "Vælg hold"
+  },
+  "home": {
+    "hi": "Hej {{name}}",
+    "youAre": "Din rolle på holdet",
+    "noRole": "Ingen rolle på dette hold",
+    "onBehalf": "på vegne af {{name}}",
+    "phase1": "Fase 1: login, profil og godkendelse. Skema, feed og events kommer i næste fase."
+  },
+  "admin": {
+    "users": "Brugere",
+    "usersIntro": "Nye profiler venter på din godkendelse. Sæt hver person på hold med en rolle, og tryk Godkend.",
+    "noPending": "Ingen afventer godkendelse.",
+    "pending": "Afventer",
+    "wished": "Ønsker",
+    "adult": "{{name}} (voksen)",
+    "child": "{{name}} (barn, {{year}})",
+    "parentOnly": "Forælder uden egen danserrolle – vælg kun hold for børnene.",
+    "makeAdmin": "Gør til admin (fuld adgang til hele skolen)",
+    "approve": "Godkend",
+    "reject": "Afvis",
+    "approved": "{{name}} er godkendt og har fået besked."
+  },
+  "settings": {
+    "language": "Sprog",
+    "privacy": "Privatliv",
+    "terms": "Vilkår"
+  }
+}

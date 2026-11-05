@@ -1,0 +1,103 @@
+{
+  "nav": {
+    "home": "Home",
+    "admin": "Admin",
+    "settings": "Settings"
+  },
+  "common": {
+    "loading": "Loading…",
+    "signOut": "Sign out",
+    "remove": "Remove",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "lang": {
+    "da": "Dansk",
+    "en": "English"
+  },
+  "roles": {
+    "parent": "Parent",
+    "dancer": "Dancer",
+    "trainer": "Trainer",
+    "assistant": "Assistant trainer",
+    "admin": "Admin"
+  },
+  "login": {
+    "welcome": "Welcome",
+    "backstage": "backstage.",
+    "tagline": "Teams, rooms, choreography and competitions – one place for the whole school.",
+    "email": "E-mail",
+    "sendCode": "Send code",
+    "noAccount": "First time? Use your e-mail – you create your profile afterwards.",
+    "codeSent": "We sent a one-time code to {{email}}. Check spam too.",
+    "code": "Code from the e-mail",
+    "verify": "Sign in",
+    "resend": "Resend code",
+    "otherEmail": "Use another e-mail",
+    "demoHint": "Demo: any 6-digit code works. admin@demo = Line, parent@demo = parent, maja@demo = trainer, new address = create profile."
+  },
+  "register": {
+    "title": "Create profile",
+    "intro": "Tell us who you are. Line approves your profile and places you on the right teams.",
+    "iAm": "I am",
+    "rolesHint": "Pick several if needed – e.g. parent and trainer.",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "phone": "Phone",
+    "email": "E-mail",
+    "birthYear": "Year of birth",
+    "tooYoung": "Dancers under {{age}} don't get their own account – a parent signs up and adds the child.",
+    "children": "My children at the school",
+    "childName": "Child's first name",
+    "addChild": "Add child",
+    "childHint": "Children under {{age}} get no login – you see and reply on their behalf.",
+    "wishedTeams": "Teams (helps Line)",
+    "wishedTeamsPh": "E.g. The AXIS, Hip Hop Mini…",
+    "terms": "By signing up you accept the",
+    "submit": "Send for approval"
+  },
+  "pending": {
+    "title": "Thanks, {{name}}",
+    "body": "Your profile has been sent to Line. You'll be notified as soon as it's approved – usually within a day.",
+    "step1": "Line sees your request",
+    "step2": "You're placed on your teams with the right role",
+    "step3": "The app opens automatically once approved",
+    "refresh": "Check again",
+    "rejectedTitle": "Profile not approved",
+    "rejectedBody": "Contact LL Dance Studio if you think this is a mistake."
+  },
+  "team": {
+    "myTeam": "My team",
+    "childsTeam": "{{name}}'s team",
+    "none": "No team yet",
+    "noneYet": "Line hasn't placed you on a team yet.",
+    "viewAs": "View as",
+    "pick": "Choose team"
+  },
+  "home": {
+    "hi": "Hi {{name}}",
+    "youAre": "Your role on the team",
+    "noRole": "No role on this team",
+    "onBehalf": "on behalf of {{name}}",
+    "phase1": "Phase 1: sign-in, profile and approval. Schedule, feed and events come next."
+  },
+  "admin": {
+    "users": "Users",
+    "usersIntro": "New profiles await your approval. Put each person on teams with a role, then press Approve.",
+    "noPending": "Nobody is waiting for approval.",
+    "pending": "Pending",
+    "wished": "Asked for",
+    "adult": "{{name}} (adult)",
+    "child": "{{name}} (child, {{year}})",
+    "parentOnly": "Parent without a dancer role – choose teams for the children only.",
+    "makeAdmin": "Make admin (full access to the whole school)",
+    "approve": "Approve",
+    "reject": "Reject",
+    "approved": "{{name}} is approved and has been notified."
+  },
+  "settings": {
+    "language": "Language",
+    "privacy": "Privacy",
+    "terms": "Terms"
+  }
+}

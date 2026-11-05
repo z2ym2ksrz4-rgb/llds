@@ -1,0 +1,16 @@
+{
+  "appId": "com.ilumie.llds",
+  "appName": "LL Dance Studio",
+  "appSlug": "llds",
+  "schoolSlug": "llds",
+  "brandColor": "#C9A24A",
+  "supportEmail": "llds@ilumie.com",
+  "privacyUrl": "https://ilumie.com/llds/privacy/",
+  "termsUrl": "https://ilumie.com/llds/terms/",
+  "siteUrl": "https://ilumie.com/llds/",
+  "supabase": {
+    "url": "",
+    "anonKey": ""
+  },
+  "minAccountAge": 13
+}
