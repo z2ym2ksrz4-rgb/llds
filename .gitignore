@@ -10,3 +10,4 @@ android/local.properties
 .env*
 .DS_Store
 
+smoke-*.png
