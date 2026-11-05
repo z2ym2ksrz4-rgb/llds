@@ -1,7 +1,7 @@
 -- Seed: LL Dance Studio, rooms and season 26/27 teams (from lldancestudio.dk/saeson-26-27).
 -- Run after 0001_schema.sql. Sessions are generated for the current week by the app's season planner later.
 insert into school(slug, name, settings) values ('llds', 'LL Dance Studio',
-  '{"minAccountAge":13,"trainersPostOnMini":true,"address":"Vinkelvej 17, 8860 Ulstrup","phone":"+45 22 44 01 55","email":"lldancestudio.info@gmail.com"}')
+  '{"minAccountAge":13,"supervisedFromAge":10,"trainersPostOnMini":true,"mobilepay":{"number":"46664","name":"LL Dance Studio"},"address":"Vinkelvej 17, 8860 Ulstrup","phone":"+45 22 44 01 55","email":"lldancestudio.info@gmail.com"}')
 on conflict (slug) do nothing;
 
 with s as (select id from school where slug = 'llds')
@@ -44,21 +44,22 @@ from s, (values
   ('Teknik The AXIS',        'Teknik',       'junior', 'Elite+',              false, false),
   ('Hip Hop Junior & Voksen Begynder', 'Hip Hop', 'mixed', 'Begynder & Let øvet', false, false),
   ('Hip Hop Junior & Voksen Elite',    'Hip Hop', 'mixed', 'Øvet & Elite',        false, false),
-  ('Contemporary Begynder',  'Contemporary', 'mixed',  'Begynder & Let øvet', false, true),
-  ('Contemporary Elite',     'Contemporary', 'mixed',  'Øvet & Elite',        false, true),
+  ('Contemporary Begynder',  'Contemporary', 'mixed',  'Begynder & Let øvet', false, false),
+  ('Contemporary Elite',     'Contemporary', 'mixed',  'Øvet & Elite',        false, false),
   ('Styrketræning Junior & Voksen', 'Styrke', 'mixed', 'Øvet+ & Elite',       false, false),
   ('Spring & Tumbling Junior & Voksen', 'Spring', 'mixed', 'Øvet & Elite',    false, false),
   ('Disco',                  'Disco',        'mixed',  'Øvet & Elite',        false, false),
   ('Disco Slow',             'Disco',        'mixed',  'Øvet & Elite',        false, false),
-  ('Hit Fit Dance',          'Fitness',      'adult',  'Alle niveauer',       false, false),
+  ('Hit Fit Dance tirsdag',  'Fitness',      'adult',  'Alle niveauer',       false, true),
+  ('Hit Fit Dance onsdag',   'Fitness',      'adult',  'Alle niveauer',       false, true),
   ('Ballet',                 'Ballet',       'mixed',  'Alle niveauer',       false, false),
   ('No Addiction',           'Showdance',    'adult',  'Elite',               true,  false)
 ) as t(name, style, category, level, closed, punch);
 
--- Punch card type for the Contemporary adult teams
+-- Punch card type for the two Hit Fit Dance teams (Line, 5 Nov 2026: 10 klip = 625 kr.)
 with s as (select id from school where slug = 'llds')
 insert into punch_card_type(school_id, name, punches, valid_days, price_dkk)
-select s.id, '10 klip – Contemporary', 10, 90, 650 from s;
+select s.id, '10 klip – Hit Fit Dance', 10, 90, 625 from s;
 
 -- Admin bootstrap (run once with the service role after Line has signed in the first time):
 -- update person set status='approved', is_admin=true where email='<lines-email>';

@@ -12,5 +12,10 @@
     "url": "",
     "anonKey": ""
   },
-  "minAccountAge": 13
+  "minAccountAge": 13,
+  "supervisedFromAge": 10,
+  "mobilepay": {
+    "number": "46664",
+    "name": "LL Dance Studio"
+  }
 }

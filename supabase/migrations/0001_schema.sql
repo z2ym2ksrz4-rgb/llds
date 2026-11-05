@@ -31,6 +31,7 @@ create table person (
   photo_consent boolean,                  -- null = not answered
   wished_roles text[] not null default '{}',  -- what they asked for at signup (admin reads it)
   wished_teams text,                      -- free text at signup
+  supervised_by uuid references person(id) on delete set null,   -- 10–12 y/o child account managed by this parent
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -40,6 +41,7 @@ create table guardian (
   parent_id uuid not null references person(id) on delete cascade,
   child_id uuid not null references person(id) on delete cascade,
   confirmed boolean not null default false,   -- parent confirmed a 13–17 y/o's own account
+  consent_at timestamptz,                      -- GDPR art. 8: parent consented to the child's own (supervised) login
   primary key (parent_id, child_id)
 );
 
@@ -448,7 +450,7 @@ create policy session_delete on session for delete using (school_id = my_school_
 
 -- booking: everyone reads (calendar), own insert, admin approves
 create policy booking_read on booking for select using (school_id = my_school_id() and i_am_approved());
-create policy booking_insert on booking for insert with check (school_id = my_school_id() and person_id = my_person_id() and i_am_approved() and status = case when i_am_staff() then 'approved' else 'pending' end);
+create policy booking_insert on booking for insert with check (school_id = my_school_id() and person_id = my_person_id() and i_am_approved() and (select supervised_by from person where id = my_person_id()) is null and status = case when i_am_staff() then 'approved' else 'pending' end);
 create policy booking_own on booking for delete using (person_id = my_person_id());
 create policy booking_admin on booking for all using (i_am_admin() and school_id = my_school_id());
 
@@ -496,14 +498,15 @@ create policy receipt_rw on message_receipt for all using (person_id in (select 
 create policy folder_read on folder for select using ((team_id in (select my_team_ids()) and not staff_only) or i_am_staff_of(team_id));
 create policy folder_write on folder for all using (i_am_staff_of(team_id));
 create policy media_read on media for select using (exists (select 1 from folder f where f.id = media.folder_id and ((f.team_id in (select my_team_ids()) and not f.staff_only) or i_am_staff_of(f.team_id))));
-create policy media_insert on media for insert with check (uploader_id = my_person_id() and exists (select 1 from folder f where f.id = media.folder_id and (f.team_id in (select my_team_ids()) or i_am_staff_of(f.team_id))));
+create policy media_insert on media for insert with check (uploader_id = my_person_id() and (select supervised_by from person where id = my_person_id()) is null and exists (select 1 from folder f where f.id = media.folder_id and (f.team_id in (select my_team_ids()) or i_am_staff_of(f.team_id))));
 create policy media_mod on media for all using (uploader_id = my_person_id() or exists (select 1 from folder f where f.id = media.folder_id and i_am_staff_of(f.team_id)));
 -- video: dancers themselves, staff, and parents only when team.parents_see_video
 create policy video_read on video for select using (
   i_am_staff_of(team_id) or
   exists (select 1 from membership m where m.team_id = video.team_id and m.person_id = my_person_id()) or
-  exists (select 1 from membership m join guardian g on g.child_id = m.person_id join team t on t.id = m.team_id
-          where m.team_id = video.team_id and g.parent_id = my_person_id() and t.parents_see_video));
+  exists (select 1 from membership m join guardian g on g.child_id = m.person_id join team t on t.id = m.team_id join person c on c.id = m.person_id
+          where m.team_id = video.team_id and g.parent_id = my_person_id()
+            and (t.parents_see_video or (c.birth_year is not null and extract(year from now()) - c.birth_year < 13))));
 create policy video_write on video for all using (i_am_staff_of(team_id));
 create policy note_read on note for select using (dancer_id in (select my_people()) or i_am_staff_of(team_id));
 create policy note_write on note for all using (i_am_staff_of(team_id));
@@ -595,7 +598,7 @@ begin
     insert into person(school_id, first_name, last_name, birth_year, status, wished_roles)
       values (sid, c->>'first_name', coalesce(c->>'last_name', p_last), (c->>'birth_year')::int, 'pending', '{dancer}')
       returning id into cid;
-    insert into guardian(parent_id, child_id, confirmed) values (pid, cid, true);
+    insert into guardian(parent_id, child_id, confirmed, consent_at) values (pid, cid, true, now());
   end loop;
   return pid;
 end $$;
