@@ -2,11 +2,10 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/core/auth";
 import { isRelease } from "@/core/release";
-import { Home, Login, Register, Pending, Rooms, TeamScreen, Admin } from "@/domain";
-import { SettingsScreen } from "./SettingsScreen";
+import { Home, Login, Register, Pending, Rooms, TeamScreen, Admin, More } from "@/domain";
 import { TestMenu } from "./TestMenu";
 
-type Tab = "home" | "rooms" | "team" | "admin" | "settings";
+type Tab = "home" | "rooms" | "team" | "admin" | "more";
 
 export default function App() {
   const { t } = useTranslation();
@@ -23,9 +22,9 @@ export default function App() {
   else if (phase === "register") body = <Register />;
   else if (phase === "pending") body = <Pending />;
   else if (phase === "rejected") body = <Pending rejected />;
-  else body = tab === "home" ? <Home /> : tab === "rooms" ? <Rooms /> : tab === "team" ? <TeamScreen /> : tab === "admin" && isAdmin ? <Admin /> : <SettingsScreen />;
+  else body = tab === "home" ? <Home /> : tab === "rooms" ? <Rooms /> : tab === "team" ? <TeamScreen /> : tab === "admin" && isAdmin ? <Admin /> : <More />;
 
-  const tabs: [Tab, string][] = [["home", t("nav.home")], ["rooms", t("nav.rooms")], ...(hasTeams ? [["team", t("nav.team")] as [Tab, string]] : []), ...(isAdmin ? [["admin", t("nav.admin")] as [Tab, string]] : []), ["settings", t("nav.settings")]];
+  const tabs: [Tab, string][] = [["home", t("nav.home")], ["rooms", t("nav.rooms")], ...(hasTeams ? [["team", t("nav.team")] as [Tab, string]] : []), ...(isAdmin ? [["admin", t("nav.admin")] as [Tab, string]] : []), ["more", t("nav.more")]];
   return (
     <div className="app">
       <main>{body}</main>

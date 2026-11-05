@@ -1,6 +1,7 @@
 import type { Api, Me, Membership, PendingPerson, Person, Role, SignUpInput, Team } from "./types";
 import { scheduleOps, seedSchedule, type SchedState } from "./mock-schedule";
 import { socialOps, seedSocial, type SocialState } from "./mock-social";
+import { shopOps, seedShop, type ShopState } from "./mock-shop";
 
 /**
  * In-memory stand-in for Supabase. Used when app.config.json has no supabase.url (dev, smoke tests, web demo).
@@ -8,7 +9,7 @@ import { socialOps, seedSocial, type SocialState } from "./mock-social";
  * The special address admin@demo signs in as Line (approved admin).
  */
 const KEY = "llds_mock";
-type State = { email: string | null; persons: Person[]; guardians: { parent_id: string; child_id: string }[]; memberships: Membership[]; teams: Team[]; S: SchedState; X: SocialState };
+type State = { email: string | null; persons: Person[]; guardians: { parent_id: string; child_id: string }[]; memberships: Membership[]; teams: Team[]; S: SchedState; X: SocialState; Y: ShopState };
 
 const SCHOOL = "school-llds";
 const TEAMS: Team[] = [
@@ -37,7 +38,7 @@ const id = () => Math.random().toString(36).slice(2, 10);
 const now = () => new Date().toISOString();
 
 function load(): State {
-  try { const s = localStorage.getItem(KEY); if (s) { const st = JSON.parse(s) as State; if (st.S && st.teams && st.X) return st; } } catch { /* ignore */ }
+  try { const s = localStorage.getItem(KEY); if (s) { const st = JSON.parse(s) as State; if (st.S && st.teams && st.X && st.Y) return st; } } catch { /* ignore */ }
   const line: Person = { id: "p-line", school_id: SCHOOL, user_id: "u-line", first_name: "Line", last_name: "Lund Olesen", email: "admin@demo", phone: "+45 22 44 01 55", birth_year: 1990, status: "approved", is_admin: true, photo_consent: true, wished_roles: ["trainer"], wished_teams: null, supervised_by: null, created_at: now() };
   const maja: Person = { ...line, id: "p-maja", user_id: "u-maja", first_name: "Maja", last_name: "Kristensen", email: "maja@demo", is_admin: false, wished_roles: ["trainer"] };
   const sofie: Person = { ...line, id: "p-sofie", user_id: "u-sofie", first_name: "Sofie", last_name: "Dahl", email: "sofie@demo", is_admin: false };
@@ -51,6 +52,7 @@ function load(): State {
     teams: TEAMS,
     S: seedSchedule(TEAMS, [line, maja, sofie]),
     X: seedSocial(TEAMS, [line, maja, sofie, st, freja]),
+    Y: seedShop(TEAMS),
     guardians: [{ parent_id: "p-st", child_id: "p-freja" }, { parent_id: "p-karin", child_id: "p-alma" }],
     memberships: [
       { person_id: "p-freja", team_id: "team-0", role: "dancer" }, { person_id: "p-freja", team_id: "team-14", role: "dancer" },
@@ -66,13 +68,17 @@ const listeners = new Set<() => void>();
 const emit = () => listeners.forEach((l) => l());
 const meRow = () => S.persons.find((p) => p.email === S.email && p.user_id) ?? null;
 
-const ctx = () => ({ get S() { return S.S; }, get X() { return S.X; }, get persons() { return S.persons; }, get memberships() { return S.memberships; }, set memberships(v: Membership[]) { S.memberships = v; }, get guardians() { return S.guardians; }, get teams() { return S.teams; }, me: meRow, save, emit });
+const notify = (person_id: string, kind: string, title: string, body: string | null, ref: Record<string, string> = {}) => { if (!S.persons.find((p) => p.id === person_id)?.user_id) return; S.Y.notifications.push({ id: "n-" + id(), person_id, kind, title, body, ref, read_at: null, created_at: now() }); };
+const ctx = () => ({ get S() { return S.S; }, get X() { return S.X; }, get Y() { return S.Y; }, notify, punchFor: (teamId: string | null, personId: string, sessionId: string) => shop.punchFor(teamId, personId, sessionId), get persons() { return S.persons; }, get memberships() { return S.memberships; }, set memberships(v: Membership[]) { S.memberships = v; }, get guardians() { return S.guardians; }, get teams() { return S.teams; }, me: meRow, save, emit });
 const social = socialOps(ctx);
-const sched = scheduleOps(() => ({ get S() { return S.S; }, get persons() { return S.persons; }, get memberships() { return S.memberships; }, set memberships(v) { S.memberships = v; }, get guardians() { return S.guardians; }, get teams() { return S.teams; }, me: meRow, save, emit }));
+const shop = shopOps(ctx);
+const { punchFor: _pf, ...shopApi } = shop; void _pf;
+const sched = scheduleOps(ctx);
 
 export const mockApi: Api = {
   ...sched,
   ...social,
+  ...shopApi,
   async sessionEmail() { return S.email; },
   async sendCode(email) { if (!email.includes("@")) throw new Error("Ugyldig e-mail"); },
   async verifyCode(email, code) {

@@ -10,6 +10,8 @@ import { MessageComposer } from "../components/Messages";
 import { Folders } from "./Folders";
 import { Choreo } from "./Choreo";
 import { Notes } from "./Notes";
+import { MILESTONE_IDEAS } from "../lib/milestones";
+import { Sheet } from "../components/Sheet";
 import { addDays, dateLabel, hm, startOfDay } from "../lib/time";
 
 type Page = "team" | "folders" | "choreo" | "notes";
@@ -30,6 +32,8 @@ export function TeamScreen() {
   const [members, setMembers] = useState<Member[]>([]);
   const [open, setOpen] = useState<Session | null>(null);
   const [compose, setCompose] = useState(false);
+  const [award, setAward] = useState<Member | null>(null);
+  const [awardTitle, setAwardTitle] = useState("");
   const [toast, setToast] = useState<string | null>(null);
   const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
 
@@ -84,13 +88,20 @@ export function TeamScreen() {
           <div className="card list">
             {trainers.map((p) => <div key={p.id} className="item"><span className="avatar">{p.first_name[0]}</span><span className="grow">{p.first_name} {p.last_name}<div className="tiny">{t(`roles.${p.memberships.find((m) => m.team_id === team.id)?.role ?? "trainer"}`)}</div></span></div>)}
             {dancers.map((p) => <div key={p.id} className="item"><span className="avatar">{p.first_name[0]}</span><span className="grow">{p.first_name} {p.last_name}{p.birth_year ? <span className="tiny"> · {p.birth_year}</span> : ""}
-              <div className="tiny">{p.parents.map((g) => `${g.first_name} ${g.phone ?? ""}`).join(" · ") || p.phone || ""}{p.photo_consent === false ? " · " + t("team.noPhotoConsent") : ""}</div></span>{p.supervised_by && <span className="chip small">{t("team.childAccount")}</span>}</div>)}
+              <div className="tiny">{p.parents.map((g) => `${g.first_name} ${g.phone ?? ""}`).join(" · ") || p.phone || ""}{p.photo_consent === false ? " · " + t("team.noPhotoConsent") : ""}</div></span>{p.supervised_by && <span className="chip small">{t("team.childAccount")}</span>}<button className="ghost small" aria-label={t("milestones.give")} data-testid="give-milestone" onClick={() => { setAward(p); setAwardTitle(""); }}>🏅</button></div>)}
           </div>
         </div>
       )}
 
       {open && <SessionSheet session={open} absences={absences} onClose={() => setOpen(null)} onChanged={() => void load()} toast={say} />}
       {compose && <MessageComposer teams={me.person.is_admin ? me.teams : me.teams.filter((x) => me.memberships.some((m) => m.person_id === me.person.id && m.team_id === x.id && m.role !== "dancer"))} defaultTeam={team.id} onClose={() => setCompose(false)} toast={say} />}
+      {award && (
+        <Sheet onClose={() => setAward(null)} eyebrow={t("milestones.give")} title={award.first_name}>
+          <div className="chips">{MILESTONE_IDEAS.map((m) => <button key={m} className={"chip" + (awardTitle === m ? " on" : "")} onClick={() => setAwardTitle(m)}>{m}</button>)}</div>
+          <input id="milestone-title" placeholder={t("milestones.custom")} value={awardTitle} onChange={(e) => setAwardTitle(e.target.value)} />
+          <button className="cta" id="milestone-save" disabled={!awardTitle.trim()} onClick={async () => { await api.giveMilestone(award.id, awardTitle.trim(), team.id); setAward(null); say(t("milestones.given", { name: award.first_name })); }}>{t("milestones.giveBtn")}</button>
+        </Sheet>
+      )}
       <Toast msg={toast} />
     </section>
   );

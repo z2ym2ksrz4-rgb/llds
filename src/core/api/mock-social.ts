@@ -35,7 +35,7 @@ export function seedSocial(teams: Team[], persons: Person[]): SocialState {
   return { posts, comments, reports: [], messages, receipts: [], folders, media: [], videos, notes };
 }
 
-export function socialOps(get: () => { X: SocialState; persons: Person[]; memberships: Membership[]; guardians: { parent_id: string; child_id: string }[]; teams: Team[]; me: () => Person | null; save: () => void; emit: () => void }) {
+export function socialOps(get: () => { X: SocialState; notify: (pid: string, kind: string, title: string, body: string | null, ref?: Record<string, string>) => void; persons: Person[]; memberships: Membership[]; guardians: { parent_id: string; child_id: string }[]; teams: Team[]; me: () => Person | null; save: () => void; emit: () => void }) {
   const name = (p: Person | null | undefined) => (p ? `${p.first_name} ${p.last_name}` : "");
   const meName = () => name(get().me());
   const isStaff = () => { const g = get(); const me = g.me(); return !!me && (me.is_admin || g.memberships.some((m) => m.person_id === me.id && m.role !== "dancer")); };
@@ -83,7 +83,12 @@ export function socialOps(get: () => { X: SocialState; persons: Person[]; member
         .map((m) => ({ ...m, acted_at: g.X.receipts.find((r) => r.message_id === m.id && r.person_id === me.id)?.acted_at ?? null }))
         .sort((a, b) => b.created_at.localeCompare(a.created_at));
     },
-    async sendMessage(i: { title: string; body: string; audience: Audience; needs: "read" | "accept" }) { const g = get(); g.X.messages.push({ id: "msg-" + id(), author_name: meName(), ...i, created_at: now(), acted_at: null }); g.save(); g.emit(); },
+    async sendMessage(i: { title: string; body: string; audience: Audience; needs: "read" | "accept" }) {
+      const g = get(); const m: Message = { id: "msg-" + id(), author_name: meName(), ...i, created_at: now(), acted_at: null }; g.X.messages.push(m);
+      const set = new Set(i.audience.teams ?? []);
+      for (const p of g.persons) if (p.user_id && p.status === "approved" && (i.audience.all || g.memberships.some((mm) => mm.person_id === p.id && set.has(mm.team_id)) || g.guardians.some((gd) => gd.parent_id === p.id && g.memberships.some((mm) => mm.person_id === gd.child_id && set.has(mm.team_id))))) g.notify(p.id, "message", i.title, i.body.slice(0, 120), { message_id: m.id });
+      g.save(); g.emit();
+    },
     async ackMessage(mid: string) { const g = get(); const me = g.me()!; if (!g.X.receipts.some((r) => r.message_id === mid && r.person_id === me.id)) g.X.receipts.push({ message_id: mid, person_id: me.id, acted_at: now() }); g.save(); g.emit(); },
     async messageStatus(mid: string): Promise<MessageStatus[]> {
       const g = get(); const m = g.X.messages.find((x) => x.id === mid); if (!m) return [];

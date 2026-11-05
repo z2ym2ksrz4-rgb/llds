@@ -205,3 +205,54 @@ export interface Api {
   addNote(teamId: string, dancerId: string, body: string): Promise<void>;
   deleteNote(id: string): Promise<void>;
 }
+
+/* ---------------- phase 4: events, shop, punch cards, milestones, notifications ---------------- */
+export type EventKind = "competition" | "show" | "workshop" | "social";
+export type Event = {
+  id: string; title: string; kind: EventKind; starts_at: string; ends_at: string | null; place: string | null; meet_time: string | null;
+  team_ids: string[]; team_names: string[] | null; plan: { time: string; text: string }[]; pack_list: string[]; info: string | null;
+  signup_deadline: string | null; price_dkk: number | null; visibility: "private" | "public"; signups: number; created_at: string;
+};
+export type EventInput = Omit<Event, "id" | "signups" | "team_names" | "created_at">;
+export type EventSignup = { event_id: string; person_id: string; person_name: string; team_name: string | null; paid: boolean; created_at: string };
+
+export type Product = { id: string; name: string; price_dkk: number; sizes: string[]; stock: number | null; image_path: string | null; image_url?: string | null; visibility: "private" | "public"; active: boolean };
+export type OrderLine = { product_id: string; name: string; size: string | null; qty: number; price_dkk: number };
+export type Order = { id: string; person_id: string; person_name: string; number: number; lines: OrderLine[]; total_dkk: number; status: "awaiting_payment" | "paid" | "delivered" | "cancelled"; claimed_paid_at: string | null; created_at: string };
+
+export type PunchCardType = { id: string; name: string; punches: number; valid_days: number; price_dkk: number; active: boolean };
+export type PunchCard = { id: string; type_id: string; type_name: string; person_id: string; person_name: string; punches_total: number; punches_left: number; used: number; expires_on: string; status: "awaiting_payment" | "active" | "expired"; claimed_paid_at: string | null; price_dkk: number; created_at: string };
+
+export type Milestone = { id: string; person_id: string; person_name: string; title: string; reached_on: string | null; team_id: string | null; team_name: string | null; given_by_name: string | null; created_at: string };
+export type Notification = { id: string; person_id: string; kind: string; title: string; body: string | null; ref: Record<string, string>; read_at: string | null; created_at: string };
+
+export interface Api {
+  /* events */
+  listEvents(includePast?: boolean): Promise<Event[]>;
+  saveEvent(input: EventInput, id?: string): Promise<void>;
+  deleteEvent(id: string): Promise<void>;
+  listSignups(eventId: string): Promise<EventSignup[]>;
+  signUp_(eventId: string, personId: string, on: boolean): Promise<void>;
+  setSignupPaid(eventId: string, personId: string, paid: boolean): Promise<void>;
+  /* shop */
+  listProducts(all?: boolean): Promise<Product[]>;
+  saveProduct(input: Omit<Product, "id" | "image_url"> & { image?: File | null }, id?: string): Promise<void>;
+  listOrders(all?: boolean): Promise<Order[]>;
+  createOrder(personId: string, lines: OrderLine[]): Promise<Order>;
+  claimPaid(orderId: string): Promise<void>;
+  setOrderStatus(orderId: string, status: Order["status"]): Promise<void>;
+  /* punch cards */
+  listPunchCardTypes(): Promise<PunchCardType[]>;
+  savePunchCardType(input: Omit<PunchCardType, "id">, id?: string): Promise<void>;
+  listPunchCards(all?: boolean): Promise<PunchCard[]>;
+  buyPunchCard(typeId: string, personId: string): Promise<PunchCard>;
+  claimPunchCardPaid(cardId: string): Promise<void>;
+  activatePunchCard(cardId: string): Promise<void>;
+  /* milestones */
+  listMilestones(personId?: string): Promise<Milestone[]>;
+  giveMilestone(personId: string, title: string, teamId: string | null): Promise<void>;
+  deleteMilestone(id: string): Promise<void>;
+  /* notifications */
+  listNotifications(): Promise<Notification[]>;
+  markNotificationsRead(ids?: string[]): Promise<void>;
+}

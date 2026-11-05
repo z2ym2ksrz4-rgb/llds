@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { api, type Booking, type Member, type Message, type Report, type Role, type Session, type Team, type TeamInput } from "@/core/api";
+import { api, type Booking, type Member, type Message, type Order, type Product, type PunchCard, type PunchCardType, type Report, type Role, type Session, type Team, type TeamInput } from "@/core/api";
+import { Events } from "../screens/Events";
 import { MessageComposer, MessageSheet } from "../components/Messages";
 import { ago } from "../lib/time";
 import { AdminUsers } from "./Users";
@@ -8,18 +9,18 @@ import { Sheet, Toast } from "../components/Sheet";
 import { SessionEditor } from "../components/SessionSheet";
 import { addDays, DAY_LONG, hm, mondayOf, startOfDay } from "../lib/time";
 
-type Page = "menu" | "users" | "members" | "teams" | "season" | "bookings" | "messages" | "reports";
+type Page = "menu" | "users" | "members" | "teams" | "season" | "bookings" | "messages" | "reports" | "events" | "shop" | "punch";
 const CATS = ["mini", "kids", "junior", "adult", "mixed"] as const;
 
 /** Admin: the one place Line runs the school from. Everything else in the app reads what she sets here. */
 export function Admin() {
   const { t } = useTranslation();
   const [page, setPage] = useState<Page>("menu");
-  const [counts, setCounts] = useState({ pending: 0, bookings: 0, subs: 0, reports: 0 });
+  const [counts, setCounts] = useState({ pending: 0, bookings: 0, subs: 0, reports: 0, orders: 0, cards: 0 });
   useEffect(() => { void (async () => {
     const from = startOfDay(new Date());
-    const [p, b, s, r] = await Promise.all([api.listPending(), api.listBookings(from.toISOString(), addDays(from, 60).toISOString()), api.listSessions(from.toISOString(), addDays(from, 14).toISOString()), api.listReports()]);
-    setCounts({ pending: p.length, bookings: b.filter((x) => x.status === "pending").length, subs: s.filter((x) => x.substitute_wanted && !x.substitute_id).length, reports: r.filter((x) => !x.resolved_at).length });
+    const [p, b, s, r, o, c] = await Promise.all([api.listPending(), api.listBookings(from.toISOString(), addDays(from, 60).toISOString()), api.listSessions(from.toISOString(), addDays(from, 14).toISOString()), api.listReports(), api.listOrders(true), api.listPunchCards(true)]);
+    setCounts({ pending: p.length, bookings: b.filter((x) => x.status === "pending").length, subs: s.filter((x) => x.substitute_wanted && !x.substitute_id).length, reports: r.filter((x) => !x.resolved_at).length, orders: o.filter((x) => x.status === "awaiting_payment" && x.claimed_paid_at).length, cards: c.filter((x) => x.status === "awaiting_payment" && x.claimed_paid_at).length });
   })(); }, [page]);
   if (page === "users") return <Back onBack={() => setPage("menu")}><AdminUsers /></Back>;
   if (page === "members") return <Back onBack={() => setPage("menu")}><Members /></Back>;
@@ -28,10 +29,14 @@ export function Admin() {
   if (page === "bookings") return <Back onBack={() => setPage("menu")}><Bookings /></Back>;
   if (page === "messages") return <Back onBack={() => setPage("menu")}><Messages /></Back>;
   if (page === "reports") return <Back onBack={() => setPage("menu")}><Reports /></Back>;
+  if (page === "events") return <Back onBack={() => setPage("menu")}><Events admin /></Back>;
+  if (page === "shop") return <Back onBack={() => setPage("menu")}><ShopAdmin /></Back>;
+  if (page === "punch") return <Back onBack={() => setPage("menu")}><PunchAdmin /></Back>;
   const items: [Page, string, string, number][] = [
     ["users", t("admin.users"), t("admin.usersSub"), counts.pending], ["members", t("admin.members"), t("admin.membersSub"), 0], ["teams", t("admin.teams"), t("admin.teamsSub"), 0],
     ["season", t("admin.season"), t("admin.seasonSub"), counts.subs], ["bookings", t("admin.bookings"), t("admin.bookingsSub"), counts.bookings],
     ["messages", t("admin.messages"), t("admin.messagesSub"), 0], ["reports", t("admin.reports"), t("admin.reportsSub"), counts.reports],
+    ["events", t("events.title"), t("admin.eventsSub"), 0], ["shop", t("admin.shop"), t("admin.shopSub"), counts.orders], ["punch", t("punch.title"), t("admin.punchSub"), counts.cards],
   ];
   return (
     <section className="screen">
@@ -39,7 +44,7 @@ export function Admin() {
       <div className="card list">
         {items.map(([k, label, sub, n]) => <button key={k} className="item" onClick={() => setPage(k)}><span className="grow">{label}<div className="tiny">{sub}</div></span>{n > 0 && <span className="chip warn small">{n}</span>}<span className="gold">›</span></button>)}
       </div>
-      <p className="tiny">{t("admin.phase3note")}</p>
+      <p className="tiny">{t("admin.phase4note")}</p>
     </section>
   );
 }
@@ -214,6 +219,76 @@ function Reports() {
       {openOnes.map((r) => <Row key={r.id} r={r} />)}
       {!openOnes.length && <p className="muted">{t("admin.noReports")}</p>}
       {done.length > 0 && <div className="sec"><h2>{t("admin.resolved")}</h2>{done.map((r) => <Row key={r.id} r={r} />)}</div>}
+    </section>
+  );
+}
+
+/* ---------------- Shop admin: products + orders ---------------- */
+function ShopAdmin() {
+  const { t } = useTranslation();
+  const [products, setProducts] = useState<Product[]>([]); const [orders, setOrders] = useState<Order[]>([]); const [edit, setEdit] = useState<Product | "new" | null>(null);
+  const [toast, setToast] = useState<string | null>(null); const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
+  const load = useCallback(async () => { const [p, o] = await Promise.all([api.listProducts(true), api.listOrders(true)]); setProducts(p); setOrders(o); }, []);
+  useEffect(() => { void load(); }, [load]);
+  const open = orders.filter((o) => o.status === "awaiting_payment"), rest = orders.filter((o) => o.status !== "awaiting_payment");
+  const OrderRow = ({ o }: { o: Order }) => (
+    <div className="item" data-testid="admin-order"><span className="grow">#{o.number} · {o.person_name}<div className="tiny">{o.lines.map((l) => `${l.qty}× ${l.name}${l.size ? ` (${l.size})` : ""}`).join(", ")} · {o.total_dkk} kr. · {ago(o.created_at)}{o.claimed_paid_at && o.status === "awaiting_payment" ? ` · ${t("shop.status.claimed")}` : ""}</div></span>
+      {o.status === "awaiting_payment" ? <div className="row"><button className="small" onClick={async () => { await api.setOrderStatus(o.id, "paid"); void load(); }}>{t("admin.markPaid")}</button><button className="ghost small danger" onClick={async () => { await api.setOrderStatus(o.id, "cancelled"); void load(); }}>×</button></div>
+        : o.status === "paid" ? <button className="ghost small" onClick={async () => { await api.setOrderStatus(o.id, "delivered"); void load(); }}>{t("admin.markDelivered")}</button> : <span className="chip small ok">{t(`shop.status.${o.status}`)}</span>}</div>
+  );
+  return (
+    <section className="screen">
+      <header className="topbar"><h1 className="display">{t("admin.shop")}</h1><button className="ghost small" id="product-new" onClick={() => setEdit("new")}>+ {t("admin.newProduct")}</button></header>
+      <div className="sec"><h2>{t("admin.ordersOpen")} · {open.length}</h2><div className="card list">{open.map((o) => <OrderRow key={o.id} o={o} />)}{!open.length && <p className="muted">{t("admin.noOrders")}</p>}</div></div>
+      <div className="sec"><h2>{t("admin.products")}</h2><div className="card list">{products.map((p) => <button key={p.id} className={"item" + (p.active ? "" : " off")} onClick={() => setEdit(p)}><span className="grow">{p.name}<div className="tiny">{p.price_dkk} kr. · {p.sizes.join("/") || t("admin.oneSize")}{p.stock != null ? ` · ${t("admin.stock")}: ${p.stock}` : ""}{p.visibility === "public" ? ` · ${t("feed.publicChip")}` : ""}</div></span><span className="gold">›</span></button>)}</div></div>
+      {rest.length > 0 && <div className="sec"><h2>{t("admin.ordersDone")}</h2><div className="card list">{rest.slice(0, 30).map((o) => <OrderRow key={o.id} o={o} />)}</div></div>}
+      {edit && <ProductEditor product={edit === "new" ? null : edit} onClose={() => setEdit(null)} onSaved={() => { setEdit(null); void load(); say(t("common.saved")); }} />}
+      <Toast msg={toast} />
+    </section>
+  );
+}
+function ProductEditor({ product, onClose, onSaved }: { product: Product | null; onClose: () => void; onSaved: () => void }) {
+  const { t } = useTranslation();
+  const [f, setF] = useState({ name: product?.name ?? "", price: product?.price_dkk?.toString() ?? "", sizes: product?.sizes.join(", ") ?? "", stock: product?.stock?.toString() ?? "", active: product?.active ?? true, pub: product?.visibility === "public", image: null as File | null });
+  return (
+    <Sheet onClose={onClose} eyebrow={t("admin.shop")} title={product ? t("common.edit") : t("admin.newProduct")}>
+      <label className="field"><span>{t("admin.productName")}</span><input id="pr-name" value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} /></label>
+      <div className="grid2"><label className="field"><span>{t("admin.price")}</span><input id="pr-price" type="number" inputMode="numeric" value={f.price} onChange={(e) => setF({ ...f, price: e.target.value })} /></label><label className="field"><span>{t("admin.stock")}</span><input type="number" inputMode="numeric" value={f.stock} onChange={(e) => setF({ ...f, stock: e.target.value })} placeholder="∞" /></label></div>
+      <label className="field"><span>{t("admin.sizes")}</span><input value={f.sizes} onChange={(e) => setF({ ...f, sizes: e.target.value })} placeholder="XS, S, M, L" /></label>
+      <label className="field"><span>{t("admin.image")}</span><input type="file" accept="image/*" onChange={(e) => setF({ ...f, image: e.target.files?.[0] ?? null })} /></label>
+      <label className="check"><input type="checkbox" checked={f.active} onChange={(e) => setF({ ...f, active: e.target.checked })} />{t("admin.productActive")}</label>
+      <label className="check"><input type="checkbox" checked={f.pub} onChange={(e) => setF({ ...f, pub: e.target.checked })} />{t("admin.productPublic")}</label>
+      <button className="cta" id="pr-save" disabled={!f.name.trim() || !f.price} onClick={async () => { await api.saveProduct({ name: f.name.trim(), price_dkk: Number(f.price), sizes: f.sizes.split(",").map((x) => x.trim()).filter(Boolean), stock: f.stock ? Number(f.stock) : null, image_path: product?.image_path ?? null, visibility: f.pub ? "public" : "private", active: f.active, image: f.image }, product?.id); onSaved(); }}>{t("common.save")}</button>
+    </Sheet>
+  );
+}
+
+/* ---------------- Punch cards admin: types + activation ---------------- */
+function PunchAdmin() {
+  const { t } = useTranslation();
+  const [types, setTypes] = useState<PunchCardType[]>([]); const [cards, setCards] = useState<PunchCard[]>([]); const [edit, setEdit] = useState<PunchCardType | "new" | null>(null);
+  const [f, setF] = useState({ name: "", punches: "10", valid_days: "365", price: "" });
+  const load = useCallback(async () => { const [ty, c] = await Promise.all([api.listPunchCardTypes(), api.listPunchCards(true)]); setTypes(ty); setCards(c); }, []);
+  useEffect(() => { void load(); }, [load]);
+  const waiting = cards.filter((c) => c.status === "awaiting_payment"), active = cards.filter((c) => c.status === "active");
+  return (
+    <section className="screen">
+      <header className="topbar"><h1 className="display">{t("punch.title")}</h1><button className="ghost small" onClick={() => { setF({ name: "", punches: "10", valid_days: "365", price: "" }); setEdit("new"); }}>+ {t("admin.newType")}</button></header>
+      <div className="sec"><h2>{t("admin.cardsWaiting")} · {waiting.length}</h2><div className="card list">
+        {waiting.map((c) => <div key={c.id} className="item" data-testid="admin-card"><span className="grow">{c.person_name}<div className="tiny">{c.type_name} · {c.price_dkk} kr. · {ago(c.created_at)}{c.claimed_paid_at ? ` · ${t("punch.status.claimed")}` : ` · ${t("punch.status.awaiting_payment")}`}</div></span><button className="small" onClick={async () => { await api.activatePunchCard(c.id); void load(); }}>{t("admin.activate")}</button></div>)}
+        {!waiting.length && <p className="muted">{t("admin.noCards")}</p>}</div></div>
+      <div className="sec"><h2>{t("admin.cardsActive")} · {active.length}</h2><div className="card list">{active.map((c) => <div key={c.id} className="item"><span className="grow">{c.person_name}<div className="tiny">{c.type_name} · {t("punch.left", { n: c.punches_left, total: c.punches_total })} · {t("punch.validUntil")} {new Date(c.expires_on).toLocaleDateString("da-DK")}</div></span></div>)}</div></div>
+      <div className="sec"><h2>{t("admin.cardTypes")}</h2><div className="card list">{types.map((ty) => <button key={ty.id} className={"item" + (ty.active ? "" : " off")} onClick={() => { setF({ name: ty.name, punches: String(ty.punches), valid_days: String(ty.valid_days), price: String(ty.price_dkk) }); setEdit(ty); }}><span className="grow">{ty.name}<div className="tiny">{ty.punches} {t("punch.punches")} · {ty.valid_days} {t("admin.days")} · {ty.price_dkk} kr.</div></span><span className="gold">›</span></button>)}</div></div>
+      <p className="tiny">{t("admin.punchHint")}</p>
+      {edit && (
+        <Sheet onClose={() => setEdit(null)} eyebrow={t("punch.title")} title={edit === "new" ? t("admin.newType") : t("common.edit")}>
+          <label className="field"><span>{t("admin.productName")}</span><input value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} /></label>
+          <div className="grid2"><label className="field"><span>{t("punch.punches")}</span><input type="number" value={f.punches} onChange={(e) => setF({ ...f, punches: e.target.value })} /></label><label className="field"><span>{t("admin.validDays")}</span><input type="number" value={f.valid_days} onChange={(e) => setF({ ...f, valid_days: e.target.value })} /></label></div>
+          <label className="field"><span>{t("admin.price")}</span><input type="number" value={f.price} onChange={(e) => setF({ ...f, price: e.target.value })} /></label>
+          <div className="row"><button className="cta grow" disabled={!f.name.trim() || !f.price} onClick={async () => { await api.savePunchCardType({ name: f.name.trim(), punches: Number(f.punches), valid_days: Number(f.valid_days), price_dkk: Number(f.price), active: true }, edit === "new" ? undefined : edit.id); setEdit(null); void load(); }}>{t("common.save")}</button>
+            {edit !== "new" && <button className="ghost danger" onClick={async () => { await api.savePunchCardType({ name: edit.name, punches: edit.punches, valid_days: edit.valid_days, price_dkk: edit.price_dkk, active: !edit.active }, edit.id); setEdit(null); void load(); }}>{edit.active ? t("admin.deactivate") : t("admin.activate")}</button>}</div>
+        </Sheet>
+      )}
     </section>
   );
 }

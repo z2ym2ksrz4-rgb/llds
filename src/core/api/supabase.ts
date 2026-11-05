@@ -3,6 +3,7 @@ import appConfig from "../../../app.config.json";
 import type { Api, Membership, PendingPerson, Person, Role, Team } from "./types";
 import { supabaseSchedule } from "./supabase-schedule";
 import { supabaseSocial } from "./supabase-social";
+import { supabaseShop } from "./supabase-shop";
 
 /** Real backend. Row Level Security in supabase/migrations/0001_schema.sql decides what each user may read. */
 export function supabaseApi(url: string, anonKey: string): Api {
@@ -15,6 +16,7 @@ export function supabaseApi(url: string, anonKey: string): Api {
   return {
     ...supabaseSchedule(sb, fail, schoolId, myPersonId),
     ...supabaseSocial(sb, fail, schoolId, myPersonId, schoolSlug),
+    ...supabaseShop(sb, fail, schoolId, myPersonId, schoolSlug),
     async sessionEmail() {
       const { data } = await sb.auth.getSession();
       return data.session?.user.email ?? null;

@@ -3,7 +3,7 @@ import type { Absence, Booking, Member, Membership, Person, PersonStatus, Role, 
 /** Phase-2 half of the mock. Seeds this week's schedule from the season plan (Mon–Thu, two rooms). */
 export type SchedState = {
   rooms: Room[]; sessions: Session[]; bookings: Booking[]; absences: Absence[];
-  attendance: { session_id: string; person_id: string; present: boolean }[];
+  attendance: { session_id: string; person_id: string; present: boolean; via_punch?: boolean }[];
 };
 const id = () => Math.random().toString(36).slice(2, 10);
 export const ROOMS: Room[] = [{ id: "room-S", name: "Store Sal", sort: 0 }, { id: "room-L", name: "Lille Sal", sort: 1 }];
@@ -43,7 +43,8 @@ export function seedSchedule(teams: Team[], staff: Person[]): SchedState {
   return { rooms: ROOMS, sessions, bookings, absences: [], attendance: [] };
 }
 
-export function scheduleOps(get: () => { S: SchedState; persons: Person[]; memberships: Membership[]; guardians: { parent_id: string; child_id: string }[]; teams: Team[]; me: () => Person | null; save: () => void; emit: () => void }) {
+export function scheduleOps(get: () => { S: SchedState; persons: Person[]; memberships: Membership[]; guardians: { parent_id: string; child_id: string }[]; teams: Team[]; me: () => Person | null; save: () => void; emit: () => void; notify: (pid: string, kind: string, title: string, body: string | null, ref?: Record<string, string>) => void; punchFor: (teamId: string | null, personId: string, sessionId: string) => boolean }) {
+  const family = (pid: string) => [pid, ...get().guardians.filter((x) => x.child_id === pid).map((x) => x.parent_id)];
   const names = (pid: string | null) => { const p = get().persons.find((x) => x.id === pid); return p ? `${p.first_name} ${p.last_name}` : null; };
   return {
     async listRooms() { return get().S.rooms; },
@@ -68,7 +69,10 @@ export function scheduleOps(get: () => { S: SchedState; persons: Person[]; membe
           const d = new Date(s.starts_at); const ns = new Date(patch.starts_at as string); d.setHours(ns.getHours(), ns.getMinutes()); p.starts_at = d.toISOString();
           const d2 = new Date(s.ends_at); const ne = new Date(patch.ends_at as string); d2.setHours(ne.getHours(), ne.getMinutes()); p.ends_at = d2.toISOString();
         }
+        const wasSub = s.substitute_wanted, wasCancelled = s.cancelled;
         Object.assign(s, p);
+        if (patch.substitute_wanted && !wasSub) for (const st of g.persons.filter((x) => x.status === "approved" && (x.is_admin || g.memberships.some((m) => m.person_id === x.id && m.role !== "dancer")) && x.id !== s.trainer_id)) g.notify(st.id, "substitute", "Vikar søges", `${s.team_name ?? ""} · ${new Date(s.starts_at).toLocaleString("da-DK", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}`, { session_id: s.id });
+        if (patch.cancelled && !wasCancelled && s.team_id) for (const m of g.memberships.filter((x) => x.team_id === s.team_id)) for (const pid of family(m.person_id)) if (g.persons.find((x) => x.id === pid)?.user_id) g.notify(pid, "session", "Træning aflyst", `${s.team_name ?? ""} · ${new Date(s.starts_at).toLocaleDateString("da-DK")}${s.cancel_note ? " · " + s.cancel_note : ""}`, { session_id: s.id });
         if ("team_id" in patch) s.team_name = g.teams.find((t) => t.id === patch.team_id)?.name ?? null;
         if ("room_id" in patch) s.room_name = g.S.rooms.find((r) => r.id === patch.room_id)?.name ?? null;
         if ("trainer_id" in patch) s.trainer_name = names(patch.trainer_id as string | null)?.split(" ")[0] ?? null;
@@ -87,7 +91,7 @@ export function scheduleOps(get: () => { S: SchedState; persons: Person[]; membe
       const b: Booking = { id: "b-" + id(), ...i, room_name: g.S.rooms.find((r) => r.id === i.room_id)?.name ?? "", person_name: names(i.person_id) ?? "", status: staff ? "approved" : "pending" };
       g.S.bookings.push(b); g.save(); g.emit(); return b;
     },
-    async setBookingStatus(bid: string, status: Booking["status"]) { const g = get(); const b = g.S.bookings.find((x) => x.id === bid); if (b) b.status = status; g.save(); g.emit(); },
+    async setBookingStatus(bid: string, status: Booking["status"]) { const g = get(); const b = g.S.bookings.find((x) => x.id === bid); if (b && b.status !== status) { b.status = status; for (const pid of family(b.person_id)) g.notify(pid, "booking", status === "approved" ? "Booking godkendt" : "Booking afvist", `${b.title} · ${b.room_name}`, { booking_id: b.id }); } g.save(); g.emit(); },
     async deleteBooking(bid: string) { const g = get(); g.S.bookings = g.S.bookings.filter((b) => b.id !== bid); g.save(); g.emit(); },
     async listAbsences(ids: string[]) { return get().S.absences.filter((a) => ids.includes(a.session_id)); },
     async reportAbsence(session_id: string, person_id: string, reason: string | null, note: string | null) {
@@ -99,11 +103,12 @@ export function scheduleOps(get: () => { S: SchedState; persons: Person[]; membe
       const g = get(); const s = g.S.sessions.find((x) => x.id === session_id); if (!s?.team_id) return [];
       return g.memberships.filter((m) => m.team_id === s.team_id && m.role === "dancer").map((m) => {
         const p = g.persons.find((x) => x.id === m.person_id)!; const a = g.S.attendance.find((x) => x.session_id === session_id && x.person_id === p.id);
-        return { person_id: p.id, name: `${p.first_name} ${p.last_name}`, birth_year: p.birth_year, role: m.role, present: a ? a.present : null, absence: g.S.absences.find((x) => x.session_id === session_id && x.person_id === p.id) ?? null, via_punch: false };
+        return { person_id: p.id, name: `${p.first_name} ${p.last_name}`, birth_year: p.birth_year, role: m.role, present: a ? a.present : null, absence: g.S.absences.find((x) => x.session_id === session_id && x.person_id === p.id) ?? null, via_punch: !!a?.via_punch };
       }).filter((r) => g.persons.find((p) => p.id === r.person_id)?.status === "approved");
     },
     async saveAttendance(session_id: string, entries: { person_id: string; present: boolean }[]) {
-      const g = get(); g.S.attendance = g.S.attendance.filter((a) => a.session_id !== session_id).concat(entries.map((e) => ({ session_id, ...e }))); g.save(); g.emit();
+      const g = get(); const s = g.S.sessions.find((x) => x.id === session_id);
+      g.S.attendance = g.S.attendance.filter((a) => a.session_id !== session_id).concat(entries.map((e) => ({ session_id, ...e, via_punch: e.present && g.punchFor(s?.team_id ?? null, e.person_id, session_id) }))); g.save(); g.emit();
     },
     async createTeam(i: TeamInput & { name: string }) {
       const g = get(); const t: Team = { id: "team-" + id(), name: i.name, style: i.style ?? null, category: i.category ?? "mixed", level: i.level ?? null, closed: !!i.closed, parents_see_video: i.parents_see_video ?? (i.category === "mini" || i.category === "kids"), punch_card_open: !!i.punch_card_open, color: i.color ?? null, sort: g.teams.length };

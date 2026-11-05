@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { api, type Absence, type Booking, type Session } from "@/core/api";
+import { api, type Absence, type Booking, type Event, type Milestone, type Session } from "@/core/api";
 import { useAuth } from "@/core/auth";
 import { TeamPicker } from "../components/TeamPicker";
 import { SessionSheet } from "../components/SessionSheet";
 import { Toast } from "../components/Sheet";
 import { MessageBanner } from "../components/Messages";
 import { Feed } from "../components/Feed";
+import { Bell } from "../components/Notifications";
 import { addDays, dateLabel, hm, startOfDay } from "../lib/time";
 
 /** Home: "Din uge" for the hat you wear; trainers see their day; admin sees today's numbers. */
@@ -19,6 +20,8 @@ export function Home() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [absences, setAbsences] = useState<Absence[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [open, setOpen] = useState<Session | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
@@ -27,6 +30,7 @@ export function Home() {
     const from = startOfDay(new Date()), to = addDays(from, 7);
     const [s, b] = await Promise.all([api.listSessions(from.toISOString(), to.toISOString()), isAdmin ? api.listBookings(from.toISOString(), addDays(from, 30).toISOString()) : Promise.resolve([])]);
     setSessions(s); setBookings(b); setAbsences(await api.listAbsences(s.map((x) => x.id)));
+    const [ev, ms] = await Promise.all([api.listEvents(), api.listMilestones()]); setEvents(ev.slice(0, 3)); setMilestones(ms);
   }, [isAdmin]);
   useEffect(() => { void load(); }, [load, viewing.personId]);
 
@@ -40,7 +44,7 @@ export function Home() {
 
   return (
     <section className="screen">
-      <header className="topbar"><h1 className="display">{isAdmin ? t("home.hiAdmin", { name: me.person.first_name }) : t("home.hi", { name: me.person.first_name })}</h1><span className="avatar">{me.person.first_name[0]}{me.person.last_name[0] ?? ""}</span></header>
+      <header className="topbar"><h1 className="display">{isAdmin ? t("home.hiAdmin", { name: me.person.first_name }) : t("home.hi", { name: me.person.first_name })}</h1><div className="row"><Bell /><span className="avatar">{me.person.first_name[0]}{me.person.last_name[0] ?? ""}</span></div></header>
 
       {isAdmin && (
         <div className="kv">
@@ -81,6 +85,15 @@ export function Home() {
         </div>
       )}
       {!teamIds.size && !isAdmin && <div className="card"><p className="muted">{t("team.noneYet")}</p></div>}
+
+      {events.length > 0 && (
+        <div className="sec"><h2>{t("home.upcomingEvents")}</h2><div className="card list">
+          {events.map((e) => <div key={e.id} className="item" data-testid="home-event"><span className="time">{dateLabel(e.starts_at)}</span><span className="grow">{e.title}<div className="tiny">{t(`events.kind.${e.kind}`)}{e.place ? ` · ${e.place}` : ""}</div></span></div>)}
+        </div><p className="tiny">{t("home.eventsHint")}</p></div>
+      )}
+      {milestones.filter((m) => m.person_id === viewing.personId).length > 0 && (
+        <div className="sec"><h2>{hat ? t("home.childsMilestones", { name: hat.first_name }) : t("home.yourMilestones")}</h2><div className="chips">{milestones.filter((m) => m.person_id === viewing.personId).map((m) => <span key={m.id} className="chip gold">{m.title}</span>)}</div></div>
+      )}
 
       <div className="sec"><h2>{t("home.news")}</h2><Feed teamId={null} channels={["school"]} toast={say} limit={3} /></div>
 
