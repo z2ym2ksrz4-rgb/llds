@@ -5,6 +5,7 @@ import { Events } from "../screens/Events";
 import { MessageComposer, MessageSheet } from "../components/Messages";
 import { ago } from "../lib/time";
 import { AdminUsers } from "./Users";
+import { useAuth } from "@/core/auth";
 import { Sheet, Toast } from "../components/Sheet";
 import { SessionEditor } from "../components/SessionSheet";
 import { addDays, DAY_LONG, hm, mondayOf, startOfDay } from "../lib/time";
@@ -73,6 +74,7 @@ function Members() {
 }
 function MemberSheet({ member: p, teams, onClose, onChanged, toast }: { member: Member; teams: Team[]; onClose: () => void; onChanged: () => void; toast: (m: string) => void }) {
   const { t } = useTranslation();
+  const me = useAuth((s) => s.me)!;
   const [ms, setMs] = useState(p.memberships.map((m) => ({ team_id: m.team_id, role: m.role })));
   const roleOf = (tid: string) => ms.find((m) => m.team_id === tid)?.role ?? null;
   const toggle = (tid: string, role: Role) => setMs((cur) => cur.some((m) => m.team_id === tid && m.role === role) ? cur.filter((m) => m.team_id !== tid) : [...cur.filter((m) => m.team_id !== tid), { team_id: tid, role }]);
@@ -83,6 +85,9 @@ function MemberSheet({ member: p, teams, onClose, onChanged, toast }: { member: 
       <div className="field"><span>{t("admin.teamsAndRoles")}</span>
         <div className="teamgrid">{teams.map((tm) => { const r = roleOf(tm.id); return <div key={tm.id} className={"teamrow" + (r ? " on" : "")}><span className="grow">{tm.name}</span><div className="chips tight">{roles.map((role) => <button key={role} className={"chip small" + (r === role ? " on" : "")} onClick={() => toggle(tm.id, role)}>{t(`roles.${role}`)}</button>)}</div></div>; })}</div>
       </div>
+      {p.user_id && !p.supervised_by && p.id !== me.person.id && (
+        <label className="toggle"><span>{t("admin.isAdmin")}<div className="tiny">{t("admin.isAdminHint")}</div></span><input type="checkbox" checked={p.is_admin} data-testid="admin-toggle" onChange={async (e) => { await api.setAdmin(p.id, e.target.checked); toast(e.target.checked ? t("admin.adminGiven", { name: p.first_name }) : t("admin.adminRemoved", { name: p.first_name })); onChanged(); }} /></label>
+      )}
       <div className="row"><button className="cta grow" onClick={async () => { await api.setMemberships(p.id, ms); toast(t("common.saved")); onChanged(); onClose(); }}>{t("common.save")}</button>
         <button className="ghost danger" onClick={async () => { await api.setPersonStatus(p.id, "inactive"); toast(t("admin.deactivated")); onChanged(); onClose(); }}>{t("admin.deactivate")}</button></div>
     </Sheet>

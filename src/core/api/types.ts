@@ -144,6 +144,7 @@ export interface Api {
   listMembers(): Promise<Member[]>;
   setMemberships(personId: string, memberships: { team_id: string; role: Role }[]): Promise<void>;
   setPersonStatus(personId: string, status: PersonStatus): Promise<void>;
+  setAdmin(personId: string, isAdmin: boolean): Promise<void>;
   staffList(): Promise<Person[]>; // trainers + assistants + admins (for trainer/substitute pickers)
   /* supervised child login */
   grantChildLogin(childId: string, email: string): Promise<void>;

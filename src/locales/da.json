@@ -206,7 +206,11 @@
     "teamPublic": "Vis på website",
     "teamPublicHint": "Holdet står på lldancestudio-sitet med stil, niveau og træningstid (aldrig navne eller billeder)",
     "teamDescription": "Beskrivelse til website",
-    "teamDescriptionPh": "Hvem er holdet for, hvad danser I, og hvordan kommer man med?"
+    "teamDescriptionPh": "Hvem er holdet for, hvad danser I, og hvordan kommer man med?",
+    "isAdmin": "Administrator",
+    "isAdminHint": "Fuld adgang til hele skolen – samme som Line. Du kan ikke fjerne dig selv.",
+    "adminGiven": "{{name}} er nu administrator",
+    "adminRemoved": "{{name}} er ikke længere administrator"
   },
   "settings": {
     "language": "Sprog",

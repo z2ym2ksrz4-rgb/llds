@@ -87,6 +87,7 @@ export function supabaseSchedule(sb: SupabaseClient, fail: Fail, schoolId: () =>
       if (ms.length) { const { error: e2 } = await sb.from("membership").insert(ms.map((m) => ({ person_id: pid, ...m }))); fail(e2); }
     },
     async setPersonStatus(pid: string, status: PersonStatus) { const { error } = await sb.from("person").update({ status }).eq("id", pid); fail(error); },
+    async setAdmin(pid: string, isAdmin: boolean) { const { error } = await sb.from("person").update({ is_admin: isAdmin }).eq("id", pid); fail(error); },
     async staffList(): Promise<Person[]> {
       const { data: ms } = await sb.from("membership").select("person_id").neq("role", "dancer");
       const ids = Array.from(new Set((ms ?? []).map((m) => m.person_id as string)));

@@ -206,7 +206,11 @@
     "teamPublic": "Show on website",
     "teamPublicHint": "The team is listed on the website with style, level and training time (never names or photos)",
     "teamDescription": "Website description",
-    "teamDescriptionPh": "Who is the team for, what do you dance, how to join?"
+    "teamDescriptionPh": "Who is the team for, what do you dance, how to join?",
+    "isAdmin": "Administrator",
+    "isAdminHint": "Full access to the whole school – same as Line. You cannot remove yourself.",
+    "adminGiven": "{{name}} is now an administrator",
+    "adminRemoved": "{{name}} is no longer an administrator"
   },
   "settings": {
     "language": "Language",

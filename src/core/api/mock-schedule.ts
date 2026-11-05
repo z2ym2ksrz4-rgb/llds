@@ -122,6 +122,7 @@ export function scheduleOps(get: () => { S: SchedState; persons: Person[]; membe
     },
     async setMemberships(pid: string, ms: { team_id: string; role: Role }[]) { const g = get(); g.memberships = g.memberships.filter((m) => m.person_id !== pid).concat(ms.map((m) => ({ person_id: pid, ...m }))); g.save(); g.emit(); },
     async setPersonStatus(pid: string, status: PersonStatus) { const g = get(); const p = g.persons.find((x) => x.id === pid); if (p) p.status = status; g.save(); g.emit(); },
+    async setAdmin(pid: string, isAdmin: boolean) { const g = get(); const p = g.persons.find((x) => x.id === pid); if (p) p.is_admin = isAdmin; g.save(); g.emit(); },
     async staffList() { const g = get(); return g.persons.filter((p) => p.status === "approved" && (p.is_admin || g.memberships.some((m) => m.person_id === p.id && m.role !== "dancer"))); },
     async grantChildLogin(cid: string, email: string) {
       const g = get(); const c = g.persons.find((x) => x.id === cid); if (!c) return;
