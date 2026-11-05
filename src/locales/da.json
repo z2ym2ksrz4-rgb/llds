@@ -224,7 +224,17 @@
     "isAdmin": "Administrator",
     "isAdminHint": "Fuld adgang til hele skolen – samme som Line. Du kan ikke fjerne dig selv.",
     "adminGiven": "{{name}} er nu administrator",
-    "adminRemoved": "{{name}} er ikke længere administrator"
+    "adminRemoved": "{{name}} er ikke længere administrator",
+    "importPhotos": "Importér billeder",
+    "importSub": "Zip med én mappe pr. hold → holdmapper + covers",
+    "importIntro": "Vælg en zip-fil med én mappe pr. hold (fx fra Google Drive). Hver mappe lægges i holdets mappe, og det første billede bliver holdets forsidebillede. Billederne er private – kun holdet, forældre og trænere ser dem.",
+    "importDefaultFolder": "Holdbilleder 25/26",
+    "importSkip": "– spring over –",
+    "importCover": "Brug første billede som holdets cover",
+    "importRun": "Importér {{n}} billeder",
+    "importProgress": "Lægger op… {{n}} af {{total}}",
+    "importDone": "Færdig – {{n}} billeder importeret",
+    "importHint": "Store zip-filer tager tid på mobilnet – brug gerne computer. Kan køres igen; eksisterende filer springes over."
   },
   "settings": {
     "language": "Sprog",

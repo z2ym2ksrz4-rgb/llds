@@ -224,7 +224,17 @@
     "isAdmin": "Administrator",
     "isAdminHint": "Full access to the whole school – same as Line. You cannot remove yourself.",
     "adminGiven": "{{name}} is now an administrator",
-    "adminRemoved": "{{name}} is no longer an administrator"
+    "adminRemoved": "{{name}} is no longer an administrator",
+    "importPhotos": "Import photos",
+    "importSub": "Zip with one folder per team → team folders + covers",
+    "importIntro": "Pick a zip with one folder per team (e.g. from Google Drive). Each folder goes into the team's folder and the first image becomes the team cover. Photos are private – only the team, parents and trainers see them.",
+    "importDefaultFolder": "Team photos 25/26",
+    "importSkip": "– skip –",
+    "importCover": "Use first image as team cover",
+    "importRun": "Import {{n}} photos",
+    "importProgress": "Uploading… {{n}} of {{total}}",
+    "importDone": "Done – {{n}} photos imported",
+    "importHint": "Large zips take time on mobile data – use a computer. Safe to run again; existing files are skipped."
   },
   "settings": {
     "language": "Language",

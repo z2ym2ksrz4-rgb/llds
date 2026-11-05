@@ -131,6 +131,14 @@ export function socialOps(get: () => { X: SocialState; notify: (pid: string, kin
     async addResult(i: { team_id: string | null; event_title: string; placed: string; held_on: string; visibility: "private" | "public" }) { const g = get(); (g.X.results ??= []).push({ id: "res-" + id(), ...i }); g.save(); g.emit(); },
     async deleteResult(rid: string) { const g = get(); g.X.results = (g.X.results ?? []).filter((r) => r.id !== rid); g.save(); g.emit(); },
     async teamStats(teamId: string) { const g = get(); const vids = g.X.videos.filter((v) => v.team_id === teamId); const folders = g.X.folders.filter((f) => f.team_id === teamId).map((f) => f.id); return { videos: vids.length, formations: vids.reduce((n, v) => n + v.formations.length, 0), media: g.X.media.filter((m) => folders.includes(m.folder_id)).length, dancers: g.memberships.filter((m) => m.team_id === teamId && m.role === "dancer").length }; },
+    async importTeamImage(teamId: string, folderName: string, file: Blob, fileName: string, asCover: boolean) {
+      const g = get(); const me = g.me()!; let f = g.X.folders.find((x) => x.team_id === teamId && x.name === folderName);
+      if (!f) { f = { id: "f-" + id(), team_id: teamId, name: folderName, staff_only: false, media_count: 0, cover_path: null, created_at: now() }; g.X.folders.push(f); }
+      const path = `mock/folders/${f.id}/${fileName}`; urls.set(path, await fileToDataUrl(await downscaleImage(file as File, 1200, 0.8)));
+      g.X.media.push({ id: "m-" + id(), folder_id: f.id, uploader_id: me.id, uploader_name: name(me), storage_path: path, kind: "image", url: "", created_at: now() });
+      if (asCover) { const t = g.teams.find((x) => x.id === teamId); if (t) { t.cover_path = path; t.cover_url = urls.get(path); } }
+      g.save(); g.emit();
+    },
     async listNotes(teamId: string, dancerId?: string): Promise<Note[]> { const g = get(); return g.X.notes.filter((n) => n.team_id === teamId && (!dancerId || n.dancer_id === dancerId) && staffOf(teamId)).sort((a, b) => b.created_at.localeCompare(a.created_at)); },
     async addNote(teamId: string, dancerId: string, body: string) { const g = get(); const me = g.me()!; g.X.notes.push({ id: "n-" + id(), team_id: teamId, dancer_id: dancerId, dancer_name: name(g.persons.find((p) => p.id === dancerId)), author_id: me.id, author_name: name(me), body, created_at: now() }); g.save(); g.emit(); },
     async deleteNote(nid: string) { const g = get(); g.X.notes = g.X.notes.filter((n) => n.id !== nid); g.save(); g.emit(); },

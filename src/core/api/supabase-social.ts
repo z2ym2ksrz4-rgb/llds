@@ -127,6 +127,19 @@ export function supabaseSocial(sb: SupabaseClient, fail: Fail, schoolId: () => P
       const [v, f, m] = await Promise.all([sb.from("video").select("formations").eq("team_id", teamId), sb.from("folder_view").select("media_count").eq("team_id", teamId), sb.from("membership").select("person_id").eq("team_id", teamId).eq("role", "dancer")]);
       return { videos: (v.data ?? []).length, formations: (v.data ?? []).reduce((n, x) => n + ((x.formations as unknown[]) ?? []).length, 0), media: (f.data ?? []).reduce((n, x) => n + Number(x.media_count ?? 0), 0), dancers: (m.data ?? []).length };
     },
+    async importTeamImage(teamId: string, folderName: string, file: Blob, fileName: string, asCover: boolean) {
+      const sid = await schoolId(); const pid = await myPersonId();
+      let { data: folder } = await sb.from("folder").select("id").eq("team_id", teamId).eq("name", folderName).maybeSingle();
+      if (!folder) { const { data, error } = await sb.from("folder").insert({ school_id: sid, team_id: teamId, name: folderName }).select("id").single(); fail(error); folder = data; }
+      const path = `${schoolSlug}/folders/${folder!.id}/${fileName.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+      const { error: ue } = await sb.storage.from(BUCKET).upload(path, file, { contentType: "image/jpeg", upsert: true }); fail(ue);
+      const { error } = await sb.from("media").upsert({ folder_id: folder!.id, uploader_id: pid, storage_path: path, kind: "image" }, { onConflict: "storage_path", ignoreDuplicates: true }); fail(error);
+      if (asCover) {
+        const cover = `${schoolSlug}/teams/${teamId}/cover.jpg`;
+        const { error: ce } = await sb.storage.from(BUCKET).upload(cover, file, { contentType: "image/jpeg", upsert: true }); fail(ce);
+        const { error: te } = await sb.from("team").update({ cover_path: cover }).eq("id", teamId); fail(te);
+      }
+    },
     async listNotes(teamId: string, dancerId?: string): Promise<Note[]> {
       let q = sb.from("note_view").select("*").eq("team_id", teamId).order("created_at", { ascending: false });
       if (dancerId) q = q.eq("dancer_id", dancerId);

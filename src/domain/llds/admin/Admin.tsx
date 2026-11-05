@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type Booking, type Member, type Message, type Order, type Product, type PunchCard, type PunchCardType, type Report, type Role, type Session, type Team, type TeamInput } from "@/core/api";
 import { Events } from "../screens/Events";
+import { ImportPhotos } from "./ImportPhotos";
 import { MessageComposer, MessageSheet } from "../components/Messages";
 import { ago } from "../lib/time";
 import { AdminUsers } from "./Users";
@@ -10,7 +11,7 @@ import { Sheet, Toast } from "../components/Sheet";
 import { SessionEditor } from "../components/SessionSheet";
 import { addDays, DAY_LONG, hm, mondayOf, startOfDay } from "../lib/time";
 
-type Page = "menu" | "users" | "members" | "teams" | "season" | "bookings" | "messages" | "reports" | "events" | "shop" | "punch";
+type Page = "menu" | "users" | "members" | "teams" | "season" | "bookings" | "messages" | "reports" | "events" | "shop" | "punch" | "import";
 const CATS = ["mini", "kids", "junior", "adult", "mixed"] as const;
 
 /** Admin: the one place Line runs the school from. Everything else in the app reads what she sets here. */
@@ -33,11 +34,13 @@ export function Admin() {
   if (page === "events") return <Back onBack={() => setPage("menu")}><Events admin /></Back>;
   if (page === "shop") return <Back onBack={() => setPage("menu")}><ShopAdmin /></Back>;
   if (page === "punch") return <Back onBack={() => setPage("menu")}><PunchAdmin /></Back>;
+  if (page === "import") return <Back onBack={() => setPage("menu")}><ImportPhotos /></Back>;
   const items: [Page, string, string, number][] = [
     ["users", t("admin.users"), t("admin.usersSub"), counts.pending], ["members", t("admin.members"), t("admin.membersSub"), 0], ["teams", t("admin.teams"), t("admin.teamsSub"), 0],
     ["season", t("admin.season"), t("admin.seasonSub"), counts.subs], ["bookings", t("admin.bookings"), t("admin.bookingsSub"), counts.bookings],
     ["messages", t("admin.messages"), t("admin.messagesSub"), 0], ["reports", t("admin.reports"), t("admin.reportsSub"), counts.reports],
     ["events", t("events.title"), t("admin.eventsSub"), 0], ["shop", t("admin.shop"), t("admin.shopSub"), counts.orders], ["punch", t("punch.title"), t("admin.punchSub"), counts.cards],
+    ["import", t("admin.importPhotos"), t("admin.importSub"), 0],
   ];
   return (
     <section className="screen">

@@ -273,3 +273,9 @@ export interface Api {
   /** counts for the team tiles */
   teamStats(teamId: string): Promise<{ videos: number; media: number; formations: number; dancers: number }>;
 }
+
+/* ---------------- admin: bulk photo import ---------------- */
+export interface Api {
+  /** Upload one image into a team folder (creates the folder by name if missing); optionally set it as the team cover. */
+  importTeamImage(teamId: string, folderName: string, file: Blob, fileName: string, asCover: boolean): Promise<void>;
+}
