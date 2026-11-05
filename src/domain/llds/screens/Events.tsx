@@ -1,16 +1,64 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { api, type Event, type EventInput, type EventSignup } from "@/core/api";
+import { api, type Event, type EventInput, type EventSignup, type Result } from "@/core/api";
 import { useAuth } from "@/core/auth";
 import { Sheet, Toast } from "../components/Sheet";
 import { PaySheet } from "../components/Pay";
 import { dateLabel, hm, isoDate } from "../lib/time";
+import { artFor } from "../lib/art";
+import { TopRight } from "../components/ProfileMenu";
+import { Shop } from "./Shop";
 
 const KINDS = ["competition", "show", "workshop", "social"] as const;
 
-/** Events & competitions: plan, pack list, meet time, sign-up (for me or my child), payment via MobilePay. Staff create/edit and see sign-ups. */
-export function Events({ onBack, admin }: { onBack?: () => void; admin?: boolean }) {
+/** Events tab like the demo: Kommende (photo cards) · Resultater (trophies) · Stjerneshoppen (shop). */
+export function Events({ admin }: { admin?: boolean }) {
   const { t } = useTranslation();
+  const [tab, setTab] = useState<"upcoming" | "results" | "shop">("upcoming");
+  return (
+    <section className="screen">
+      <header className="topbar"><h1 className="display">{t("events.title")}</h1>{!admin && <TopRight />}</header>
+      <div className="subtabs"><button className={tab === "upcoming" ? "on" : ""} onClick={() => setTab("upcoming")}>{t("events.upcoming")}</button><button className={tab === "results" ? "on" : ""} onClick={() => setTab("results")}>{t("events.results")}</button><button className={tab === "shop" ? "on" : ""} onClick={() => setTab("shop")}>{t("events.shopTab")}</button></div>
+      {tab === "upcoming" && <EventsList admin={admin} />}
+      {tab === "results" && <Results />}
+      {tab === "shop" && <Shop embedded />}
+    </section>
+  );
+}
+
+function Results() {
+  const { t } = useTranslation();
+  const me = useAuth((s) => s.me)!;
+  const isStaff = me.person.is_admin || me.memberships.some((m) => m.person_id === me.person.id && m.role !== "dancer");
+  const [list, setList] = useState<Result[]>([]);
+  const [adding, setAdding] = useState(false);
+  const [f, setF] = useState({ team_id: me.teams[0]?.id ?? "", event_title: "", placed: "", held_on: isoDate(new Date()), pub: true });
+  const load = useCallback(async () => setList(await api.listResults()), []);
+  useEffect(() => { void load(); }, [load]);
+  return (
+    <div className="stack" style={{ marginTop: 10 }}>
+      {isStaff && <button className="ghost small" onClick={() => setAdding(true)}>+ {t("events.addResult")}</button>}
+      <div className="card list">
+        {list.map((r) => <div key={r.id} className="item" data-testid="result"><span className="time">{new Date(r.held_on).toLocaleDateString("da-DK", { month: "short", year: "numeric" })}</span><span className="grow">{r.event_title}<div className="tiny">{r.team_name ?? ""}{r.visibility === "public" ? ` · ${t("feed.publicChip")}` : ""}</div></span><span className="chip gold small">{r.placed}</span>{isStaff && <button className="linklike tiny" onClick={async () => { await api.deleteResult(r.id); void load(); }}>×</button>}</div>)}
+        {!list.length && <p className="muted">{t("events.noResults")}</p>}
+      </div>
+      {adding && (
+        <Sheet onClose={() => setAdding(false)} eyebrow={t("events.results")} title={t("events.addResult")}>
+          <div className="field"><span>{t("events.teams")}</span><div className="chips">{me.teams.map((x) => <button key={x.id} className={"chip" + (f.team_id === x.id ? " on" : "")} onClick={() => setF({ ...f, team_id: x.id })}>{x.name}</button>)}</div></div>
+          <label className="field"><span>{t("events.name")}</span><input id="res-title" value={f.event_title} onChange={(e) => setF({ ...f, event_title: e.target.value })} placeholder="DM Showdance – finale" /></label>
+          <div className="grid2"><label className="field"><span>{t("events.placed")}</span><input id="res-placed" value={f.placed} onChange={(e) => setF({ ...f, placed: e.target.value })} placeholder="1. plads 🥇" /></label><label className="field"><span>{t("events.date")}</span><input type="date" value={f.held_on} onChange={(e) => setF({ ...f, held_on: e.target.value })} /></label></div>
+          <label className="check"><input type="checkbox" checked={f.pub} onChange={(e) => setF({ ...f, pub: e.target.checked })} />{t("events.publicResult")}</label>
+          <button className="cta" id="res-save" disabled={!f.event_title.trim() || !f.placed.trim()} onClick={async () => { await api.addResult({ team_id: f.team_id || null, event_title: f.event_title.trim(), placed: f.placed.trim(), held_on: f.held_on, visibility: f.pub ? "public" : "private" }); setAdding(false); void load(); }}>{t("common.save")}</button>
+        </Sheet>
+      )}
+    </div>
+  );
+}
+
+/** Upcoming events: photo cards with sign-up status, sheet with plan/pack list/sign-up/payment; staff create/edit. */
+function EventsList({ admin }: { admin?: boolean }) {
+  const { t } = useTranslation();
+  const me = useAuth((s) => s.me)!;
   const isStaff = useAuth((s) => s.isStaff)();
   const staff = admin || isStaff;
   const [events, setEvents] = useState<Event[]>([]);
@@ -20,19 +68,22 @@ export function Events({ onBack, admin }: { onBack?: () => void; admin?: boolean
   const [toast, setToast] = useState<string | null>(null); const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
   const load = useCallback(async () => { const e = await api.listEvents(past); setEvents(e); setOpen((o) => (o ? e.find((x) => x.id === o.id) ?? null : null)); }, [past]);
   useEffect(() => { void load(); }, [load]);
+  const mine = new Set(me.memberships.map((m) => m.team_id));
   return (
-    <section className="screen">
-      {onBack && <button className="linklike" onClick={onBack}>‹ {t("nav.more")}</button>}
-      <header className="topbar"><h1 className="display">{t("events.title")}</h1>{staff && <button className="ghost small" id="event-new" onClick={() => setEdit("new")}>+ {t("events.new")}</button>}</header>
-      <div className="card list">
-        {events.map((e) => <button key={e.id} className="item" onClick={() => setOpen(e)} data-testid="event"><span className="time">{dateLabel(e.starts_at)}<br />{hm(e.starts_at)}</span><span className="grow">{e.title}<div className="tiny">{t(`events.kind.${e.kind}`)}{e.place ? ` · ${e.place}` : ""}{e.team_names?.length ? ` · ${e.team_names.join(", ")}` : ` · ${t("events.allTeams")}`}{e.visibility === "public" ? ` · ${t("feed.publicChip")}` : ""}</div></span>{e.price_dkk ? <span className="chip small">{e.price_dkk} kr.</span> : null}<span className="gold">›</span></button>)}
-        {!events.length && <p className="muted">{t("events.empty")}</p>}
-      </div>
+    <div className="stack" style={{ marginTop: 10 }}>
+      {staff && <button className="ghost small" id="event-new" onClick={() => setEdit("new")}>+ {t("events.new")}</button>}
+      {events.map((e) => { const relevant = !e.team_ids.length || e.team_ids.some((id) => mine.has(id)); return (
+        <button key={e.id} className="hero tap photo evcard" data-testid="event" onClick={() => setOpen(e)} style={{ backgroundImage: `url(${artFor(e.id)})` }}>
+          <div><div className="eyebrow">{dateLabel(e.starts_at)} · {t(`events.kind.${e.kind}`)}</div><h2 className="display">{e.title}</h2>
+            <div className="row between"><span className="small muted">{e.place ?? ""}{e.team_names?.length ? ` · ${e.team_names.join(", ")}` : ` · ${t("events.allTeams")}`}</span>
+              {e.mySignups && e.mySignups > 0 ? <span className="chip ok small">{t("events.on")}</span> : relevant && (e.signup_deadline || e.price_dkk) ? <span className="chip gold small">{t("events.openSignup")}</span> : null}</div></div>
+        </button>); })}
+      {!events.length && <p className="muted">{t("events.empty")}</p>}
       <button className="linklike small" onClick={() => setPast(!past)}>{past ? t("events.hidePast") : t("events.showPast")}</button>
-      {open && <EventSheet event={open} staff={staff} onClose={() => setOpen(null)} onEdit={() => { setEdit(open); setOpen(null); }} onChanged={() => void load()} toast={say} />}
+      {open && <EventSheet event={open} staff={staff} onClose={() => { setOpen(null); void load(); }} onEdit={() => { setEdit(open); setOpen(null); }} onChanged={() => void load()} toast={say} />}
       {edit && <EventEditor event={edit === "new" ? null : edit} onClose={() => setEdit(null)} onSaved={() => { setEdit(null); void load(); say(t("common.saved")); }} />}
       <Toast msg={toast} />
-    </section>
+    </div>
   );
 }
 

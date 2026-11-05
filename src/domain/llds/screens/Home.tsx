@@ -1,20 +1,22 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { api, type Absence, type Booking, type Event, type Milestone, type Session } from "@/core/api";
+import { api, type Absence, type Booking, type Event, type Milestone, type Order, type PunchCard, type Session } from "@/core/api";
 import { useAuth } from "@/core/auth";
+import { useNav } from "@/core/nav";
 import { TeamPicker } from "../components/TeamPicker";
 import { SessionSheet } from "../components/SessionSheet";
 import { Toast } from "../components/Sheet";
 import { MessageBanner } from "../components/Messages";
-import { Feed } from "../components/Feed";
-import { Bell } from "../components/Notifications";
+import { TopRight } from "../components/ProfileMenu";
+import { artFor } from "../lib/art";
 import { addDays, dateLabel, hm, startOfDay } from "../lib/time";
 
-/** Home: "Din uge" for the hat you wear; trainers see their day; admin sees today's numbers. */
+/** Home, laid out like the approved demo: next event as a photo hero, messages that need you, your (child's) week with absence buttons, open payments. */
 export function Home() {
   const { t } = useTranslation();
   const me = useAuth((s) => s.me)!;
   const viewing = useAuth((s) => s.viewing)!;
+  const setTab = useNav((s) => s.setTab);
   const isAdmin = me.person.is_admin;
   const isStaff = isAdmin || me.memberships.some((m) => m.person_id === me.person.id && m.role !== "dancer");
   const [sessions, setSessions] = useState<Session[]>([]);
@@ -22,33 +24,48 @@ export function Home() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
   const [milestones, setMilestones] = useState<Milestone[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [cards, setCards] = useState<PunchCard[]>([]);
   const [open, setOpen] = useState<Session | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
 
   const load = useCallback(async () => {
     const from = startOfDay(new Date()), to = addDays(from, 7);
-    const [s, b] = await Promise.all([api.listSessions(from.toISOString(), to.toISOString()), isAdmin ? api.listBookings(from.toISOString(), addDays(from, 30).toISOString()) : Promise.resolve([])]);
-    setSessions(s); setBookings(b); setAbsences(await api.listAbsences(s.map((x) => x.id)));
-    const [ev, ms] = await Promise.all([api.listEvents(), api.listMilestones()]); setEvents(ev.slice(0, 3)); setMilestones(ms);
+    const [s, b, ev, ms, o, c] = await Promise.all([api.listSessions(from.toISOString(), to.toISOString()), isAdmin ? api.listBookings(from.toISOString(), addDays(from, 30).toISOString()) : Promise.resolve([]), api.listEvents(), api.listMilestones(), api.listOrders(), api.listPunchCards()]);
+    setSessions(s); setBookings(b); setEvents(ev); setMilestones(ms); setOrders(o); setCards(c); setAbsences(await api.listAbsences(s.map((x) => x.id)));
   }, [isAdmin]);
   useEffect(() => { void load(); }, [load, viewing.personId]);
 
   const teamIds = new Set(me.memberships.filter((m) => m.person_id === viewing.personId).map((m) => m.team_id));
   const myWeek = sessions.filter((s) => s.team_id && teamIds.has(s.team_id));
-  const staffToday = sessions.filter((s) => (s.trainer_id === me.person.id || s.substitute_id === me.person.id || (isAdmin && new Date(s.starts_at).toDateString() === new Date().toDateString())) && new Date(s.starts_at).toDateString() === new Date().toDateString());
+  const today = new Date().toDateString();
+  const staffToday = sessions.filter((s) => (s.trainer_id === me.person.id || s.substitute_id === me.person.id) && new Date(s.starts_at).toDateString() === today);
   const subWanted = sessions.filter((s) => s.substitute_wanted && !s.substitute_id && !s.cancelled);
   const hat = viewing.isChild ? me.children.find((c) => c.id === viewing.personId) : null;
   const myAbs = (s: Session) => absences.find((a) => a.session_id === s.id && a.person_id === viewing.personId);
-  const todayAbs = absences.filter((a) => sessions.some((s) => s.id === a.session_id && new Date(s.starts_at).toDateString() === new Date().toDateString()));
+  const todayAbs = absences.filter((a) => sessions.some((s) => s.id === a.session_id && new Date(s.starts_at).toDateString() === today));
+  const myTeamIds = new Set(me.memberships.map((m) => m.team_id));
+  const hero = events.find((e) => !e.team_ids.length || e.team_ids.some((id) => myTeamIds.has(id))) ?? events[0];
+  const daysTo = hero ? Math.max(0, Math.round((new Date(hero.starts_at).getTime() - Date.now()) / 864e5)) : 0;
+  const openPay = [...orders.filter((o) => o.status === "awaiting_payment").map((o) => ({ id: o.id, label: `${t("shop.title")} #${o.number}`, sub: o.claimed_paid_at ? t("shop.status.claimed") : t("shop.status.awaiting_payment"), amount: o.total_dkk })),
+    ...cards.filter((c) => c.status === "awaiting_payment").map((c) => ({ id: c.id, label: c.type_name, sub: c.claimed_paid_at ? t("punch.status.claimed") : t("punch.status.awaiting_payment"), amount: c.price_dkk }))];
+  const myMilestones = milestones.filter((m) => m.person_id === viewing.personId);
 
   return (
     <section className="screen">
-      <header className="topbar"><h1 className="display">{isAdmin ? t("home.hiAdmin", { name: me.person.first_name }) : t("home.hi", { name: me.person.first_name })}</h1><div className="row"><Bell /><span className="avatar">{me.person.first_name[0]}{me.person.last_name[0] ?? ""}</span></div></header>
+      <header className="topbar"><h1 className="display">{isAdmin ? t("home.hiAdmin", { name: me.person.first_name }) : t("home.hi", { name: me.person.first_name })}</h1><TopRight /></header>
+
+      {hero && (
+        <button className="hero tap photo" data-testid="hero" onClick={() => setTab("events")} style={{ backgroundImage: `url(${artFor(hero.id)})` }}>
+          <div><div className="eyebrow">{daysTo === 0 ? t("home.today") : t("home.inDays", { n: daysTo })}</div><h2 className="display">{hero.title}</h2>
+            <div className="small muted">{dateLabel(hero.starts_at)}{hero.place ? ` · ${hero.place}` : ""}{hero.team_names?.length ? ` · ${hero.team_names.join(", ")}` : ""}</div></div>
+        </button>
+      )}
 
       {isAdmin && (
         <div className="kv">
-          <div className="card"><div className="n">{sessions.filter((s) => new Date(s.starts_at).toDateString() === new Date().toDateString() && !s.cancelled).length}</div><div className="tiny">{t("home.trainingsToday")}</div></div>
+          <div className="card"><div className="n">{sessions.filter((s) => new Date(s.starts_at).toDateString() === today && !s.cancelled).length}</div><div className="tiny">{t("home.trainingsToday")}</div></div>
           <div className="card"><div className="n">{todayAbs.length}</div><div className="tiny">{t("home.absencesToday")}</div></div>
           <div className="card"><div className="n">{bookings.filter((b) => b.status === "pending").length}</div><div className="tiny">{t("home.bookingsPending")}</div></div>
           <div className="card"><div className="n">{subWanted.length}</div><div className="tiny">{t("home.subsWanted")}</div></div>
@@ -72,30 +89,31 @@ export function Home() {
 
       {(!isAdmin || teamIds.size > 0) && <TeamPicker />}
       {teamIds.size > 0 && (
-        <div className="sec"><div className="row between"><h2>{hat ? t("home.childsWeek", { name: hat.first_name }) : t("home.yourWeek")}</h2></div>
+        <div className="sec"><div className="row between"><h2>{hat ? t("home.childsWeek", { name: hat.first_name }) : t("home.yourWeek")}</h2><button className="linklike small" onClick={() => setTab("rooms")}>{t("home.fullSchedule")}</button></div>
           <div className="card list">
-            {myWeek.map((s) => { const a = myAbs(s); return (
-              <button key={s.id} className={"item" + (s.cancelled ? " off" : "")} onClick={() => setOpen(s)}>
-                <span className="time">{dateLabel(s.starts_at)}<br />{hm(s.starts_at)}</span>
-                <span className="grow">{s.team_name}<div className="tiny">{s.room_name} · {s.substitute_name ?? s.trainer_name}{s.cancelled ? " · " + t("session.cancelled") : ""}</div></span>
-                {a ? <span className="chip warn small">{t("session.absenceSentChip")}</span> : !s.cancelled && <span className="tiny">{t("home.tapAbsence")}</span>}
-              </button>); })}
+            {myWeek.map((s) => { const a = myAbs(s); const past = new Date(s.ends_at) < new Date(); return (
+              <div key={s.id} className={"item" + (s.cancelled ? " off" : "")}>
+                <button className="grow row linklike-none" onClick={() => setOpen(s)} style={{ textAlign: "left", background: "none", padding: 0, color: "inherit", fontWeight: 300, fontSize: "1rem", gap: 12 }}>
+                  <span className="time">{dateLabel(s.starts_at)}<br />{hm(s.starts_at)}</span>
+                  <span className="grow">{s.team_name}<div className="tiny">{s.room_name} · {s.substitute_name ?? s.trainer_name}{s.cancelled ? " · " + t("session.cancelled") : ""}</div></span>
+                </button>
+                {a ? <span className="chip warn small">{t("session.absenceSentChip")}</span> : !s.cancelled && !past && <button className="ghost small" onClick={() => setOpen(s)}>{t("session.absenceBtn")}</button>}
+              </div>); })}
             {!myWeek.length && <p className="muted">{t("home.noTrainings")}</p>}
           </div>
         </div>
       )}
       {!teamIds.size && !isAdmin && <div className="card"><p className="muted">{t("team.noneYet")}</p></div>}
 
-      {events.length > 0 && (
-        <div className="sec"><h2>{t("home.upcomingEvents")}</h2><div className="card list">
-          {events.map((e) => <div key={e.id} className="item" data-testid="home-event"><span className="time">{dateLabel(e.starts_at)}</span><span className="grow">{e.title}<div className="tiny">{t(`events.kind.${e.kind}`)}{e.place ? ` · ${e.place}` : ""}</div></span></div>)}
-        </div><p className="tiny">{t("home.eventsHint")}</p></div>
-      )}
-      {milestones.filter((m) => m.person_id === viewing.personId).length > 0 && (
-        <div className="sec"><h2>{hat ? t("home.childsMilestones", { name: hat.first_name }) : t("home.yourMilestones")}</h2><div className="chips">{milestones.filter((m) => m.person_id === viewing.personId).map((m) => <span key={m.id} className="chip gold">{m.title}</span>)}</div></div>
+      {openPay.length > 0 && (
+        <div className="sec"><h2>{t("home.payments")}</h2><div className="card list">
+          {openPay.map((p) => <button key={p.id} className="item" onClick={() => setTab("more")}><span className="grow">{p.label}<div className="tiny">{p.sub}</div></span><span className="gold">{p.amount} kr.</span></button>)}
+        </div></div>
       )}
 
-      <div className="sec"><h2>{t("home.news")}</h2><Feed teamId={null} channels={["school"]} toast={say} limit={3} /></div>
+      {myMilestones.length > 0 && (
+        <div className="sec"><h2>{hat ? t("home.childsMilestones", { name: hat.first_name }) : t("home.yourMilestones")}</h2><div className="chips">{myMilestones.map((m) => <span key={m.id} className="chip gold">{m.title}</span>)}</div></div>
+      )}
 
       {open && <SessionSheet session={open} absences={absences} onClose={() => setOpen(null)} onChanged={() => void load()} toast={say} />}
       <Toast msg={toast} />

@@ -50,6 +50,8 @@ export function supabaseApi(url: string, anonKey: string): Api {
       const ids = [person.id, ...childIds];
       const memberships = ((await sb.from("membership").select("person_id,team_id,role").in("person_id", ids)).data ?? []) as Membership[];
       const teams = person.status === "approved" ? (((await sb.from("team").select("*").eq("archived", false).order("sort")).data ?? []) as Team[]) : [];
+      const covers = teams.filter((t) => t.cover_path).map((t) => t.cover_path as string);
+      if (covers.length) { const { data: signed } = await sb.storage.from("media").createSignedUrls(covers, 3600); for (const t of teams) { const hit = signed?.find((x) => x.path === t.cover_path); if (hit?.signedUrl) t.cover_url = hit.signedUrl; } }
       return { person: person as Person, children, memberships, teams };
     },
 

@@ -5,7 +5,10 @@
     "settings": "Settings",
     "rooms": "Rooms",
     "team": "My team",
-    "more": "More"
+    "more": "More",
+    "social": "Social",
+    "events": "Events",
+    "profile": "Profile"
   },
   "common": {
     "loading": "Loading…",
@@ -92,7 +95,14 @@
     "childAccount": "Child profile",
     "choreoSub": "Video, tempo, mirror, formations",
     "choreoLocked": "Dancers and trainers only",
-    "foldersSub": "Photos and clips – team only"
+    "foldersSub": "Photos and clips – team only",
+    "dancersN": "{{n}} dancers",
+    "videosN": "{{n}} videos",
+    "mediaN": "{{n}} photos",
+    "formationsN": "{{n}} formations",
+    "nextForTeam": "Next for the team",
+    "trophies": "Trophy shelf",
+    "rosterStaffOnly": "Contact details are visible to the team's staff only."
   },
   "home": {
     "hi": "Hi {{name}}",
@@ -114,7 +124,11 @@
     "upcomingEvents": "Upcoming events",
     "eventsHint": "Sign-up and pack list under More → Events.",
     "yourMilestones": "Your milestones",
-    "childsMilestones": "{{name}}'s milestones"
+    "childsMilestones": "{{name}}'s milestones",
+    "today": "Today",
+    "inDays": "In {{n}} days",
+    "fullSchedule": "Full schedule",
+    "payments": "Payments"
   },
   "admin": {
     "users": "Users",
@@ -303,7 +317,8 @@
     "create": "Create training",
     "created": "Training created – room booked",
     "saved": "Saved",
-    "deleted": "Training deleted – room freed"
+    "deleted": "Training deleted – room freed",
+    "absenceBtn": "Report absence"
   },
   "rooms": {
     "prevWeek": "Previous week",
@@ -471,7 +486,9 @@
     "shopSub": "Hoodies, apparel, bottles – MobilePay",
     "punchSub": "Buy and see your punches",
     "milestonesSub": "What you have achieved",
-    "settingsSub": "Profile, child accounts, language, sign out"
+    "settingsSub": "Profile, child accounts, language, sign out",
+    "adminSub": "Users, teams, season, messages, shop",
+    "menuSub": "Shop, punch cards, milestones, settings"
   },
   "events": {
     "title": "Events",
@@ -515,7 +532,15 @@
     "packField": "Pack list (one per line)",
     "info": "Info for participants",
     "price": "Fee (DKK)",
-    "public": "Show on website (without sign-ups)"
+    "public": "Show on website (without sign-ups)",
+    "upcoming": "Upcoming",
+    "results": "Results",
+    "shopTab": "Star shop",
+    "openSignup": "Sign-up open",
+    "addResult": "Add result",
+    "noResults": "No results yet.",
+    "placed": "Placing",
+    "publicResult": "Show on website"
   },
   "shop": {
     "title": "Shop",
@@ -582,5 +607,9 @@
     "title": "Notifications",
     "eyebrow": "Latest",
     "empty": "No notifications yet."
+  },
+  "social": {
+    "feed": "Feed",
+    "all": "All"
   }
 }

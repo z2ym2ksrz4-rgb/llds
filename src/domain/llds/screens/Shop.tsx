@@ -7,7 +7,7 @@ import { PaySheet } from "../components/Pay";
 import { ago } from "../lib/time";
 
 /** Simple shop: pick product + size → order → MobilePay → "I have paid" → Line marks paid/handed out. No card payments, no stock sync beyond a number. */
-export function Shop({ onBack }: { onBack: () => void }) {
+export function Shop({ onBack, embedded }: { onBack?: () => void; embedded?: boolean }) {
   const { t } = useTranslation();
   const me = useAuth((s) => s.me)!;
   const viewing = useAuth((s) => s.viewing)!;
@@ -23,9 +23,9 @@ export function Shop({ onBack }: { onBack: () => void }) {
   const checkout = async () => { const o = await api.createOrder(viewing.personId, cart); setCart([]); await load(); setPay(o); };
   const who = viewing.isChild ? me.children.find((c) => c.id === viewing.personId)?.first_name : me.person.first_name;
   return (
-    <section className="screen">
-      <button className="linklike" onClick={onBack}>‹ {t("nav.more")}</button>
-      <header className="topbar"><h1 className="display">{t("shop.title")}</h1></header>
+    <section className={embedded ? "stack" : "screen"} style={embedded ? { marginTop: 10 } : undefined}>
+      {!embedded && <button className="linklike" onClick={onBack}>‹ {t("nav.more")}</button>}
+      {!embedded && <header className="topbar"><h1 className="display">{t("shop.title")}</h1></header>}
       <div className="shop-grid">
         {products.map((p) => <button key={p.id} className="product" onClick={() => setPick(p)} data-testid="product"><div className="cover">{p.image_url ? <img src={p.image_url} alt="" /> : <span className="display">{p.name[0]}</span>}</div><div className="small">{p.name}</div><div className="tiny gold">{p.price_dkk} kr.{p.stock != null && p.stock <= 0 ? ` · ${t("shop.soldOut")}` : ""}</div></button>)}
         {!products.length && <p className="muted">{t("shop.empty")}</p>}

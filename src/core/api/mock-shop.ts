@@ -45,7 +45,8 @@ export function shopOps(get: () => { Y: ShopState; persons: Person[]; membership
   return {
     async listEvents(includePast = false): Promise<Event[]> {
       const g = get(); const cut = new Date(Date.now() - 864e5).toISOString();
-      return g.Y.events.filter((e) => includePast || e.starts_at >= cut).map((e) => ({ ...e, signups: g.Y.signups.filter((s) => s.event_id === e.id).length, team_names: e.team_ids.length ? e.team_ids.map((t) => g.teams.find((x) => x.id === t)?.name ?? "?") : null })).sort((a, b) => a.starts_at.localeCompare(b.starts_at));
+      const mine = myPeople();
+      return g.Y.events.filter((e) => includePast || e.starts_at >= cut).map((e) => ({ ...e, mySignups: g.Y.signups.filter((s) => s.event_id === e.id && mine.includes(s.person_id)).length, signups: g.Y.signups.filter((s) => s.event_id === e.id).length, team_names: e.team_ids.length ? e.team_ids.map((t) => g.teams.find((x) => x.id === t)?.name ?? "?") : null })).sort((a, b) => a.starts_at.localeCompare(b.starts_at));
     },
     async saveEvent(i: EventInput, eid?: string) {
       const g = get();

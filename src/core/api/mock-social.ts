@@ -3,6 +3,7 @@ import { downscaleImage, fileToDataUrl } from "./image";
 
 /** Phase-3 half of the mock. Binary media lives in memory only (data/object URLs), so it is gone after a reload. */
 export type SocialState = {
+  results?: { id: string; team_id: string | null; event_title: string; placed: string; held_on: string; visibility: "private" | "public" }[];
   posts: Post[]; comments: Comment[]; reports: Report[]; messages: Message[]; receipts: { message_id: string; person_id: string; acted_at: string }[];
   folders: Folder[]; media: MediaItem[]; videos: Video[]; notes: Note[];
 };
@@ -32,7 +33,7 @@ export function seedSocial(teams: Team[], persons: Person[]): SocialState {
   const videos: Video[] = [{ id: "v-1", team_id: axis.id, uploader_id: line.id, uploader_name: `${line.first_name} ${line.last_name}`, title: "DM-nummer – fuld gennemgang (uden video i demo)", storage_path: "", url: "", duration_s: 154, created_at: h(60),
     formations: [{ label: "Intro", positions: [{ initials: "FT", x: 0.3, y: 0.4 }, { initials: "AN", x: 0.7, y: 0.4 }, { initials: "LL", x: 0.5, y: 0.7 }] }, { label: "Omkvæd", positions: [{ initials: "FT", x: 0.2, y: 0.3 }, { initials: "AN", x: 0.5, y: 0.3 }, { initials: "LL", x: 0.8, y: 0.3 }] }] }];
   const notes: Note[] = [{ id: "n-1", team_id: axis.id, dancer_id: "p-freja", dancer_name: "Freja Therkildsen", author_id: line.id, author_name: `${line.first_name} ${line.last_name}`, body: "Arbejder på spagat – stor fremgang siden august. Husk at rose for musikalitet.", created_at: h(70) }];
-  return { posts, comments, reports: [], messages, receipts: [], folders, media: [], videos, notes };
+  return { posts, comments, reports: [], messages, receipts: [], folders, media: [], videos, notes, results: [{ id: "res-1", team_id: axis.id, event_title: "DM Showdance – finale", placed: "2. plads 🥈", held_on: "2026-05-09", visibility: "public" }, { id: "res-2", team_id: axis.id, event_title: "Nordic Dance Championship", placed: "1. plads 🥇", held_on: "2026-03-14", visibility: "public" }] };
 }
 
 export function socialOps(get: () => { X: SocialState; notify: (pid: string, kind: string, title: string, body: string | null, ref?: Record<string, string>) => void; persons: Person[]; memberships: Membership[]; guardians: { parent_id: string; child_id: string }[]; teams: Team[]; me: () => Person | null; save: () => void; emit: () => void }) {
@@ -121,6 +122,15 @@ export function socialOps(get: () => { X: SocialState; notify: (pid: string, kin
     async updateVideo(vid: string, patch: { title?: string; formations?: Formation[] }) { const g = get(); const v = g.X.videos.find((x) => x.id === vid); if (v) Object.assign(v, patch); g.save(); g.emit(); },
     async deleteVideo(vid: string) { const g = get(); g.X.videos = g.X.videos.filter((v) => v.id !== vid); g.save(); g.emit(); },
 
+    async listFeed(): Promise<Post[]> {
+      const g = get(); const mine = myTeamIds(); const admin = !!g.me()?.is_admin;
+      return g.X.posts.filter((p) => !p.hidden && (p.channel === "school" || (p.channel === "team" && p.team_id && (mine.has(p.team_id) || admin || staffOf(p.team_id)))))
+        .map((p) => ({ ...p, media: withUrls(p.media), comment_count: g.X.comments.filter((c) => c.post_id === p.id && !c.hidden).length })).sort((a, b) => b.created_at.localeCompare(a.created_at));
+    },
+    async listResults(teamId?: string) { const g = get(); return (g.X.results ?? []).filter((r) => !teamId || r.team_id === teamId).map((r) => ({ ...r, team_name: g.teams.find((t) => t.id === r.team_id)?.name ?? null })).sort((a, b) => b.held_on.localeCompare(a.held_on)); },
+    async addResult(i: { team_id: string | null; event_title: string; placed: string; held_on: string; visibility: "private" | "public" }) { const g = get(); (g.X.results ??= []).push({ id: "res-" + id(), ...i }); g.save(); g.emit(); },
+    async deleteResult(rid: string) { const g = get(); g.X.results = (g.X.results ?? []).filter((r) => r.id !== rid); g.save(); g.emit(); },
+    async teamStats(teamId: string) { const g = get(); const vids = g.X.videos.filter((v) => v.team_id === teamId); const folders = g.X.folders.filter((f) => f.team_id === teamId).map((f) => f.id); return { videos: vids.length, formations: vids.reduce((n, v) => n + v.formations.length, 0), media: g.X.media.filter((m) => folders.includes(m.folder_id)).length, dancers: g.memberships.filter((m) => m.team_id === teamId && m.role === "dancer").length }; },
     async listNotes(teamId: string, dancerId?: string): Promise<Note[]> { const g = get(); return g.X.notes.filter((n) => n.team_id === teamId && (!dancerId || n.dancer_id === dancerId) && staffOf(teamId)).sort((a, b) => b.created_at.localeCompare(a.created_at)); },
     async addNote(teamId: string, dancerId: string, body: string) { const g = get(); const me = g.me()!; g.X.notes.push({ id: "n-" + id(), team_id: teamId, dancer_id: dancerId, dancer_name: name(g.persons.find((p) => p.id === dancerId)), author_id: me.id, author_name: name(me), body, created_at: now() }); g.save(); g.emit(); },
     async deleteNote(nid: string) { const g = get(); g.X.notes = g.X.notes.filter((n) => n.id !== nid); g.save(); g.emit(); },

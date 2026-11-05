@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, isMock } from "@/core/api";
 import { Logo } from "../components/Logo";
+import { art } from "../lib/art";
 
 /** E-mail + one-time code. No passwords. */
 export function Login() {
@@ -23,7 +24,7 @@ export function Login() {
 
   return (
     <section className="screen login">
-      <div className="login-art" aria-hidden="true" />
+      <img className="login-bg" src={art("trails")} alt="" aria-hidden="true" /><div className="login-art" aria-hidden="true" />
       <div className="login-body">
         <Logo />
         <h1 className="display">{t("login.welcome")} <em>{t("login.backstage")}</em></h1>

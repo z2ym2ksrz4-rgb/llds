@@ -111,6 +111,22 @@ export function supabaseSocial(sb: SupabaseClient, fail: Fail, schoolId: () => P
       if (v?.storage_path) await sb.storage.from(BUCKET).remove([v.storage_path]);
     },
 
+    async listFeed(): Promise<Post[]> {
+      const { data, error } = await sb.from("post_view").select("*").in("channel", ["team", "school"]).eq("hidden", false).order("created_at", { ascending: false }).limit(60); fail(error);
+      const rows = (data ?? []) as (Post & { media: MediaRef[] })[]; const urls = await sign(rows.flatMap((p) => (p.media ?? []).map((m) => m.path)));
+      return rows.map((p) => ({ ...p, media: (p.media ?? []).map((m) => ({ ...m, url: urls[m.path] })), comment_count: Number(p.comment_count ?? 0) }));
+    },
+    async listResults(teamId?: string) {
+      let q = sb.from("result").select("*, team:team_id(name)").order("held_on", { ascending: false }); if (teamId) q = q.eq("team_id", teamId);
+      const { data, error } = await q; fail(error);
+      return (data ?? []).map((r: Record<string, unknown>) => ({ id: r.id as string, team_id: r.team_id as string | null, team_name: (r.team as { name: string } | null)?.name ?? null, event_title: r.event_title as string, placed: r.placed as string, held_on: r.held_on as string, visibility: r.visibility as "private" | "public" }));
+    },
+    async addResult(i: { team_id: string | null; event_title: string; placed: string; held_on: string; visibility: "private" | "public" }) { const { error } = await sb.from("result").insert({ ...i, school_id: await schoolId() }); fail(error); },
+    async deleteResult(id: string) { const { error } = await sb.from("result").delete().eq("id", id); fail(error); },
+    async teamStats(teamId: string) {
+      const [v, f, m] = await Promise.all([sb.from("video").select("formations").eq("team_id", teamId), sb.from("folder_view").select("media_count").eq("team_id", teamId), sb.from("membership").select("person_id").eq("team_id", teamId).eq("role", "dancer")]);
+      return { videos: (v.data ?? []).length, formations: (v.data ?? []).reduce((n, x) => n + ((x.formations as unknown[]) ?? []).length, 0), media: (f.data ?? []).reduce((n, x) => n + Number(x.media_count ?? 0), 0), dancers: (m.data ?? []).length };
+    },
     async listNotes(teamId: string, dancerId?: string): Promise<Note[]> {
       let q = sb.from("note_view").select("*").eq("team_id", teamId).order("created_at", { ascending: false });
       if (dancerId) q = q.eq("dancer_id", dancerId);

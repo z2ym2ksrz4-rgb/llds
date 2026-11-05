@@ -5,7 +5,10 @@
     "settings": "Indstillinger",
     "rooms": "Sale",
     "team": "Mit hold",
-    "more": "Mere"
+    "more": "Mere",
+    "social": "Social",
+    "events": "Events",
+    "profile": "Profil"
   },
   "common": {
     "loading": "Indlæser…",
@@ -92,7 +95,14 @@
     "childAccount": "Børneprofil",
     "choreoSub": "Video, tempo, spejl, formationer",
     "choreoLocked": "Kun for dansere og trænere på holdet",
-    "foldersSub": "Billeder og klip – kun for holdet"
+    "foldersSub": "Billeder og klip – kun for holdet",
+    "dancersN": "{{n}} dansere",
+    "videosN": "{{n}} videoer",
+    "mediaN": "{{n}} billeder",
+    "formationsN": "{{n}} formationer",
+    "nextForTeam": "Næste for holdet",
+    "trophies": "Trofæhylde",
+    "rosterStaffOnly": "Kontaktoplysninger ses kun af holdets trænere."
   },
   "home": {
     "hi": "Hej {{name}}",
@@ -114,7 +124,11 @@
     "upcomingEvents": "Kommende events",
     "eventsHint": "Tilmelding og pakkeliste under Mere → Events.",
     "yourMilestones": "Dine milepæle",
-    "childsMilestones": "{{name}}s milepæle"
+    "childsMilestones": "{{name}}s milepæle",
+    "today": "I dag",
+    "inDays": "Om {{n}} dage",
+    "fullSchedule": "Hele skemaet",
+    "payments": "Betaling"
   },
   "admin": {
     "users": "Brugere",
@@ -303,7 +317,8 @@
     "create": "Opret træning",
     "created": "Træning oprettet – salen er booket",
     "saved": "Gemt",
-    "deleted": "Træning slettet – salen er fri"
+    "deleted": "Træning slettet – salen er fri",
+    "absenceBtn": "Meld afbud"
   },
   "rooms": {
     "prevWeek": "Forrige uge",
@@ -471,7 +486,9 @@
     "shopSub": "Hoodies, tøj, drikkedunke – MobilePay",
     "punchSub": "Køb og se dine klip",
     "milestonesSub": "Det du har nået",
-    "settingsSub": "Profil, børneprofiler, sprog, log ud"
+    "settingsSub": "Profil, børneprofiler, sprog, log ud",
+    "adminSub": "Brugere, hold, sæsonplan, beskeder, shop",
+    "menuSub": "Shop, klippekort, milepæle, indstillinger"
   },
   "events": {
     "title": "Events",
@@ -515,7 +532,15 @@
     "packField": "Pakkeliste (én pr. linje)",
     "info": "Info til deltagerne",
     "price": "Egenbetaling (kr.)",
-    "public": "Vis på website (uden tilmeldinger)"
+    "public": "Vis på website (uden tilmeldinger)",
+    "upcoming": "Kommende",
+    "results": "Resultater",
+    "shopTab": "Stjerneshoppen",
+    "openSignup": "Åben tilmelding",
+    "addResult": "Tilføj resultat",
+    "noResults": "Ingen resultater endnu.",
+    "placed": "Placering",
+    "publicResult": "Vis på website"
   },
   "shop": {
     "title": "Shop",
@@ -582,5 +607,9 @@
     "title": "Notifikationer",
     "eyebrow": "Seneste",
     "empty": "Ingen notifikationer endnu."
+  },
+  "social": {
+    "feed": "Feed",
+    "all": "Alle"
   }
 }

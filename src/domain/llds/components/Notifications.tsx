@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type Notification } from "@/core/api";
 import { Sheet } from "./Sheet";
+import { Icon } from "./Icons";
 import { ago } from "../lib/time";
 
 const ICON: Record<string, string> = { message: "✉️", booking: "🏠", substitute: "🙋", session: "⚠️", event: "📅", milestone: "🏅", order: "🛍", punch: "🎟", post: "💬" };
@@ -17,7 +18,7 @@ export function Bell() {
   const openIt = async () => { setOpen(true); if (unread) { await api.markNotificationsRead(); setTimeout(() => void load(), 400); } };
   return (
     <>
-      <button className="bell" aria-label={t("notif.title")} data-testid="bell" onClick={() => void openIt()}>🔔{unread > 0 && <span className="badge" data-testid="badge">{unread}</span>}</button>
+      <button className="bell" aria-label={t("notif.title")} data-testid="bell" onClick={() => void openIt()}><Icon name="bell" />{unread > 0 && <span className="badge" data-testid="badge">{unread}</span>}</button>
       {open && (
         <Sheet onClose={() => setOpen(false)} eyebrow={t("notif.eyebrow")} title={t("notif.title")}>
           <div className="list">

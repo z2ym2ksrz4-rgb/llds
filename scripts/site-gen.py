@@ -33,8 +33,8 @@ header.top .wrap{display:flex;align-items:center;justify-content:space-between;g
 nav a{color:var(--muted);text-decoration:none;margin-left:18px;font-size:.85rem;letter-spacing:.08em;text-transform:uppercase}nav a:hover{color:var(--gold2)}
 nav a.app{color:var(--gold2);border:1px solid var(--gold3);border-radius:999px;padding:7px 14px}
 @media(max-width:640px){nav a:not(.app){display:none}}
-.hero{position:relative;padding:60px 0 70px;overflow:hidden}
-.hero:before{content:"";position:absolute;inset:0;background:radial-gradient(60% 60% at 70% 0%,rgba(201,162,74,.28),transparent 70%),linear-gradient(180deg,#15120d,transparent 70%);pointer-events:none}
+.hero{position:relative;padding:80px 0 90px;overflow:hidden;min-height:70vh;display:flex;align-items:center;background:url(BASEURL/art/1.jpg) center/cover}
+.hero:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(10,10,11,.92) 0%,rgba(10,10,11,.75) 50%,rgba(10,10,11,.35) 100%),linear-gradient(180deg,transparent 60%,var(--bg) 100%);pointer-events:none}
 .hero .wrap{position:relative;display:grid;grid-template-columns:1.2fr .8fr;gap:40px;align-items:center}
 @media(max-width:800px){.hero .wrap{grid-template-columns:1fr}}
 .hero .mark{width:min(260px,70vw);filter:drop-shadow(0 12px 32px rgba(201,162,74,.3));justify-self:center}
@@ -43,6 +43,12 @@ nav a.app{color:var(--gold2);border:1px solid var(--gold3);border-radius:999px;p
 .btn{display:inline-block;background:linear-gradient(135deg,var(--gold2),var(--gold));color:#161206;text-decoration:none;padding:14px 22px;border-radius:12px;font-weight:500;letter-spacing:.02em}
 .btn.ghost{background:none;color:var(--fg);border:1px solid var(--line);margin-left:8px}
 section{padding:48px 0;border-top:1px solid var(--line)}
+.band{position:relative;min-height:260px;border-radius:20px;overflow:hidden;display:flex;align-items:flex-end;padding:24px;margin:0 0 28px;background:center/cover}
+.band:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,11,.1),rgba(10,10,11,.85))}
+.band>*{position:relative}.band h3{font-size:1.8rem}
+.card.team{background:var(--card) center/cover;position:relative;overflow:hidden;min-height:150px;display:flex;flex-direction:column;justify-content:flex-end}
+.card.team:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,11,.2),rgba(10,10,11,.9))}.card.team>*{position:relative}
+.event{background:center/cover;position:relative;overflow:hidden}.event:before{content:"";position:absolute;inset:0;background:rgba(10,10,11,.78)}.event>*{position:relative}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
 .card h3{margin-bottom:4px}.tiny{font-size:.78rem;color:var(--fg3)}.muted{color:var(--muted)}.small{font-size:.9rem}
@@ -73,6 +79,7 @@ const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<
 const DAYS = ["Mandag","Tirsdag","Onsdag","Torsdag","Fredag","Lørdag","Søndag"]; const MON = ["jan","feb","mar","apr","maj","jun","jul","aug","sep","okt","nov","dec"];
 const hm = (iso) => new Date(iso).toLocaleTimeString("da-DK", { hour: "2-digit", minute: "2-digit" });
 const CAT = { mini: "Mini (3–6 år)", kids: "Børn", junior: "Junior", adult: "Voksen", mixed: "Junior & Voksen" };
+const ART = (k) => `%(base)s/art/${k}.jpg`; const CATART = { mini: 3, kids: 3, junior: 1, adult: 4, mixed: 4 }; const pick = (seed, pool) => { let h = 0; for (const c of seed) h = (h * 31 + c.charCodeAt(0)) >>> 0; return pool[h %% pool.length]; };
 (async () => {
   const [school] = await q("school", `&slug=eq.${SLUG}`); const sid = school?.id;
   if (school) { const s = school.settings || {}; document.querySelectorAll("[data-contact]").forEach((el) => { el.textContent = s[el.dataset.contact] || ""; }); }
@@ -82,7 +89,7 @@ const CAT = { mini: "Mini (3–6 år)", kids: "Børn", junior: "Junior", adult: 
   const tEl = document.getElementById("teams");
   if (teams.length) {
     const cats = ["mini", "kids", "junior", "adult", "mixed"].filter((c) => teams.some((t) => t.category === c));
-    tEl.innerHTML = cats.map((c) => `<div class="cat"><h3>${CAT[c]}</h3><div class="grid">${teams.filter((t) => t.category === c).map((t) => `<div class="card"><h3>${esc(t.name)}</h3><div class="tiny">${esc(t.style || "")}${t.level ? " · " + esc(t.level) : ""}</div>${t.description ? `<p class="small muted">${esc(t.description)}</p>` : ""}<div>${t.closed ? '<span class="chip gold">Lukket hold – audition</span>' : '<span class="chip">Åbent for tilmelding</span>'}${t.punch_card_open ? '<span class="chip">Klippekort</span>' : ""}</div></div>`).join("")}</div></div>`).join("");
+    tEl.innerHTML = cats.map((c) => `<div class="cat"><h3>${CAT[c]}</h3><div class="grid">${teams.filter((t) => t.category === c).map((t) => `<div class="card team" style="background-image:url(${ART(CATART[t.category] || 1)})"><h3>${esc(t.name)}</h3><div class="tiny">${esc(t.style || "")}${t.level ? " · " + esc(t.level) : ""}</div>${t.description ? `<p class="small muted">${esc(t.description)}</p>` : ""}<div>${t.closed ? '<span class="chip gold">Lukket hold – audition</span>' : '<span class="chip">Åbent for tilmelding</span>'}${t.punch_card_open ? '<span class="chip">Klippekort</span>' : ""}</div></div>`).join("")}</div></div>`).join("");
   } else tEl.innerHTML = '<p class="empty">Holdene for sæsonen er på vej.</p>';
   // timetable
   const sched = await q("public_schedule", f + "&order=starts_at");
@@ -94,7 +101,7 @@ const CAT = { mini: "Mini (3–6 år)", kids: "Børn", junior: "Junior", adult: 
   // events
   const events = await q("public_events", f + "&order=starts_at");
   const eEl = document.getElementById("events");
-  eEl.innerHTML = events.length ? events.map((e) => { const d = new Date(e.starts_at); return `<div class="card event"><div class="date">${d.getDate()}<small>${MON[d.getMonth()]}</small></div><div><h3>${esc(e.title)}</h3><div class="tiny">${{competition:"Konkurrence",show:"Show",workshop:"Workshop",social:"Socialt"}[e.kind] || ""}${e.place ? " · " + esc(e.place) : ""}${e.team_names?.length ? " · " + e.team_names.map(esc).join(", ") : ""}</div>${e.info ? `<p class="small muted">${esc(e.info)}</p>` : ""}</div></div>`; }).join("") : '<p class="empty">Ingen kommende events lige nu.</p>';
+  eEl.innerHTML = events.length ? events.map((e) => { const d = new Date(e.starts_at); return `<div class="card event" style="background-image:url(${ART(pick(e.id, [1,3,5]))})"><div class="date">${d.getDate()}<small>${MON[d.getMonth()]}</small></div><div><h3>${esc(e.title)}</h3><div class="tiny">${{competition:"Konkurrence",show:"Show",workshop:"Workshop",social:"Socialt"}[e.kind] || ""}${e.place ? " · " + esc(e.place) : ""}${e.team_names?.length ? " · " + e.team_names.map(esc).join(", ") : ""}</div>${e.info ? `<p class="small muted">${esc(e.info)}</p>` : ""}</div></div>`; }).join("") : '<p class="empty">Ingen kommende events lige nu.</p>';
   // news
   const posts = await q("public_posts", f + "&order=created_at.desc&limit=4");
   const nEl = document.getElementById("news");
@@ -120,12 +127,12 @@ INDEX = f"""
 <div class="hero"><div class="wrap"><div><div class="eyebrow">Ulstrup · Showdance · Hip Hop · Contemporary · Ballet</div><h1>Dans med hjertet.<br><em>Vind med holdet.</em></h1>
 <p class="lead">LL Dance Studio er danseskolen i Ulstrup for alle fra 3 år til voksne – fra Mini Cuties til DM-hold. Her er plads til at lære, lege og konkurrere.</p>
 <a class="btn" href="#hold">Se holdene</a><a class="btn ghost" href="{BASE}/app/">Log ind i appen</a></div>{LOGO}</div></div>
-<section id="hold"><div class="wrap"><div class="eyebrow">Sæson 26/27</div><h2>Vores hold</h2><div id="teams"><p class="empty">Henter hold…</p></div></div></section>
+<section id="hold"><div class="wrap"><div class="band" style="background-image:url({BASE}/art/4.jpg)"><div><div class="eyebrow">Sæson 26/27</div><h3>Fra Mini Cuties til DM-hold</h3><p class="muted small" style="margin:4px 0 0">Showdance, hip hop, contemporary, ballet, spring &amp; tumbling og styrke – for alle aldre.</p></div></div><h2>Vores hold</h2><div id="teams"><p class="empty">Henter hold…</p></div></div></section>
 <section id="skema"><div class="wrap"><div class="eyebrow">Ugens træninger</div><h2>Skema</h2><div class="tt" id="timetable"><p class="empty">Henter skema…</p></div><p class="tiny" style="margin-top:14px">Skemaet viser den kommende uge og opdateres automatisk fra studiets planlægning. Aflysninger og vikarer meldes i appen.</p></div></section>
 <section id="events"><div class="wrap"><div class="eyebrow">Konkurrencer & shows</div><h2>Events</h2><div class="grid" id="events"><p class="empty">Henter events…</p></div></div></section>
 <section id="nyt"><div class="wrap"><div class="eyebrow">Fra studiet</div><h2>Nyt</h2><div id="news"></div></div></section>
-<section id="shop"><div class="wrap"><div class="eyebrow">Merchandise</div><h2>Shop</h2><div class="grid" id="shop"></div><p class="tiny" style="margin-top:14px">Bestilling og betaling (MobilePay) sker i appen – varerne udleveres i studiet.</p></div></section>
-<section id="app"><div class="wrap"><div class="install"><div class="eyebrow">Appen</div><h2>Alt om dit hold – ét sted</h2><p class="muted">Træninger, afbud, koreografi-video, holdets mapper, beskeder fra Line, bookinger af salene, klippekort og shop. Dansere, forældre og trænere logger ind med deres e-mail – ingen adgangskode.</p>
+<section id="shop"><div class="wrap"><div class="band" style="background-image:url({BASE}/art/6.jpg)"><div><div class="eyebrow">Merchandise</div><h3>Stjerneshoppen</h3></div></div><h2>Shop</h2><div class="grid" id="shop"></div><p class="tiny" style="margin-top:14px">Bestilling og betaling (MobilePay) sker i appen – varerne udleveres i studiet.</p></div></section>
+<section id="app"><div class="wrap"><div class="band" style="background-image:url({BASE}/art/5.jpg)"><div><div class="eyebrow">Øv hjemme</div><h3>Koreografi i halvt tempo, spejlvendt, loop</h3></div></div><div class="install"><div class="eyebrow">Appen</div><h2>Alt om dit hold – ét sted</h2><p class="muted">Træninger, afbud, koreografi-video, holdets mapper, beskeder fra Line, bookinger af salene, klippekort og shop. Dansere, forældre og trænere logger ind med deres e-mail – ingen adgangskode.</p>
 <a class="btn" href="{BASE}/app/">Åbn appen</a><p class="tiny" style="margin-top:12px">På iPhone: åbn linket i Safari → Del → “Føj til hjemmeskærm”. På Android: menuen → “Installér app”. Butiksversioner følger.</p></div></div></section>
 <section id="kontakt"><div class="wrap"><div class="eyebrow">Kontakt</div><h2>Find os</h2><div class="contact">
 <div class="card"><h3>Adresse</h3><p class="muted" data-contact="address">Vinkelvej 17, 8860 Ulstrup</p></div>
@@ -168,7 +175,9 @@ write("index.html", page("LL Dance Studio – danseskole i Ulstrup", INDEX, "Sho
 write("privacy/index.html", page("Privatlivspolitik – LL Dance Studio", PRIVACY, "Sådan behandler LL Dance Studio-appen dine data."))
 write("terms/index.html", page("Vilkår – LL Dance Studio", TERMS, "Vilkår for brug af LL Dance Studio-appen."))
 write("support/index.html", page("Hjælp – LL Dance Studio", SUPPORTP, "Kom i gang med LL Dance Studio-appen."))
-write("style.css", CSS)
-write("site.js", JS % {"url": SB_URL, "key": SB_KEY, "slug": SLUG})
+write("style.css", CSS.replace("BASEURL", BASE))
+write("site.js", JS % {"url": SB_URL, "key": SB_KEY, "slug": SLUG, "base": BASE})
 shutil.copy(os.path.join(ROOT, "public", "favicon.svg"), os.path.join(OUT, "favicon.svg"))
+os.makedirs(os.path.join(OUT, "art"), exist_ok=True)
+for f in os.listdir(os.path.join(ROOT, "public", "art")): shutil.copy(os.path.join(ROOT, "public", "art", f), os.path.join(OUT, "art", f))
 print("site written to", OUT)

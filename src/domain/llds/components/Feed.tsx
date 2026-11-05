@@ -73,6 +73,23 @@ function Composer({ teamId, channel, isStaff, isAdmin, onPosted }: { teamId: str
   );
 }
 
+/** A plain list of posts (used by the Social "Alle" feed); moderation per post's own team. */
+export function PostList({ posts, onChanged, toast }: { posts: Post[]; onChanged: () => void; toast: (m: string) => void }) {
+  const { t } = useTranslation();
+  const me = useAuth((s) => s.me)!;
+  const [open, setOpen] = useState<Post | null>(null);
+  const [lightbox, setLightbox] = useState<string | null>(null);
+  const modOf = (p: Post) => me.person.is_admin || (p.team_id != null && me.memberships.some((m) => m.person_id === me.person.id && m.team_id === p.team_id && m.role !== "dancer"));
+  return (
+    <div className="feed" data-testid="feed">
+      {posts.map((p) => <PostCard key={p.id} post={p} mod={modOf(p)} onOpen={() => setOpen(p)} onImage={setLightbox} onChanged={onChanged} toast={toast} />)}
+      {!posts.length && <p className="muted small">{t("feed.empty")}</p>}
+      {open && <CommentSheet post={open} mod={modOf(open)} onClose={() => { setOpen(null); onChanged(); }} toast={toast} />}
+      {lightbox && <div className="lightbox" onClick={() => setLightbox(null)}><img src={lightbox} alt="" /></div>}
+    </div>
+  );
+}
+
 function PostCard({ post, mod, onOpen, onImage, onChanged, toast }: { post: Post; mod: boolean; onOpen: () => void; onImage: (url: string) => void; onChanged: () => void; toast: (m: string) => void }) {
   const { t } = useTranslation();
   const me = useAuth((s) => s.me)!;
@@ -85,7 +102,7 @@ function PostCard({ post, mod, onOpen, onImage, onChanged, toast }: { post: Post
   return (
     <article className={"card post" + (post.hidden ? " hidden-post" : "")} data-testid="post">
       <div className="row between">
-        <div className="row"><span className="avatar small">{post.author_name[0]}</span><div><div className="small">{post.author_name}{post.official && <span className="chip gold small" style={{ marginLeft: 6 }}>{t("feed.officialChip")}</span>}{post.visibility === "public" && <span className="chip small" style={{ marginLeft: 6 }}>{t("feed.publicChip")}</span>}{post.hidden && <span className="chip warn small" style={{ marginLeft: 6 }}>{t("feed.hiddenChip")}</span>}</div><div className="tiny">{ago(post.created_at)}{post.team_name && post.channel !== "team" ? ` · ${post.team_name}` : ""}</div></div></div>
+        <div className="row"><span className="avatar small">{post.author_name[0]}</span><div><div className="small">{post.author_name}{post.official && <span className="chip gold small" style={{ marginLeft: 6 }}>{t("feed.officialChip")}</span>}{post.visibility === "public" && <span className="chip small" style={{ marginLeft: 6 }}>{t("feed.publicChip")}</span>}{post.hidden && <span className="chip warn small" style={{ marginLeft: 6 }}>{t("feed.hiddenChip")}</span>}</div><div className="tiny">{ago(post.created_at)} · {post.channel === "school" ? t("feed.channel.school") : post.channel === "trainers" ? t("feed.channel.trainers") : post.team_name ?? ""}</div></div></div>
         <button className="ghost small" aria-label={t("feed.more")} onClick={() => setMenu(!menu)}>···</button>
       </div>
       {menu && (

@@ -6,7 +6,7 @@ const p = await (await b.newContext({ viewport: { width: 390, height: 844 } })).
 const errors = []; p.on("pageerror", e => errors.push(e.message)); p.on("console", m => { if (m.type() === "error" && !m.text().includes("Failed to load resource")) errors.push(m.text()); });
 const out = {}; const shot = (n) => p.screenshot({ path: `smoke2-${n}.png` });
 const login = async (email) => { await p.waitForSelector("#email"); await p.fill("#email", email); await p.click("form button.cta"); await p.fill("#code", "123456"); await p.click("form button.cta"); await p.waitForSelector("nav.tabbar"); };
-const logout = async () => { await p.click("nav.tabbar >> text=Mere"); await p.click("[data-testid=more-settings]"); await p.click("text=Log ud"); };
+const logout = async () => { await p.click("nav.tabbar >> text=Hjem"); await p.click("[data-testid=avatar]"); await p.click("[data-testid=menu-more]"); await p.click("[data-testid=more-settings]"); await p.click("text=Log ud"); };
 await p.goto(base, { waitUntil: "networkidle" }); await p.evaluate(() => localStorage.clear()); await p.reload({ waitUntil: "networkidle" });
 
 // 1. parent: Freja's week, report absence on first training
@@ -21,7 +21,7 @@ await p.click(".days .day >> nth=4"); await p.waitForTimeout(200);
 await p.click("button[aria-label='Store Sal 10:00']"); await p.waitForSelector("#bk-title"); await p.click("text=Send til godkendelse");
 await p.waitForSelector(".toast"); out.booking = await p.textContent(".toast"); await shot(2);
 // 1c. parent grants child login (Freja is 2013 → 13 → not eligible in 2026; so expect "own account" text)
-await p.click("nav.tabbar >> text=Mere"); await p.click("[data-testid=more-settings]"); out.childText = await p.textContent(".sec .card .tiny");
+await p.click("nav.tabbar >> text=Hjem"); await p.click("[data-testid=avatar]"); await p.click("[data-testid=menu-more]"); await p.click("[data-testid=more-settings]"); out.childText = await p.textContent(".sec .card .tiny");
 await p.click("text=Log ud");
 
 // 2. admin: season → new weekly training (clash), bookings → approve
