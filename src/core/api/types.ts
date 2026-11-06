@@ -284,3 +284,14 @@ export interface Api {
   /** Upload one image into a team folder (creates the folder by name if missing); optionally set it as the team cover. */
   importTeamImage(teamId: string, folderName: string, file: Blob, fileName: string, asCover: boolean): Promise<void>;
 }
+
+/* ---------------- emblems (badges) ---------------- */
+export type Badge = { id: string; key: string; name: string; emoji: string; description: string | null; kind: "auto" | "manual"; monthly: boolean; sort: number };
+export type PersonBadge = { id: string; person_id: string; person_name: string; key: string; name: string; emoji: string; description: string | null; kind: "auto" | "manual"; team_id: string | null; team_name: string | null; period: string | null; note: string | null; given_by_name: string | null; created_at: string };
+export interface Api {
+  listBadges(): Promise<Badge[]>;
+  /** awards: for one person, or for a whole team (latest first); no args = my people */
+  listPersonBadges(filter?: { personId?: string; teamId?: string }): Promise<PersonBadge[]>;
+  giveBadge(personId: string, badgeId: string, teamId: string | null, note?: string): Promise<void>;
+  removeBadge(id: string): Promise<void>;
+}

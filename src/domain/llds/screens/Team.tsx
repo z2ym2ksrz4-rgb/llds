@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { api, type Absence, type Event, type Member, type Result, type Session } from "@/core/api";
+import { api, type Absence, type Event, type Member, type PersonBadge, type Result, type Session } from "@/core/api";
+import { EmblemRow, EmblemSheet, GiveEmblemSheet } from "../components/Emblems";
 import { useAuth } from "@/core/auth";
+import { useNav } from "@/core/nav";
 import { TeamPicker } from "../components/TeamPicker";
 import { SessionSheet } from "../components/SessionSheet";
 import { Sheet, Toast } from "../components/Sheet";
@@ -13,7 +15,7 @@ import { Choreo } from "./Choreo";
 import { Notes } from "./Notes";
 import { MILESTONE_IDEAS } from "../lib/milestones";
 import { artForCategory } from "../lib/art";
-import { ageOf, addDays, dateLabel, DAY_LONG, hm, startOfDay } from "../lib/time";
+import { ageOf, addDays, ago, dateLabel, DAY_LONG, hm, startOfDay } from "../lib/time";
 
 type Page = "team" | "folders" | "choreo" | "notes" | "dancers";
 
@@ -37,6 +39,10 @@ export function TeamScreen() {
   const [open, setOpen] = useState<Session | null>(null);
   const [compose, setCompose] = useState(false);
   const [award, setAward] = useState<Member | null>(null);
+  const setTab = useNav((s) => s.setTab);
+  const [badges, setBadges] = useState<PersonBadge[]>([]);
+  const [giveTo, setGiveTo] = useState<Member | null>(null);
+  const [openBadge, setOpenBadge] = useState<PersonBadge | null>(null);
   const [awardTitle, setAwardTitle] = useState("");
   const [toast, setToast] = useState<string | null>(null);
   const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
@@ -44,9 +50,9 @@ export function TeamScreen() {
   const load = useCallback(async () => {
     if (!teamId) return;
     const from = startOfDay(new Date());
-    const [s, ev, rs, st] = await Promise.all([api.listSessions(from.toISOString(), addDays(from, 28).toISOString()), api.listEvents(), api.listResults(teamId), api.teamStats(teamId)]);
+    const [s, ev, rs, st, bd] = await Promise.all([api.listSessions(from.toISOString(), addDays(from, 28).toISOString()), api.listEvents(), api.listResults(teamId), api.teamStats(teamId), api.listPersonBadges({ teamId })]);
     const mine = s.filter((x) => x.team_id === teamId);
-    setSessions(mine); setEvents(ev.filter((e) => !e.team_ids.length || e.team_ids.includes(teamId))); setResults(rs); setStats(st);
+    setSessions(mine); setEvents(ev.filter((e) => !e.team_ids.length || e.team_ids.includes(teamId))); setResults(rs); setStats(st); setBadges(bd);
     setAbsences(await api.listAbsences(mine.map((x) => x.id)));
     if (staff) setMembers((await api.listMembers()).filter((p) => p.memberships.some((m) => m.team_id === teamId)));
   }, [teamId, staff]);
@@ -73,9 +79,10 @@ export function TeamScreen() {
       <div className="card list">
         {trainers.map((p) => <div key={p.id} className="item"><span className="avatar">{p.first_name[0]}</span><span className="grow">{p.first_name} {p.last_name}<div className="tiny">{t(`roles.${p.memberships.find((m) => m.team_id === team.id)?.role ?? "trainer"}`)}</div></span></div>)}
         {dancers.map((p) => <div key={p.id} className="item"><span className="avatar">{p.first_name[0]}</span><span className="grow">{p.first_name} {p.last_name}{p.birth_year ? <span className="tiny"> · {p.birth_year}</span> : ""}
-          <div className="tiny">{p.parents.map((g) => `${g.first_name} ${g.phone ?? ""}`).join(" · ") || p.phone || ""}{p.photo_consent === false ? " · " + t("team.noPhotoConsent") : ""}</div></span>{p.supervised_by && <span className="chip small">{t("team.childAccount")}</span>}<button className="ghost small" aria-label={t("milestones.give")} data-testid="give-milestone" onClick={() => { setAward(p); setAwardTitle(""); }}>🏅</button></div>)}
+          <div className="tiny">{p.parents.map((g) => `${g.first_name} ${g.phone ?? ""}`).join(" · ") || p.phone || ""}{p.photo_consent === false ? " · " + t("team.noPhotoConsent") : ""}</div><EmblemRow badges={badges.filter((b) => b.person_id === p.id)} size="sm" /></span>{p.supervised_by && <span className="chip small">{t("team.childAccount")}</span>}<button className="ghost small" aria-label={t("badges.give")} data-testid="give-badge" onClick={() => setGiveTo(p)}>🎖</button><button className="ghost small" aria-label={t("milestones.give")} data-testid="give-milestone" onClick={() => { setAward(p); setAwardTitle(""); }}>🏅</button></div>)}
         {!staff && <p className="muted">{t("team.rosterStaffOnly")}</p>}
       </div>
+      {giveTo && <GiveEmblemSheet personId={giveTo.id} personName={giveTo.first_name} teamId={team.id} onClose={() => setGiveTo(null)} onGiven={(b) => { setGiveTo(null); say(t("badges.given", { name: giveTo.first_name, badge: `${b.emoji} ${b.name}` })); void load(); }} />}
       {award && (
         <Sheet onClose={() => setAward(null)} eyebrow={t("milestones.give")} title={award.first_name}>
           <div className="chips">{MILESTONE_IDEAS.map((m) => <button key={m} className={"chip" + (awardTitle === m ? " on" : "")} onClick={() => setAwardTitle(m)}>{m}</button>)}</div>
@@ -118,11 +125,16 @@ export function TeamScreen() {
         </div></div>
       )}
 
-      {results.length > 0 && (
-        <div className="sec"><h2>{t("team.trophies")}</h2><div className="card list">
-          {results.map((r) => <div key={r.id} className="item" data-testid="result"><span className="time">{new Date(r.held_on).toLocaleDateString("da-DK", { month: "short", year: "numeric" })}</span><span className="grow">{r.event_title}</span><span className="chip gold small">{r.placed}</span></div>)}
-        </div></div>
-      )}
+      <div className="sec"><div className="row between"><h2>{t("team.trophies")}</h2>{staff && <button className="linklike small" onClick={() => setTab("events")}>+ {t("events.addResult")}</button>}</div><div className="card list" data-testid="trophies">
+        {results.map((r) => <div key={r.id} className="item" data-testid="result"><span className="time">{new Date(r.held_on).toLocaleDateString("da-DK", { month: "short", year: "numeric" })}</span><span className="grow">{r.event_title}</span><span className="chip gold small">{r.placed}</span></div>)}
+        {!results.length && <p className="muted small" style={{ margin: 0 }}>{events.find((e) => e.kind === "competition") ? t("team.noTrophiesYet", { event: events.find((e) => e.kind === "competition")!.title, date: dateLabel(events.find((e) => e.kind === "competition")!.starts_at) }) : t("team.noTrophies")}</p>}
+      </div></div>
+
+      <div className="sec"><div className="row between"><h2>{t("badges.title")}</h2>{staff && <button className="linklike small" onClick={() => setPage("dancers")}>{t("badges.give")}</button>}</div><div className="card" data-testid="team-badges">
+        {badges.slice(0, 8).map((b) => <button key={b.id} className="item" onClick={() => setOpenBadge(b)}><span className="emblem sm"><span className="e">{b.emoji}</span></span><span className="grow">{b.person_name}<div className="tiny">{b.name}{b.note ? ` · “${b.note}”` : ""} · {ago(b.created_at)}</div></span></button>)}
+        {!badges.length && <p className="muted small" style={{ margin: 0 }}>{t("badges.emptyTeam")}</p>}
+      </div></div>
+      {openBadge && <EmblemSheet b={openBadge} onClose={() => setOpenBadge(null)} onRemove={staff ? async () => { await api.removeBadge(openBadge.id); setOpenBadge(null); void load(); } : undefined} />}
 
       <div className="sec"><h2>{t("feed.title")}</h2><Feed teamId={team.id} channels={isStaffAnywhere ? ["team", "school", "trainers"] : ["team", "school"]} toast={say} /></div>
 

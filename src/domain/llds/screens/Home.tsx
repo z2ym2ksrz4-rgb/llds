@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { api, type Absence, type Booking, type Event, type Milestone, type Order, type PunchCard, type Session } from "@/core/api";
+import { api, type Absence, type Booking, type Event, type Milestone, type PersonBadge, type Order, type PunchCard, type Session } from "@/core/api";
 import { useAuth } from "@/core/auth";
 import { useNav } from "@/core/nav";
 import { TeamPicker } from "../components/TeamPicker";
@@ -9,6 +9,7 @@ import { Toast } from "../components/Sheet";
 import { MessageBanner } from "../components/Messages";
 import { TopRight } from "../components/ProfileMenu";
 import { artFor } from "../lib/art";
+import { EmblemRow } from "../components/Emblems";
 import { addDays, dateLabel, hm, startOfDay } from "../lib/time";
 
 /** Home, laid out like the approved demo: next event as a photo hero, messages that need you, your (child's) week with absence buttons, open payments. */
@@ -24,6 +25,7 @@ export function Home() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
   const [milestones, setMilestones] = useState<Milestone[]>([]);
+  const [badges, setBadges] = useState<PersonBadge[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [cards, setCards] = useState<PunchCard[]>([]);
   const [open, setOpen] = useState<Session | null>(null);
@@ -33,6 +35,7 @@ export function Home() {
   const load = useCallback(async () => {
     const from = startOfDay(new Date()), to = addDays(from, 7);
     const [s, b, ev, ms, o, c] = await Promise.all([api.listSessions(from.toISOString(), to.toISOString()), isAdmin ? api.listBookings(from.toISOString(), addDays(from, 30).toISOString()) : Promise.resolve([]), api.listEvents(), api.listMilestones(), api.listOrders(), api.listPunchCards()]);
+    void api.listPersonBadges().then(setBadges).catch(() => setBadges([]));
     setSessions(s); setBookings(b); setEvents(ev); setMilestones(ms); setOrders(o); setCards(c); setAbsences(await api.listAbsences(s.map((x) => x.id)));
   }, [isAdmin]);
   useEffect(() => { void load(); }, [load, viewing.personId]);
@@ -128,6 +131,9 @@ export function Home() {
         </div></div>
       )}
 
+      {badges.some((b) => b.person_id === viewing.personId) && (
+        <div className="sec"><h2>{hat ? t("badges.childs", { name: hat.first_name }) : t("badges.yours")}</h2><EmblemRow badges={badges.filter((b) => b.person_id === viewing.personId)} /></div>
+      )}
       {myMilestones.length > 0 && (
         <div className="sec"><h2>{hat ? t("home.childsMilestones", { name: hat.first_name }) : t("home.yourMilestones")}</h2><div className="chips">{myMilestones.map((m) => <span key={m.id} className="chip gold">{m.title}</span>)}</div></div>
       )}

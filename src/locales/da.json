@@ -109,7 +109,9 @@
     "trophies": "Trofæhylde",
     "rosterStaffOnly": "Kontaktoplysninger ses kun af holdets trænere.",
     "about": "Om holdet",
-    "price": "Pris pr. sæson"
+    "price": "Pris pr. sæson",
+    "noTrophiesYet": "Ingen pokaler endnu – første stævne er {{event}} den {{date}}.",
+    "noTrophies": "Ingen pokaler endnu."
   },
   "home": {
     "hi": "Hej {{name}}",
@@ -641,5 +643,21 @@
     "blockedEyebrow": "Ingen adgang",
     "blocked": "Dansere på dette hold (årgang {{years}}) er under {{age}} år og har ikke egen adgang til appen. Forældrene ser holdet, træningerne og billederne.",
     "asParent": "Vis som forælder"
+  },
+  "badges": {
+    "title": "Emblemer",
+    "give": "Giv emblem",
+    "giveBtn": "Giv emblem",
+    "given": "{{name}} fik {{badge}}",
+    "yours": "Dine emblemer",
+    "childs": "{{name}}s emblemer",
+    "auto": "Optjent automatisk",
+    "manual": "Givet af træneren",
+    "givenBy": "Givet af {{name}}",
+    "earned": "Optjent ved fremmøde",
+    "remove": "Fjern emblem",
+    "notePh": "En lille hilsen (valgfrit)",
+    "monthlyHint": "Kan gives én gang om måneden",
+    "emptyTeam": "Ingen emblemer endnu – de første kommer, når fremmøde registreres (10 i træk 🔥), eller når træneren giver et."
   }
 }

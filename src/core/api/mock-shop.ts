@@ -1,10 +1,11 @@
-import type { Event, EventInput, EventSignup, Membership, Milestone, Notification, Order, OrderLine, Person, Product, PunchCard, PunchCardType, Team } from "./types";
+import type { PersonBadge, Event, EventInput, EventSignup, Membership, Milestone, Notification, Order, OrderLine, Person, Product, PunchCard, PunchCardType, Team } from "./types";
 import { downscaleImage, fileToDataUrl } from "./image";
+import { BADGES, monthKey } from "@/domain/llds/lib/badges";
 
 /** Phase-4 half of the mock: events, shop, punch cards, milestones, notifications. */
 export type ShopState = {
   events: Event[]; signups: EventSignup[]; products: Product[]; orders: Order[]; orderSeq: number;
-  cardTypes: PunchCardType[]; cards: PunchCard[]; punches: { card_id: string; session_id: string }[]; milestones: Milestone[]; notifications: Notification[];
+  cardTypes: PunchCardType[]; cards: PunchCard[]; punches: { card_id: string; session_id: string }[]; milestones: Milestone[]; notifications: Notification[]; badges?: PersonBadge[];
 };
 const id = () => Math.random().toString(36).slice(2, 10);
 const now = () => new Date().toISOString();
@@ -106,6 +107,34 @@ export function shopOps(get: () => { Y: ShopState; persons: Person[]; membership
     async giveMilestone(personId: string, title: string, teamId: string | null) {
       const g = get(); const me = g.me()!; const m: Milestone = { id: "ms-" + id(), person_id: personId, person_name: name(personId), title, reached_on: now().slice(0, 10), team_id: teamId, team_name: g.teams.find((t) => t.id === teamId)?.name ?? null, given_by_name: name(me.id), created_at: now() };
       g.Y.milestones.push(m); for (const pid of family(personId)) g.notify(pid, "milestone", "Ny milepæl 🏅", title, { milestone_id: m.id }); g.save(); g.emit();
+    },
+    /* emblems */
+    async listBadges() { return BADGES.map((b, i) => ({ id: "b-" + b.key, key: b.key, name: b.name, emoji: b.emoji, description: b.desc, kind: b.kind, monthly: !!b.monthly, sort: i })); },
+    async listPersonBadges(filter?: { personId?: string; teamId?: string }) {
+      const g = get(); const all = g.Y.badges ?? []; const mine = myPeople();
+      return all.filter((x) => filter?.personId ? x.person_id === filter.personId : filter?.teamId ? x.team_id === filter.teamId : mine.includes(x.person_id)).sort((a, b) => b.created_at.localeCompare(a.created_at));
+    },
+    async giveBadge(personId: string, badgeId: string, teamId: string | null, note?: string) {
+      const g = get(); const me = g.me()!; const def = BADGES.find((b) => "b-" + b.key === badgeId)!; const period = def.monthly ? monthKey() : null;
+      if (!g.Y.badges) g.Y.badges = [];
+      if (g.Y.badges.some((x) => x.person_id === personId && x.key === def.key && x.period === period)) throw new Error(def.monthly ? "Allerede givet denne måned" : "Har allerede dette emblem");
+      const pb: PersonBadge = { id: "pb-" + id(), person_id: personId, person_name: name(personId), key: def.key, name: def.name, emoji: def.emoji, description: def.desc, kind: def.kind, team_id: teamId, team_name: g.teams.find((t) => t.id === teamId)?.name ?? null, period, note: note || null, given_by_name: name(me.id), created_at: now() };
+      g.Y.badges.push(pb); for (const pid of family(personId)) g.notify(pid, "badge", `Nyt emblem ${def.emoji}`, def.name + (note ? ` – ${note}` : ""), { badge_id: pb.id }); g.save(); g.emit();
+    },
+    async removeBadge(bid: string) { const g = get(); g.Y.badges = (g.Y.badges ?? []).filter((x) => x.id !== bid); g.save(); g.emit(); },
+    /** auto emblems from attendance (mirrors award_auto_badges in SQL) */
+    awardAutoBadges(personId: string, attendance: { session_id: string; person_id: string; present: boolean }[], sessions: { id: string; team_id: string | null; starts_at: string }[], absences: { session_id: string; person_id: string }[]) {
+      const g = get(); if (!g.Y.badges) g.Y.badges = [];
+      const rows = attendance.filter((a) => a.person_id === personId).map((a) => ({ a, s: sessions.find((s) => s.id === a.session_id) })).filter((x) => x.s).sort((x, y) => y.s!.starts_at.localeCompare(x.s!.starts_at));
+      const total = rows.filter((x) => x.a.present).length; let streak = 0; let team: string | null = null;
+      for (const x of rows) { if (x.a.present && !absences.some((ab) => ab.session_id === x.a.session_id && ab.person_id === personId)) { streak++; team ??= x.s!.team_id; } else break; }
+      for (const def of BADGES) {
+        if (def.kind !== "auto" || g.Y.badges.some((b) => b.person_id === personId && b.key === def.key)) continue;
+        if ((def.rule?.streak && streak >= def.rule.streak) || (def.rule?.total && total >= def.rule.total)) {
+          const pb: PersonBadge = { id: "pb-" + id(), person_id: personId, person_name: name(personId), key: def.key, name: def.name, emoji: def.emoji, description: def.desc, kind: "auto", team_id: team, team_name: g.teams.find((t) => t.id === team)?.name ?? null, period: null, note: null, given_by_name: null, created_at: now() };
+          g.Y.badges.push(pb); for (const pid of family(personId)) g.notify(pid, "badge", `Nyt emblem ${def.emoji}`, def.name, { badge_id: pb.id });
+        }
+      }
     },
     async deleteMilestone(mid: string) { const g = get(); g.Y.milestones = g.Y.milestones.filter((m) => m.id !== mid); g.save(); g.emit(); },
 

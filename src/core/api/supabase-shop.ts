@@ -1,4 +1,4 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Badge, PersonBadge, SupabaseClient } from "@supabase/supabase-js";
 import type { Event, EventInput, EventSignup, Milestone, Notification, Order, OrderLine, Product, PunchCard, PunchCardType } from "./types";
 import { downscaleImage } from "./image";
 
@@ -76,6 +76,20 @@ export function supabaseShop(sb: SupabaseClient, fail: Fail, schoolId: () => Pro
     },
     async giveMilestone(personId: string, title: string, teamId: string | null) { const { error } = await sb.from("milestone").insert({ person_id: personId, title, team_id: teamId, reached_on: new Date().toISOString().slice(0, 10), given_by: await myPersonId() }); fail(error); },
     async deleteMilestone(id: string) { const { error } = await sb.from("milestone").delete().eq("id", id); fail(error); },
+
+    /* emblems */
+    async listBadges() { const { data, error } = await sb.from("badge").select("*").eq("active", true).order("sort"); fail(error); return (data ?? []) as Badge[]; },
+    async listPersonBadges(filter) {
+      let q = sb.from("person_badge_view").select("*").order("created_at", { ascending: false });
+      if (filter?.personId) q = q.eq("person_id", filter.personId); else if (filter?.teamId) q = q.eq("team_id", filter.teamId);
+      const { data, error } = await q.limit(200); fail(error); return (data ?? []) as PersonBadge[];
+    },
+    async giveBadge(personId, badgeId, teamId, note) {
+      const { data: b } = await sb.from("badge").select("monthly").eq("id", badgeId).single();
+      const period = b?.monthly ? new Date().toISOString().slice(0, 7) : null;
+      const { error } = await sb.from("person_badge").insert({ person_id: personId, badge_id: badgeId, team_id: teamId, period, note: note || null, given_by: await myPersonId() }); fail(error);
+    },
+    async removeBadge(id) { const { error } = await sb.from("person_badge").delete().eq("id", id); fail(error); },
 
     async listNotifications(): Promise<Notification[]> { const { data, error } = await sb.from("notification").select("*").order("created_at", { ascending: false }).limit(60); fail(error); return (data ?? []) as Notification[]; },
     async markNotificationsRead(ids?: string[]) {

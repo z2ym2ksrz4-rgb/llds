@@ -109,7 +109,9 @@
     "trophies": "Trophy shelf",
     "rosterStaffOnly": "Contact details are visible to the team's staff only.",
     "about": "About the team",
-    "price": "Season price"
+    "price": "Season price",
+    "noTrophiesYet": "No trophies yet – first competition is {{event}} on {{date}}.",
+    "noTrophies": "No trophies yet."
   },
   "home": {
     "hi": "Hi {{name}}",
@@ -641,5 +643,21 @@
     "blockedEyebrow": "No access",
     "blocked": "Dancers on this team ({{years}}) are under {{age}} and have no login of their own. Parents see the team, trainings and photos.",
     "asParent": "View as parent"
+  },
+  "badges": {
+    "title": "Emblems",
+    "give": "Give emblem",
+    "giveBtn": "Give emblem",
+    "given": "{{name}} got {{badge}}",
+    "yours": "Your emblems",
+    "childs": "{{name}}'s emblems",
+    "auto": "Earned automatically",
+    "manual": "Given by the trainer",
+    "givenBy": "Given by {{name}}",
+    "earned": "Earned by attendance",
+    "remove": "Remove emblem",
+    "notePh": "A short note (optional)",
+    "monthlyHint": "Once per month",
+    "emptyTeam": "No emblems yet – the first come when attendance is taken (10 in a row 🔥) or when a trainer gives one."
   }
 }

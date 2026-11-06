@@ -43,7 +43,7 @@ export function seedSchedule(teams: Team[], staff: Person[]): SchedState {
   return { rooms: ROOMS, sessions, bookings, absences: [], attendance: [] };
 }
 
-export function scheduleOps(get: () => { S: SchedState; persons: Person[]; memberships: Membership[]; guardians: { parent_id: string; child_id: string }[]; teams: Team[]; me: () => Person | null; save: () => void; emit: () => void; notify: (pid: string, kind: string, title: string, body: string | null, ref?: Record<string, string>) => void; punchFor: (teamId: string | null, personId: string, sessionId: string) => boolean }) {
+export function scheduleOps(get: () => { S: SchedState; persons: Person[]; memberships: Membership[]; guardians: { parent_id: string; child_id: string }[]; teams: Team[]; me: () => Person | null; save: () => void; emit: () => void; notify: (pid: string, kind: string, title: string, body: string | null, ref?: Record<string, string>) => void; punchFor: (teamId: string | null, personId: string, sessionId: string) => boolean; awardAuto: (pid: string) => void }) {
   const family = (pid: string) => [pid, ...get().guardians.filter((x) => x.child_id === pid).map((x) => x.parent_id)];
   const names = (pid: string | null) => { const p = get().persons.find((x) => x.id === pid); return p ? `${p.first_name} ${p.last_name}` : null; };
   return {
@@ -108,7 +108,7 @@ export function scheduleOps(get: () => { S: SchedState; persons: Person[]; membe
     },
     async saveAttendance(session_id: string, entries: { person_id: string; present: boolean }[]) {
       const g = get(); const s = g.S.sessions.find((x) => x.id === session_id);
-      g.S.attendance = g.S.attendance.filter((a) => a.session_id !== session_id).concat(entries.map((e) => ({ session_id, ...e, via_punch: e.present && g.punchFor(s?.team_id ?? null, e.person_id, session_id) }))); g.save(); g.emit();
+      g.S.attendance = g.S.attendance.filter((a) => a.session_id !== session_id).concat(entries.map((e) => ({ session_id, ...e, via_punch: e.present && g.punchFor(s?.team_id ?? null, e.person_id, session_id) }))); for (const e of entries) g.awardAuto(e.person_id); g.save(); g.emit();
     },
     async createTeam(i: TeamInput & { name: string }) {
       const g = get(); const t: Team = { id: "team-" + id(), name: i.name, style: i.style ?? null, category: i.category ?? "mixed", level: i.level ?? null, closed: !!i.closed, parents_see_video: i.parents_see_video ?? (i.category === "mini" || i.category === "kids"), punch_card_open: !!i.punch_card_open, color: i.color ?? null, sort: g.teams.length };

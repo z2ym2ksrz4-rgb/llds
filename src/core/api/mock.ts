@@ -70,7 +70,7 @@ const emit = () => listeners.forEach((l) => l());
 const meRow = () => S.persons.find((p) => p.email === S.email && p.user_id) ?? null;
 
 const notify = (person_id: string, kind: string, title: string, body: string | null, ref: Record<string, string> = {}) => { if (!S.persons.find((p) => p.id === person_id)?.user_id) return; S.Y.notifications.push({ id: "n-" + id(), person_id, kind, title, body, ref, read_at: null, created_at: now() }); };
-const ctx = () => ({ get S() { return S.S; }, get X() { return S.X; }, get Y() { return S.Y; }, notify, punchFor: (teamId: string | null, personId: string, sessionId: string) => shop.punchFor(teamId, personId, sessionId), get persons() { return S.persons; }, get memberships() { return S.memberships; }, set memberships(v: Membership[]) { S.memberships = v; }, get guardians() { return S.guardians; }, get teams() { return S.teams; }, me: meRow, save, emit });
+const ctx = () => ({ get S() { return S.S; }, get X() { return S.X; }, get Y() { return S.Y; }, notify, punchFor: (teamId: string | null, personId: string, sessionId: string) => shop.punchFor(teamId, personId, sessionId), awardAuto: (pid: string) => shop.awardAutoBadges(pid, S.S.attendance, S.S.sessions, S.S.absences), get persons() { return S.persons; }, get memberships() { return S.memberships; }, set memberships(v: Membership[]) { S.memberships = v; }, get guardians() { return S.guardians; }, get teams() { return S.teams; }, me: meRow, save, emit });
 const social = socialOps(ctx);
 const shop = shopOps(ctx);
 const { punchFor: _pf, ...shopApi } = shop; void _pf;
