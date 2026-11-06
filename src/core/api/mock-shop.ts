@@ -1,6 +1,6 @@
 import type { PersonBadge, Event, EventInput, EventSignup, Membership, Milestone, Notification, Order, OrderLine, Person, Product, PunchCard, PunchCardType, Team } from "./types";
 import { downscaleImage, fileToDataUrl } from "./image";
-import { BADGES, monthKey } from "@/domain/llds/lib/badges";
+import { BADGES, monthKey, totalBadge } from "@/domain/llds/lib/badges";
 
 /** Phase-4 half of the mock: events, shop, punch cards, milestones, notifications. */
 export type ShopState = {
@@ -128,8 +128,9 @@ export function shopOps(get: () => { Y: ShopState; persons: Person[]; membership
       const rows = attendance.filter((a) => a.person_id === personId).map((a) => ({ a, s: sessions.find((s) => s.id === a.session_id) })).filter((x) => x.s).sort((x, y) => y.s!.starts_at.localeCompare(x.s!.starts_at));
       const total = rows.filter((x) => x.a.present).length; let streak = 0; let team: string | null = null;
       for (const x of rows) { if (x.a.present && !absences.some((ab) => ab.session_id === x.a.session_id && ab.person_id === personId)) { streak++; team ??= x.s!.team_id; } else break; }
-      for (const def of BADGES) {
-        if (def.kind !== "auto" || g.Y.badges.some((b) => b.person_id === personId && b.key === def.key)) continue;
+      const defs = [...BADGES.filter((d) => d.kind === "auto" && !d.rule?.total), ...Array.from({ length: Math.floor(total / 50) }, (_, i) => totalBadge((i + 1) * 50))];
+      for (const def of defs) {
+        if (g.Y.badges.some((b) => b.person_id === personId && b.key === def.key)) continue;
         if ((def.rule?.streak && streak >= def.rule.streak) || (def.rule?.total && total >= def.rule.total)) {
           const pb: PersonBadge = { id: "pb-" + id(), person_id: personId, person_name: name(personId), key: def.key, name: def.name, emoji: def.emoji, description: def.desc, kind: "auto", team_id: team, team_name: g.teams.find((t) => t.id === team)?.name ?? null, period: null, note: null, given_by_name: null, created_at: now() };
           g.Y.badges.push(pb); for (const pid of family(personId)) g.notify(pid, "badge", `Nyt emblem ${def.emoji}`, def.name, { badge_id: pb.id });
