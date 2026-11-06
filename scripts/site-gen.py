@@ -72,7 +72,7 @@ header.top .wrap{display:flex;align-items:center;justify-content:space-between;g
 .logo{display:flex;align-items:center;gap:10px;color:var(--fg)}.logo .mark{height:54px;width:auto;transition:transform .5s var(--ease)}.logo:hover .mark{transform:rotate(-6deg)}
 .pill{display:flex;gap:2px;padding:4px;border:1px solid var(--line);border-radius:999px;background:rgba(10,10,11,.5);backdrop-filter:blur(12px)}
 .pill a{color:var(--muted);padding:9px 16px;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;border-radius:999px;transition:all .3s}.pill a:hover{color:var(--fg)}.pill a.on{color:#161206;background:linear-gradient(135deg,var(--gold2),var(--gold))}
-.hr{display:flex;align-items:center;gap:8px}
+.hr{display:flex;align-items:center;gap:8px}.langs{display:flex;gap:2px;margin-right:4px}.flag{font-size:1.15rem;line-height:1;padding:6px 5px;border-radius:999px;opacity:.55;transition:opacity .3s,transform .3s;filter:saturate(.8)}.flag:hover{opacity:1;transform:scale(1.1)}.flag.on{opacity:1}
 .btn.sm{padding:11px 18px;font-size:.85rem}
 .burger{display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,.04);border:1px solid var(--line2);color:var(--fg);border-radius:999px;padding:10px 16px;font-family:inherit;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;backdrop-filter:blur(8px);position:relative;z-index:60}
 .burger i{display:block;width:18px;height:10px;position:relative}.burger i:before,.burger i:after{content:"";position:absolute;left:0;right:0;height:1.5px;background:currentColor;transition:transform .4s var(--ease),top .4s}.burger i:before{top:0}.burger i:after{top:8px}
@@ -171,10 +171,10 @@ footer .big{font-family:var(--display);font-size:clamp(2rem,5vw,3.4rem);line-hei
 """
 
 JS = r"""
-const SB="%(url)s",KEY="%(key)s",SLUG="%(slug)s",BASE="%(base)s";
+const SB="%(url)s",KEY="%(key)s",SLUG="%(slug)s",BASE="%(base)s";const EN=document.documentElement.lang==="en";const L=EN?{kinds:{competition:"Competition",show:"Show",workshop:"Workshop",social:"Social"},noEvents:"No upcoming events right now – the Christmas ball, workshops and shows are announced here.",live:"This week – live from the app",cancel:"Cancellations and substitutes are shown in the app.",inApp:"In the app right now",mon:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]}:{kinds:{competition:"Konkurrence",show:"Show",workshop:"Workshop",social:"Socialt"},noEvents:"Ingen kommende events lige nu – julebal, workshops og shows annonceres her.",live:"Denne uge – live fra appen",cancel:"Aflysninger og vikarer vises i appen.",inApp:"I appen lige nu",mon:["jan","feb","mar","apr","maj","jun","jul","aug","sep","okt","nov","dec"]};
 const q=async(v,x="")=>{try{const r=await fetch(`${SB}/rest/v1/${v}?select=*${x}`,{headers:{apikey:KEY}});return r.ok?await r.json():[]}catch{return[]}};
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const MON=["jan","feb","mar","apr","maj","jun","jul","aug","sep","okt","nov","dec"];
+const MON=L.mon;
 const hm=iso=>new Date(iso).toLocaleTimeString("da-DK",{hour:"2-digit",minute:"2-digit"});
 const artFor=s=>{let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))>>>0;return `${BASE}/art/${[1,3,4,5][h%%4]}.jpg`};
 // header + menu
@@ -197,10 +197,10 @@ const fd=document.getElementById("finder-cards");if(fd){const T=JSON.parse(docum
 if(document.querySelector(".stickycta a"))document.body.classList.add("hasstk");
 // live data
 (async()=>{const[school]=await q("school",`&slug=eq.${SLUG}`);const f=school?`&school_id=eq.${school.id}`:"";
-const eEl=document.getElementById("events");if(eEl){const ev=await q("public_events",f+"&order=starts_at");eEl.innerHTML=ev.length?ev.map(e=>{const d=new Date(e.starts_at);return`<div class="card event" style="background-image:url(${artFor(e.title)})"><div class="date">${d.getDate()}<small>${MON[d.getMonth()]}</small></div><div><h3>${esc(e.title)}</h3><div class="tiny">${{competition:"Konkurrence",show:"Show",workshop:"Workshop",social:"Socialt"}[e.kind]||""}${e.place?" · "+esc(e.place):""}${e.price_dkk?" · "+e.price_dkk+" kr.":""}</div>${e.info?`<p class="small muted">${esc(e.info)}</p>`:""}</div></div>`}).join(""):'<p class="empty">Ingen kommende events lige nu – julebal, workshops og shows annonceres her.</p>'}
+const eEl=document.getElementById("events");if(eEl){const ev=await q("public_events",f+"&order=starts_at");eEl.innerHTML=ev.length?ev.map(e=>{const d=new Date(e.starts_at);return`<div class="card event" style="background-image:url(${artFor(e.title)})"><div class="date">${d.getDate()}<small>${MON[d.getMonth()]}</small></div><div><h3>${esc(e.title)}</h3><div class="tiny">${L.kinds[e.kind]||""}${e.place?" · "+esc(e.place):""}${e.price_dkk?" · "+e.price_dkk+" kr.":""}</div>${e.info?`<p class="small muted">${esc(e.info)}</p>`:""}</div></div>`}).join(""):`<p class="empty">${L.noEvents}</p>`}
 const nEl=document.getElementById("news");if(nEl){const ps=await q("public_posts",f+"&order=created_at.desc&limit=3");if(ps.length)nEl.innerHTML=ps.map(p=>{const d=new Date(p.created_at);return`<div class="post"><div class="tiny">${d.getDate()}. ${MON[d.getMonth()]} ${d.getFullYear()}</div>${esc(p.body)}</div>`}).join("");else nEl.closest("section")?.remove()}
-const pEl=document.getElementById("live-products");if(pEl){const pr=await q("public_products",f+"&order=name");if(pr.length)pEl.innerHTML=`<div class="eyebrow">I appen lige nu</div><div class="prods">${pr.map((p,i)=>`<div class="prod" data-i="${i+1}"><h4>${esc(p.name)}</h4>${p.sizes?.length?`<div class="tiny">${p.sizes.map(esc).join(" · ")}</div>`:""}<div class="price">${p.price_dkk} kr.</div></div>`).join("")}</div>`}
-const sEl=document.getElementById("live-note");if(sEl){const sc=await q("public_schedule",f+"&order=starts_at");if(sc.length)sEl.innerHTML=`<div class="card"><div class="eyebrow">Denne uge – live fra appen</div>${sc.map(s=>`<div class="small"><span style="color:var(--gold2)">${hm(s.starts_at)}–${hm(s.ends_at)}</span> ${esc(s.name)}${s.room?` <span class="tiny">· ${esc(s.room)}</span>`:""}</div>`).join("")}<p class="tiny" style="margin:8px 0 0">Aflysninger og vikarer vises i appen.</p></div>`}
+const pEl=document.getElementById("live-products");if(pEl){const pr=await q("public_products",f+"&order=name");if(pr.length)pEl.innerHTML=`<div class="eyebrow">${L.inApp}</div><div class="prods">${pr.map((p,i)=>`<div class="prod" data-i="${i+1}"><h4>${esc(p.name)}</h4>${p.sizes?.length?`<div class="tiny">${p.sizes.map(esc).join(" · ")}</div>`:""}<div class="price">${p.price_dkk} kr.</div></div>`).join("")}</div>`}
+const sEl=document.getElementById("live-note");if(sEl){const sc=await q("public_schedule",f+"&order=starts_at");if(sc.length)sEl.innerHTML=`<div class="card"><div class="eyebrow">${L.live}</div>${sc.map(s=>`<div class="small"><span style="color:var(--gold2)">${hm(s.starts_at)}–${hm(s.ends_at)}</span> ${esc(s.name)}${s.room?` <span class="tiny">· ${esc(s.room)}</span>`:""}</div>`).join("")}<p class="tiny" style="margin:8px 0 0">${L.cancel}</p></div>`}
 })();
 """
 
@@ -212,7 +212,7 @@ def page(title, body, desc, active="", hero=None, hero_title=None, hero_sub=None
 <title>{E(title)}</title><meta name="description" content="{E(desc)}"><meta name="theme-color" content="#0a0a0b"><meta property="og:title" content="{E(title)}"><meta property="og:description" content="{E(desc)}">{f'<meta property="og:image" content="{hero}">' if hero else ""}
 <link rel="icon" href="{BASE}/favicon.png" type="image/png"><link rel="apple-touch-icon" href="{BASE}/icons/apple-touch-icon.png"><link rel="stylesheet" href="{BASE}/style.css">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Outfit:wght@300;400;500&display=swap"></head><body>
-<header class="top"><div class="wrap"><a class="logo" href="{BASE}/">{LOGO}</a><nav class="pill">{pill}</nav><div class="hr"><a class="btn sm hbtn" href="{BASE}/app/">Åbn appen</a><button class="burger" aria-label="Menu"><i></i>Menu</button></div></div></header>
+<header class="top"><div class="wrap"><a class="logo" href="{BASE}/">{LOGO}</a><nav class="pill">{pill}</nav><div class="hr"><div class="langs"><a href="__DA__" class="flag on" title="Dansk" aria-label="Dansk">🇩🇰</a><a href="__EN__" class="flag" title="English" aria-label="English">🇬🇧</a></div><a class="btn sm hbtn" href="{BASE}/app/">Åbn appen</a><button class="burger" aria-label="Menu"><i></i>Menu</button></div></div></header>
 <div class="menu"><div class="l"><a class="big" href="{BASE}/" style="transition-delay:40ms"><small>00</small>Forside<span>LL Dance Studio</span></a>{big}<div class="foot"><a class="btn" href="{BASE}/app/">Åbn appen {ICON_ARROW}</a><a class="btn ghost" href="tel:{C["phone"].replace(" ", "")}">{E(C["phone"])}</a></div></div><div class="r" style="background-image:url({ART(6)})"><div><div class="eyebrow">Ulstrup</div><h3>Dans med hjertet.<br><em>Vind med holdet.</em></h3></div></div></div>
 {heroh}{body}
 <footer><div class="wrap"><div class="cols3"><div><img src="{BASE}/brand/logo-white.png" alt="LL Dance Studio" style="width:180px;margin-bottom:14px"><p class="muted small">{E(C["address"])}<br><a href="tel:{C["phone"].replace(" ", "")}" style="display:inline">{E(C["phone"])}</a> · {E(C["hours"])}<br><a href="mailto:{C["email"]}" style="display:inline">{C["email"]}</a></p></div>
@@ -222,8 +222,36 @@ def page(title, body, desc, active="", hero=None, hero_title=None, hero_sub=None
 <div class="stickycta">{sticky}</div>
 <script src="{BASE}/site.js" defer></script></body></html>"""
 
+EN = json.load(open(os.path.join(ROOT, "site", "en.json")))
+UI = json.load(open(os.path.join(ROOT, "site", "en-ui.json")))
+_ALL = {html.escape(html.unescape(k)): v for k, v in {**EN, **UI}.items() if k != "_tokens"}
+_KEYS = sorted(_ALL, key=len, reverse=True)
+_B = r"(?<![\wæøåÆØÅ])", r"(?![\wæøåÆØÅ])"
+_TOK = [(re.compile(_B[0] + k + _B[1]), v) for k, v in UI.get("_tokens", {}).items()]
+def translate_text(txt):
+    t = txt.strip()
+    if not t: return txt
+    if t in _ALL: return txt.replace(t, _ALL[t])
+    out = txt
+    for k in _KEYS:
+        if len(k) > 3 and k in out: out = out.replace(k, _ALL[k])
+    for rx, v in _TOK: out = rx.sub(v, out)
+    return out
+def translate_html(h, rel):
+    h = re.sub(r">([^<>]+)<", lambda m: ">" + translate_text(m.group(1)) + "<", h)
+    h = re.sub(r'(placeholder|alt|title|aria-label|content)="([^"]*)"', lambda m: f'{m.group(1)}="{translate_text(m.group(2))}"', h)
+    h = h.replace('<html lang="da">', '<html lang="en">')
+    h = re.sub(r'href="' + re.escape(BASE) + r'/(?!en/|style\.css|site\.js|brand/|icons/|art/|favicon|app/)', f'href="{BASE}/en/', h)
+    h = h.replace('class="tiny en-only" hidden', 'class="tiny en-only"')
+    return h
 def write(rel, content):
-    p = os.path.join(OUT, rel); os.makedirs(os.path.dirname(p), exist_ok=True); open(p, "w").write(content)
+    d = rel.rsplit("/", 1)[0] + "/" if "/" in rel else ""
+    da = content.replace("__DA__", f"{BASE}/{d}").replace("__EN__", f"{BASE}/en/{d}").replace('class="flag on"', 'class="flag on"')
+    p = os.path.join(OUT, rel); os.makedirs(os.path.dirname(p), exist_ok=True); open(p, "w").write(da)
+    if rel.endswith(".html"):
+        en = content.replace('class="flag on" title="Dansk"', 'class="flag" title="Dansk"').replace('class="flag" title="English"', 'class="flag on" title="English"')
+        en = translate_html(en, rel).replace("__DA__", f"{BASE}/{d}").replace("__EN__", f"{BASE}/en/{d}")
+        p2 = os.path.join(OUT, "en", rel); os.makedirs(os.path.dirname(p2), exist_ok=True); open(p2, "w").write(en)
 
 def tcard(t):
     slug = t["slug"].strip("/"); f = t.get("facts") or {}; img = team_img(slug)
@@ -291,7 +319,7 @@ for t in TEAMS:
     relh = f'<section class="tight"><div class="wrap"><div class="head"><div><div class="eyebrow">Måske også</div><h2>Andre hold for <em>samme alder</em></h2></div></div><div class="tcards">{"".join(tcard(x) for x in related)}</div></div></section>' if related else ""
     price = E(f.get("price") or "Se medlemsskab"); p1, p2 = (price.split(" for ", 1) + ["pr. sæson"])[:2] if " for " in price else (price, "pr. sæson")
     side = f'<aside class="side"><div class="card"><div class="eyebrow">Pris</div><div class="price">{p1}</div><div class="tiny">{p2}</div>{(("<div class=muted style=margin-top:10px;font-size:.9rem>" + E(t["payment"]) + "</div>") if t.get("payment") else "")}{inc}<div class="btns" style="margin-top:18px;flex-direction:column;align-items:stretch"><a class="btn" style="justify-content:center" href="{BASE}/app/">Tilmeld via appen {ICON_ARROW}</a><a class="btn ghost" style="justify-content:center" href="{BASE}/medlemsskab/">Rater og familierabat</a></div><p class="tiny" style="margin:14px 0 0">{"Elitehold – optagelse via audition." if f.get("closed") else "2 gratis prøvetimer – start når som helst i sæsonen."}</p></div></aside>'
-    body = f"""<section class="tight"><div class="wrap"><div class="facts rv">{factsh}</div><div class="cols"><article class="rv">{"<p class=lead>" + E(t["intro"]) + "</p>" if t.get("intro") else ""}{secs}{docsh}{gal}</article>{side}</div></div></section>{relh}"""
+    body = f"""<section class="tight"><div class="wrap"><div class="facts rv">{factsh}</div><div class="cols"><article class="rv">{"<p class=lead>" + E(t["intro"]) + "</p>" if t.get("intro") else ""}{'<p class="tiny en-only" hidden>Holdbeskrivelsen herunder er på dansk – skriv til os på engelsk, så hjælper vi.</p>' if secs else ""}{secs}{docsh}{gal}</article>{side}</div></div></section>{relh}"""
     write(f"{slug}/index.html", page(f"{short_title(t['title'])} – LL Dance Studio", body, (t.get("intro") or t["title"])[:155], "/saeson-26-27/", hero=imgs[0] if imgs else ART(1), hero_title=E(short_title(t["title"])), hero_sub=" · ".join(x for x in [f.get("style"), f.get("level"), f.get("years")] if x) or "Hold", extra=f'<div class="btns"><a class="btn" href="{BASE}/app/">Tilmeld via appen {ICON_ARROW}</a><a class="btn ghost" href="{BASE}/saeson-26-27/">Holdplanen</a></div>', sticky=f'<a class="btn" href="{BASE}/app/">Tilmeld via appen · {p1}</a>'))
 
 # ---------------- medlemsskab

@@ -4,6 +4,7 @@ import { useAuth } from "@/core/auth";
 import { useNav } from "@/core/nav";
 import { Sheet } from "./Sheet";
 import { Bell } from "./Notifications";
+import { LangFlags } from "./LangFlags";
 
 /** Top-right of every main screen: bell + avatar. Avatar opens the profile menu (shop, punch cards, milestones, settings, sign out). */
 export function TopRight() {
@@ -18,6 +19,7 @@ export function TopRight() {
   const [open, setOpen] = useState(false);
   return (
     <div className="row">
+      <LangFlags />
       <Bell />
       <button className="avatar" aria-label={t("nav.profile")} data-testid="avatar" onClick={() => setOpen(true)}>{me.person.first_name[0]}{me.person.last_name[0] ?? ""}</button>
       {open && (

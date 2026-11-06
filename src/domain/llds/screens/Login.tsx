@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, isMock } from "@/core/api";
+import { LangFlags } from "../components/LangFlags";
 import { Logo } from "../components/Logo";
 import { art } from "../lib/art";
 
@@ -25,6 +26,7 @@ export function Login() {
   return (
     <section className="screen login">
       <img className="login-bg" src={art("trails")} alt="" aria-hidden="true" /><div className="login-art" aria-hidden="true" />
+      <LangFlags className="login-lang" />
       <div className="login-body">
         <Logo />
         <h1 className="display">{t("login.welcome")} <em>{t("login.backstage")}</em></h1>

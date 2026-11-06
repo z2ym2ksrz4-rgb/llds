@@ -237,3 +237,9 @@ a.cta.mp { background:#5a78ff; color:#fff; text-decoration:none; text-align:cent
 .emblem .n { font-size:.66rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); max-width:76px; text-align:center; line-height:1.2; }
 .emblem.sm .e { width:26px; height:26px; font-size:.85rem; box-shadow:none; }
 .item > .emblem.sm { flex:none; margin-right:4px; }
+
+/* language flags */
+.langflags { display:inline-flex; gap:2px; }
+.langflags button { background:none; border:0; padding:4px 3px; font-size:1.1rem; line-height:1; opacity:.45; filter:saturate(.8); border-radius:999px; transition:opacity .2s, transform .2s; }
+.langflags button.on { opacity:1; } .langflags button:active { transform:scale(1.15); }
+.login-lang { position:absolute; top:calc(14px + env(safe-area-inset-top)); right:16px; z-index:3; }
