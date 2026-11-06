@@ -19,7 +19,7 @@ begin
   n := 50;
   while n <= total loop
     insert into badge(school_id, key, name, emoji, description, kind, rule, sort)
-      values (sid, 'total' || n, n || ' træninger', case when n = 50 then '🏅' else '💯' end, n || ' registrerede træninger', 'auto', jsonb_build_object('total', n), 2 + n / 50)
+      values (sid, 'total' || n, n || ' træninger', case when n = 50 then '🏅' when n = 100 then '💯' else '🥇' end, n || ' registrerede træninger', 'auto', jsonb_build_object('total', n), 2 + n / 50)
       on conflict (school_id, key) do nothing;
     select id into bid from badge where school_id = sid and key = 'total' || n;
     insert into person_badge(person_id, badge_id, team_id) values (p_person, bid, last_team) on conflict do nothing;
