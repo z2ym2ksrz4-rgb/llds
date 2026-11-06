@@ -40,12 +40,14 @@ export function MessageSheet({ message, onClose, toast }: { message: Message; on
   const [status, setStatus] = useState<MessageStatus[] | null>(null);
   const [acted, setActed] = useState(message.acted_at);
   const ack = async () => { await api.ackMessage(message.id); setActed(new Date().toISOString()); toast(t(`msg.acked.${message.needs}`)); };
+  // "read" messages are marked read the moment they are opened – no button; only "accept" asks for a tap
+  useEffect(() => { if (message.needs === "read" && !message.acted_at) void api.ackMessage(message.id).then(() => setActed(new Date().toISOString())).catch(() => { /* ignore */ }); }, [message.id]); // eslint-disable-line react-hooks/exhaustive-deps
   const done = status?.filter((s) => s.acted_at).length ?? 0;
   return (
     <Sheet onClose={onClose} eyebrow={`${message.author_name} · ${ago(message.created_at)}`} title={message.title}>
       <p style={{ whiteSpace: "pre-wrap", margin: 0 }}>{message.body}</p>
       {acted ? <span className="chip ok">{t(`msg.done.${message.needs}`)} · {ago(acted)}</span>
-        : <button className="cta" id="msg-ack" onClick={() => void ack()}>{t(`msg.ackBtn.${message.needs}`)}</button>}
+        : message.needs === "accept" ? <button className="cta" id="msg-ack" onClick={() => void ack()}>{t(`msg.ackBtn.${message.needs}`)}</button> : null}
       {isStaff && (status ? (
         <div className="card" style={{ margin: 0 }}>
           <div className="eyebrow">{t("msg.status", { done, total: status.length })}</div>

@@ -437,7 +437,7 @@
     "eyebrow": "Official messages",
     "title": "Messages",
     "none": "No messages.",
-    "status": "{{done}} of {{total}} have answered",
+    "status": "{{done}} of {{total}} have seen it",
     "showStatus": "Who is missing?",
     "new": "New message",
     "titleField": "Title",

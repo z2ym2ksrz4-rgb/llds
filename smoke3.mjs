@@ -20,6 +20,8 @@ await p.click("[data-testid=msg-banner] .item >> nth=0"); await p.waitForSelecto
 await p.waitForSelector(".toast"); out.accepted = await p.textContent(".toast"); await shot(1);
 await p.click(".sheet-bg", { position: { x: 5, y: 5 } }); await p.waitForTimeout(200);
 out.bannerAfter = await p.$$eval("[data-testid=msg-banner] .item", e => e.length);
+// a "read" message is marked read just by opening it – no button
+if (out.bannerAfter > 0) { await p.click("[data-testid=msg-banner] .item >> nth=0"); await p.waitForSelector(".sheet .chip.ok"); out.readAuto = await p.textContent(".sheet .chip.ok"); out.noReadButton = !(await p.$("#msg-ack")); await p.click(".sheet-bg", { position: { x: 5, y: 5 } }); await p.waitForTimeout(200); out.bannerAfterRead = await p.$$eval("[data-testid=msg-banner] .item", e => e.length); }
 out.homeNews = await p.$$eval("[data-testid=feed] [data-testid=post]", e => e.length);
 // 1b. team room: post with photo, then comment on Line's post
 await p.click("nav.tabbar >> text=/^(Mit hold|Hold)$/"); await p.waitForSelector("[data-testid=feed]");

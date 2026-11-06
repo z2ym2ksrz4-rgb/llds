@@ -437,7 +437,7 @@
     "eyebrow": "Officielle beskeder",
     "title": "Beskeder",
     "none": "Ingen beskeder.",
-    "status": "{{done}} af {{total}} har svaret",
+    "status": "{{done}} af {{total}} har set beskeden",
     "showStatus": "Hvem mangler?",
     "new": "Ny besked",
     "titleField": "Overskrift",
