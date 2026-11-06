@@ -35,6 +35,9 @@ export type Team = {
   description?: string | null;
   cover_path?: string | null;
   cover_url?: string | null;
+  price?: string | null;
+  years?: string | null;
+  day_time?: string | null;
 };
 
 export type Membership = { person_id: string; team_id: string; role: Role };

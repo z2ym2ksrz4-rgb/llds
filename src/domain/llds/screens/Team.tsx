@@ -105,6 +105,13 @@ export function TeamScreen() {
       </div>
       {staff && <div className="row" style={{ marginTop: 6 }}><button className="ghost small" onClick={() => setPage("notes")} data-testid="go-notes">{t("notes.title")}</button><button className="ghost small" onClick={() => setCompose(true)}>{t("msg.new")}</button></div>}
 
+      {(team.description || team.price || team.day_time) && (
+        <div className="sec"><h2>{t("team.about")}</h2><div className="card" data-testid="team-about">
+          {(team.day_time || team.years) && <div className="small muted" style={{ marginBottom: 8 }}>{[team.day_time, team.years].filter(Boolean).join(" · ")}</div>}
+          {team.description && <About text={team.description} />}
+          {team.price && <div className="row between" style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid var(--line)" }}><span className="tiny">{t("team.price")}</span><span className="gold small">{team.price}</span></div>}
+        </div></div>
+      )}
       {events.length > 0 && (
         <div className="sec"><h2>{t("team.nextForTeam")}</h2><div className="card list">
           {events.slice(0, 3).map((e) => <div key={e.id} className="item"><span className="time">{dateLabel(e.starts_at)}</span><span className="grow">{e.title}<div className="tiny">{e.place ?? t(`events.kind.${e.kind}`)}</div></span><span className="gold">›</span></div>)}
@@ -131,4 +138,10 @@ export function TeamScreen() {
       <Toast msg={toast} />
     </section>
   );
+}
+
+function About({ text }: { text: string }) {
+  const [open, setOpen] = useState(false); const { t } = useTranslation();
+  const short = text.length > 260 && !open ? text.slice(0, 260).replace(/\s+\S*$/, "") + "…" : text;
+  return <div><p className="small muted" style={{ whiteSpace: "pre-line", margin: 0 }}>{short}</p>{text.length > 260 && <button className="linklike small" onClick={() => setOpen(!open)}>{open ? t("common.less") : t("common.more")}</button>}</div>;
 }

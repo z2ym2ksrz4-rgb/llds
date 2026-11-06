@@ -51,6 +51,11 @@ export function Home() {
   const openPay = [...orders.filter((o) => o.status === "awaiting_payment").map((o) => ({ id: o.id, label: `${t("shop.title")} #${o.number}`, sub: o.claimed_paid_at ? t("shop.status.claimed") : t("shop.status.awaiting_payment"), amount: o.total_dkk })),
     ...cards.filter((c) => c.status === "awaiting_payment").map((c) => ({ id: c.id, label: c.type_name, sub: c.claimed_paid_at ? t("punch.status.claimed") : t("punch.status.awaiting_payment"), amount: c.price_dkk }))];
   const myMilestones = milestones.filter((m) => m.person_id === viewing.personId);
+  const todaysAll = sessions.filter((s) => new Date(s.starts_at).toDateString() === today);
+  const nextDay = sessions.find((s) => new Date(s.starts_at) > new Date())?.starts_at;
+  const studioToday = todaysAll.length > 0;
+  const studio = (studioToday ? todaysAll : nextDay ? sessions.filter((s) => new Date(s.starts_at).toDateString() === new Date(nextDay).toDateString()) : []).slice(0, 12);
+  const upcoming = events.filter((e) => e.id !== hero?.id).slice(0, 4);
 
   return (
     <section className="screen">
@@ -87,6 +92,18 @@ export function Home() {
         </div>
       )}
 
+      {isAdmin && studio.length > 0 && (
+        <div className="sec"><div className="row between"><h2>{studioToday ? t("home.todayInStudio") : t("home.nextInStudio")}</h2><button className="linklike small" onClick={() => setTab("rooms")}>{t("home.fullSchedule")}</button></div>
+          <div className="card list" data-testid="studio-today">
+            {studio.map((s) => <button key={s.id} className={"item" + (s.cancelled ? " off" : "")} onClick={() => setOpen(s)}><span className="time">{studioToday ? hm(s.starts_at) : <>{dateLabel(s.starts_at)}<br />{hm(s.starts_at)}</>}</span><span className="grow">{s.title ?? s.team_name}<div className="tiny">{s.room_name}{s.trainer_name ? ` · ${s.substitute_name ?? s.trainer_name}` : ""}{s.cancelled ? " · " + t("session.cancelled") : ""}</div></span><span className="gold">›</span></button>)}
+          </div>
+        </div>
+      )}
+      {upcoming.length > 1 && (
+        <div className="sec"><div className="row between"><h2>{t("home.upcoming")}</h2><button className="linklike small" onClick={() => setTab("events")}>{t("home.fullSchedule")}</button></div>
+          <div className="card list">{upcoming.map((e) => <button key={e.id} className="item" onClick={() => setTab("events")}><span className="time">{dateLabel(e.starts_at)}</span><span className="grow">{e.title}<div className="tiny">{e.place ?? t(`events.kind.${e.kind}`)}{e.team_names?.length ? ` · ${e.team_names.slice(0, 3).join(", ")}${e.team_names.length > 3 ? " …" : ""}` : ""}</div></span><span className="gold">›</span></button>)}</div>
+        </div>
+      )}
       {(!isAdmin || teamIds.size > 0) && <TeamPicker />}
       {teamIds.size > 0 && (
         <div className="sec"><div className="row between"><h2>{hat ? t("home.childsWeek", { name: hat.first_name }) : t("home.yourWeek")}</h2><button className="linklike small" onClick={() => setTab("rooms")}>{t("home.fullSchedule")}</button></div>

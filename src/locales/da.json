@@ -19,7 +19,9 @@
     "edit": "Redigér",
     "delete": "Slet",
     "back": "Tilbage",
-    "saved": "Gemt"
+    "saved": "Gemt",
+    "more": "Læs mere",
+    "less": "Vis mindre"
   },
   "lang": {
     "da": "Dansk",
@@ -102,7 +104,9 @@
     "formationsN": "{{n}} formationer",
     "nextForTeam": "Næste for holdet",
     "trophies": "Trofæhylde",
-    "rosterStaffOnly": "Kontaktoplysninger ses kun af holdets trænere."
+    "rosterStaffOnly": "Kontaktoplysninger ses kun af holdets trænere.",
+    "about": "Om holdet",
+    "price": "Pris pr. sæson"
   },
   "home": {
     "hi": "Hej {{name}}",
@@ -128,7 +132,11 @@
     "today": "I dag",
     "inDays": "Om {{n}} dage",
     "fullSchedule": "Hele skemaet",
-    "payments": "Betaling"
+    "payments": "Betaling",
+    "todayInStudio": "I dag i studiet",
+    "nextInStudio": "Næste træninger",
+    "upcoming": "Kommende events",
+    "teamsCount": "{{n}} hold"
   },
   "admin": {
     "users": "Brugere",

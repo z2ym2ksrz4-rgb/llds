@@ -19,7 +19,9 @@
     "edit": "Edit",
     "delete": "Delete",
     "back": "Back",
-    "saved": "Saved"
+    "saved": "Saved",
+    "more": "Read more",
+    "less": "Show less"
   },
   "lang": {
     "da": "Dansk",
@@ -102,7 +104,9 @@
     "formationsN": "{{n}} formations",
     "nextForTeam": "Next for the team",
     "trophies": "Trophy shelf",
-    "rosterStaffOnly": "Contact details are visible to the team's staff only."
+    "rosterStaffOnly": "Contact details are visible to the team's staff only.",
+    "about": "About the team",
+    "price": "Season price"
   },
   "home": {
     "hi": "Hi {{name}}",
@@ -128,7 +132,11 @@
     "today": "Today",
     "inDays": "In {{n}} days",
     "fullSchedule": "Full schedule",
-    "payments": "Payments"
+    "payments": "Payments",
+    "todayInStudio": "Today in the studio",
+    "nextInStudio": "Next trainings",
+    "upcoming": "Upcoming events",
+    "teamsCount": "{{n}} teams"
   },
   "admin": {
     "users": "Users",
