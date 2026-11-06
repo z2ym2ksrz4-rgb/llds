@@ -57,9 +57,9 @@ export function supabaseApi(url: string, anonKey: string): Api {
 
     async signUp(i) {
       const { error } = await sb.rpc("sign_up", {
-        p_school_slug: schoolSlug, p_first: i.firstName, p_last: i.lastName, p_phone: i.phone, p_birth_year: i.birthYear,
+        p_school_slug: schoolSlug, p_first: i.firstName, p_last: i.lastName, p_phone: i.phone, p_birth_year: i.birthYear, p_birth_date: i.birthDate,
         p_roles: i.roles, p_wished_teams: i.wishedTeams,
-        p_children: i.children.map((c) => ({ first_name: c.firstName, birth_year: c.birthYear })),
+        p_children: i.children.map((c) => ({ first_name: c.firstName, birth_year: c.birthYear, birth_date: c.birthDate || null })),
       });
       fail(error);
     },

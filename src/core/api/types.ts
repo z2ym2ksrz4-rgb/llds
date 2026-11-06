@@ -11,6 +11,7 @@ export type Person = {
   email: string | null;
   phone: string | null;
   birth_year: number | null;
+  birth_date?: string | null;   // yyyy-mm-dd; birth_year is derived from it
   status: PersonStatus;
   is_admin: boolean;
   photo_consent: boolean | null;
@@ -54,9 +55,10 @@ export type SignUpInput = {
   lastName: string;
   phone: string;
   birthYear: number | null;
+  birthDate: string | null;     // yyyy-mm-dd
   roles: ("parent" | "dancer" | "trainer" | "assistant")[];
   wishedTeams: string;
-  children: { firstName: string; birthYear: number }[];
+  children: { firstName: string; birthYear: number; birthDate: string }[];
 };
 
 export type PendingPerson = Person & { children: Person[] };

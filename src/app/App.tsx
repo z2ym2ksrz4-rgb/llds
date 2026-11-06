@@ -12,8 +12,10 @@ export default function App() {
   const phase = useAuth((s) => s.phase);
   const me = useAuth((s) => s.me);
   const isAdmin = !!me?.person.is_admin;
-  const hasTeams = !!me && me.memberships.length > 0;
+  const realAdmin = useAuth((s) => !!s.realMe?.person.is_admin);
   const viewAs = useAuth((s) => s.viewAs); const setViewAs = useAuth((s) => s.setViewAs);
+  const hasTeams = !!me && (me.memberships.length > 0 || (realAdmin && !viewAs));
+  const blocked = useAuth((s) => s.previewBlocked)();
   const tab = useNav((s) => s.tab); const setTab = useNav((s) => s.setTab);
   useEffect(() => { if (phase !== "ready") setTab("home"); }, [phase, setTab]);
   useEffect(() => { if ((tab === "admin" && !isAdmin) || (tab === "team" && !hasTeams)) setTab("home"); }, [tab, isAdmin, hasTeams, setTab]); // every sign-in starts on Home
@@ -24,9 +26,10 @@ export default function App() {
   else if (phase === "register") body = <Register />;
   else if (phase === "pending") body = <Pending />;
   else if (phase === "rejected") body = <Pending rejected />;
+  else if (blocked) body = <section className="screen centered"><div className="card" style={{ maxWidth: 420 }}><div className="eyebrow">{t("view.blockedEyebrow")}</div><h2 className="display">{blocked.name}</h2><p className="muted">{t("view.blocked", { years: blocked.years ?? "", age: 10 })}</p><div className="row" style={{ gap: 8, marginTop: 12 }}><button className="cta" onClick={() => setViewAs("parent")}>{t("view.asParent")}</button><button className="ghost" onClick={() => setViewAs(null)}>{t("view.exit")}</button></div></div></section>;
   else body = tab === "home" ? <Home /> : tab === "rooms" ? <Rooms /> : tab === "team" ? <TeamScreen /> : tab === "social" ? <Social /> : tab === "events" ? <Events /> : tab === "admin" && isAdmin ? <Admin /> : <More />;
 
-  const tabs: [Tab, string, string][] = [["home", t("nav.home"), "home"], ["rooms", t("nav.rooms"), "cal"], ...(hasTeams ? [["team", t("nav.team"), "team"] as [Tab, string, string]] : []), ["social", t("nav.social"), "chat"], ["events", t("nav.events"), "star"], ...(isAdmin ? [["admin", t("nav.admin"), "grid"] as [Tab, string, string]] : [])];
+  const tabs: [Tab, string, string][] = [["home", t("nav.home"), "home"], ["rooms", t("nav.rooms"), "cal"], ...(hasTeams ? [["team", realAdmin && !viewAs ? t("nav.teams") : t("nav.team"), "team"] as [Tab, string, string]] : []), ["social", t("nav.social"), "chat"], ["events", t("nav.events"), "star"], ...(isAdmin ? [["admin", t("nav.admin"), "grid"] as [Tab, string, string]] : [])];
   return (
     <div className="app">
       {phase === "ready" && viewAs && <div className="viewbar" data-testid="viewbar"><span>{t("view.previewing", { role: t(`roles.${viewAs}`) })}</span><button onClick={() => setViewAs(null)}>{t("view.exit")}</button></div>}

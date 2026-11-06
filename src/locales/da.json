@@ -8,7 +8,8 @@
     "more": "Mere",
     "social": "Social",
     "events": "Events",
-    "profile": "Profil"
+    "profile": "Profil",
+    "teams": "Hold"
   },
   "common": {
     "loading": "Indlæser…",
@@ -32,7 +33,8 @@
     "dancer": "Danser",
     "trainer": "Træner",
     "assistant": "Hjælpetræner",
-    "admin": "Admin"
+    "admin": "Admin",
+    "dancerChild": "Danser 10–12 (børnelogin)"
   },
   "login": {
     "welcome": "Velkommen",
@@ -66,7 +68,8 @@
     "wishedTeams": "Hold (hjælp til Line)",
     "wishedTeamsPh": "Fx The AXIS, Hip Hop Mini…",
     "terms": "Ved at oprette dig accepterer du",
-    "submit": "Send til godkendelse"
+    "submit": "Send til godkendelse",
+    "birthDate": "Fødselsdato"
   },
   "pending": {
     "title": "Tak, {{name}}",
@@ -634,6 +637,9 @@
     "as": "Vis appen som",
     "hint": "Prøv appen med en anden rolles øjne – rettigheder på serveren ændres ikke.",
     "previewing": "Du ser appen som {{role}}",
-    "exit": "Afslut"
+    "exit": "Afslut",
+    "blockedEyebrow": "Ingen adgang",
+    "blocked": "Dansere på dette hold (årgang {{years}}) er under {{age}} år og har ikke egen adgang til appen. Forældrene ser holdet, træningerne og billederne.",
+    "asParent": "Vis som forælder"
   }
 }

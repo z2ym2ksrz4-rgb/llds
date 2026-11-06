@@ -11,6 +11,6 @@ await p.click("nav.tabbar >> text=Admin"); await p.click(".item:has-text('Import
 await p.setInputFiles("#import-zip", process.env.ZIP ?? "/tmp/claude-0/-home-claude/3044d1cf-5408-513b-86aa-778c465d4d10/scratchpad/t.zip"); await p.waitForSelector("[data-testid=import-group]");
 out.groups = await p.$$eval("[data-testid=import-group] select", e => e.map(s => s.options[s.selectedIndex].text));
 await p.click("#import-run"); await p.waitForSelector("text=Færdig", { timeout: 20000 }); out.done = await p.textContent(".ok");
-await p.click("nav.tabbar >> text=Mit hold"); await p.waitForSelector("[data-testid=team-hero]"); out.hero = (await p.getAttribute("[data-testid=team-hero]", "style")).slice(0, 40);
+await p.click("nav.tabbar >> text=/^(Mit hold|Hold)$/"); await p.waitForSelector("[data-testid=team-hero]"); out.hero = (await p.getAttribute("[data-testid=team-hero]", "style")).slice(0, 40);
 await p.click("[data-testid=go-folders]"); await p.waitForSelector("[data-testid=folder]"); out.folderCounts = await p.$$eval("[data-testid=folder] .tiny", e => e.map(x => x.textContent));
 out.errors = errors; console.log(JSON.stringify(out, null, 1)); await b.close(); if (errors.length) process.exit(1);

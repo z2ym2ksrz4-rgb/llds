@@ -126,7 +126,7 @@ export function scheduleOps(get: () => { S: SchedState; persons: Person[]; membe
     async staffList() { const g = get(); return g.persons.filter((p) => p.status === "approved" && (p.is_admin || g.memberships.some((m) => m.person_id === p.id && m.role !== "dancer"))); },
     async grantChildLogin(cid: string, email: string) {
       const g = get(); const c = g.persons.find((x) => x.id === cid); if (!c) return;
-      if (c.birth_year && new Date().getFullYear() - c.birth_year < 10) throw new Error("Barnet skal være mindst 10 år");
+      if (((c.birth_date ? Math.floor((Date.now() - new Date(c.birth_date).getTime()) / 31557600000) : c.birth_year ? new Date().getFullYear() - c.birth_year : 99)) < 10) throw new Error("Barnet skal være mindst 10 år");
       c.email = email.toLowerCase(); c.user_id = "u-" + id(); c.supervised_by = g.me()?.id ?? null; g.save(); g.emit();
     },
     async revokeChildLogin(cid: string) { const g = get(); const c = g.persons.find((x) => x.id === cid); if (c) { c.email = null; c.user_id = null; c.supervised_by = null; } g.save(); g.emit(); },

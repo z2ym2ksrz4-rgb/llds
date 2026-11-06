@@ -8,7 +8,8 @@
     "more": "More",
     "social": "Social",
     "events": "Events",
-    "profile": "Profile"
+    "profile": "Profile",
+    "teams": "Teams"
   },
   "common": {
     "loading": "Loading…",
@@ -32,7 +33,8 @@
     "dancer": "Dancer",
     "trainer": "Trainer",
     "assistant": "Assistant trainer",
-    "admin": "Admin"
+    "admin": "Admin",
+    "dancerChild": "Dancer 10–12 (child login)"
   },
   "login": {
     "welcome": "Welcome",
@@ -66,7 +68,8 @@
     "wishedTeams": "Teams (helps Line)",
     "wishedTeamsPh": "E.g. The AXIS, Hip Hop Mini…",
     "terms": "By signing up you accept the",
-    "submit": "Send for approval"
+    "submit": "Send for approval",
+    "birthDate": "Date of birth"
   },
   "pending": {
     "title": "Thanks, {{name}}",
@@ -634,6 +637,9 @@
     "as": "View app as",
     "hint": "Preview the app through another role – server permissions are unchanged.",
     "previewing": "Viewing the app as {{role}}",
-    "exit": "Exit"
+    "exit": "Exit",
+    "blockedEyebrow": "No access",
+    "blocked": "Dancers on this team ({{years}}) are under {{age}} and have no login of their own. Parents see the team, trainings and photos.",
+    "asParent": "View as parent"
   }
 }

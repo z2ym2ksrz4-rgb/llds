@@ -1,13 +1,32 @@
 import { create } from "zustand";
 import { api, type Me, type Role, type Team } from "@/core/api";
 import { registerPush } from "@/core/push";
+import appConfig from "../../../app.config.json";
+
+/** Oldest possible dancer age on a team, from its "årgang" text ("2017–2020", "Fra årgang 2016", "3 år til skolestart", "14 år+"). null = unknown. */
+export function teamMaxAge(t: Team | undefined): number | null {
+  if (!t?.years) return null;
+  const y = new Date().getFullYear();
+  const years = (t.years.match(/\b(19|20)\d{2}\b/g) ?? []).map(Number);
+  if (years.length) return y - Math.min(...years);
+  const ages = (t.years.match(/(\d+)\s*år/g) ?? []).map((m) => parseInt(m));
+  if (ages.length) return /\+|ældre|fra/i.test(t.years) ? 99 : Math.max(...ages);
+  if (/skolestart|skolegruppen/i.test(t.years)) return 6;
+  return null;
+}
+/** What access a dancer of the team's oldest age would have. */
+export function dancerAccess(t: Team | undefined): "none" | "child" | "own" | "unknown" {
+  const a = teamMaxAge(t); if (a == null) return "unknown";
+  return a < appConfig.supervisedFromAge ? "none" : a < appConfig.minAccountAge ? "child" : "own";
+}
 
 export type Phase = "loading" | "signedOut" | "register" | "pending" | "rejected" | "ready";
 
 /** Which hat the user wears right now: themselves, or one of their children. */
 export type Viewing = { personId: string; isChild: boolean };
 /** "Vis appen som": preview the app with one of your roles (or, as admin, any role). null = your real self. */
-export type ViewRole = "admin" | "trainer" | "assistant" | "dancer" | "parent";
+export type ViewRole = "admin" | "trainer" | "assistant" | "dancer" | "dancerChild" | "parent";
+export const PREVIEW_CHILD = "preview-child";
 
 type Store = {
   phase: Phase;
@@ -26,6 +45,8 @@ type Store = {
   setViewAs: (r: ViewRole | null) => void;
   /** roles this account can preview: the ones it holds, or all five for an admin */
   viewOptions: () => ViewRole[];
+  /** when previewing as a dancer on a team whose dancers are too young for any login */
+  previewBlocked: () => Team | null;
   /** derived */
   isAdmin: () => boolean;
   isStaff: () => boolean;
@@ -41,10 +62,21 @@ function applyView(real: Me, viewAs: ViewRole | null, teamId: string | null): Me
   if (!viewAs || (viewAs === "admin" && real.person.is_admin)) return real;
   const own = real.memberships.filter((m) => m.person_id === real.person.id);
   const person = { ...real.person, is_admin: false };
-  if (viewAs === "parent") return { ...real, person, memberships: real.memberships.filter((m) => m.person_id !== real.person.id) };
-  let mine = own.filter((m) => m.role === viewAs);
-  if (!mine.length && real.person.is_admin) { const tid = teamId && real.teams.some((t) => t.id === teamId) ? teamId : real.teams[0]?.id; if (tid) mine = [{ person_id: real.person.id, team_id: tid, role: viewAs }]; }
-  return { ...real, person, children: [], memberships: mine };
+  const tid = teamId && real.teams.some((t) => t.id === teamId) ? teamId : real.teams[0]?.id;
+  if (viewAs === "parent") {
+    if (real.children.length) return { ...real, person, memberships: real.memberships.filter((m) => m.person_id !== real.person.id) };
+    // admin without children: a synthetic child on the chosen team (born so it fits the team's age band)
+    const team = real.teams.find((t) => t.id === tid); const age = teamMaxAge(team);
+    const child = { ...real.person, id: PREVIEW_CHILD, first_name: "Barnet", last_name: real.person.last_name, email: null, user_id: null, is_admin: false, birth_year: new Date().getFullYear() - Math.min(age ?? 8, 12), birth_date: `${new Date().getFullYear() - Math.min(age ?? 8, 12)}-01-15`, supervised_by: null };
+    return { ...real, person, children: [child], memberships: tid ? [{ person_id: PREVIEW_CHILD, team_id: tid, role: "dancer" as Role }] : [] };
+  }
+  const role: Role = viewAs === "dancerChild" ? "dancer" : viewAs;
+  let mine = own.filter((m) => m.role === role);
+  if (!mine.length && real.person.is_admin && tid) mine = [{ person_id: real.person.id, team_id: tid, role }];
+  // a dancer on a team whose oldest dancers are 10–12 only has a supervised child login (no photo upload)
+  const team = real.teams.find((t) => t.id === (mine[0]?.team_id ?? tid));
+  const childLogin = viewAs === "dancerChild" || (viewAs === "dancer" && dancerAccess(team) === "child");
+  return { ...real, person: childLogin ? { ...person, supervised_by: person.id } : person, children: [], memberships: mine };
 }
 
 export const useAuth = create<Store>((set, get) => ({
@@ -75,7 +107,7 @@ export const useAuth = create<Store>((set, get) => ({
       const ownTeams = me.memberships.filter((m) => m.person_id === me.person.id);
       if (!ownTeams.length && me.children.length && viewing.personId === me.person.id) viewing = { personId: me.children[0].id, isChild: true };
       const teamsOf = me.memberships.filter((m) => m.person_id === viewing.personId).map((m) => m.team_id);
-      if (!teamId || !teamsOf.includes(teamId)) teamId = teamsOf[0] ?? null;
+      if (!teamId || !teamsOf.includes(teamId)) teamId = teamsOf[0] ?? (real.person.is_admin ? (teamId && real.teams.some((t) => t.id === teamId) ? teamId : real.teams[0]?.id ?? null) : null);
       set({ phase, email, me, realMe: real, viewAs, viewing, teamId, error: null });
       if (phase === "ready") void registerPush();
     } catch (e) {
@@ -91,8 +123,9 @@ export const useAuth = create<Store>((set, get) => ({
     const me = applyView(real, viewAs, get().teamId);
     const own = me.memberships.filter((m) => m.person_id === me.person.id);
     const viewing: Viewing = viewAs === "parent" && me.children.length ? { personId: me.children[0].id, isChild: true } : { personId: me.person.id, isChild: false };
+    if (viewAs === "parent" && !me.children.length) { set({ viewAs: null, me: real }); return; }
     const teamsOf = me.memberships.filter((m) => m.person_id === viewing.personId).map((m) => m.team_id);
-    const teamId = teamsOf.includes(get().teamId ?? "") ? get().teamId : teamsOf[0] ?? (own[0]?.team_id ?? null);
+    const teamId = teamsOf.includes(get().teamId ?? "") ? get().teamId : teamsOf[0] ?? (own[0]?.team_id ?? (real.person.is_admin ? real.teams[0]?.id ?? null : null));
     set({ viewAs, me, viewing, teamId });
     try { if (viewAs) sessionStorage.setItem(ROLE_KEY, viewAs); else sessionStorage.removeItem(ROLE_KEY); } catch { /* ignore */ }
   },
@@ -102,9 +135,15 @@ export const useAuth = create<Store>((set, get) => ({
     const has = (r: ViewRole) => own.some((m) => m.role === r);
     const opts: ViewRole[] = [];
     if (real.person.is_admin) opts.push("admin");
-    for (const r of ["trainer", "assistant", "dancer"] as ViewRole[]) if (real.person.is_admin || has(r)) opts.push(r);
-    if (real.children.length) opts.push("parent");
+    for (const r of ["trainer", "assistant", "dancer"] as ViewRole[]) if (real.person.is_admin || has(r as Role)) opts.push(r);
+    if (real.person.is_admin) opts.push("dancerChild");
+    if (real.children.length || real.person.is_admin) opts.push("parent");
     return opts;
+  },
+  previewBlocked() {
+    const { viewAs, me, teamId } = get(); if (!me || (viewAs !== "dancer" && viewAs !== "dancerChild")) return null;
+    const team = me.teams.find((t) => t.id === teamId); if (!team) return null;
+    return dancerAccess(team) === "none" ? team : null;
   },
 
   setViewing(v) {
@@ -133,7 +172,9 @@ export const useAuth = create<Store>((set, get) => ({
   myTeams: () => {
     const me = get().me; const v = get().viewing; if (!me || !v) return [];
     // an admin previewing a role may pick any team – the membership is synthesised on the chosen one
-    if (get().viewAs && get().realMe?.person.is_admin && !get().realMe!.memberships.some((m) => m.person_id === me.person.id && m.role === get().viewAs)) return me.teams;
+    const real = get().realMe; const va = get().viewAs;
+    if (real?.person.is_admin && (!va || va === "admin")) return me.teams;                       // admin: every team's wall
+    if (va && real?.person.is_admin && !real.memberships.some((m) => m.person_id === me.person.id && m.role === (va === "dancerChild" ? "dancer" : va))) return me.teams;
     const ids = new Set(me.memberships.filter((m) => m.person_id === v.personId).map((m) => m.team_id));
     return me.teams.filter((t) => ids.has(t.id));
   },

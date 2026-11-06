@@ -1,4 +1,10 @@
 /** Small date helpers. All display is da-DK; storage is ISO UTC. */
+/** Exact age from birth_date, else from birth_year (older profiles). */
+export function ageOf(p: { birth_date?: string | null; birth_year: number | null } | null | undefined): number | null {
+  if (!p) return null;
+  if (p.birth_date) { const b = new Date(p.birth_date); const n = new Date(); let a = n.getFullYear() - b.getFullYear(); if (n < new Date(n.getFullYear(), b.getMonth(), b.getDate())) a--; return a; }
+  return p.birth_year ? new Date().getFullYear() - p.birth_year : null;
+}
 export const DAY_NAMES = ["Man", "Tir", "Ons", "Tor", "Fre", "Lør", "Søn"];
 export const DAY_LONG = ["Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag", "Søndag"];
 

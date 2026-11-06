@@ -32,6 +32,7 @@ const TEAMS: Team[] = [
 ].map(([name, style, category, level, closed, psv, punch], i) => ({
   id: `team-${i}`, name: name as string, style: style as string, category: category as Team["category"], level: level as string,
   closed: closed as boolean, parents_see_video: psv as boolean, punch_card_open: punch as boolean, color: null, sort: i,
+  years: ({ mini: "2017–2020", kids: "2014–2016", junior: "2008–2013", adult: "2007 og ældre (17 år+)", mixed: "Fra årgang 2012" } as Record<string, string>)[category as string],
 }));
 
 const id = () => Math.random().toString(36).slice(2, 10);
@@ -102,10 +103,10 @@ export const mockApi: Api = {
     if (!S.email) throw new Error("not signed in");
     if (meRow()) throw new Error("already registered");
     const pid = "p-" + id();
-    S.persons.push({ id: pid, school_id: SCHOOL, user_id: "u-" + id(), first_name: i.firstName, last_name: i.lastName, email: S.email, phone: i.phone, birth_year: i.birthYear, status: "pending", is_admin: false, photo_consent: null, wished_roles: i.roles, wished_teams: i.wishedTeams, supervised_by: null, created_at: now() });
+    S.persons.push({ id: pid, school_id: SCHOOL, user_id: "u-" + id(), first_name: i.firstName, last_name: i.lastName, email: S.email, phone: i.phone, birth_year: i.birthYear, birth_date: i.birthDate, status: "pending", is_admin: false, photo_consent: null, wished_roles: i.roles, wished_teams: i.wishedTeams, supervised_by: null, created_at: now() });
     for (const c of i.children) {
       const cid = "p-" + id();
-      S.persons.push({ id: cid, school_id: SCHOOL, user_id: null, first_name: c.firstName, last_name: i.lastName, email: null, phone: null, birth_year: c.birthYear, status: "pending", is_admin: false, photo_consent: null, wished_roles: ["dancer"], wished_teams: null, supervised_by: null, created_at: now() });
+      S.persons.push({ id: cid, school_id: SCHOOL, user_id: null, first_name: c.firstName, last_name: i.lastName, email: null, phone: null, birth_year: c.birthYear, birth_date: c.birthDate || null, status: "pending", is_admin: false, photo_consent: null, wished_roles: ["dancer"], wished_teams: null, supervised_by: null, created_at: now() });
       S.guardians.push({ parent_id: pid, child_id: cid });
     }
     save(); emit();

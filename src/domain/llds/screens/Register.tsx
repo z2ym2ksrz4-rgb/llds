@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type SignUpInput } from "@/core/api";
 import { useAuth } from "@/core/auth";
+import { ageOf } from "../lib/time";
 import appConfig from "../../../../app.config.json";
 
 type R = SignUpInput["roles"][number];
@@ -14,7 +15,7 @@ export function Register() {
   const email = useAuth((s) => s.email);
   const refresh = useAuth((s) => s.refresh);
   const signOut = useAuth((s) => s.signOut);
-  const [f, setF] = useState<SignUpInput>({ firstName: "", lastName: "", phone: "", birthYear: null, roles: [], wishedTeams: "", children: [] });
+  const [f, setF] = useState<SignUpInput>({ firstName: "", lastName: "", phone: "", birthYear: null, birthDate: null, roles: [], wishedTeams: "", children: [] });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const minAge = appConfig.minAccountAge;
@@ -22,10 +23,10 @@ export function Register() {
   const toggleRole = (r: R) => setF((x) => ({ ...x, roles: x.roles.includes(r) ? x.roles.filter((y) => y !== r) : [...x.roles, r] }));
   const isParent = f.roles.includes("parent");
   const isDancer = f.roles.includes("dancer");
-  const tooYoung = isDancer && f.birthYear != null && thisYear - f.birthYear < minAge;
+  const tooYoung = isDancer && f.birthDate != null && (ageOf({ birth_date: f.birthDate, birth_year: null }) ?? 99) < minAge;
   const valid = f.firstName.trim() && f.lastName.trim() && f.phone.trim() && f.roles.length > 0 && !tooYoung
-    && (!isParent || f.children.every((c) => c.firstName.trim() && c.birthYear > 1990))
-    && (!isDancer || f.birthYear != null);
+    && (!isParent || f.children.every((c) => c.firstName.trim() && c.birthDate.length === 10))
+    && (!isDancer || !!f.birthDate);
 
   const submit = async () => {
     setBusy(true); setErr(null);
@@ -50,8 +51,8 @@ export function Register() {
         <label className="field"><span>{t("register.phone")}</span><input id="phone" type="tel" inputMode="tel" required value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} /></label>
         <label className="field"><span>{t("register.email")}</span><input value={email ?? ""} disabled /></label>
         {isDancer && (
-          <label className="field"><span>{t("register.birthYear")}</span>
-            <input id="birthYear" type="number" inputMode="numeric" min={1940} max={thisYear} value={f.birthYear ?? ""} onChange={(e) => setF({ ...f, birthYear: e.target.value ? Number(e.target.value) : null })} />
+          <label className="field"><span>{t("register.birthDate")}</span>
+            <input id="birthDate" type="date" min="1940-01-01" max={new Date().toISOString().slice(0, 10)} value={f.birthDate ?? ""} onChange={(e) => setF({ ...f, birthDate: e.target.value || null, birthYear: e.target.value ? Number(e.target.value.slice(0, 4)) : null })} />
             {tooYoung && <small className="error">{t("register.tooYoung", { age: minAge })}</small>}
           </label>
         )}
@@ -60,11 +61,11 @@ export function Register() {
             {f.children.map((c, i) => (
               <div className="row" key={i}>
                 <input placeholder={t("register.childName")} value={c.firstName} onChange={(e) => setF({ ...f, children: f.children.map((x, j) => j === i ? { ...x, firstName: e.target.value } : x) })} />
-                <input type="number" inputMode="numeric" placeholder={t("register.birthYear")} style={{ maxWidth: 110 }} value={c.birthYear || ""} onChange={(e) => setF({ ...f, children: f.children.map((x, j) => j === i ? { ...x, birthYear: Number(e.target.value) } : x) })} />
+                <input type="date" aria-label={t("register.birthDate")} max={new Date().toISOString().slice(0, 10)} style={{ maxWidth: 170 }} value={c.birthDate} onChange={(e) => setF({ ...f, children: f.children.map((x, j) => j === i ? { ...x, birthDate: e.target.value, birthYear: Number(e.target.value.slice(0, 4)) } : x) })} />
                 <button type="button" className="ghost small" aria-label={t("common.remove")} onClick={() => setF({ ...f, children: f.children.filter((_, j) => j !== i) })}>×</button>
               </div>
             ))}
-            <button type="button" className="ghost small" onClick={() => setF({ ...f, children: [...f.children, { firstName: "", birthYear: 0 }] })}>+ {t("register.addChild")}</button>
+            <button type="button" className="ghost small" onClick={() => setF({ ...f, children: [...f.children, { firstName: "", birthYear: 0, birthDate: "" }] })}>+ {t("register.addChild")}</button>
             <small className="muted">{t("register.childHint", { age: minAge })}</small>
           </div>
         )}

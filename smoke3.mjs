@@ -22,7 +22,7 @@ await p.click(".sheet-bg", { position: { x: 5, y: 5 } }); await p.waitForTimeout
 out.bannerAfter = await p.$$eval("[data-testid=msg-banner] .item", e => e.length);
 out.homeNews = await p.$$eval("[data-testid=feed] [data-testid=post]", e => e.length);
 // 1b. team room: post with photo, then comment on Line's post
-await p.click("nav.tabbar >> text=Mit hold"); await p.waitForSelector("[data-testid=feed]");
+await p.click("nav.tabbar >> text=/^(Mit hold|Hold)$/"); await p.waitForSelector("[data-testid=feed]");
 out.teamPostsBefore = await p.$$eval("[data-testid=post]", e => e.length);
 await p.fill("#post-body", "Freja har fået nye dansesko 👟"); await p.setInputFiles("input[type=file]", IMG); await p.click("#post-send");
 await p.waitForSelector(".toast"); await p.waitForTimeout(300); out.teamPostsAfter = await p.$$eval("[data-testid=post]", e => e.length);
@@ -51,7 +51,7 @@ await p.waitForSelector(".toast"); out.sent = await p.textContent(".toast"); awa
 await p.click("[data-testid=admin-msg] >> nth=1"); await p.waitForSelector(".sheet"); await p.click("text=Hvem mangler?"); await p.waitForSelector(".sheet .chips .chip"); out.status = await p.textContent(".sheet .eyebrow >> nth=1"); await shot(4);
 await p.click(".sheet-bg", { position: { x: 5, y: 5 } });
 // team: hidden post visible to admin as hidden; notes; formations
-await p.click("nav.tabbar >> text=Mit hold"); await p.waitForSelector("[data-testid=feed]");
+await p.click("nav.tabbar >> text=/^(Mit hold|Hold)$/"); await p.waitForSelector("[data-testid=feed]");
 out.hiddenVisibleToAdmin = await p.$$eval("[data-testid=post].hidden-post", e => e.length);
 await p.click("[data-testid=go-notes]"); await p.waitForSelector("#note-body", { state: "attached" }).catch(() => {});
 await p.click(".chips .chip:has-text('Freja')"); await p.fill("#note-body", "Flot fremgang i pirouetter"); await p.click("#note-save"); await p.waitForTimeout(200); out.notes = await p.$$eval("[data-testid=note]", e => e.length);
@@ -62,7 +62,7 @@ out.dotMoved = await p.$eval("[data-testid=stage] .dot:has-text('AN')", e => e.s
 await p.click("text=‹ Koreografi"); await logout();
 
 // 3. trainer (Maja): trainers channel visible, post there
-await login("maja@demo"); await p.click("nav.tabbar >> text=Mit hold"); await p.waitForSelector("[data-testid=feed]");
+await login("maja@demo"); await p.click("nav.tabbar >> text=/^(Mit hold|Hold)$/"); await p.waitForSelector("[data-testid=feed]");
 await p.click(".chip:has-text('Trænere')"); await p.waitForTimeout(200); out.trainerPosts = await p.$$eval("[data-testid=post]", e => e.length);
 await p.fill("#post-body", "Jeg tager Hip Hop Mini mandag"); await p.click("#post-send"); await p.waitForSelector(".toast"); await p.waitForTimeout(200); out.trainerPostsAfter = await p.$$eval("[data-testid=post]", e => e.length);
 // desktop layout check

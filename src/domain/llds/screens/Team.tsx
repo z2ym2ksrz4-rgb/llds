@@ -13,7 +13,7 @@ import { Choreo } from "./Choreo";
 import { Notes } from "./Notes";
 import { MILESTONE_IDEAS } from "../lib/milestones";
 import { artForCategory } from "../lib/art";
-import { addDays, dateLabel, DAY_LONG, hm, startOfDay } from "../lib/time";
+import { ageOf, addDays, dateLabel, DAY_LONG, hm, startOfDay } from "../lib/time";
 
 type Page = "team" | "folders" | "choreo" | "notes" | "dancers";
 
@@ -62,7 +62,7 @@ export function TeamScreen() {
   const dancers = members.filter((p) => p.memberships.some((m) => m.team_id === team.id && m.role === "dancer"));
   const trainers = members.filter((p) => p.memberships.some((m) => m.team_id === team.id && m.role !== "dancer"));
   const child = viewing.isChild ? me.children.find((c) => c.id === viewing.personId) : null;
-  const seesChoreo = staff || role !== "parent" || team.parents_see_video || (!!child?.birth_year && new Date().getFullYear() - child.birth_year < 13);
+  const seesChoreo = staff || role !== "parent" || team.parents_see_video || ((ageOf(child) ?? 99) < 13);
   const next = sessions[0];
   const trainerName = next?.trainer_name ?? trainers[0]?.first_name ?? null;
 
@@ -109,7 +109,7 @@ export function TeamScreen() {
         <div className="sec"><h2>{t("team.about")}</h2><div className="card" data-testid="team-about">
           {(team.day_time || team.years) && <div className="small muted" style={{ marginBottom: 8 }}>{[team.day_time, team.years].filter(Boolean).join(" · ")}</div>}
           {team.description && <About text={team.description} />}
-          {team.price && <div className="row between" style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid var(--line)" }}><span className="tiny">{t("team.price")}</span><span className="gold small">{team.price}</span></div>}
+          {team.price && (staff || role === "parent") && <div className="row between" style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid var(--line)" }}><span className="tiny">{t("team.price")}</span><span className="gold small">{team.price}</span></div>}
         </div></div>
       )}
       {events.length > 0 && (

@@ -18,7 +18,7 @@ out.registerShown = true; await shot(1);
 await p.click("text=Forælder"); await p.click("text=Træner");
 await p.fill("#firstName", "Test"); await p.fill("#lastName", "Testesen"); await p.fill("#phone", "12345678");
 await p.click("text=Tilføj barn");
-await p.fill("input[placeholder='Barnets fornavn']", "Mille"); await p.fill("input[placeholder='Fødselsår']", "2014");
+await p.fill("input[placeholder='Barnets fornavn']", "Mille"); await p.fill("input[type=date]", "2014-05-01");
 await p.fill("#wishedTeams", "Apexion");
 await p.click("form button.cta");
 await p.waitForSelector("text=Tak, Test"); out.pendingShown = true; await shot(2);

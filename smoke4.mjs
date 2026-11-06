@@ -33,7 +33,7 @@ out.adminOrderAfter = await p.textContent("[data-testid=admin-order]");
 await p.click("text=‹ Admin"); await p.click(".item:has-text('Klippekort')"); await p.waitForSelector("[data-testid=admin-card]"); await p.click("[data-testid=admin-card] button"); await p.waitForTimeout(200); out.cardsWaitingAfter = await p.$$eval("[data-testid=admin-card]", e => e.length);
 await p.click("text=‹ Admin"); await p.click(".item:has-text('Events')"); await p.waitForSelector("#event-new"); await p.click("#event-new");
 await p.fill("#ev-title", "Workshop med gæstetræner"); await p.click(".sheet .chip:has-text('Workshop')"); await p.click("#ev-save"); await p.waitForSelector(".toast"); await p.waitForTimeout(200); out.eventsAfter = await p.$$eval("[data-testid=event]", e => e.length);
-await p.click("nav.tabbar >> text=Mit hold"); await p.click("[data-testid=go-dancers]"); await p.waitForSelector("[data-testid=give-milestone]");
+await p.click("nav.tabbar >> text=/^(Mit hold|Hold)$/"); await p.click("[data-testid=go-dancers]"); await p.waitForSelector("[data-testid=give-milestone]");
 const freja = p.locator(".item", { hasText: "Freja" }); await freja.locator("[data-testid=give-milestone]").click(); await p.click(".sheet .chip:has-text('Spagat')"); await p.click("#milestone-save"); await p.waitForSelector(".toast"); out.milestone = await p.textContent(".toast");
 // attendance on Contemporary Elite (Monday 19:20 this week) → Freja present → punch
 await p.click("nav.tabbar >> text=Sale"); await p.waitForSelector(".cal"); await p.click(".days .day >> nth=0"); await p.waitForTimeout(200);

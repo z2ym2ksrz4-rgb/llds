@@ -1,3 +1,4 @@
+import { ageOf } from "@/domain/llds/lib/time";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSettings } from "@/core/settings";
@@ -24,7 +25,7 @@ export function SettingsScreen() {
 
       {me && me.children.length > 0 && (
         <div className="sec"><h2>{t("settings.children")}</h2>
-          {me.children.map((c) => { const age = c.birth_year ? year - c.birth_year : null; const eligible = age != null && age >= appConfig.supervisedFromAge && age < appConfig.minAccountAge; return (
+          {me.children.map((c) => { const age = ageOf(c); const eligible = age != null && age >= appConfig.supervisedFromAge && age < appConfig.minAccountAge; return (
             <div className="card" key={c.id}>
               <div className="row between"><strong>{c.first_name}</strong><span className="tiny">{c.birth_year ?? ""}{age != null ? ` · ${age} ${t("settings.years")}` : ""}</span></div>
               {c.supervised_by ? (
