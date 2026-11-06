@@ -8,7 +8,7 @@ export function supabaseSchedule(sb: SupabaseClient, fail: Fail, schoolId: () =>
   const mapSession = (r: Record<string, unknown>): Session => ({
     id: r.id as string, team_id: r.team_id as string | null, team_name: r.team_name as string | null, room_id: r.room_id as string | null, room_name: r.room_name as string | null,
     title: r.title as string | null, starts_at: r.starts_at as string, ends_at: r.ends_at as string, trainer_id: r.trainer_id as string | null, trainer_name: r.trainer_name as string | null,
-    substitute_id: r.substitute_id as string | null, substitute_name: r.substitute_name as string | null, lesson_plan: r.lesson_plan as string | null, lesson_plan_read_at: r.lesson_plan_read_at as string | null,
+    substitute_id: r.substitute_id as string | null, substitute_name: r.substitute_name as string | null, assistant_id: (r.assistant_id as string | null) ?? null, assistant_name: (r.assistant_name as string | null) ?? null, lesson_plan: r.lesson_plan as string | null, lesson_plan_read_at: r.lesson_plan_read_at as string | null,
     cancelled: !!r.cancelled, cancel_note: r.cancel_note as string | null, weekly_rule_id: r.weekly_rule_id as string | null, substitute_wanted: !!r.substitute_wanted,
   });
   return {
@@ -19,9 +19,9 @@ export function supabaseSchedule(sb: SupabaseClient, fail: Fail, schoolId: () =>
     },
     async createSession(i: SessionInput) {
       if (i.repeatWeeklyUntil) {
-        const { error } = await sb.rpc("create_weekly_sessions", { p_team: i.team_id, p_room: i.room_id, p_title: i.title ?? null, p_start: i.starts_at, p_end: i.ends_at, p_trainer: i.trainer_id ?? null, p_until: i.repeatWeeklyUntil }); fail(error);
+        const { error } = await sb.rpc("create_weekly_sessions", { p_team: i.team_id, p_room: i.room_id, p_title: i.title ?? null, p_start: i.starts_at, p_end: i.ends_at, p_trainer: i.trainer_id ?? null, p_until: i.repeatWeeklyUntil, p_assistant: i.assistant_id ?? null }); fail(error);
       } else {
-        const { error } = await sb.from("session").insert({ school_id: await schoolId(), team_id: i.team_id, room_id: i.room_id, title: i.title ?? null, starts_at: i.starts_at, ends_at: i.ends_at, trainer_id: i.trainer_id ?? null }); fail(error);
+        const { error } = await sb.from("session").insert({ school_id: await schoolId(), team_id: i.team_id, room_id: i.room_id, title: i.title ?? null, starts_at: i.starts_at, ends_at: i.ends_at, trainer_id: i.trainer_id ?? null, assistant_id: i.assistant_id ?? null }); fail(error);
       }
     },
     async updateSession(id: string, patch: Record<string, unknown>, scope: "one" | "future" = "one") {

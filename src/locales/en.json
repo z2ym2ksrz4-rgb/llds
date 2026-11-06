@@ -341,7 +341,15 @@
     "created": "Training created – room booked",
     "saved": "Saved",
     "deleted": "Training deleted – room freed",
-    "absenceBtn": "Report absence"
+    "absenceBtn": "Report absence",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "repeatWeekly": "Repeat weekly",
+    "repeatHint": "– every week until {{date}}",
+    "once": "– this one time only",
+    "changeStaff": "Change",
+    "useTeamStaff": "Use the team's trainer and assistant",
+    "badUntil": "End date must be after start date"
   },
   "rooms": {
     "prevWeek": "Previous week",

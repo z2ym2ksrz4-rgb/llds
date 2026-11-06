@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { api, type Absence, type Person, type Session, type Team, type Room } from "@/core/api";
+import { api, type Member, type Absence, type Person, type Session, type Team, type Room } from "@/core/api";
 import { useAuth } from "@/core/auth";
 import { Sheet } from "./Sheet";
 import { dateLabel, hm, SEASON_END, isoDate } from "../lib/time";
@@ -41,7 +41,7 @@ export function SessionSheet({ session, absences, onClose, onChanged, toast }: {
       <div className="chips">
         <span className="chip">{dateLabel(session.starts_at)} {hm(session.starts_at)}–{hm(session.ends_at)}</span>
         {session.room_name && <span className="chip">{session.room_name}</span>}
-        {session.substitute_name ? <span className="chip gold">{t("session.sub")}: {session.substitute_name}</span> : session.trainer_name && <span className="chip">{session.trainer_name}</span>}
+        {session.substitute_name ? <span className="chip gold">{t("session.sub")}: {session.substitute_name}</span> : session.trainer_name && <span className="chip">{session.trainer_name}</span>}{session.assistant_name && <span className="chip">{t("roles.assistant")}: {session.assistant_name}</span>}
         {session.substitute_wanted && !session.substitute_id && <span className="chip warn">{t("session.subWanted")}</span>}
       </div>
       {session.cancelled && session.cancel_note && <p className="small muted">{session.cancel_note}</p>}
@@ -137,46 +137,69 @@ export function SessionEditor({ session, defaults, onClose, onSaved, toast }: { 
   const { t } = useTranslation();
   const me = useAuth((s) => s.me)!;
   const isAdmin = me.person.is_admin;
-  const [teams, setTeams] = useState<Team[]>([]); const [rooms, setRooms] = useState<Room[]>([]); const [staff, setStaff] = useState<Person[]>([]);
+  const [teams, setTeams] = useState<Team[]>([]); const [rooms, setRooms] = useState<Room[]>([]); const [staff, setStaff] = useState<Person[]>([]); const [members, setMembers] = useState<Member[]>([]);
   const myTrainerTeams = me.memberships.filter((m) => m.person_id === me.person.id && m.role === "trainer").map((m) => m.team_id);
   const s0 = session ? new Date(session.starts_at) : defaults!.date;
   const [f, setF] = useState({
     team_id: session?.team_id ?? "", room_id: session?.room_id ?? defaults?.room_id ?? "", title: session?.title ?? "",
-    date: isoDate(s0), start: session ? hm(session.starts_at) : defaults!.start, end: session ? hm(session.ends_at) : addMin(defaults!.start, 60),
-    trainer_id: session?.trainer_id ?? (isAdmin ? "" : me.person.id), repeat: !session, until: SEASON_END, scope: "one" as "one" | "future",
+    date: isoDate(s0), until: SEASON_END, start: session ? hm(session.starts_at) : defaults!.start, end: session ? hm(session.ends_at) : addMin(defaults!.start, 60),
+    trainer_id: session?.trainer_id ?? (isAdmin ? "" : me.person.id), assistant_id: session?.assistant_id ?? "", repeat: !session, scope: "one" as "one" | "future",
   });
+  const [editStaff, setEditStaff] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  useEffect(() => { void Promise.all([api.listTeams(), api.listRooms(), api.staffList()]).then(([tm, r, st]) => { setTeams(isAdmin ? tm : tm.filter((x) => myTrainerTeams.includes(x.id))); setRooms(r); setStaff(st); }); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { void Promise.all([api.listTeams(), api.listRooms(), api.staffList(), api.listMembers()]).then(([tm, r, st, mb]) => { setTeams(isAdmin ? tm : tm.filter((x) => myTrainerTeams.includes(x.id))); setRooms(r); setStaff(st); setMembers(mb); }); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  /** the team's own trainer + assistant follow the team automatically; "Skift" overrides for this training */
+  const teamStaff = (teamId: string) => {
+    const tr = members.find((m) => m.memberships.some((x) => x.team_id === teamId && x.role === "trainer"));
+    const as = members.find((m) => m.memberships.some((x) => x.team_id === teamId && x.role === "assistant"));
+    return { trainer_id: tr?.id ?? "", assistant_id: as?.id ?? "" };
+  };
+  const pickTeam = (teamId: string) => { const ts = teamId ? teamStaff(teamId) : { trainer_id: f.trainer_id, assistant_id: "" }; setF({ ...f, team_id: teamId, trainer_id: ts.trainer_id || (isAdmin ? "" : me.person.id), assistant_id: ts.assistant_id }); setEditStaff(false); };
+  const nameOf = (id: string) => { const p = staff.find((x) => x.id === id); return p ? `${p.first_name} ${p.last_name}` : null; };
   const save = async () => {
     setErr(null);
     const starts_at = new Date(`${f.date}T${f.start}:00`).toISOString(), ends_at = new Date(`${f.date}T${f.end}:00`).toISOString();
     if (ends_at <= starts_at) { setErr(t("session.badTime")); return; }
+    if (!session && f.repeat && f.until < f.date) { setErr(t("session.badUntil")); return; }
     // clash check in the same room
     const day0 = new Date(f.date); const next = new Date(day0); next.setDate(next.getDate() + 1);
     const [ss, bs] = await Promise.all([api.listSessions(day0.toISOString(), next.toISOString()), api.listBookings(day0.toISOString(), next.toISOString())]);
     const clash = ss.find((x) => x.room_id === f.room_id && x.id !== session?.id && !x.cancelled && x.starts_at < ends_at && starts_at < x.ends_at) || bs.find((x) => x.room_id === f.room_id && x.status !== "rejected" && x.starts_at < ends_at && starts_at < x.ends_at);
     if (clash) { setErr(t("session.clash", { what: ("team_name" in clash ? clash.team_name : clash.title) ?? "", from: hm(clash.starts_at), to: hm(clash.ends_at) })); return; }
-    const payload = { team_id: f.team_id || null, room_id: f.room_id || null, title: f.title || null, starts_at, ends_at, trainer_id: f.trainer_id || null };
+    const payload = { team_id: f.team_id || null, room_id: f.room_id || null, title: f.title || null, starts_at, ends_at, trainer_id: f.trainer_id || null, assistant_id: f.assistant_id || null };
     if (session) await api.updateSession(session.id, payload, f.scope); else await api.createSession({ ...payload, repeatWeeklyUntil: f.repeat ? f.until : null });
     toast(session ? t("session.saved") : t("session.created")); onSaved();
   };
   return (
     <Sheet onClose={onClose} eyebrow={session ? t("common.edit") : t("session.new")} title={f.title || teams.find((x) => x.id === f.team_id)?.name || t("session.training")}>
       <label className="field"><span>{t("session.team")}</span>
-        <select id="se-team" value={f.team_id} onChange={(e) => setF({ ...f, team_id: e.target.value })}><option value="">{t("session.noTeam")}</option>{teams.map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</select></label>
+        <select id="se-team" value={f.team_id} onChange={(e) => pickTeam(e.target.value)}><option value="">{t("session.noTeam")}</option>{teams.map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</select></label>
       {!f.team_id && <label className="field"><span>{t("session.title")}</span><input id="se-title" value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} placeholder={t("session.titlePh")} /></label>}
+      <label className="field"><span>{t("session.room")}</span><select id="se-room" value={f.room_id} onChange={(e) => setF({ ...f, room_id: e.target.value })}>{rooms.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}</select></label>
+
+      <label className="field"><span>{session || !f.repeat ? t("session.date") : t("session.startDate")}</span><input id="se-date" type="date" value={f.date} onChange={(e) => setF({ ...f, date: e.target.value })} /></label>
+      {!session && f.repeat && <label className="field"><span>{t("session.endDate")}</span><input id="se-until" type="date" value={f.until} min={f.date} onChange={(e) => setF({ ...f, until: e.target.value })} /></label>}
       <div className="grid2">
-        <label className="field"><span>{t("session.room")}</span><select id="se-room" value={f.room_id} onChange={(e) => setF({ ...f, room_id: e.target.value })}>{rooms.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}</select></label>
-        <label className="field"><span>{t("session.date")}</span><input id="se-date" type="date" value={f.date} onChange={(e) => setF({ ...f, date: e.target.value })} /></label>
         <label className="field"><span>{t("session.start")}</span><input id="se-start" type="time" value={f.start} onChange={(e) => setF({ ...f, start: e.target.value })} /></label>
         <label className="field"><span>{t("session.end")}</span><input id="se-end" type="time" value={f.end} onChange={(e) => setF({ ...f, end: e.target.value })} /></label>
       </div>
-      <label className="field"><span>{t("session.trainer")}</span><select id="se-trainer" value={f.trainer_id} onChange={(e) => setF({ ...f, trainer_id: e.target.value })}><option value="">–</option>{staff.map((p) => <option key={p.id} value={p.id}>{p.first_name} {p.last_name}</option>)}</select></label>
       {!session ? (
-        <label className="check"><input type="checkbox" checked={f.repeat} onChange={(e) => setF({ ...f, repeat: e.target.checked })} /> {t("session.repeatUntil")} <input type="date" value={f.until} style={{ width: "auto" }} onChange={(e) => setF({ ...f, until: e.target.value })} disabled={!f.repeat} /></label>
+        <label className="check" data-testid="se-repeat"><input type="checkbox" checked={f.repeat} onChange={(e) => setF({ ...f, repeat: e.target.checked })} /> {t("session.repeatWeekly")}<span className="tiny" style={{ marginLeft: 6 }}>{f.repeat ? t("session.repeatHint", { date: new Date(f.until).toLocaleDateString("da-DK", { day: "numeric", month: "short" }) }) : t("session.once")}</span></label>
       ) : session.weekly_rule_id && (
         <div className="field"><span>{t("session.applyTo")}</span><div className="chips"><button className={"chip" + (f.scope === "one" ? " on" : "")} onClick={() => setF({ ...f, scope: "one" })}>{t("session.onlyThis")}</button><button className={"chip" + (f.scope === "future" ? " on" : "")} onClick={() => setF({ ...f, scope: "future" })}>{t("session.thisAndFuture")}</button></div></div>
       )}
+
+      <div className="card" style={{ padding: 12 }} data-testid="se-staff">
+        {!editStaff ? (
+          <div className="row between"><div><div className="tiny">{t("session.trainer")}</div><div>{nameOf(f.trainer_id) ?? <span className="muted">–</span>}</div>{(f.assistant_id || f.team_id) && <><div className="tiny" style={{ marginTop: 6 }}>{t("roles.assistant")}</div><div>{nameOf(f.assistant_id) ?? <span className="muted">–</span>}</div></>}</div><button className="ghost small" onClick={() => setEditStaff(true)} data-testid="se-change-staff">{t("session.changeStaff")}</button></div>
+        ) : (
+          <>
+            <label className="field"><span>{t("session.trainer")}</span><select id="se-trainer" value={f.trainer_id} onChange={(e) => setF({ ...f, trainer_id: e.target.value })}><option value="">–</option>{staff.map((p) => <option key={p.id} value={p.id}>{p.first_name} {p.last_name}</option>)}</select></label>
+            <label className="field"><span>{t("roles.assistant")}</span><select id="se-assistant" value={f.assistant_id} onChange={(e) => setF({ ...f, assistant_id: e.target.value })}><option value="">–</option>{staff.filter((p) => p.id !== f.trainer_id).map((p) => <option key={p.id} value={p.id}>{p.first_name} {p.last_name}</option>)}</select></label>
+            {f.team_id && <button className="linklike small" onClick={() => { const ts = teamStaff(f.team_id); setF({ ...f, ...ts }); setEditStaff(false); }}>{t("session.useTeamStaff")}</button>}
+          </>
+        )}
+      </div>
       <p className="tiny">{t("session.autoBook")}</p>
       {err && <p className="error" role="alert">{err}</p>}
       <div className="row"><button className="cta grow" disabled={!f.room_id || (!f.team_id && !f.title)} onClick={() => void save()}>{session ? t("common.save") : t("session.create")}</button>

@@ -55,7 +55,7 @@ export function scheduleOps(get: () => { S: SchedState; persons: Person[]; membe
       const until = i.repeatWeeklyUntil ? new Date(i.repeatWeeklyUntil) : s;
       while (s <= until) {
         g.S.sessions.push({ id: "s-" + id(), team_id: i.team_id, team_name: team?.name ?? null, room_id: i.room_id, room_name: room?.name ?? null, title: i.title ?? null, starts_at: s.toISOString(), ends_at: e.toISOString(),
-          trainer_id: i.trainer_id ?? null, trainer_name: names(i.trainer_id ?? null)?.split(" ")[0] ?? null, substitute_id: null, substitute_name: null, lesson_plan: null, lesson_plan_read_at: null, cancelled: false, cancel_note: null, weekly_rule_id: rule, substitute_wanted: false });
+          trainer_id: i.trainer_id ?? null, trainer_name: names(i.trainer_id ?? null)?.split(" ")[0] ?? null, assistant_id: i.assistant_id ?? null, assistant_name: names(i.assistant_id ?? null)?.split(" ")[0] ?? null, substitute_id: null, substitute_name: null, lesson_plan: null, lesson_plan_read_at: null, cancelled: false, cancel_note: null, weekly_rule_id: rule, substitute_wanted: false });
         s = new Date(s.getTime() + 7 * 864e5); e = new Date(e.getTime() + 7 * 864e5);
       }
       g.save(); g.emit();
@@ -74,6 +74,8 @@ export function scheduleOps(get: () => { S: SchedState; persons: Person[]; membe
         if (patch.substitute_wanted && !wasSub) for (const st of g.persons.filter((x) => x.status === "approved" && (x.is_admin || g.memberships.some((m) => m.person_id === x.id && m.role !== "dancer")) && x.id !== s.trainer_id)) g.notify(st.id, "substitute", "Vikar søges", `${s.team_name ?? ""} · ${new Date(s.starts_at).toLocaleString("da-DK", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}`, { session_id: s.id });
         if (patch.cancelled && !wasCancelled && s.team_id) for (const m of g.memberships.filter((x) => x.team_id === s.team_id)) for (const pid of family(m.person_id)) if (g.persons.find((x) => x.id === pid)?.user_id) g.notify(pid, "session", "Træning aflyst", `${s.team_name ?? ""} · ${new Date(s.starts_at).toLocaleDateString("da-DK")}${s.cancel_note ? " · " + s.cancel_note : ""}`, { session_id: s.id });
         if ("team_id" in patch) s.team_name = g.teams.find((t) => t.id === patch.team_id)?.name ?? null;
+        if ("trainer_id" in patch) s.trainer_name = names(patch.trainer_id as string | null)?.split(" ")[0] ?? null;
+        if ("assistant_id" in patch) s.assistant_name = names(patch.assistant_id as string | null)?.split(" ")[0] ?? null;
         if ("room_id" in patch) s.room_name = g.S.rooms.find((r) => r.id === patch.room_id)?.name ?? null;
         if ("trainer_id" in patch) s.trainer_name = names(patch.trainer_id as string | null)?.split(" ")[0] ?? null;
         if ("substitute_id" in patch) s.substitute_name = names(patch.substitute_id as string | null)?.split(" ")[0] ?? null;

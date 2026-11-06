@@ -96,6 +96,8 @@ export type Session = {
   trainer_name: string | null;
   substitute_id: string | null;
   substitute_name: string | null;
+  assistant_id?: string | null;
+  assistant_name?: string | null;
   lesson_plan: string | null;
   lesson_plan_read_at: string | null;
   cancelled: boolean;
@@ -111,6 +113,7 @@ export type SessionInput = {
   starts_at: string;
   ends_at: string;
   trainer_id?: string | null;
+  assistant_id?: string | null;
   repeatWeeklyUntil?: string | null; // ISO date → generates one session per week incl. the first
 };
 

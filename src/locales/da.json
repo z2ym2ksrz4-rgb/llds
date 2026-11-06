@@ -341,7 +341,15 @@
     "created": "Træning oprettet – salen er booket",
     "saved": "Gemt",
     "deleted": "Træning slettet – salen er fri",
-    "absenceBtn": "Meld afbud"
+    "absenceBtn": "Meld afbud",
+    "startDate": "Startdato",
+    "endDate": "Slutdato",
+    "repeatWeekly": "Gentag ugentligt",
+    "repeatHint": "– hver uge til {{date}}",
+    "once": "– kun denne ene gang",
+    "changeStaff": "Skift",
+    "useTeamStaff": "Brug holdets træner og hjælpetræner",
+    "badUntil": "Slutdato skal være efter startdato"
   },
   "rooms": {
     "prevWeek": "Forrige uge",
