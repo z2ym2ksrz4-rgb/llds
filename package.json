@@ -15,7 +15,7 @@
     "cap:android": "npm run cap:sync && npx cap open android",
     "android:apk": "npm run cap:sync && cd android && ./gradlew assembleDebug",
     "new-app": "node scripts/new-app.mjs",
-    "smoke": "node smoke.mjs && node smoke2.mjs && node smoke3.mjs && node smoke4.mjs && node smoke5.mjs",
+    "smoke": "node smoke.mjs && node smoke2.mjs && node smoke3.mjs && node smoke4.mjs && node smoke5.mjs && node smoke6.mjs",
     "build:mock": "VITE_MOCK=1 vite build",
     "dev:mock": "VITE_MOCK=1 vite",
     "build:web": "RELEASE=1 vite build --base=/llds/app/",

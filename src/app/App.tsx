@@ -13,8 +13,10 @@ export default function App() {
   const me = useAuth((s) => s.me);
   const isAdmin = !!me?.person.is_admin;
   const hasTeams = !!me && me.memberships.length > 0;
+  const viewAs = useAuth((s) => s.viewAs); const setViewAs = useAuth((s) => s.setViewAs);
   const tab = useNav((s) => s.tab); const setTab = useNav((s) => s.setTab);
-  useEffect(() => { if (phase !== "ready") setTab("home"); }, [phase, setTab]); // every sign-in starts on Home
+  useEffect(() => { if (phase !== "ready") setTab("home"); }, [phase, setTab]);
+  useEffect(() => { if ((tab === "admin" && !isAdmin) || (tab === "team" && !hasTeams)) setTab("home"); }, [tab, isAdmin, hasTeams, setTab]); // every sign-in starts on Home
 
   let body: React.ReactNode;
   if (phase === "loading") body = <section className="screen centered"><div className="spinner" aria-label={t("common.loading")} /></section>;
@@ -27,6 +29,7 @@ export default function App() {
   const tabs: [Tab, string, string][] = [["home", t("nav.home"), "home"], ["rooms", t("nav.rooms"), "cal"], ...(hasTeams ? [["team", t("nav.team"), "team"] as [Tab, string, string]] : []), ["social", t("nav.social"), "chat"], ["events", t("nav.events"), "star"], ...(isAdmin ? [["admin", t("nav.admin"), "grid"] as [Tab, string, string]] : [])];
   return (
     <div className="app">
+      {phase === "ready" && viewAs && <div className="viewbar" data-testid="viewbar"><span>{t("view.previewing", { role: t(`roles.${viewAs}`) })}</span><button onClick={() => setViewAs(null)}>{t("view.exit")}</button></div>}
       <main>{body}</main>
       {phase === "ready" && (
         <nav className="tabbar">

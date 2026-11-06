@@ -1,0 +1,27 @@
+// Phase-7 smoke: "Vis appen som" – admin previews trainer / dancer, exits; tabs and Admin menu follow. Runs against the mock.
+import { chromium } from "playwright";
+const base = process.env.BASE ?? "http://localhost:4173/";
+const b = await chromium.launch({ executablePath: process.env.CHROME ?? "/opt/pw-browsers/chromium" });
+const p = await b.newPage({ viewport: { width: 390, height: 844 } }); const out = { errors: [] };
+p.on("pageerror", (e) => out.errors.push(e.message));
+await p.goto(base, { waitUntil: "networkidle" });
+await p.fill("#email", "admin@demo"); await p.click("form button.cta"); await p.fill("#code", "000000"); await p.click("form button.cta");
+await p.waitForSelector("nav.tabbar");
+out.tabsAdmin = await p.$$eval("nav.tabbar button span", (e) => e.map((x) => x.textContent));
+await p.click("[data-testid=avatar]"); await p.waitForSelector("[data-testid=view-as]");
+out.options = await p.$$eval("[data-testid=view-as] .chip", (e) => e.map((x) => x.textContent));
+await p.click("[data-testid=view-as] .chip:has-text('Træner')");
+await p.waitForSelector("[data-testid=viewbar]");
+out.viewbar = await p.textContent("[data-testid=viewbar]");
+out.tabsTrainer = await p.$$eval("nav.tabbar button span", (e) => e.map((x) => x.textContent));
+await p.click("nav.tabbar >> text=Mit hold"); await p.waitForSelector("[data-testid=team-hero]");
+out.teamAsTrainer = await p.textContent("[data-testid=team-hero] .small");
+await p.click("[data-testid=avatar]"); await p.click("[data-testid=view-as] .chip:has-text('Danser')"); await p.waitForTimeout(300);
+out.tabsDancer = await p.$$eval("nav.tabbar button span", (e) => e.map((x) => x.textContent));
+out.adminMenuHidden = (await p.$$("[data-testid=avatar]")).length ? !(await (await p.click("[data-testid=avatar]"), p.waitForTimeout(200), p.$(".sheet .item:has-text('Admin')"))) : null;
+await p.keyboard.press("Escape"); await p.click(".sheet-bg", { position: { x: 5, y: 5 } }).catch(() => {});
+await p.click("[data-testid=viewbar] button"); await p.waitForTimeout(300);
+out.viewbarGone = !(await p.$("[data-testid=viewbar]"));
+out.tabsBack = await p.$$eval("nav.tabbar button span", (e) => e.map((x) => x.textContent));
+console.log(JSON.stringify(out, null, 1)); await b.close();
+if (out.errors.length || !out.tabsAdmin.includes("Admin") || out.tabsTrainer.includes("Admin") || !out.tabsTrainer.includes("Mit hold") || !out.viewbarGone || !out.tabsBack.includes("Admin")) process.exit(1);

@@ -629,5 +629,11 @@
   "social": {
     "feed": "Feed",
     "all": "Alle"
+  },
+  "view": {
+    "as": "Vis appen som",
+    "hint": "Prøv appen med en anden rolles øjne – rettigheder på serveren ændres ikke.",
+    "previewing": "Du ser appen som {{role}}",
+    "exit": "Afslut"
   }
 }

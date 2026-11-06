@@ -629,5 +629,11 @@
   "social": {
     "feed": "Feed",
     "all": "All"
+  },
+  "view": {
+    "as": "View app as",
+    "hint": "Preview the app through another role – server permissions are unchanged.",
+    "previewing": "Viewing the app as {{role}}",
+    "exit": "Exit"
   }
 }
