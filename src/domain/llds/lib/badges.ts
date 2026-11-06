@@ -19,4 +19,4 @@ export const BADGES: BadgeDef[] = [
 export const badgeDef = (key: string) => BADGES.find((b) => b.key === key);
 export const monthKey = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
 /** Training-count emblems continue every 50 after 100 (150, 200 …) – generated on the fly, mirrored in SQL. */
-export const totalBadge = (n: number): BadgeDef => n === 50 ? BADGES[2] : { key: `total${n}`, emoji: "🥇", name: `${n} træninger`, desc: `${n} registrerede træninger`, kind: "auto", rule: { total: n } };
+export const totalBadge = (n: number): BadgeDef => n === 50 ? BADGES[2] : n === 100 ? BADGES[3] : { key: `total${n}`, emoji: "🥇", name: `${n} træninger`, desc: `${n} registrerede træninger`, kind: "auto", rule: { total: n } };
