@@ -34,7 +34,7 @@ workflows:
           RELEASE=1 npm run build
           [ -d ios ] || npx cap add ios
           bash scripts/ios-postadd.sh
-          npx @capacitor/assets generate --ios --iconBackgroundColor '#0a0a0b' --iconBackgroundColorDark '#0a0a0b' --splashBackgroundColor '#0a0a0b' --splashBackgroundColorDark '#0a0a0b'
+          npx @capacitor/assets generate --ios --iconBackgroundColor '#ffffff' --iconBackgroundColorDark '#ffffff' --splashBackgroundColor '#ffffff' --splashBackgroundColorDark '#ffffff'
           npx cap sync ios
       - name: Set version & build number
         script: |
@@ -80,7 +80,7 @@ workflows:
           bash scripts/android-postadd.sh
           # Firebase (push): google-services.json from the GOOGLE_SERVICES_JSON secret (base64) when present
           if [ -n "${GOOGLE_SERVICES_JSON:-}" ]; then echo "$GOOGLE_SERVICES_JSON" | base64 -d > android/app/google-services.json; fi
-          npx @capacitor/assets generate --android --iconBackgroundColor '#0a0a0b' --iconBackgroundColorDark '#0a0a0b' --splashBackgroundColor '#0a0a0b' --splashBackgroundColorDark '#0a0a0b'
+          npx @capacitor/assets generate --android --iconBackgroundColor '#ffffff' --iconBackgroundColorDark '#ffffff' --splashBackgroundColor '#ffffff' --splashBackgroundColorDark '#ffffff'
           npx cap sync android
       - name: Keystore
         script: |

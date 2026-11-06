@@ -44,7 +44,7 @@ for c in SCHED["classes"] + SCHED["monthly"]:
     if c.get("slug"): team_ages.setdefault(c["slug"], set()).update(age_tokens(c["age"]))
 team_ages["solo-duo"] = {"born", "junior", "voksen"}
 
-LOGO = """<svg class="mark" viewBox="-30 0 300 230" role="img" aria-label="LL Dance Studio"><defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f3dc9a"/><stop offset=".35" stop-color="#c9a24a"/><stop offset=".55" stop-color="#8c6c25"/><stop offset=".8" stop-color="#e6c87a"/><stop offset="1" stop-color="#a8832f"/></linearGradient><linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff3c4"/><stop offset=".5" stop-color="#e6c87a"/><stop offset="1" stop-color="#b48a35"/></linearGradient></defs><g fill="url(#g2)"><path d="M120 6l3.6 7.6 8.3 1.1-6.1 5.7 1.6 8.2-7.4-4.1-7.4 4.1 1.6-8.2-6.1-5.7 8.3-1.1z"/><path d="M93 12l3 6.1 6.7.9-4.9 4.6 1.3 6.6-6.1-3.3-6.1 3.3 1.3-6.6-4.9-4.6 6.7-.9z"/><path d="M147 12l3 6.1 6.7.9-4.9 4.6 1.3 6.6-6.1-3.3-6.1 3.3 1.3-6.6-4.9-4.6 6.7-.9z"/><path d="M69 24l2.5 5 5.5.8-4 3.8 1 5.4-5-2.7-5 2.7 1-5.4-4-3.8 5.5-.8z"/><path d="M171 24l2.5 5 5.5.8-4 3.8 1 5.4-5-2.7-5 2.7 1-5.4-4-3.8 5.5-.8z"/></g><circle cx="120" cy="105" r="62" fill="url(#g1)"/><g font-family="Cormorant Garamond,Georgia,serif" font-weight="600" font-size="72" fill="#0c0b0a"><g transform="matrix(-1 0 0 1 240 0)"><text x="124" y="129">L</text></g><text x="124" y="129">L</text></g><rect x="119" y="72" width="2" height="66" fill="#0c0b0a"/><text x="120" y="212" text-anchor="middle" font-family="Cormorant Garamond,Georgia,serif" font-weight="600" font-size="34" fill="url(#g2)" letter-spacing="4">DANCE STUDIO</text></svg>"""
+LOGO = f'<img class="mark" src="{BASE}/brand/logo-white.png" alt="LL Dance Studio">'
 NAV = [("Holdplan", "/saeson-26-27/", "Alle hold, dag for dag"), ("Medlemsskab", "/medlemsskab/", "Priser, rater og prøvetimer"), ("Stjerneshoppen", "/merchandise/", "Tøj og merchandise"), ("Backstage", "/backstage/", "Trænerne bag studiet"), ("Kontakt", "/kontakt/", "Find os i Ulstrup")]
 ICON_ARROW = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>'
 
@@ -69,7 +69,7 @@ h2{font-size:clamp(2rem,4.6vw,3.4rem);margin:0 0 20px}h3{font-size:1.5rem}
 header.top{position:fixed;top:0;left:0;right:0;z-index:50;padding:16px 0;transition:background .5s,backdrop-filter .5s,padding .5s}
 header.top.solid{background:rgba(10,10,11,.72);backdrop-filter:blur(16px) saturate(140%);-webkit-backdrop-filter:blur(16px) saturate(140%);padding:10px 0;border-bottom:1px solid var(--line)}
 header.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px}
-.logo{display:flex;align-items:center;gap:10px;color:var(--fg)}.logo .mark{width:56px;height:44px;transition:transform .5s var(--ease)}.logo:hover .mark{transform:rotate(-6deg)}
+.logo{display:flex;align-items:center;gap:10px;color:var(--fg)}.logo .mark{height:54px;width:auto;transition:transform .5s var(--ease)}.logo:hover .mark{transform:rotate(-6deg)}
 .pill{display:flex;gap:2px;padding:4px;border:1px solid var(--line);border-radius:999px;background:rgba(10,10,11,.5);backdrop-filter:blur(12px)}
 .pill a{color:var(--muted);padding:9px 16px;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;border-radius:999px;transition:all .3s}.pill a:hover{color:var(--fg)}.pill a.on{color:#161206;background:linear-gradient(135deg,var(--gold2),var(--gold))}
 .hr{display:flex;align-items:center;gap:8px}
@@ -210,12 +210,12 @@ def page(title, body, desc, active="", hero=None, hero_title=None, hero_sub=None
     heroh = f'<div class="hero{" small" if small else ""}"><div class="bg" style="background-image:url({hero})"></div><div class="wrap">{"<div class=eyebrow>" + E(hero_sub) + "</div>" if hero_sub else ""}<h1>{hero_title}</h1>{("<p class=lead>" + hero_lead + "</p>") if hero_lead else ""}{extra}</div></div>' if hero else ""
     return f"""<!doctype html><html lang="da"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>{E(title)}</title><meta name="description" content="{E(desc)}"><meta name="theme-color" content="#0a0a0b"><meta property="og:title" content="{E(title)}"><meta property="og:description" content="{E(desc)}">{f'<meta property="og:image" content="{hero}">' if hero else ""}
-<link rel="icon" href="{BASE}/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="{BASE}/style.css">
+<link rel="icon" href="{BASE}/favicon.png" type="image/png"><link rel="apple-touch-icon" href="{BASE}/icons/apple-touch-icon.png"><link rel="stylesheet" href="{BASE}/style.css">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Outfit:wght@300;400;500&display=swap"></head><body>
 <header class="top"><div class="wrap"><a class="logo" href="{BASE}/">{LOGO}</a><nav class="pill">{pill}</nav><div class="hr"><a class="btn sm hbtn" href="{BASE}/app/">Åbn appen</a><button class="burger" aria-label="Menu"><i></i>Menu</button></div></div></header>
 <div class="menu"><div class="l"><a class="big" href="{BASE}/" style="transition-delay:40ms"><small>00</small>Forside<span>LL Dance Studio</span></a>{big}<div class="foot"><a class="btn" href="{BASE}/app/">Åbn appen {ICON_ARROW}</a><a class="btn ghost" href="tel:{C["phone"].replace(" ", "")}">{E(C["phone"])}</a></div></div><div class="r" style="background-image:url({ART(6)})"><div><div class="eyebrow">Ulstrup</div><h3>Dans med hjertet.<br><em>Vind med holdet.</em></h3></div></div></div>
 {heroh}{body}
-<footer><div class="wrap"><div class="cols3"><div><div class="big">LL Dance<br><em style="color:var(--gold2)">Studio</em></div><p class="muted small">{E(C["address"])}<br><a href="tel:{C["phone"].replace(" ", "")}" style="display:inline">{E(C["phone"])}</a> · {E(C["hours"])}<br><a href="mailto:{C["email"]}" style="display:inline">{C["email"]}</a></p></div>
+<footer><div class="wrap"><div class="cols3"><div><img src="{BASE}/brand/logo-white.png" alt="LL Dance Studio" style="width:180px;margin-bottom:14px"><p class="muted small">{E(C["address"])}<br><a href="tel:{C["phone"].replace(" ", "")}" style="display:inline">{E(C["phone"])}</a> · {E(C["hours"])}<br><a href="mailto:{C["email"]}" style="display:inline">{C["email"]}</a></p></div>
 <div><h4>Sider</h4>{"".join(f'<a href="{BASE}{h}">{l}</a>' for l, h, _ in NAV)}<a href="{BASE}/solo-duo/">Solo / Duo</a></div>
 <div><h4>Appen</h4><a href="{BASE}/app/">Log ind / tilmeld</a><a href="{BASE}/support/">Hjælp &amp; FAQ</a><a href="{BASE}/privacy/">Privatlivspolitik</a><a href="{BASE}/terms/">Vilkår</a></div></div>
 <div class="legal"><span>© {date.today().year} {E(C["name"])}</span><span>App og website af <a href="https://ilumie.com/" style="display:inline">Ilumie</a></span></div></div></footer>
@@ -345,7 +345,10 @@ write("support/index.html", plain("Hjælp – LL Dance Studio", SUPPORTP, "Kom i
 
 write("style.css", CSS)
 write("site.js", JS % {"url": SB_URL, "key": SB_KEY, "slug": SLUG, "base": BASE})
-shutil.copy(os.path.join(ROOT, "public", "favicon.svg"), os.path.join(OUT, "favicon.svg"))
+shutil.copy(os.path.join(ROOT, "public", "favicon.png"), os.path.join(OUT, "favicon.png"))
+os.makedirs(os.path.join(OUT, "brand"), exist_ok=True); os.makedirs(os.path.join(OUT, "icons"), exist_ok=True)
+for n in os.listdir(os.path.join(ROOT, "public", "brand")): shutil.copy(os.path.join(ROOT, "public", "brand", n), os.path.join(OUT, "brand", n))
+for n in os.listdir(os.path.join(ROOT, "public", "icons")): shutil.copy(os.path.join(ROOT, "public", "icons", n), os.path.join(OUT, "icons", n))
 os.makedirs(os.path.join(OUT, "art"), exist_ok=True)
 for n in range(1, 7): shutil.copy(os.path.join(ROOT, "public", "art", f"{n}.jpg"), os.path.join(OUT, "art", f"{n}.jpg"))
 print(f"site written to {OUT}: {len(TEAMS)} team pages")
