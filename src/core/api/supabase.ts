@@ -66,6 +66,10 @@ export function supabaseApi(url: string, anonKey: string): Api {
     async saveAppearance(a) { const { error } = await sb.from("school").update({ appearance: a }).eq("slug", schoolSlug); fail(error); },
     async deleteMyAccount() { const { error } = await sb.rpc("delete_my_account"); fail(error); await sb.auth.signOut(); },
     async listWebSignups() { const { data, error } = await sb.from("web_signup_view").select("*").order("created_at", { ascending: false }).limit(200); fail(error); return (data ?? []) as WebSignup[]; },
+    async listMyPayments() { const { data, error } = await sb.from("web_signup_view").select("*").order("created_at", { ascending: false }); fail(error); return (data ?? []) as WebSignup[]; },
+    async claimPaymentPaid(id) { const { error } = await sb.rpc("web_signup_claim_paid", { p_id: id }); fail(error); },
+    async appSignupTeam(teamId, personId, plan) { const { data, error } = await sb.rpc("app_signup_team", { p_team: teamId, p_person: personId, p_plan: plan }); fail(error); return data as { id: string; reference: string; amount_dkk: number | null; amount_before_dkk: number | null; discount_pct: number; team: string }; },
+    async requestPayment(i) { const { data, error } = await sb.rpc("request_payment", { p_team: i.team_id, p_person_ids: i.person_ids, p_plan: i.plan, p_amount: i.amount_dkk, p_discount_pct: i.discount_pct, p_message: i.message ?? null }); fail(error); return (data as number) ?? 0; },
     async setWebSignupStatus(id, status) { const { error } = await sb.from("web_signup").update({ status }).eq("id", id); fail(error); },
     async signUp(i) {
       const { error } = await sb.rpc("sign_up", {

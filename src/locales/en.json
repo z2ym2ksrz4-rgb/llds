@@ -676,12 +676,51 @@
     "notForOthers": "Other teams pay a season fee and do not use punches."
   },
   "pay": {
-    "eyebrow": "MobilePay",
-    "to": "to",
-    "open": "Open MobilePay",
-    "reference": "Write in the comment",
-    "hint": "On the phone: tap the button. On a computer: scan the QR code with MobilePay. Then tap “I have paid”.",
-    "claim": "I have paid"
+    "title": "Season payments",
+    "moreSub": "Team payments, receipts and status",
+    "none": "No season payments.",
+    "claimed": "Thanks – Line confirms the payment.",
+    "cancelled": "Cancelled",
+    "discount": "Discount {{pct}} %",
+    "plan": {
+      "full": "Full season",
+      "half": "Half season",
+      "rates": "Instalments (agreed)",
+      "custom": "Other amount"
+    },
+    "join": "Join a new team",
+    "joinSub": "Yourself or your child on another team – family discount applied automatically",
+    "joinEyebrow": "New team",
+    "who": "Who",
+    "team": "Team",
+    "planLabel": "Payment",
+    "familyHint": "Family discount: full price for the most expensive team, 10 % off every further team – applied automatically.",
+    "joinSend": "Sign up and go to payment",
+    "already": "Already on the team or signed up.",
+    "adminTitle": "Payments",
+    "adminSub": "Season payments, website sign-ups, send payment requests with a discount",
+    "request": "Send payment request",
+    "open": "Open",
+    "all": "All",
+    "noneAdmin": "No payments here.",
+    "adminHint": "“Mark paid” puts the dancer on the team, approves the profile and sends a receipt by e-mail.",
+    "marked": "Marked as paid – receipt sent.",
+    "srcWeb": "Website",
+    "srcApp": "App",
+    "srcAdmin": "Request",
+    "ref": "Ref.",
+    "toWhom": "To",
+    "noDancers": "No dancers on the team yet.",
+    "selectAll": "Select all",
+    "selectNone": "Clear",
+    "amount": "Amount",
+    "discountLabel": "Discount",
+    "message": "Message (optional)",
+    "messagePh": "e.g. “Special deal – half price in spring”",
+    "perDancer": "Per dancer",
+    "total": "Total ({{n}} dancers)",
+    "send": "Send to {{n}}",
+    "sentN": "{{n}} payment requests sent."
   },
   "milestones": {
     "title": "Milestones",
@@ -834,7 +873,8 @@
       "order": "Shop orders",
       "punch": "Punch cards",
       "booking": "Room bookings",
-      "signup": "New sign-ups (admin)"
+      "signup": "New sign-ups (admin)",
+      "payment": "Season payments"
     }
   },
   "customize": {

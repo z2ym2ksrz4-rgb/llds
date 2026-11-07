@@ -676,12 +676,51 @@
     "notForOthers": "Andre hold betaler sæsonpris og skal ikke bruge klip."
   },
   "pay": {
-    "eyebrow": "MobilePay",
-    "to": "til",
-    "open": "Åbn MobilePay",
-    "reference": "Skriv i kommentar",
-    "hint": "På telefonen: tryk knappen. På computer: scan QR-koden med MobilePay. Tryk derefter “Jeg har betalt”.",
-    "claim": "Jeg har betalt"
+    "title": "Sæsonbetalinger",
+    "moreSub": "Holdbetalinger, kvitteringer og status",
+    "none": "Ingen sæsonbetalinger.",
+    "claimed": "Tak – Line bekræfter betalingen.",
+    "cancelled": "Annulleret",
+    "discount": "Rabat {{pct}} %",
+    "plan": {
+      "full": "Hel sæson",
+      "half": "Halv sæson",
+      "rates": "Rater (aftales)",
+      "custom": "Andet beløb"
+    },
+    "join": "Tilmeld nyt hold",
+    "joinSub": "Dig selv eller dit barn på endnu et hold – familierabat beregnes automatisk",
+    "joinEyebrow": "Nyt hold",
+    "who": "Hvem",
+    "team": "Hold",
+    "planLabel": "Betaling",
+    "familyHint": "Familierabat: fuld pris for det dyreste hold, 10 % på hvert yderligere hold – beregnes automatisk.",
+    "joinSend": "Tilmeld og gå til betaling",
+    "already": "Er allerede på holdet eller tilmeldt.",
+    "adminTitle": "Betalinger",
+    "adminSub": "Sæsonbetalinger, web-tilmeldinger, send betalingsanmodning med rabat",
+    "request": "Send betalingsanmodning",
+    "open": "Åbne",
+    "all": "Alle",
+    "noneAdmin": "Ingen betalinger her.",
+    "adminHint": "“Markér betalt” sætter danseren på holdet, godkender profilen og sender en kvittering på e-mail.",
+    "marked": "Markeret som betalt – kvittering sendt.",
+    "srcWeb": "Website",
+    "srcApp": "App",
+    "srcAdmin": "Anmodning",
+    "ref": "Ref.",
+    "toWhom": "Til",
+    "noDancers": "Ingen dansere på holdet endnu.",
+    "selectAll": "Vælg alle",
+    "selectNone": "Fravælg alle",
+    "amount": "Beløb",
+    "discountLabel": "Rabat",
+    "message": "Besked (valgfri)",
+    "messagePh": "fx “Særaftale – halv pris i forår”",
+    "perDancer": "Pr. danser",
+    "total": "I alt ({{n}} dansere)",
+    "send": "Send til {{n}}",
+    "sentN": "{{n}} betalingsanmodninger sendt."
   },
   "milestones": {
     "title": "Milepæle",
@@ -834,7 +873,8 @@
       "order": "Shop-ordrer",
       "punch": "Klippekort",
       "booking": "Salbookinger",
-      "signup": "Nye tilmeldinger (admin)"
+      "signup": "Nye tilmeldinger (admin)",
+      "payment": "Sæsonbetalinger"
     }
   },
   "customize": {

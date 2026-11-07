@@ -11,6 +11,7 @@ export const NOTIFY_KINDS: { key: string; emoji: string; admin?: boolean }[] = [
   { key: "milestone", emoji: "🏅" },
   { key: "order", emoji: "🛍" },
   { key: "punch", emoji: "🎟" },
+  { key: "payment", emoji: "💳" },
   { key: "booking", emoji: "🏠" },
   { key: "signup", emoji: "📝", admin: true },
 ];

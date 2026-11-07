@@ -1,4 +1,4 @@
-import type { Api, Appearance, Me, Membership, PendingPerson, Person, Role, SignUpInput, Team } from "./types";
+import type { Api, Appearance, WebSignup, Me, Membership, PendingPerson, Person, Role, SignUpInput, Team } from "./types";
 import { scheduleOps, seedSchedule, type SchedState } from "./mock-schedule";
 import { socialOps, seedSocial, type SocialState } from "./mock-social";
 import { shopOps, seedShop, type ShopState } from "./mock-shop";
@@ -9,7 +9,7 @@ import { shopOps, seedShop, type ShopState } from "./mock-shop";
  * The special address admin@demo signs in as Line (approved admin).
  */
 const KEY = "llds_mock";
-type State = { email: string | null; appearance?: Appearance; persons: Person[]; guardians: { parent_id: string; child_id: string }[]; memberships: Membership[]; teams: Team[]; S: SchedState; X: SocialState; Y: ShopState };
+type State = { email: string | null; appearance?: Appearance; payments?: WebSignup[]; persons: Person[]; guardians: { parent_id: string; child_id: string }[]; memberships: Membership[]; teams: Team[]; S: SchedState; X: SocialState; Y: ShopState };
 
 const SCHOOL = "school-llds";
 const TEAMS: Team[] = [
@@ -33,6 +33,7 @@ const TEAMS: Team[] = [
   id: `team-${i}`, name: name as string, style: style as string, category: category as Team["category"], level: level as string,
   closed: closed as boolean, admission: (closed ? "audition" : "open") as Team["admission"], parents_see_video: psv as boolean, punch_card_open: punch as boolean, color: null, sort: i,
   years: ({ mini: "2017–2020", kids: "2014–2016", junior: "2008–2013", adult: "2007 og ældre (17 år+)", mixed: "Fra årgang 2012" } as Record<string, string>)[category as string],
+  price: ({ mini: "2.400 kr. for hel sæson, eller 1.750 kr. for halv sæson", kids: "2.650 kr. for hel sæson, eller 1.900 kr. for halv sæson", junior: "3.200 kr. for hel sæson, eller 2.250 kr. for halv sæson", adult: "2.900 kr. for hel sæson", mixed: "2.250 kr. for hel sæson, eller 1.550 kr. for halv sæson" } as Record<string, string>)[category as string],
   description: `${name} er et ${(style as string).toLowerCase()}-hold på niveauet ${level}. Vi træner teknik, udtryk og sammenhold – og glæder os til at se dig på gulvet.`,
 }));
 
@@ -115,8 +116,29 @@ export const mockApi: Api = {
     save(); emit();
   },
   async updateNotifyPrefs(prefs) { const me = meRow(); if (me) me.notify_prefs = prefs; save(); emit(); },
-  async listWebSignups() { return []; },
-  async setWebSignupStatus() { /* no web signups in mock */ },
+  async listWebSignups() { return S.payments ?? []; },
+  async setWebSignupStatus(id, status) { const p = (S.payments ?? []).find((x) => x.id === id); if (p) { p.status = status; if (status === "paid") { if (!S.memberships.some((m) => m.person_id === p.dancer_id && m.team_id === p.team_id)) S.memberships.push({ person_id: p.dancer_id, team_id: p.team_id, role: "dancer" }); for (const pid of new Set([p.dancer_id, p.contact_id])) notify(pid, "payment", "Betaling modtaget ✓", `${p.team_name} · ${p.amount_dkk} kr.`, { payment_id: p.id }); } } save(); emit(); },
+  async listMyPayments() { const me = meRow(); if (!me) return []; const mine = new Set([me.id, ...S.guardians.filter((g) => g.parent_id === me.id).map((g) => g.child_id)]); return (S.payments ?? []).filter((p) => mine.has(p.dancer_id) || mine.has(p.contact_id)); },
+  async claimPaymentPaid(id) { const p = (S.payments ?? []).find((x) => x.id === id); if (p && !p.claimed_paid_at) { p.claimed_paid_at = now(); for (const a of S.persons.filter((x) => x.is_admin && x.status === "approved")) notify(a.id, "payment", "Betaling meldt", `${p.dancer_name} · ${p.team_name} · ${p.amount_dkk} kr.`, { payment_id: p.id }); } save(); emit(); },
+  async appSignupTeam(teamId, personId, plan) {
+    const me = meRow()!; const team = S.teams.find((t) => t.id === teamId)!; const p = S.persons.find((x) => x.id === personId)!;
+    if (S.memberships.some((m) => m.person_id === personId && m.team_id === teamId)) throw new Error("already member");
+    const amounts = (team.price ?? "").match(/([0-9][0-9.]*) kr/g)?.map((x) => parseInt(x.replace(/\D/g, ""), 10)) ?? [2400, 1750];
+    const before = plan === "full" ? amounts[0] : plan === "half" ? amounts[1] ?? amounts[0] : null;
+    const pct = before != null && (S.payments ?? []).some((w) => w.contact_id === me.id && w.status !== "cancelled" && (w.amount_before_dkk ?? w.amount_dkk ?? 0) >= before) ? 10 : 0;
+    const amount = before == null ? null : Math.round(before * (100 - pct) / 100); const reference = `${team.name.slice(0, 18)} ${p.first_name}`; const pid = "pay-" + id();
+    (S.payments ??= []).push({ id: pid, dancer_id: p.id, contact_id: me.id, team_id: team.id, team_name: team.name, dancer_name: `${p.first_name} ${p.last_name}`, contact_name: `${me.first_name} ${me.last_name}`, email: me.email, phone: me.phone, plan, amount_dkk: amount, amount_before_dkk: before, discount_pct: pct, source: "app", message: null, reference, note: null, status: "awaiting_payment", claimed_paid_at: null, created_at: now() });
+    for (const a of S.persons.filter((x) => x.is_admin && x.status === "approved")) notify(a.id, "signup", "Ny holdtilmelding i appen 📝", `${p.first_name} → ${team.name}`, { payment_id: pid });
+    save(); emit(); return { id: pid, reference, amount_dkk: amount, amount_before_dkk: before, discount_pct: pct, team: team.name };
+  },
+  async requestPayment(i) {
+    const team = S.teams.find((t) => t.id === i.team_id); if (!team) return 0; let n = 0;
+    for (const pid of i.person_ids) { const p = S.persons.find((x) => x.id === pid); if (!p) continue; const contact = p.user_id || p.email ? p : S.persons.find((x) => x.id === S.guardians.find((g) => g.child_id === pid)?.parent_id) ?? p;
+      const amount = Math.round(i.amount_dkk * (100 - i.discount_pct) / 100);
+      (S.payments ??= []).push({ id: "pay-" + id(), dancer_id: p.id, contact_id: contact.id, team_id: team.id, team_name: team.name, dancer_name: `${p.first_name} ${p.last_name}`, contact_name: `${contact.first_name} ${contact.last_name}`, email: contact.email, phone: contact.phone, plan: i.plan, amount_dkk: amount, amount_before_dkk: i.amount_dkk, discount_pct: i.discount_pct, source: "admin", message: i.message ?? null, reference: `${team.name.slice(0, 18)} ${p.first_name}`, note: null, status: "awaiting_payment", claimed_paid_at: null, created_at: now() });
+      notify(contact.id, "payment", `Betaling: ${team.name}`, `${p.first_name} · ${amount} kr.${i.discount_pct ? ` (rabat ${i.discount_pct} %)` : ""}${i.message ? " · " + i.message : ""}`, {}); n++; }
+    save(); emit(); return n;
+  },
   async deleteMyAccount() { const me = meRow(); if (!me) return; const kids = S.guardians.filter((g) => g.parent_id === me.id).map((g) => g.child_id); S.persons = S.persons.filter((p) => p.id !== me.id && !kids.includes(p.id)); S.guardians = S.guardians.filter((g) => g.parent_id !== me.id); S.memberships = S.memberships.filter((m) => m.person_id !== me.id && !kids.includes(m.person_id)); S.email = null; save(); emit(); },
   async getAppearance() { return S.appearance ?? {}; },
   async saveAppearance(a) { S.appearance = a; save(); emit(); },

@@ -80,7 +80,7 @@ export type SignUpInput = {
 };
 
 export type PendingPerson = Person & { children: Person[] };
-export type WebSignup = { id: string; dancer_id: string; contact_id: string; team_id: string; team_name: string; dancer_name: string; contact_name: string; email: string | null; phone: string | null; plan: "full" | "half" | "rates"; amount_dkk: number | null; reference: string; note: string | null; status: "awaiting_payment" | "paid" | "cancelled"; claimed_paid_at: string | null; created_at: string };
+export type WebSignup = { id: string; dancer_id: string; contact_id: string; team_id: string; team_name: string; dancer_name: string; contact_name: string; email: string | null; phone: string | null; plan: "full" | "half" | "rates" | string | null; amount_dkk: number | null; amount_before_dkk?: number | null; discount_pct?: number; source?: "web" | "admin" | "app"; message?: string | null; reference: string; note: string | null; status: "awaiting_payment" | "paid" | "cancelled"; claimed_paid_at: string | null; created_at: string };
 
 export interface Api {
   /** auth */
@@ -95,7 +95,11 @@ export interface Api {
   deleteMyAccount(): Promise<void>;
   /* sign-ups made on the website (no app): season payment via MobilePay, Line confirms */
   listWebSignups(): Promise<WebSignup[]>;
-  setWebSignupStatus(id: string, status: "awaiting_payment" | "paid" | "cancelled"): Promise<void>;   // person + children without own login + auth user; throws 'last admin'
+  setWebSignupStatus(id: string, status: "awaiting_payment" | "paid" | "cancelled"): Promise<void>;
+  listMyPayments(): Promise<WebSignup[]>;                       // season payments for me / my children (web sign-ups + admin requests)
+  claimPaymentPaid(id: string): Promise<void>;                  // "Jeg har betalt" on a season payment
+  appSignupTeam(teamId: string, personId: string, plan: string): Promise<{ id: string; reference: string; amount_dkk: number | null; amount_before_dkk: number | null; discount_pct: number; team: string }>;
+  requestPayment(input: { team_id: string; person_ids: string[]; plan: string; amount_dkk: number; discount_pct: number; message?: string | null }): Promise<number>;   // person + children without own login + auth user; throws 'last admin'
   getAppearance(): Promise<Appearance>;      // works before login (anon)
   saveAppearance(a: Appearance): Promise<void>; // admin
   signUp(input: SignUpInput): Promise<void>;

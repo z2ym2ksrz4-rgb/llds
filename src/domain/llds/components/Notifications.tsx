@@ -6,7 +6,7 @@ import { Icon } from "./Icons";
 import { ago } from "../lib/time";
 import { browserNotify } from "../lib/notify";
 
-const ICON: Record<string, string> = { message: "✉️", booking: "🏠", substitute: "🙋", session: "⚠️", event: "📅", milestone: "🏅", badge: "🔥", order: "🛍", punch: "🎟", post: "💬", signup: "📝" };
+const ICON: Record<string, string> = { message: "✉️", booking: "🏠", substitute: "🙋", session: "⚠️", event: "📅", milestone: "🏅", badge: "🔥", order: "🛍", punch: "🎟", payment: "💳", post: "💬", signup: "📝" };
 
 /** Bell with unread count; the in-app inbox. Native push arrives with the store build – the rows are the same. */
 export function Bell() {

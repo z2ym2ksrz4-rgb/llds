@@ -17,6 +17,7 @@ import { resolveImage } from "../lib/catalog";
 import { TrophyShelf } from "../components/Emblems";
 import { ScrollList } from "../components/ScrollList";
 import { CustomBoxCard } from "../admin/Customize";
+import { MyPayments } from "./Payments";
 
 /** Home, laid out like the approved demo: next event as a photo hero, messages that need you, your (child's) week with absence buttons, open payments. */
 export function Home() {
@@ -185,6 +186,7 @@ export function Home() {
       )}
     </>),
     payments: () => (<>
+      <MyPayments embedded />
       {openPay.length > 0 && (
         <div className="sec"><h2>{t("home.payments")}</h2><ScrollList>
           {openPay.map((p) => <button key={p.id} className="item" onClick={() => setTab("more")}><span className="grow">{p.label}<div className="tiny">{p.sub}</div></span><span className="gold">{p.amount} kr.</span></button>)}

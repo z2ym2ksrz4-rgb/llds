@@ -4,26 +4,32 @@ import { api, type Milestone } from "@/core/api";
 import { useAuth } from "@/core/auth";
 import { useNav } from "@/core/nav";
 import { SettingsScreen } from "@/app/SettingsScreen";
+import { JoinTeam, MyPayments } from "./Payments";
+import { Toast } from "../components/Sheet";
 import { Shop } from "./Shop";
 import { PunchCards } from "./PunchCards";
 
-type Page = "menu" | "shop" | "punch" | "milestones" | "settings";
+type Page = "menu" | "shop" | "punch" | "milestones" | "settings" | "payments";
 
 /** "Mere": events, shop, punch cards, milestones, settings. */
 export function More() {
   const { t } = useTranslation();
   const [page, setPage] = useState<Page>("menu");
+  const [join, setJoin] = useState(false); const [toast, setToast] = useState<string | null>(null); const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
   const setTab = useNav((s) => s.setTab);
   if (page === "shop") return <Shop onBack={() => setPage("menu")} />;
   if (page === "punch") return <PunchCards onBack={() => setPage("menu")} />;
   if (page === "milestones") return <Milestones onBack={() => setPage("menu")} />;
   if (page === "settings") return <div><button className="linklike" onClick={() => setPage("menu")}>‹ {t("nav.more")}</button><SettingsScreen /></div>;
-  const items: [Page, string, string][] = [["milestones", t("milestones.title"), t("more.milestonesSub")], ["settings", t("nav.settings"), t("more.settingsSub")]];
+  if (page === "payments") return <MyPayments onBack={() => setPage("menu")} />;
+  const items: [Page, string, string][] = [["payments", t("pay.title"), t("pay.moreSub")], ["milestones", t("milestones.title"), t("more.milestonesSub")], ["settings", t("nav.settings"), t("more.settingsSub")]];
   return (
     <section className="screen">
       <button className="linklike" onClick={() => setTab("home")}>‹ {t("nav.home")}</button>
       <header className="topbar"><h1 className="display">{t("nav.more")}</h1></header>
-      <div className="card list">{items.map(([k, label, sub]) => <button key={k} className="item" data-testid={`more-${k}`} onClick={() => setPage(k)}><span className="grow">{label}<div className="tiny">{sub}</div></span><span className="gold">›</span></button>)}</div>
+      <div className="card list">{items.map(([k, label, sub]) => <button key={k} className="item" data-testid={`more-${k}`} onClick={() => setPage(k)}><span className="grow">{label}<div className="tiny">{sub}</div></span><span className="gold">›</span></button>)}<button className="item" data-testid="more-join" onClick={() => setJoin(true)}><span className="grow">{t("pay.join")}<div className="tiny">{t("pay.joinSub")}</div></span><span className="gold">›</span></button></div>
+      {join && <JoinTeam onClose={() => setJoin(false)} toast={say} />}
+      <Toast msg={toast} />
     </section>
   );
 }
