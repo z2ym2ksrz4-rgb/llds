@@ -89,7 +89,8 @@ function EventsList({ admin }: { admin?: boolean }) {
   );
 }
 
-function EventSheet({ event, staff, onClose, onEdit, onChanged, toast }: { event: Event; staff: boolean; onClose: () => void; onEdit: () => void; onChanged: () => void; toast: (m: string) => void }) {
+/** Full event overlay: photo, when/where/who, info, programme, pack list, sign-up & payment, staff list. Closes back to wherever you were. */
+export function EventSheet({ event, staff, onClose, onEdit, onChanged, toast }: { event: Event; staff: boolean; onClose: () => void; onEdit?: () => void; onChanged: () => void; toast: (m: string) => void }) {
   const { t } = useTranslation();
   const me = useAuth((s) => s.me)!;
   const [signups, setSignups] = useState<EventSignup[]>([]);
@@ -102,8 +103,13 @@ function EventSheet({ event, staff, onClose, onEdit, onChanged, toast }: { event
   const toggle = async (pid: string) => { const on = !mine(pid); await api.signUp_(event.id, pid, on); toast(on ? t("events.signedUp") : t("events.withdrawn")); await load(); onChanged(); if (on && event.price_dkk) setPay(pid); };
   const paid = signups.filter((s) => s.paid).length;
   return (
-    <Sheet onClose={onClose} eyebrow={`${t(`events.kind.${event.kind}`)} · ${dateLabel(event.starts_at)} ${hm(event.starts_at)}`} title={event.title}>
-      <div className="chips">{event.place && <span className="chip">{event.place}</span>}{event.meet_time && <span className="chip gold">{t("events.meet")}: {event.meet_time}</span>}{event.price_dkk ? <span className="chip">{event.price_dkk} kr.</span> : null}{event.signup_deadline && <span className={"chip" + (deadlinePassed ? " warn" : "")}>{t("events.deadline")}: {new Date(event.signup_deadline).toLocaleDateString("da-DK")}</span>}</div>
+    <Sheet onClose={onClose} photo={catalogUrl(event.image_key) ?? artFor(event.id)} eyebrow={`${t(`events.kind.${event.kind}`)} · ${dateLabel(event.starts_at)}`} title={event.title}>
+      <div className="card list" style={{ margin: 0 }} data-testid="event-facts">
+        <div className="item"><span className="avatar small">🕒</span><span className="grow">{dateLabel(event.starts_at)} · {hm(event.starts_at)}–{hm(event.ends_at)}{event.meet_time ? <div className="tiny">{t("events.meet")}: {event.meet_time}</div> : null}</span></div>
+        {event.place && <div className="item"><span className="avatar small">📍</span><span className="grow">{event.place}</span><a className="linklike small" href={`https://maps.google.com/?q=${encodeURIComponent(event.place)}`} target="_blank" rel="noreferrer">{t("events.map")}</a></div>}
+        <div className="item"><span className="avatar small">👯</span><span className="grow">{event.team_names?.length ? event.team_names.join(", ") : t("events.allTeams")}</span></div>
+        {(event.price_dkk || event.signup_deadline) && <div className="item"><span className="avatar small">🎟</span><span className="grow">{event.price_dkk ? `${event.price_dkk} kr.` : t("events.free")}{event.signup_deadline && <div className={"tiny" + (deadlinePassed ? " warn" : "")}>{t("events.deadline")}: {new Date(event.signup_deadline).toLocaleDateString("da-DK")}</div>}</span>{event.signups > 0 && <span className="tiny">{t("events.signups", { n: event.signups })}</span>}</div>}
+      </div>
       {event.info && <p className="small" style={{ whiteSpace: "pre-wrap", margin: 0 }}>{event.info}</p>}
       {event.plan.length > 0 && <div className="card" style={{ margin: 0 }}><div className="eyebrow">{t("events.plan")}</div>{event.plan.map((p, i) => <div key={i} className="row"><span className="time">{p.time}</span><span>{p.text}</span></div>)}</div>}
       {event.pack_list.length > 0 && <div className="card" style={{ margin: 0 }}><div className="eyebrow">{t("events.pack")}</div><ul className="checklist">{event.pack_list.map((p, i) => <li key={i}>{p}</li>)}</ul></div>}
@@ -118,7 +124,7 @@ function EventSheet({ event, staff, onClose, onEdit, onChanged, toast }: { event
         </div>
       )}
       {staff && (
-        <div className="card" style={{ margin: 0 }}><div className="row between"><span className="eyebrow">{t("events.signups", { n: signups.length })}{event.price_dkk ? ` · ${t("events.paidN", { n: paid })}` : ""}</span><button className="linklike small" onClick={onEdit}>{t("common.edit")}</button></div>
+        <div className="card" style={{ margin: 0 }}><div className="row between"><span className="eyebrow">{t("events.signups", { n: signups.length })}{event.price_dkk ? ` · ${t("events.paidN", { n: paid })}` : ""}</span>{onEdit && <button className="linklike small" onClick={onEdit}>{t("common.edit")}</button>}</div>
           <div className="list">{signups.map((s) => <div key={s.person_id} className="item" style={{ padding: "6px 0" }}><span className="grow">{s.person_name}<span className="tiny"> · {s.team_name ?? ""}</span></span>{event.price_dkk ? <button className={"chip small" + (s.paid ? " ok" : " warn")} onClick={async () => { await api.setSignupPaid(event.id, s.person_id, !s.paid); void load(); }}>{s.paid ? t("events.paid") : t("events.markPaid")}</button> : null}</div>)}</div>
         </div>
       )}

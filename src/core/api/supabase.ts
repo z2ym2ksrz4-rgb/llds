@@ -1,6 +1,6 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import appConfig from "../../../app.config.json";
-import type { Api, Membership, PendingPerson, Person, Role, Team } from "./types";
+import type { Api, Appearance, Membership, PendingPerson, Person, Role, Team } from "./types";
 import { supabaseSchedule } from "./supabase-schedule";
 import { supabaseSocial } from "./supabase-social";
 import { supabaseShop } from "./supabase-shop";

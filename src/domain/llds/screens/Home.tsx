@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import React, { Fragment, useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type Absence, type Booking, type Event, type Milestone, type PersonBadge, type Order, type PunchCard, type Session } from "@/core/api";
 import { useAuth } from "@/core/auth";
@@ -11,7 +11,10 @@ import { TopRight } from "../components/ProfileMenu";
 import { artFor } from "../lib/art";
 import { catalogUrl } from "../lib/catalog";
 import { EmblemRow } from "../components/Emblems";
+import { EventSheet } from "./Events";
 import { addDays, dateLabel, hm, startOfDay } from "../lib/time";
+import { boxOf, homeOrder, isHidden, useAppearance } from "@/core/appearance";
+import { CustomBoxCard } from "../admin/Customize";
 
 /** Home, laid out like the approved demo: next event as a photo hero, messages that need you, your (child's) week with absence buttons, open payments. */
 export function Home() {
@@ -19,6 +22,7 @@ export function Home() {
   const me = useAuth((s) => s.me)!;
   const viewing = useAuth((s) => s.viewing)!;
   const setTab = useNav((s) => s.setTab);
+  const appearance = useAppearance((s) => s.a);
   const isAdmin = me.person.is_admin;
   const isStaff = isAdmin || me.memberships.some((m) => m.person_id === me.person.id && m.role !== "dancer");
   const [sessions, setSessions] = useState<Session[]>([]);
@@ -30,6 +34,7 @@ export function Home() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [cards, setCards] = useState<PunchCard[]>([]);
   const [open, setOpen] = useState<Session | null>(null);
+  const [openEvent, setOpenEvent] = useState<Event | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
 
@@ -61,17 +66,16 @@ export function Home() {
   const studio = (studioToday ? todaysAll : nextDay ? sessions.filter((s) => new Date(s.starts_at).toDateString() === new Date(nextDay).toDateString()) : []).slice(0, 12);
   const upcoming = events.filter((e) => e.id !== hero?.id).slice(0, 4);
 
-  return (
-    <section className="screen">
-      <header className="topbar"><h1 className="display">{isAdmin ? t("home.hiAdmin", { name: me.person.first_name }) : t("home.hi", { name: me.person.first_name })}</h1><TopRight /></header>
-
+  const SECTIONS: Record<string, () => React.ReactNode> = {
+    hero: () => (<>
       {hero && (
-        <button className="hero tap photo kb" data-testid="hero" data-tour="hero" onClick={() => setTab("events")}><span className="bg warm" style={{ backgroundImage: `url(${catalogUrl(hero.image_key) ?? artFor(hero.id)})` }} />
+        <button className="hero tap photo kb" data-testid="hero" data-tour="hero" onClick={() => setOpenEvent(hero)}><span className="bg warm" style={{ backgroundImage: `url(${catalogUrl(hero.image_key) ?? catalogUrl(appearance.images?.hero) ?? artFor(hero.id)})` }} />
           <div><div className="eyebrow">{daysTo === 0 ? t("home.today") : t("home.inDays", { n: daysTo })}</div><h2 className="display">{hero.title}</h2>
             <div className="small muted">{dateLabel(hero.starts_at)}{hero.place ? ` · ${hero.place}` : ""}{hero.team_names?.length ? ` · ${hero.team_names.join(", ")}` : ""}</div></div>
         </button>
       )}
-
+    </>),
+    stats: () => (<>
       {isAdmin && (
         <div className="kv">
           <div className="card"><div className="n">{sessions.filter((s) => new Date(s.starts_at).toDateString() === today && !s.cancelled).length}</div><div className="tiny">{t("home.trainingsToday")}</div></div>
@@ -80,22 +84,26 @@ export function Home() {
           <div className="card"><div className="n">{subWanted.length}</div><div className="tiny">{t("home.subsWanted")}</div></div>
         </div>
       )}
-
+    </>),
+    messages: () => (<>
       <MessageBanner toast={say} />
-
+    </>),
+    subs: () => (<>
       {subWanted.length > 0 && isStaff && (
         <div className="card" style={{ borderColor: "var(--gold3)" }}>
           <div className="eyebrow">{t("home.subsWanted")}</div>
           {subWanted.map((s) => <button key={s.id} className="item" onClick={() => setOpen(s)}><span className="time">{dateLabel(s.starts_at)} {hm(s.starts_at)}</span><span className="grow">{s.team_name}</span><span className="gold">›</span></button>)}
         </div>
       )}
-
+    </>),
+    yourDay: () => (<>
       {isStaff && !isAdmin && staffToday.length > 0 && (
         <div className="sec"><h2>{t("home.yourDay")}</h2>
           <div className="card list">{staffToday.map((s) => <button key={s.id} className="item" onClick={() => setOpen(s)}><span className="time">{hm(s.starts_at)}</span><span className="grow">{s.team_name}<div className="tiny">{s.room_name}{s.lesson_plan ? " · " + t("session.planShort") : ""}</div></span><span className="gold">›</span></button>)}</div>
         </div>
       )}
-
+    </>),
+    studio: () => (<>
       {isAdmin && studio.length > 0 && (
         <div className="sec" data-tour="week"><div className="row between"><h2>{studioToday ? t("home.todayInStudio") : t("home.nextInStudio")}</h2><button className="linklike small" onClick={() => setTab("rooms")}>{t("home.fullSchedule")}</button></div>
           <div className="card list" data-testid="studio-today">
@@ -103,12 +111,18 @@ export function Home() {
           </div>
         </div>
       )}
+    </>),
+    upcoming: () => (<>
       {upcoming.length > 1 && (
         <div className="sec"><div className="row between"><h2>{t("home.upcoming")}</h2><button className="linklike small" onClick={() => setTab("events")}>{t("home.fullSchedule")}</button></div>
-          <div className="card list">{upcoming.map((e) => <button key={e.id} className="item" onClick={() => setTab("events")}><span className="time">{dateLabel(e.starts_at)}</span><span className="grow">{e.title}<div className="tiny">{e.place ?? t(`events.kind.${e.kind}`)}{e.team_names?.length ? ` · ${e.team_names.slice(0, 3).join(", ")}${e.team_names.length > 3 ? " …" : ""}` : ""}</div></span><span className="gold">›</span></button>)}</div>
+          <div className="card list">{upcoming.map((e) => <button key={e.id} className="item" onClick={() => setOpenEvent(e)}><span className="time">{dateLabel(e.starts_at)}</span><span className="grow">{e.title}<div className="tiny">{e.place ?? t(`events.kind.${e.kind}`)}{e.team_names?.length ? ` · ${e.team_names.slice(0, 3).join(", ")}${e.team_names.length > 3 ? " …" : ""}` : ""}</div></span><span className="gold">›</span></button>)}</div>
         </div>
       )}
+    </>),
+    teampick: () => (<>
       {(!isAdmin || teamIds.size > 0) && <TeamPicker />}
+    </>),
+    week: () => (<>
       {teamIds.size > 0 && (
         <div className="sec" data-tour="week"><div className="row between"><h2>{hat ? t("home.childsWeek", { name: hat.first_name }) : t("home.yourWeek")}</h2><button className="linklike small" onClick={() => setTab("rooms")}>{t("home.fullSchedule")}</button></div>
           <div className="card list">
@@ -125,20 +139,34 @@ export function Home() {
         </div>
       )}
       {!teamIds.size && !isAdmin && <div className="card"><p className="muted">{t("team.noneYet")}</p></div>}
-
+    </>),
+    payments: () => (<>
       {openPay.length > 0 && (
         <div className="sec"><h2>{t("home.payments")}</h2><div className="card list">
           {openPay.map((p) => <button key={p.id} className="item" onClick={() => setTab("more")}><span className="grow">{p.label}<div className="tiny">{p.sub}</div></span><span className="gold">{p.amount} kr.</span></button>)}
         </div></div>
       )}
-
+    </>),
+    badges: () => (<>
       {badges.some((b) => b.person_id === viewing.personId) && (
         <div className="sec"><h2>{hat ? t("badges.childs", { name: hat.first_name }) : t("badges.yours")}</h2><EmblemRow badges={badges.filter((b) => b.person_id === viewing.personId)} /></div>
       )}
+    </>),
+    milestones: () => (<>
       {myMilestones.length > 0 && (
         <div className="sec"><h2>{hat ? t("home.childsMilestones", { name: hat.first_name }) : t("home.yourMilestones")}</h2><div className="chips">{myMilestones.map((m) => <span key={m.id} className="chip gold">{m.title}</span>)}</div></div>
       )}
+    </>),
+  };
+  const order = homeOrder(appearance).filter((k) => !isHidden(appearance, k));
 
+  return (
+    <section className="screen">
+      <header className="topbar"><h1 className="display">{isAdmin ? t("home.hiAdmin", { name: me.person.first_name }) : t("home.hi", { name: me.person.first_name })}</h1><TopRight /></header>
+
+      {order.map((k) => { const box = boxOf(appearance, k); return <Fragment key={k}>{box ? <CustomBoxCard box={box} onTab={(tab) => setTab(tab as Parameters<typeof setTab>[0])} /> : SECTIONS[k]?.()}</Fragment>; })}
+
+      {openEvent && <EventSheet event={openEvent} staff={isStaff} onClose={() => { setOpenEvent(null); void load(); }} onChanged={() => void load()} toast={say} />}
       {open && <SessionSheet session={open} absences={absences} onClose={() => setOpen(null)} onChanged={() => void load()} toast={say} />}
       <Toast msg={toast} />
     </section>

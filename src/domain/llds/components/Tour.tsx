@@ -59,7 +59,7 @@ export function Tour() {
   }, [i, tick]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { const h = () => setTick((x) => x + 1); addEventListener("resize", h); return () => removeEventListener("resize", h); }, []);
 
-  const finish = (state: Saved["state"]) => { save({ state, at: Date.now() }); setI(-1); setTab("home"); };
+  const finish = (state: Saved["state"]) => { save({ state, at: Date.now() }); setI(-1); setTab("home"); dispatchEvent(new Event("llds:tour-done")); };
   const next = () => { if (i + 1 >= steps.length) finish("done"); else setI(i + 1); };
   if (i === -1 || !me) return null;
 

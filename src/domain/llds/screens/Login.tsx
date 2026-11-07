@@ -4,6 +4,8 @@ import { api, isMock } from "@/core/api";
 import { LangFlags } from "../components/LangFlags";
 import { Logo } from "../components/Logo";
 import { art } from "../lib/art";
+import { useAppearance } from "@/core/appearance";
+import { catalogUrl } from "../lib/catalog";
 
 /** E-mail + one-time code. No passwords. */
 export function Login() {
@@ -13,6 +15,7 @@ export function Login() {
   const [step, setStep] = useState<"email" | "code">("email");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const loginImg = useAppearance((s) => catalogUrl(s.a.images?.login));
 
   const send = async () => {
     setBusy(true); setErr(null);
@@ -25,7 +28,7 @@ export function Login() {
 
   return (
     <section className="screen login">
-      <img className="login-bg" src={art("trails")} alt="" aria-hidden="true" /><div className="login-art" aria-hidden="true" />
+      <img className="login-bg" src={loginImg ?? art("trails")} alt="" aria-hidden="true" /><div className="login-art" aria-hidden="true" />
       <LangFlags className="login-lang" />
       <div className="login-body">
         <Logo draw />

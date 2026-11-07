@@ -1,4 +1,4 @@
-import type { Api, Me, Membership, PendingPerson, Person, Role, SignUpInput, Team } from "./types";
+import type { Api, Appearance, Me, Membership, PendingPerson, Person, Role, SignUpInput, Team } from "./types";
 import { scheduleOps, seedSchedule, type SchedState } from "./mock-schedule";
 import { socialOps, seedSocial, type SocialState } from "./mock-social";
 import { shopOps, seedShop, type ShopState } from "./mock-shop";
@@ -9,7 +9,7 @@ import { shopOps, seedShop, type ShopState } from "./mock-shop";
  * The special address admin@demo signs in as Line (approved admin).
  */
 const KEY = "llds_mock";
-type State = { email: string | null; persons: Person[]; guardians: { parent_id: string; child_id: string }[]; memberships: Membership[]; teams: Team[]; S: SchedState; X: SocialState; Y: ShopState };
+type State = { email: string | null; appearance?: Appearance; persons: Person[]; guardians: { parent_id: string; child_id: string }[]; memberships: Membership[]; teams: Team[]; S: SchedState; X: SocialState; Y: ShopState };
 
 const SCHOOL = "school-llds";
 const TEAMS: Team[] = [
@@ -69,7 +69,8 @@ const listeners = new Set<() => void>();
 const emit = () => listeners.forEach((l) => l());
 const meRow = () => S.persons.find((p) => p.email === S.email && p.user_id) ?? null;
 
-const notify = (person_id: string, kind: string, title: string, body: string | null, ref: Record<string, string> = {}) => { if (!S.persons.find((p) => p.id === person_id)?.user_id) return; S.Y.notifications.push({ id: "n-" + id(), person_id, kind, title, body, ref, read_at: null, created_at: now() }); };
+const wants = (p: Person | undefined, kind: string) => !!p?.user_id && (p.notify_prefs?.on ?? true) && (p.notify_prefs?.kinds?.[kind] ?? true);
+const notify = (person_id: string, kind: string, title: string, body: string | null, ref: Record<string, string> = {}) => { if (!wants(S.persons.find((p) => p.id === person_id), kind)) return; S.Y.notifications.push({ id: "n-" + id(), person_id, kind, title, body, ref, read_at: null, created_at: now() }); };
 const ctx = () => ({ get S() { return S.S; }, get X() { return S.X; }, get Y() { return S.Y; }, notify, punchFor: (teamId: string | null, personId: string, sessionId: string) => shop.punchFor(teamId, personId, sessionId), awardAuto: (pid: string) => shop.awardAutoBadges(pid, S.S.attendance, S.S.sessions, S.S.absences), get persons() { return S.persons; }, get memberships() { return S.memberships; }, set memberships(v: Membership[]) { S.memberships = v; }, get guardians() { return S.guardians; }, get teams() { return S.teams; }, me: meRow, save, emit });
 const social = socialOps(ctx);
 const shop = shopOps(ctx);
@@ -109,8 +110,12 @@ export const mockApi: Api = {
       S.persons.push({ id: cid, school_id: SCHOOL, user_id: null, first_name: c.firstName, last_name: i.lastName, email: null, phone: null, birth_year: c.birthYear, birth_date: c.birthDate || null, status: "pending", is_admin: false, photo_consent: null, wished_roles: ["dancer"], wished_teams: null, supervised_by: null, created_at: now() });
       S.guardians.push({ parent_id: pid, child_id: cid });
     }
+    for (const a of S.persons.filter((p) => p.is_admin && p.status === "approved")) notify(a.id, "signup", "Ny tilmelding 📝", `${i.firstName} ${i.lastName}${i.wishedTeams ? " – " + i.wishedTeams : ""}`, { person_id: pid });
     save(); emit();
   },
+  async updateNotifyPrefs(prefs) { const me = meRow(); if (me) me.notify_prefs = prefs; save(); emit(); },
+  async getAppearance() { return S.appearance ?? {}; },
+  async saveAppearance(a) { S.appearance = a; save(); emit(); },
 
   async listPending(): Promise<PendingPerson[]> {
     return S.persons.filter((p) => p.status === "pending" && p.user_id).map((p) => ({

@@ -59,7 +59,7 @@ export function shopOps(get: () => { Y: ShopState; persons: Person[]; membership
     async listSignups(eventId: string): Promise<EventSignup[]> { const g = get(); const me = g.me()!; const staff = me.is_admin || g.memberships.some((m) => m.person_id === me.id && m.role !== "dancer"); const mine = myPeople(); return g.Y.signups.filter((s) => s.event_id === eventId && (staff || mine.includes(s.person_id))); },
     async signUp_(eventId: string, personId: string, on: boolean) {
       const g = get(); g.Y.signups = g.Y.signups.filter((s) => !(s.event_id === eventId && s.person_id === personId));
-      if (on) { const e = g.Y.events.find((x) => x.id === eventId); const tn = g.memberships.filter((m) => m.person_id === personId && e?.team_ids.includes(m.team_id)).map((m) => g.teams.find((t) => t.id === m.team_id)?.name)[0] ?? null; g.Y.signups.push({ event_id: eventId, person_id: personId, person_name: name(personId), team_name: tn, paid: false, created_at: now() }); }
+      if (on) { const e = g.Y.events.find((x) => x.id === eventId); const tn = g.memberships.filter((m) => m.person_id === personId && e?.team_ids.includes(m.team_id)).map((m) => g.teams.find((t) => t.id === m.team_id)?.name)[0] ?? null; g.Y.signups.push({ event_id: eventId, person_id: personId, person_name: name(personId), team_name: tn, paid: false, created_at: now() }); for (const a of admins()) g.notify(a.id, "signup", `Tilmelding til ${e?.title ?? ""} ✅`, name(personId), { event_id: eventId }); }
       g.save(); g.emit();
     },
     async setSignupPaid(eventId: string, personId: string, paid: boolean) { const g = get(); const s = g.Y.signups.find((x) => x.event_id === eventId && x.person_id === personId); if (s) s.paid = paid; g.save(); g.emit(); },
@@ -74,7 +74,7 @@ export function shopOps(get: () => { Y: ShopState; persons: Person[]; membership
     async listOrders(all = false): Promise<Order[]> { const mine = myPeople(); return get().Y.orders.filter((o) => all || mine.includes(o.person_id)).sort((a, b) => b.created_at.localeCompare(a.created_at)); },
     async createOrder(personId: string, lines: OrderLine[]): Promise<Order> {
       const g = get(); const o: Order = { id: "o-" + id(), person_id: personId, person_name: name(personId), number: ++g.Y.orderSeq, lines, total_dkk: lines.reduce((s, l) => s + l.qty * l.price_dkk, 0), status: "awaiting_payment", claimed_paid_at: null, created_at: now() };
-      g.Y.orders.push(o); g.save(); g.emit(); return o;
+      g.Y.orders.push(o); for (const a of admins()) g.notify(a.id, "order", `Ny ordre 🛍 #${o.number}`, `${o.person_name} · ${o.total_dkk} kr.`, { order_id: o.id }); g.save(); g.emit(); return o;
     },
     async claimPaid(oid: string) { const g = get(); const o = g.Y.orders.find((x) => x.id === oid); if (o) { o.claimed_paid_at = now(); for (const a of admins()) g.notify(a.id, "order", "Betaling meldt", `Ordre #${o.number} · ${o.total_dkk} kr.`, { order_id: o.id }); } g.save(); g.emit(); },
     async setOrderStatus(oid: string, status: Order["status"]) { const g = get(); const o = g.Y.orders.find((x) => x.id === oid); if (o && o.status !== status) { o.status = status; for (const pid of family(o.person_id)) g.notify(pid, "order", status === "paid" ? "Betaling modtaget" : status === "delivered" ? "Ordre udleveret" : "Ordre annulleret", `Ordre #${o.number}`, { order_id: o.id }); } g.save(); g.emit(); },
@@ -85,7 +85,7 @@ export function shopOps(get: () => { Y: ShopState; persons: Person[]; membership
     async buyPunchCard(typeId: string, personId: string): Promise<PunchCard> {
       const g = get(); const ty = g.Y.cardTypes.find((x) => x.id === typeId)!;
       const c: PunchCard = { id: "pc-" + id(), type_id: ty.id, type_name: ty.name, person_id: personId, person_name: name(personId), punches_total: ty.punches, punches_left: ty.punches, used: 0, expires_on: new Date(Date.now() + ty.valid_days * 864e5).toISOString().slice(0, 10), status: "awaiting_payment", claimed_paid_at: null, price_dkk: ty.price_dkk, created_at: now() };
-      g.Y.cards.push(c); g.save(); g.emit(); return c;
+      g.Y.cards.push(c); for (const a of admins()) g.notify(a.id, "punch", "Nyt klippekort 🎟", `${c.person_name} · ${c.type_name}`, { card_id: c.id }); g.save(); g.emit(); return c;
     },
     async claimPunchCardPaid(cid: string) { const g = get(); const c = g.Y.cards.find((x) => x.id === cid); if (c) { c.claimed_paid_at = now(); for (const a of admins()) g.notify(a.id, "punch", "Klippekort – betaling meldt", `${c.person_name} · ${c.type_name}`, { card_id: c.id }); } g.save(); g.emit(); },
     async activatePunchCard(cid: string) {

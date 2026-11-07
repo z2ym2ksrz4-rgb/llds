@@ -580,7 +580,9 @@
     "addResult": "Add result",
     "noResults": "No results yet.",
     "placed": "Placing",
-    "publicResult": "Show on website"
+    "publicResult": "Show on website",
+    "map": "Map",
+    "free": "Free"
   },
   "shop": {
     "title": "Shop",
@@ -761,6 +763,71 @@
         "title": "All admin in the app",
         "body": "Users, teams, season plan, bookings, messages, events, shop and image catalogue – no console needed."
       }
+    }
+  },
+  "notifPrefs": {
+    "eyebrow": "Notifications",
+    "promptTitle": "Want to be notified?",
+    "promptBody": "Get a notification when the trainer sends a message, a training changes, new events open and more. You choose which types under Settings.",
+    "turnOn": "Turn on",
+    "notNow": "Not now",
+    "noThanks": "No thanks",
+    "changeLater": "You can always change this under Settings → Notifications.",
+    "title": "Notifications",
+    "master": "Notifications",
+    "masterSub": "Turn all notifications on or off",
+    "kinds": {
+      "message": "Messages from trainer/school",
+      "session": "Changes and cancellations",
+      "substitute": "Substitute wanted",
+      "event": "New events and sign-ups",
+      "post": "New in the rooms",
+      "badge": "Badges",
+      "milestone": "Milestones",
+      "order": "Shop orders",
+      "punch": "Punch cards",
+      "booking": "Room bookings",
+      "signup": "New sign-ups (admin)"
+    }
+  },
+  "customize": {
+    "title": "Customise the app",
+    "sub": "Rearrange Home, new text boxes, images",
+    "intro": "Decide what people see on Home and in which order. Make your own boxes with text, image and link, and change the login and home images. Changes apply to everyone when you press Save.",
+    "home": "Home screen",
+    "newBox": "New box",
+    "customBox": "Custom box",
+    "untitled": "(untitled)",
+    "up": "Move up",
+    "down": "Move down",
+    "show": "Show",
+    "hide": "Hide",
+    "images": "Images",
+    "loginImage": "Login image",
+    "loginImageSub": "The background of the login screen. Pick from the catalogue or upload your own.",
+    "heroImage": "Default home image",
+    "heroImageSub": "Used on the big card at the top of Home when the event has no image of its own.",
+    "reset": "Reset to default",
+    "saved": "Saved – everyone sees the change next time they open the app.",
+    "boxTitle": "Title",
+    "boxBody": "Text",
+    "boxTab": "Opens tab when tapped",
+    "noTab": "None",
+    "boxLink": "Link (optional)",
+    "boxLinkLabel": "Link text",
+    "sections": {
+      "hero": "Next event (big card)",
+      "stats": "Admin numbers (today)",
+      "messages": "Messages that need you",
+      "subs": "Substitute wanted",
+      "yourDay": "Your day (trainers)",
+      "studio": "In the studio today (admin)",
+      "upcoming": "Upcoming events",
+      "teampick": "Team picker",
+      "week": "Your/child's week",
+      "payments": "Open payments",
+      "badges": "Badges",
+      "milestones": "Milestones"
     }
   }
 }

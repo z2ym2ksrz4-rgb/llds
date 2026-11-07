@@ -580,7 +580,9 @@
     "addResult": "Tilføj resultat",
     "noResults": "Ingen resultater endnu.",
     "placed": "Placering",
-    "publicResult": "Vis på website"
+    "publicResult": "Vis på website",
+    "map": "Kort",
+    "free": "Gratis"
   },
   "shop": {
     "title": "Shop",
@@ -761,6 +763,71 @@
         "title": "Alt admin i appen",
         "body": "Brugere, hold, sæsonplan, bookinger, beskeder, events, shop og billedkatalog – Line rører aldrig en konsol."
       }
+    }
+  },
+  "notifPrefs": {
+    "eyebrow": "Notifikationer",
+    "promptTitle": "Vil du have besked?",
+    "promptBody": "Få en notifikation, når der kommer beskeder fra træneren, ændringer i træningen, nye events og mere. Du vælger selv hvilke typer under Indstillinger.",
+    "turnOn": "Slå til",
+    "notNow": "Ikke nu",
+    "noThanks": "Nej tak",
+    "changeLater": "Kan altid ændres under Indstillinger → Notifikationer.",
+    "title": "Notifikationer",
+    "master": "Notifikationer",
+    "masterSub": "Slå alle notifikationer til eller fra",
+    "kinds": {
+      "message": "Beskeder fra træner/skolen",
+      "session": "Ændringer og aflysninger",
+      "substitute": "Vikar søges",
+      "event": "Nye events og tilmeldinger",
+      "post": "Nyt i rummene",
+      "badge": "Emblemer",
+      "milestone": "Milepæle",
+      "order": "Shop-ordrer",
+      "punch": "Klippekort",
+      "booking": "Salbookinger",
+      "signup": "Nye tilmeldinger (admin)"
+    }
+  },
+  "customize": {
+    "title": "Tilpas appen",
+    "sub": "Flyt rundt på forsiden, nye tekstbokse, billeder",
+    "intro": "Her bestemmer du, hvad brugerne ser på Hjem, og i hvilken rækkefølge. Lav egne bokse med tekst, billede og link, og skift login- og forsidebillede. Ændringer gælder for alle, når du trykker Gem.",
+    "home": "Forsiden (Hjem)",
+    "newBox": "Ny boks",
+    "customBox": "Egen boks",
+    "untitled": "(uden titel)",
+    "up": "Flyt op",
+    "down": "Flyt ned",
+    "show": "Vis",
+    "hide": "Skjul",
+    "images": "Billeder",
+    "loginImage": "Login-billede",
+    "loginImageSub": "Baggrunden på login-skærmen. Vælg fra kataloget eller upload dit eget.",
+    "heroImage": "Standard forsidebillede",
+    "heroImageSub": "Bruges på det store kort øverst på Hjem, når eventet ikke selv har et billede.",
+    "reset": "Nulstil til standard",
+    "saved": "Gemt – alle ser ændringen ved næste åbning.",
+    "boxTitle": "Titel",
+    "boxBody": "Tekst",
+    "boxTab": "Åbner fane ved tryk",
+    "noTab": "Ingen",
+    "boxLink": "Link (valgfrit)",
+    "boxLinkLabel": "Linktekst",
+    "sections": {
+      "hero": "Næste event (stort kort)",
+      "stats": "Admin-tal (i dag)",
+      "messages": "Beskeder der kræver dig",
+      "subs": "Vikar søges",
+      "yourDay": "Din dag (trænere)",
+      "studio": "I studiet i dag (admin)",
+      "upcoming": "Kommende events",
+      "teampick": "Holdvælger",
+      "week": "Din/barnets uge",
+      "payments": "Åbne betalinger",
+      "badges": "Emblemer",
+      "milestones": "Milepæle"
     }
   }
 }

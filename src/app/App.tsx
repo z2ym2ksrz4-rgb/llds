@@ -7,6 +7,7 @@ import { Home, Login, Register, Pending, Rooms, TeamScreen, Admin, More, Social,
 import { Icon } from "@/domain/llds/components/Icons";
 import { Logo } from "@/domain/llds/components/Logo";
 import { Tour } from "@/domain/llds/components/Tour";
+import { NotifyPrompt } from "@/domain/llds/components/NotifyPrompt";
 import { UpdateBanner } from "./UpdateBanner";
 import { TestMenu } from "./TestMenu";
 
@@ -38,6 +39,7 @@ export default function App() {
       {phase === "ready" && viewAs && <div className="viewbar" data-testid="viewbar"><span>{t("view.previewing", { role: t(`roles.${viewAs}`) })}</span><button onClick={() => setViewAs(null)}>{t("view.exit")}</button></div>}
       <main>{body}</main>
       {phase === "ready" && <Tour />}
+      {phase === "ready" && <NotifyPrompt />}
       <UpdateBanner />
       {phase === "ready" && (
         <nav className="tabbar">

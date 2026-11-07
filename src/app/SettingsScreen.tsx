@@ -1,5 +1,6 @@
 import { ageOf } from "@/domain/llds/lib/time";
 import { resetTour } from "@/domain/llds/components/Tour";
+import { NotifySettings } from "@/domain/llds/components/NotifyPrompt";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSettings } from "@/core/settings";
@@ -43,6 +44,7 @@ export function SettingsScreen() {
         </div>
       )}
 
+      <NotifySettings />
       <button className="ghost small" style={{ alignSelf: "flex-start" }} onClick={() => { resetTour(); location.reload(); }}>{t("tour.again")}</button>
       <label className="field"><span>{t("settings.language")}</span>
         <select value={s.language} onChange={(e) => { const l = e.target.value as Lang; s.set("language", l); void i18n.changeLanguage(l); }}>

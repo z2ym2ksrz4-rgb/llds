@@ -18,7 +18,20 @@ export type Person = {
   wished_roles: string[];
   wished_teams: string | null;
   supervised_by: string | null;
+  notify_prefs?: NotifyPrefs | null;  // {on, kinds:{message:false,…}} – missing kind = on
   created_at: string;
+};
+
+/** Notification preferences: master switch + per kind. A kind that is not listed is on. */
+export type NotifyPrefs = { on?: boolean; kinds?: Record<string, boolean>; asked?: boolean };
+
+/** Admin-customised look of the app (Admin → Tilpas appen). Stored on school.appearance; readable without login (login image). */
+export type CustomBox = { id: string; title: string; body: string; image?: string | null; link?: string | null; linkLabel?: string | null; tab?: string | null };
+export type Appearance = {
+  home?: string[];           // order of Home sections (keys from HOME_SECTIONS plus "box:<id>"); unknown keys appended in default order
+  hidden?: string[];         // section keys hidden for everyone
+  boxes?: CustomBox[];
+  images?: { login?: string | null; hero?: string | null };  // catalog key or URL
 };
 
 export type Team = {
@@ -73,6 +86,9 @@ export interface Api {
   onAuthChange(cb: () => void): () => void;
   /** me */
   getMe(): Promise<Me | null>; // null = signed in but no person yet
+  updateNotifyPrefs(prefs: NotifyPrefs): Promise<void>;
+  getAppearance(): Promise<Appearance>;      // works before login (anon)
+  saveAppearance(a: Appearance): Promise<void>; // admin
   signUp(input: SignUpInput): Promise<void>;
   /** admin */
   listPending(): Promise<PendingPerson[]>;

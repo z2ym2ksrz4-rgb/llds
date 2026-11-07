@@ -320,3 +320,20 @@ button.cta { box-shadow:0 10px 26px -12px rgba(201,162,74,.7); }
 .imgpick .ip.upload .auto { font-size:1.6rem; }
 .card .mood { aspect-ratio:16/7; border-radius:12px; background:center/cover; margin:-4px 0 6px; filter:sepia(.12) saturate(.95); }
 .updatebar { position:fixed; left:50%; transform:translateX(-50%); bottom:calc(92px + env(safe-area-inset-bottom)); z-index:120; background:linear-gradient(135deg,var(--gold2),var(--gold)); color:#161206; border-radius:999px; padding:10px 16px; font-size:.85rem; font-weight:500; box-shadow:0 10px 30px -10px rgba(201,162,74,.8); }
+
+/* notification switches + custom boxes (Admin → Tilpas appen) */
+.item.switch { cursor:pointer; }
+.item.switch input[type=checkbox] { appearance:none; width:44px; height:26px; border-radius:13px; background:var(--line); position:relative; flex:none; transition:background .2s; cursor:pointer; }
+.item.switch input[type=checkbox]::after { content:""; position:absolute; top:3px; left:3px; width:20px; height:20px; border-radius:50%; background:#fff; transition:left .2s; }
+.item.switch input[type=checkbox]:checked { background:var(--gold2); }
+.item.switch input[type=checkbox]:checked::after { left:21px; }
+.custombox { display:flex; flex-direction:column; gap:8px; text-align:left; color:var(--fg); width:100%; }
+.custombox .mood { margin:-4px -4px 4px; }
+.custombox .eyebrow { margin:0; }
+
+/* sheet with a photo header (events) */
+.sheet.withphoto { padding-top:0; }
+.sheet-photo { height:190px; margin:0 -20px 4px; background-size:cover; background-position:center; position:relative; border-radius:22px 22px 0 0; }
+.sheet-photo::after { content:""; position:absolute; inset:0; background:linear-gradient(to bottom, transparent 35%, var(--bg2)); border-radius:22px 22px 0 0; }
+.sheet-close { position:absolute; top:10px; right:12px; z-index:1; width:34px; height:34px; border-radius:50%; background:rgba(0,0,0,.5); color:#fff; font-size:22px; line-height:1; border:1px solid rgba(255,255,255,.25); padding:0; }
+.sheet.withphoto .handle { display:none; }
