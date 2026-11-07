@@ -247,7 +247,10 @@
     "importRun": "Import {{n}} photos",
     "importProgress": "Uploading… {{n}} of {{total}}",
     "importDone": "Done – {{n}} photos imported",
-    "importHint": "Large zips take time on mobile data – use a computer. Safe to run again; existing files are skipped."
+    "importHint": "Large zips take time on mobile data – use a computer. Safe to run again; existing files are skipped.",
+    "sizeTypes": "Size types",
+    "sizeTypesHint": "Pick one or more sets – adjust the list below if a size is missing or should go.",
+    "imageUrl": "Image link (optional)"
   },
   "settings": {
     "language": "Language",
@@ -667,5 +670,11 @@
     "notePh": "A short note (optional)",
     "monthlyHint": "Once per month",
     "emptyTeam": "No emblems yet – the first come when attendance is taken (10 in a row 🔥) or when a trainer gives one."
+  },
+  "catalog": {
+    "title": "Image catalogue",
+    "pick": "Image",
+    "auto": "Automatic",
+    "hint": "{{n}} images in the catalogue – add new ones in public/art/catalog."
   }
 }

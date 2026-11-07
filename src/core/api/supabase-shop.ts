@@ -6,7 +6,7 @@ type Fail = (e: { message: string } | null) => void;
 
 /** Phase-4 half of the Supabase API: events, shop, punch cards, milestones, notifications. Triggers in 0004 create the notifications. */
 export function supabaseShop(sb: SupabaseClient, fail: Fail, schoolId: () => Promise<string>, myPersonId: () => Promise<string | null>, schoolSlug: string) {
-  const pubUrl = (path: string | null) => (path ? sb.storage.from("public").getPublicUrl(path).data.publicUrl : null);
+  const pubUrl = (path: string | null) => (path ? (path.startsWith("http") ? path : sb.storage.from("public").getPublicUrl(path).data.publicUrl) : null);
   return {
     async listEvents(includePast = false): Promise<Event[]> {
       let q = sb.from("event_view").select("*").order("starts_at");

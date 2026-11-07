@@ -1,0 +1,412 @@
+[
+ {
+  "name": "Grå oversized T-shirt",
+  "price": 325,
+  "sizes": [
+   "90-100",
+   "110-120",
+   "XXS",
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL"
+  ],
+  "images": [
+   "https://lldancestudio.dk/wp-content/uploads/2026/10/IMG_2032-scaled.jpg",
+   "https://lldancestudio.dk/wp-content/uploads/2026/10/IMG_2029-scaled.jpg",
+   "https://lldancestudio.dk/wp-content/uploads/2026/10/IMG_2025-2-scaled.jpg"
+  ],
+  "note": "Børnestørrelser (90–120) lysegrå, voksenstørrelser mørkegrå."
+ },
+ {
+  "name": "Sport-bh",
+  "price": 400,
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L"
+  ],
+  "images": [
+   "https://lldancestudio.dk/wp-content/uploads/2026/10/IMG_1775-2-scaled.jpg",
+   "https://lldancestudio.dk/wp-content/uploads/2026/10/IMG_1773-2-scaled.jpg"
+  ],
+  "note": null
+ },
+ {
+  "name": "T-shirt “Facon”",
+  "price": 400,
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL"
+  ],
+  "images": [
+   "https://lldancestudio.dk/wp-content/uploads/2026/09/IMG_1791-scaled.jpg",
+   "https://lldancestudio.dk/wp-content/uploads/2026/09/IMG_1789-scaled.jpg"
+  ],
+  "note": null
+ },
+ {
+  "name": "Mørkegrå leggings",
+  "price": 625,
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L"
+  ],
+  "images": [
+   "https://lldancestudio.dk/wp-content/uploads/2026/09/IMG_1761-scaled.jpg",
+   "https://lldancestudio.dk/wp-content/uploads/2026/09/IMG_1767-scaled.jpg"
+  ],
+  "note": null
+ },
+ {
+  "name": "Mørkegrå træningsjakke",
+  "price": 475,
+  "sizes": [
+   "XXS",
+   "XS",
+   "S"
+  ],
+  "images": [
+   "https://lldancestudio.dk/wp-content/uploads/2026/09/IMG_1814-scaled.jpg",
+   "https://lldancestudio.dk/wp-content/uploads/2026/09/IMG_1807-scaled.jpg"
+  ],
+  "note": null
+ },
+ {
+  "name": "Crewneck / hoodie",
+  "price": 725,
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL"
+  ],
+  "images": [
+   "https://lldancestudio.dk/wp-content/uploads/2026/09/IMG_1752-scaled.jpg",
+   "https://lldancestudio.dk/wp-content/uploads/2026/09/IMG_1745-scaled.jpg",
+   "https://lldancestudio.dk/wp-content/uploads/2026/09/IMG_1753-scaled.jpg"
+  ],
+  "note": null
+ },
+ {
+  "name": "T-shirt med similisten",
+  "price": 360,
+  "sizes": [
+   "5-6 år",
+   "7-8 år",
+   "9-11 år",
+   "12-13 år",
+   "S",
+   "M",
+   "L",
+   "XL"
+  ],
+  "images": [],
+  "note": null
+ },
+ {
+  "name": "T-shirt “LL Dance Mom”",
+  "price": 360,
+  "sizes": [
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
+  "images": [
+   "https://lldancestudio.dk/wp-content/uploads/2025/11/1446bea9-f026-489a-86c1-66d4f4ab4a2b.jpg"
+  ],
+  "note": null
+ },
+ {
+  "name": "T-shirt “LL Dance Dad”",
+  "price": 360,
+  "sizes": [
+   "M",
+   "L",
+   "XL",
+   "XXL"
+  ],
+  "images": [
+   "https://lldancestudio.dk/wp-content/uploads/2025/11/d6d6f49f-0a73-42de-ba89-0396e6f3548e.jpg"
+  ],
+  "note": null
+ },
+ {
+  "name": "Træningsvest med similisten",
+  "price": 360,
+  "sizes": [
+   "5-6 år",
+   "7-8 år",
+   "9-11 år",
+   "12-13 år",
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL"
+  ],
+  "images": [
+   "https://lldancestudio.dk/wp-content/uploads/2025/11/5454b498-d507-4ec3-b6cf-85227891be38-2.jpg"
+  ],
+  "note": null
+ },
+ {
+  "name": "Top med similisten",
+  "price": 360,
+  "sizes": [
+   "5-6 år",
+   "7-8 år",
+   "9-11 år",
+   "12-13 år",
+   "XS",
+   "S",
+   "M",
+   "L"
+  ],
+  "images": [
+   "https://lldancestudio.dk/wp-content/uploads/2025/11/78d9bda4-cbc5-4693-aebd-1424a2f2b2bf-2.jpg"
+  ],
+  "note": null
+ },
+ {
+  "name": "Leggings med similisten",
+  "price": 435,
+  "sizes": [
+   "5-6 år",
+   "7-8 år",
+   "9-11 år",
+   "12-13 år",
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL"
+  ],
+  "images": [
+   "https://lldancestudio.dk/wp-content/uploads/2025/11/e0feb152-b7e6-4201-8be1-f0abd767650d-2.jpg"
+  ],
+  "note": null
+ },
+ {
+  "name": "Ballet-slå-om-bluse",
+  "price": 350,
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L"
+  ],
+  "images": [
+   "https://lldancestudio.dk/wp-content/uploads/2025/11/IMG_7872.jpg",
+   "https://lldancestudio.dk/wp-content/uploads/2025/11/IMG_7873.jpg"
+  ],
+  "note": null
+ },
+ {
+  "name": "Sort top",
+  "price": 160,
+  "sizes": [
+   "S",
+   "M",
+   "L",
+   "XL"
+  ],
+  "images": [
+   "https://lldancestudio.dk/wp-content/uploads/2024/08/DSC07582-scaled.jpg",
+   "https://lldancestudio.dk/wp-content/uploads/2024/08/DSC07628-scaled.jpg"
+  ],
+  "note": null
+ },
+ {
+  "name": "Grå top",
+  "price": 160,
+  "sizes": [
+   "S",
+   "M",
+   "L"
+  ],
+  "images": [
+   "https://lldancestudio.dk/wp-content/uploads/2025/08/DSC07301-top.jpg",
+   "https://lldancestudio.dk/wp-content/uploads/2025/08/DSC07319-top.jpg"
+  ],
+  "note": null
+ },
+ {
+  "name": "Grå leggings",
+  "price": 275,
+  "sizes": [
+   "XXS",
+   "XS",
+   "S",
+   "M",
+   "L",
+   "XL"
+  ],
+  "images": [
+   "https://lldancestudio.dk/wp-content/uploads/2024/08/DSC07319-scaled.jpg",
+   "https://lldancestudio.dk/wp-content/uploads/2025/08/DSC07301-scaled.jpg"
+  ],
+  "note": null
+ },
+ {
+  "name": "Sorte sweatpants",
+  "price": 380,
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L"
+  ],
+  "images": [
+   "https://lldancestudio.dk/wp-content/uploads/2024/08/DSC07741-scaled.jpg",
+   "https://lldancestudio.dk/wp-content/uploads/2024/08/DSC07737-scaled.jpg",
+   "https://lldancestudio.dk/wp-content/uploads/2024/08/DSC07740-scaled.jpg"
+  ],
+  "note": null
+ },
+ {
+  "name": "Refleks-taske",
+  "price": 185,
+  "sizes": [],
+  "images": [
+   "https://lldancestudio.dk/wp-content/uploads/2025/08/DSC07827-scaled.jpg",
+   "https://lldancestudio.dk/wp-content/uploads/2025/08/DSC07817-scaled.jpg"
+  ],
+  "note": null
+ },
+ {
+  "name": "Sorte leggings",
+  "price": 275,
+  "sizes": [
+   "XS",
+   "S",
+   "M",
+   "L"
+  ],
+  "images": [
+   "https://lldancestudio.dk/wp-content/uploads/2025/08/DSC07460-scaled.jpg",
+   "https://lldancestudio.dk/wp-content/uploads/2025/08/DSC07518-scaled.jpg"
+  ],
+  "note": null
+ },
+ {
+  "name": "Sort T-shirt",
+  "price": 160,
+  "sizes": [
+   "XS",
+   "S",
+   "M"
+  ],
+  "images": [
+   "https://lldancestudio.dk/wp-content/uploads/2025/08/DSC07683-scaled.jpg",
+   "https://lldancestudio.dk/wp-content/uploads/2025/08/DSC07693-scaled.jpg"
+  ],
+  "note": null
+ },
+ {
+  "name": "Børnesæt",
+  "price": 280,
+  "sizes": [
+   "4-6 år",
+   "6-8 år",
+   "8-10 år"
+  ],
+  "images": [
+   "https://lldancestudio.dk/wp-content/uploads/2024/08/Unknown-2.jpeg",
+   "https://lldancestudio.dk/wp-content/uploads/2024/08/Unknown-5.jpeg",
+   "https://lldancestudio.dk/wp-content/uploads/2024/08/Unknown-4.jpeg",
+   "https://lldancestudio.dk/wp-content/uploads/2024/08/Unknown-3.jpeg"
+  ],
+  "note": null
+ },
+ {
+  "name": "Sort sportstaske",
+  "price": 350,
+  "sizes": [],
+  "images": [
+   "https://lldancestudio.dk/wp-content/uploads/2025/08/DSC07863-scaled.jpg",
+   "https://lldancestudio.dk/wp-content/uploads/2025/08/DSC07853-scaled.jpg"
+  ],
+  "note": null
+ },
+ {
+  "name": "Drikkedunk",
+  "price": 200,
+  "sizes": [],
+  "images": [
+   "https://lldancestudio.dk/wp-content/uploads/2025/08/DSC07811-scaled.jpg"
+  ],
+  "note": null
+ },
+ {
+  "name": "Tæppe 150 × 200 cm",
+  "price": 230,
+  "sizes": [],
+  "images": [
+   "https://lldancestudio.dk/wp-content/uploads/2024/11/IMG_3566.jpg",
+   "https://lldancestudio.dk/wp-content/uploads/2024/11/IMG_3565.jpg"
+  ],
+  "note": null
+ },
+ {
+  "name": "Børnetoppe",
+  "price": 160,
+  "sizes": [
+   "4-6 år",
+   "6-8 år",
+   "8-10 år"
+  ],
+  "images": [
+   "https://lldancestudio.dk/wp-content/uploads/2025/08/IMG_5933-scaled.jpg",
+   "https://lldancestudio.dk/wp-content/uploads/2025/08/IMG_5938-scaled.jpg"
+  ],
+  "note": null
+ },
+ {
+  "name": "Børneleggings",
+  "price": 210,
+  "sizes": [
+   "5-6 år",
+   "6-7 år",
+   "7-8 år"
+  ],
+  "images": [
+   "https://lldancestudio.dk/wp-content/uploads/2025/08/IMG_5929-scaled.jpg"
+  ],
+  "note": null
+ },
+ {
+  "name": "Baby-bodystocking",
+  "price": 160,
+  "sizes": [
+   "12-18 mdr.",
+   "18-24 mdr."
+  ],
+  "images": [
+   "https://lldancestudio.dk/wp-content/uploads/2025/08/IMG_6766-scaled.jpg",
+   "https://lldancestudio.dk/wp-content/uploads/2025/08/IMG_6768-scaled.jpg"
+  ],
+  "note": null
+ },
+ {
+  "name": "Baby-T-shirt",
+  "price": 160,
+  "sizes": [
+   "2 år"
+  ],
+  "images": [
+   "https://lldancestudio.dk/wp-content/uploads/2025/08/IMG_6763-scaled.jpg",
+   "https://lldancestudio.dk/wp-content/uploads/2025/08/IMG_6765-scaled.jpg"
+  ],
+  "note": null
+ }
+]

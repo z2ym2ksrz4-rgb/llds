@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type Channel, type Comment, type Post } from "@/core/api";
 import { useAuth } from "@/core/auth";
+import { ImagePicker } from "./ImagePicker";
+import { catalogUrl } from "../lib/catalog";
 import { Sheet } from "./Sheet";
 import { ago } from "../lib/time";
 
@@ -43,6 +45,8 @@ function Composer({ teamId, channel, isStaff, isAdmin, onPosted }: { teamId: str
   const me = useAuth((s) => s.me)!;
   const [body, setBody] = useState("");
   const [files, setFiles] = useState<File[]>([]);
+  const [pickImg, setPickImg] = useState(false);
+  const addCatalog = async (key: string | null) => { if (!key) return; const url = catalogUrl(key)!; const blob = await (await fetch(url)).blob(); setFiles([...files, new File([blob], `${key}.jpg`, { type: blob.type || "image/jpeg" })]); setPickImg(false); };
   const [official, setOfficial] = useState(channel === "school");
   const [pub, setPub] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -57,10 +61,12 @@ function Composer({ teamId, channel, isStaff, isAdmin, onPosted }: { teamId: str
   return (
     <div className="card composer">
       <textarea id="post-body" rows={2} placeholder={t(channel === "trainers" ? "feed.placeholderTrainers" : "feed.placeholder")} value={body} onChange={(e) => setBody(e.target.value)} />
+      {pickImg && <ImagePicker tag="post" value={null} onChange={(k) => void addCatalog(k)} allowNone={false} />}
       {files.length > 0 && <div className="thumbs">{files.map((f, i) => <span key={i} className="chip small">{f.type.startsWith("video/") ? "🎬" : "🖼"} {f.name.slice(0, 18)} <button className="linklike" onClick={() => setFiles(files.filter((_, j) => j !== i))}>×</button></span>)}</div>}
       <div className="row between">
         <div className="row">
           {!supervised && <><button className="ghost small" onClick={() => fileRef.current?.click()}>📷 {t("feed.addPhoto")}</button>
+            {isStaff && <button className="ghost small" onClick={() => setPickImg(!pickImg)} data-testid="pick-catalog">✦ {t("catalog.title")}</button>}
             <input ref={fileRef} type="file" accept="image/*,video/*" multiple hidden onChange={(e) => { setFiles([...files, ...Array.from(e.target.files ?? [])]); e.target.value = ""; }} /></>}
           {isStaff && channel !== "trainers" && <label className="check small"><input type="checkbox" checked={official} onChange={(e) => setOfficial(e.target.checked)} />{t("feed.official")}</label>}
           {isAdmin && channel === "school" && <label className="check small"><input type="checkbox" checked={pub} onChange={(e) => setPub(e.target.checked)} />{t("feed.public")}</label>}

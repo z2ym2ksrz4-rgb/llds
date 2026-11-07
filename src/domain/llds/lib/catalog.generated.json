@@ -1,0 +1,60 @@
+[
+ {
+  "key": "costume-detail",
+  "file": "costume-detail.jpg",
+  "title": "Kostume",
+  "tags": [
+   "event",
+   "team",
+   "post"
+  ]
+ },
+ {
+  "key": "group-stage",
+  "file": "group-stage.jpg",
+  "title": "Holdet på scenen",
+  "tags": [
+   "event",
+   "team",
+   "post"
+  ]
+ },
+ {
+  "key": "light-trails",
+  "file": "light-trails.jpg",
+  "title": "Lysspor",
+  "tags": [
+   "event",
+   "team",
+   "post"
+  ]
+ },
+ {
+  "key": "solo-spotlight",
+  "file": "solo-spotlight.jpg",
+  "title": "Solo i spotlight",
+  "tags": [
+   "event",
+   "team",
+   "post"
+  ]
+ },
+ {
+  "key": "studio-mirror",
+  "file": "studio-mirror.jpg",
+  "title": "Studiet",
+  "tags": [
+   "team",
+   "post"
+  ]
+ },
+ {
+  "key": "trophy-gold",
+  "file": "trophy-gold.jpg",
+  "title": "Pokaler",
+  "tags": [
+   "event",
+   "post"
+  ]
+ }
+]

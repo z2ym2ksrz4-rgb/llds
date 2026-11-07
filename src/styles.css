@@ -243,3 +243,38 @@ a.cta.mp { background:#5a78ff; color:#fff; text-decoration:none; text-align:cent
 .langflags button { background:none; border:0; padding:4px 3px; font-size:1.1rem; line-height:1; opacity:.45; filter:saturate(.8); border-radius:999px; transition:opacity .2s, transform .2s; }
 .langflags button.on { opacity:1; } .langflags button:active { transform:scale(1.15); }
 .login-lang { position:absolute; top:calc(14px + env(safe-area-inset-top)); right:16px; z-index:3; }
+
+/* image catalogue picker */
+.imgpick { display:grid; grid-template-columns:repeat(auto-fill,minmax(88px,1fr)); gap:8px; margin-top:6px; }
+.imgpick .ip { position:relative; aspect-ratio:1; border-radius:12px; background:var(--card) center/cover; border:2px solid transparent; padding:0; overflow:hidden; display:flex; align-items:flex-end; }
+.imgpick .ip.on { border-color:var(--gold); box-shadow:0 0 0 2px rgba(201,162,74,.25); }
+.imgpick .ip small { width:100%; font-size:.6rem; letter-spacing:.04em; padding:14px 6px 5px; background:linear-gradient(transparent, rgba(10,10,11,.85)); color:var(--fg); text-align:left; line-height:1.1; }
+.imgpick .ip .auto { position:absolute; inset:0; display:grid; place-items:center; color:var(--gold2); font-size:1.4rem; }
+
+/* ===== Gold pass (Steffen 7. nov.): the app gets the website's editorial glow ===== */
+body { background: radial-gradient(90% 40% at 50% -10%, rgba(201,162,74,.16), transparent 60%), var(--bg); }
+body::after { content:""; position:fixed; inset:0; pointer-events:none; z-index:9; opacity:.035; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+.topbar h1.display { position:relative; }
+.topbar h1.display::after { content:""; display:block; width:28px; height:1px; margin-top:6px; background:linear-gradient(90deg,var(--gold2),transparent); }
+.card { position:relative; background:linear-gradient(180deg, rgba(255,255,255,.025), transparent 40%), var(--card); border-color:rgba(255,255,255,.07); }
+.card::before { content:""; position:absolute; left:14px; right:14px; top:0; height:1px; background:linear-gradient(90deg,transparent,rgba(201,162,74,.45),transparent); pointer-events:none; }
+.card.tap:active { transform:scale(.99); }
+.sec h2, .screen > h2 { display:flex; align-items:center; gap:10px; }
+.sec h2::after { content:""; flex:1; height:1px; background:linear-gradient(90deg,rgba(201,162,74,.35),transparent); }
+.hero.photo { border-color:rgba(201,162,74,.28); box-shadow:0 18px 40px -24px rgba(201,162,74,.45); }
+.hero.photo::after { content:""; position:absolute; inset:0; z-index:1; border-radius:inherit; box-shadow:inset 0 0 0 1px rgba(255,243,196,.08), inset 0 -40px 60px -30px rgba(201,162,74,.25); pointer-events:none; }
+.hero.photo .eyebrow { display:inline-flex; align-items:center; gap:8px; }
+.hero.photo .eyebrow::before { content:""; width:18px; height:1px; background:var(--gold); }
+.kv .n { background:linear-gradient(135deg,#fff3c4,#c9a24a 60%,#8c6c25); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.tabbar { background:linear-gradient(transparent, rgba(10,10,11,.92) 28%, var(--bg) 60%); }
+.tabbar::before { content:""; position:absolute; left:16px; right:16px; top:14px; height:1px; background:linear-gradient(90deg,transparent,rgba(201,162,74,.35),transparent); }
+.tabbar button.active .ico { filter:drop-shadow(0 0 6px rgba(230,200,122,.6)); }
+.tabbar button.active::after { content:""; width:4px; height:4px; border-radius:50%; background:var(--gold2); margin-top:2px; box-shadow:0 0 8px var(--gold2); }
+.avatar { background:radial-gradient(circle at 30% 30%, #2a2416, #141210); border-color:rgba(201,162,74,.45); box-shadow:0 0 0 2px rgba(201,162,74,.12); }
+.chip.gold { background:linear-gradient(135deg, rgba(201,162,74,.22), rgba(201,162,74,.08)); }
+.teampick strong { background:linear-gradient(90deg,var(--fg),var(--gold2)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+button.cta { box-shadow:0 10px 26px -12px rgba(201,162,74,.7); }
+.item .time { color:var(--gold2); }
+.sheet { border-top:1px solid rgba(201,162,74,.35); box-shadow:0 -20px 60px -30px rgba(201,162,74,.35); }
+.emblem .e { box-shadow:0 0 0 3px rgba(201,162,74,.12), 0 6px 18px -8px rgba(201,162,74,.6), inset 0 1px 0 rgba(255,243,196,.25); }
+@media (prefers-reduced-motion: reduce) { .card.tap:active { transform:none; } }

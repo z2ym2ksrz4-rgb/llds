@@ -126,7 +126,7 @@ export type Absence = { id: string; session_id: string; person_id: string; reaso
 
 export type RosterEntry = { person_id: string; name: string; birth_year: number | null; role: Role; present: boolean | null; absence: Absence | null; via_punch: boolean };
 
-export type TeamInput = Partial<Pick<Team, "name" | "style" | "category" | "level" | "closed" | "parents_see_video" | "punch_card_open" | "color" | "description">> & { max_dancers?: number | null; visibility?: "public" | "private"; archived?: boolean };
+export type TeamInput = Partial<Pick<Team, "name" | "style" | "category" | "level" | "closed" | "parents_see_video" | "punch_card_open" | "color" | "description" | "cover_url">> & { max_dancers?: number | null; visibility?: "public" | "private"; archived?: boolean };
 
 export type Member = Person & { memberships: Membership[]; children: Person[]; parents: Person[] };
 
@@ -222,6 +222,7 @@ export interface Api {
 /* ---------------- phase 4: events, shop, punch cards, milestones, notifications ---------------- */
 export type EventKind = "competition" | "show" | "workshop" | "social";
 export type Event = {
+  image_key?: string | null;        // catalogue image (public/art/catalog) chosen by the admin; null = automatic
   id: string; title: string; kind: EventKind; starts_at: string; ends_at: string | null; place: string | null; meet_time: string | null;
   team_ids: string[]; team_names: string[] | null; plan: { time: string; text: string }[]; pack_list: string[]; info: string | null;
   signup_deadline: string | null; price_dkk: number | null; visibility: "private" | "public"; signups: number; created_at: string; mySignups?: number;

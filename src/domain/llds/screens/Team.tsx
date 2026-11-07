@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type Absence, type Event, type Member, type PersonBadge, type Result, type Session } from "@/core/api";
+import { resolveImage } from "../lib/catalog";
 import { EmblemRow, EmblemSheet, GiveEmblemSheet } from "../components/Emblems";
 import { useAuth } from "@/core/auth";
 import { useNav } from "@/core/nav";
@@ -98,7 +99,7 @@ export function TeamScreen() {
     <section className="screen">
       <header className="topbar"><h1 className="display">{team.name}</h1><TopRight /></header>
       <TeamPicker />
-      <div className="hero photo" data-testid="team-hero" style={{ backgroundImage: `url(${team.cover_url ?? artForCategory(team.category)})` }}>
+      <div className="hero photo" data-testid="team-hero" style={{ backgroundImage: `url(${resolveImage(team.cover_url) ?? artForCategory(team.category)})` }}>
         <div><div className="eyebrow">{team.style} · {t(`category.${team.category}`)} · {team.level}</div><h2 className="display">{team.name}</h2>
           <div className="small muted">{t("team.dancersN", { n: stats.dancers })}{trainerName ? ` · ${trainerName}` : ""}{next ? ` · ${DAY_LONG[(new Date(next.starts_at).getDay() + 6) % 7]} ${hm(next.starts_at)} ${next.room_name ?? ""}` : ""}</div>
           <div className="small muted">{t(`roles.${role ?? "dancer"}`)}{team.closed ? ` · ${t("team.closed")}` : ""}{team.punch_card_open ? ` · ${t("team.punchOpen")}` : ""}</div></div>

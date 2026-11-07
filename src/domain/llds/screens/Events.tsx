@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type Event, type EventInput, type EventSignup, type Result } from "@/core/api";
 import { useAuth } from "@/core/auth";
+import { ImagePicker } from "../components/ImagePicker";
+import { catalogUrl } from "../lib/catalog";
 import { Sheet, Toast } from "../components/Sheet";
 import { PaySheet } from "../components/Pay";
 import { dateLabel, hm, isoDate } from "../lib/time";
@@ -73,7 +75,7 @@ function EventsList({ admin }: { admin?: boolean }) {
     <div className="stack" style={{ marginTop: 10 }}>
       {staff && <button className="ghost small" id="event-new" onClick={() => setEdit("new")}>+ {t("events.new")}</button>}
       {events.map((e) => { const relevant = !e.team_ids.length || e.team_ids.some((id) => mine.has(id)); return (
-        <button key={e.id} className="hero tap photo evcard" data-testid="event" onClick={() => setOpen(e)} style={{ backgroundImage: `url(${artFor(e.id)})` }}>
+        <button key={e.id} className="hero tap photo evcard" data-testid="event" onClick={() => setOpen(e)} style={{ backgroundImage: `url(${catalogUrl(e.image_key) ?? artFor(e.id)})` }}>
           <div><div className="eyebrow">{dateLabel(e.starts_at)} · {t(`events.kind.${e.kind}`)}</div><h2 className="display">{e.title}</h2>
             <div className="row between"><span className="small muted">{e.place ?? ""}{e.team_names?.length ? ` · ${e.team_names.join(", ")}` : ` · ${t("events.allTeams")}`}</span>
               {e.mySignups && e.mySignups > 0 ? <span className="chip ok small">{t("events.on")}</span> : relevant && (e.signup_deadline || e.price_dkk) ? <span className="chip gold small">{t("events.openSignup")}</span> : null}</div></div>
@@ -129,6 +131,7 @@ function EventEditor({ event, onClose, onSaved }: { event: Event | null; onClose
   const { t } = useTranslation();
   const me = useAuth((s) => s.me)!;
   const d0 = event ? new Date(event.starts_at) : new Date(Date.now() + 14 * 864e5);
+  const [image, setImage] = useState<string | null>(event?.image_key ?? null);
   const [f, setF] = useState({ title: event?.title ?? "", kind: event?.kind ?? "competition", date: isoDate(d0), time: event ? hm(event.starts_at) : "10:00", place: event?.place ?? "", meet_time: event?.meet_time ?? "", team_ids: event?.team_ids ?? [], plan: event?.plan.map((p) => `${p.time} ${p.text}`).join("\n") ?? "", pack: event?.pack_list.join("\n") ?? "", info: event?.info ?? "", deadline: event?.signup_deadline ?? "", price: event?.price_dkk?.toString() ?? "", pub: event?.visibility === "public" });
   const [busy, setBusy] = useState(false);
   const save = async () => {
@@ -137,7 +140,7 @@ function EventEditor({ event, onClose, onSaved }: { event: Event | null; onClose
       const starts = new Date(`${f.date}T${f.time}:00`);
       const input: EventInput = { title: f.title.trim(), kind: f.kind as Event["kind"], starts_at: starts.toISOString(), ends_at: null, place: f.place || null, meet_time: f.meet_time || null, team_ids: f.team_ids,
         plan: f.plan.split("\n").map((l) => l.trim()).filter(Boolean).map((l) => { const m = l.match(/^(\d{1,2}[.:]\d{2})\s+(.*)$/); return m ? { time: m[1].replace(".", ":"), text: m[2] } : { time: "", text: l }; }),
-        pack_list: f.pack.split("\n").map((l) => l.trim()).filter(Boolean), info: f.info || null, signup_deadline: f.deadline || null, price_dkk: f.price ? Number(f.price) : null, visibility: f.pub ? "public" : "private" };
+        pack_list: f.pack.split("\n").map((l) => l.trim()).filter(Boolean), info: f.info || null, signup_deadline: f.deadline || null, price_dkk: f.price ? Number(f.price) : null, visibility: f.pub ? "public" : "private", image_key: image };
       await api.saveEvent(input, event?.id); onSaved();
     } finally { setBusy(false); }
   };
@@ -145,6 +148,7 @@ function EventEditor({ event, onClose, onSaved }: { event: Event | null; onClose
   return (
     <Sheet onClose={onClose} eyebrow={t("events.title")} title={event ? t("common.edit") : t("events.new")}>
       <label className="field"><span>{t("events.name")}</span><input id="ev-title" value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} /></label>
+      <ImagePicker tag="event" value={image} onChange={setImage} />
       <div className="field"><span>{t("events.kindLabel")}</span><div className="chips">{KINDS.map((k) => <button key={k} className={"chip" + (f.kind === k ? " on" : "")} onClick={() => setF({ ...f, kind: k })}>{t(`events.kind.${k}`)}</button>)}</div></div>
       <div className="grid2"><label className="field"><span>{t("events.date")}</span><input id="ev-date" type="date" value={f.date} onChange={(e) => setF({ ...f, date: e.target.value })} /></label><label className="field"><span>{t("events.time")}</span><input type="time" value={f.time} onChange={(e) => setF({ ...f, time: e.target.value })} /></label></div>
       <div className="grid2"><label className="field"><span>{t("events.place")}</span><input value={f.place} onChange={(e) => setF({ ...f, place: e.target.value })} /></label><label className="field"><span>{t("events.meet")}</span><input value={f.meet_time} onChange={(e) => setF({ ...f, meet_time: e.target.value })} placeholder="07:15 ved studiet" /></label></div>

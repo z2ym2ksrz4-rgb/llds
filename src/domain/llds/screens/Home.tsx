@@ -9,6 +9,7 @@ import { Toast } from "../components/Sheet";
 import { MessageBanner } from "../components/Messages";
 import { TopRight } from "../components/ProfileMenu";
 import { artFor } from "../lib/art";
+import { catalogUrl } from "../lib/catalog";
 import { EmblemRow } from "../components/Emblems";
 import { addDays, dateLabel, hm, startOfDay } from "../lib/time";
 
@@ -65,7 +66,7 @@ export function Home() {
       <header className="topbar"><h1 className="display">{isAdmin ? t("home.hiAdmin", { name: me.person.first_name }) : t("home.hi", { name: me.person.first_name })}</h1><TopRight /></header>
 
       {hero && (
-        <button className="hero tap photo" data-testid="hero" onClick={() => setTab("events")} style={{ backgroundImage: `url(${artFor(hero.id)})` }}>
+        <button className="hero tap photo" data-testid="hero" onClick={() => setTab("events")} style={{ backgroundImage: `url(${catalogUrl(hero.image_key) ?? artFor(hero.id)})` }}>
           <div><div className="eyebrow">{daysTo === 0 ? t("home.today") : t("home.inDays", { n: daysTo })}</div><h2 className="display">{hero.title}</h2>
             <div className="small muted">{dateLabel(hero.starts_at)}{hero.place ? ` · ${hero.place}` : ""}{hero.team_names?.length ? ` · ${hero.team_names.join(", ")}` : ""}</div></div>
         </button>

@@ -64,7 +64,7 @@ export function shopOps(get: () => { Y: ShopState; persons: Person[]; membership
     },
     async setSignupPaid(eventId: string, personId: string, paid: boolean) { const g = get(); const s = g.Y.signups.find((x) => x.event_id === eventId && x.person_id === personId); if (s) s.paid = paid; g.save(); g.emit(); },
 
-    async listProducts(all = false): Promise<Product[]> { return get().Y.products.filter((p) => all || p.active).map((p) => ({ ...p, image_url: p.image_path ? imgs.get(p.image_path) ?? null : null })); },
+    async listProducts(all = false): Promise<Product[]> { return get().Y.products.filter((p) => all || p.active).map((p) => ({ ...p, image_url: p.image_path ? (p.image_path.startsWith("http") ? p.image_path : imgs.get(p.image_path) ?? null) : null })); },
     async saveProduct(i: Omit<Product, "id" | "image_url"> & { image?: File | null }, pid?: string) {
       const g = get(); const { image, ...rest } = i; let image_path = rest.image_path;
       if (image) { image_path = "mock/shop/" + id(); imgs.set(image_path, await fileToDataUrl(await downscaleImage(image, 800, 0.8))); }

@@ -9,6 +9,8 @@ import { AdminUsers } from "./Users";
 import { useAuth } from "@/core/auth";
 import { Sheet, Toast } from "../components/Sheet";
 import { SessionEditor } from "../components/SessionSheet";
+import { ImagePicker } from "../components/ImagePicker";
+import { CATALOG, catalogUrl } from "../lib/catalog";
 import { addDays, DAY_LONG, hm, mondayOf, startOfDay } from "../lib/time";
 
 type Page = "menu" | "users" | "members" | "teams" | "season" | "bookings" | "messages" | "reports" | "events" | "shop" | "punch" | "import";
@@ -116,7 +118,7 @@ function Teams() {
 }
 function TeamEditor({ team, onClose, onSaved }: { team: Team | null; onClose: () => void; onSaved: () => void }) {
   const { t } = useTranslation();
-  const [f, setF] = useState<TeamInput & { name: string }>({ name: team?.name ?? "", style: team?.style ?? "Showdance", category: team?.category ?? "junior", level: team?.level ?? "", closed: team?.closed ?? false, parents_see_video: team?.parents_see_video ?? false, punch_card_open: team?.punch_card_open ?? false, visibility: team?.visibility ?? "public", description: team?.description ?? "" });
+  const [f, setF] = useState<TeamInput & { name: string }>({ name: team?.name ?? "", style: team?.style ?? "Showdance", category: team?.category ?? "junior", level: team?.level ?? "", closed: team?.closed ?? false, parents_see_video: team?.parents_see_video ?? false, punch_card_open: team?.punch_card_open ?? false, visibility: team?.visibility ?? "public", description: team?.description ?? "", cover_url: team?.cover_url ?? null });
   const Toggle = ({ k, label, hint }: { k: "closed" | "parents_see_video" | "punch_card_open"; label: string; hint: string }) => <label className="toggle"><span>{label}<div className="tiny">{hint}</div></span><input type="checkbox" checked={!!f[k]} onChange={(e) => setF({ ...f, [k]: e.target.checked })} /></label>;
   return (
     <Sheet onClose={onClose} eyebrow={team ? t("common.edit") : t("admin.newTeam")} title={f.name || t("admin.team")}>
@@ -130,6 +132,7 @@ function TeamEditor({ team, onClose, onSaved }: { team: Team | null; onClose: ()
       <Toggle k="parents_see_video" label={t("admin.parentsSeeVideo")} hint={t("admin.parentsSeeVideoHint")} />
       <Toggle k="punch_card_open" label={t("team.punchOpen")} hint={t("admin.punchHint")} />
       <label className="toggle"><span>{t("admin.teamPublic")}<div className="tiny">{t("admin.teamPublicHint")}</div></span><input type="checkbox" checked={f.visibility === "public"} onChange={(e) => setF({ ...f, visibility: e.target.checked ? "public" : "private" })} /></label>
+      <ImagePicker tag="team" value={f.cover_url?.startsWith("art/catalog/") ? f.cover_url.replace("art/catalog/", "").replace(/\.\w+$/, "") : null} onChange={(k) => setF({ ...f, cover_url: k ? `art/catalog/${CATALOG.find((c) => c.key === k)?.file}` : (team?.cover_url?.startsWith("art/catalog/") ? null : team?.cover_url ?? null) })} />
       <label className="field"><span>{t("admin.teamDescription")}</span><textarea rows={3} value={f.description ?? ""} onChange={(e) => setF({ ...f, description: e.target.value })} placeholder={t("admin.teamDescriptionPh")} /></label>
       <div className="row"><button className="cta grow" disabled={!f.name.trim()} onClick={async () => { if (team) await api.updateTeam(team.id, f); else await api.createTeam(f); onSaved(); }}>{t("common.save")}</button>
         {team && <button className="ghost danger" onClick={async () => { await api.updateTeam(team.id, { archived: true }); onSaved(); }}>{t("admin.archive")}</button>}</div>
@@ -257,18 +260,33 @@ function ShopAdmin() {
     </section>
   );
 }
+/** Size presets exactly as the shop at lldancestudio.dk uses them – toggle a whole set, then fine-tune in the text field. */
+const SIZE_SETS: [string, string[]][] = [
+  ["Voksen XXS–XXL", ["XXS", "XS", "S", "M", "L", "XL", "XXL"]],
+  ["Voksen XS–L", ["XS", "S", "M", "L"]],
+  ["Børn 5–13 år", ["5-6 år", "7-8 år", "9-11 år", "12-13 år"]],
+  ["Børn 4–10 år", ["4-6 år", "6-8 år", "8-10 år"]],
+  ["Børn cm", ["90-100", "110-120"]],
+  ["Baby", ["12-18 mdr.", "18-24 mdr.", "2 år"]],
+  ["One size", []],
+];
 function ProductEditor({ product, onClose, onSaved }: { product: Product | null; onClose: () => void; onSaved: () => void }) {
   const { t } = useTranslation();
-  const [f, setF] = useState({ name: product?.name ?? "", price: product?.price_dkk?.toString() ?? "", sizes: product?.sizes.join(", ") ?? "", stock: product?.stock?.toString() ?? "", active: product?.active ?? true, pub: product?.visibility === "public", image: null as File | null });
+  const [f, setF] = useState({ name: product?.name ?? "", price: product?.price_dkk?.toString() ?? "", sizes: product?.sizes.join(", ") ?? "", stock: product?.stock?.toString() ?? "", active: product?.active ?? true, pub: product?.visibility === "public", image: null as File | null, imageUrl: product?.image_path?.startsWith("http") ? product.image_path : "" });
   return (
     <Sheet onClose={onClose} eyebrow={t("admin.shop")} title={product ? t("common.edit") : t("admin.newProduct")}>
       <label className="field"><span>{t("admin.productName")}</span><input id="pr-name" value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} /></label>
       <div className="grid2"><label className="field"><span>{t("admin.price")}</span><input id="pr-price" type="number" inputMode="numeric" value={f.price} onChange={(e) => setF({ ...f, price: e.target.value })} /></label><label className="field"><span>{t("admin.stock")}</span><input type="number" inputMode="numeric" value={f.stock} onChange={(e) => setF({ ...f, stock: e.target.value })} placeholder="∞" /></label></div>
+      <div className="field"><span>{t("admin.sizeTypes")}</span>
+        <div className="chips">{SIZE_SETS.map(([label, list]) => { const cur = f.sizes.split(",").map((x) => x.trim()).filter(Boolean); const on = list.every((x) => cur.includes(x)); return <button key={label} className={"chip" + (on ? " on" : "")} onClick={() => { const next = on ? cur.filter((x) => !list.includes(x)) : [...cur, ...list.filter((x) => !cur.includes(x))]; setF({ ...f, sizes: next.join(", ") }); }}>{label}</button>; })}</div>
+        <div className="tiny">{t("admin.sizeTypesHint")}</div>
+      </div>
       <label className="field"><span>{t("admin.sizes")}</span><input value={f.sizes} onChange={(e) => setF({ ...f, sizes: e.target.value })} placeholder="XS, S, M, L" /></label>
+      <label className="field"><span>{t("admin.imageUrl")}</span><input value={f.imageUrl} onChange={(e) => setF({ ...f, imageUrl: e.target.value })} placeholder="https://…" /></label>
       <label className="field"><span>{t("admin.image")}</span><input type="file" accept="image/*" onChange={(e) => setF({ ...f, image: e.target.files?.[0] ?? null })} /></label>
       <label className="check"><input type="checkbox" checked={f.active} onChange={(e) => setF({ ...f, active: e.target.checked })} />{t("admin.productActive")}</label>
       <label className="check"><input type="checkbox" checked={f.pub} onChange={(e) => setF({ ...f, pub: e.target.checked })} />{t("admin.productPublic")}</label>
-      <button className="cta" id="pr-save" disabled={!f.name.trim() || !f.price} onClick={async () => { await api.saveProduct({ name: f.name.trim(), price_dkk: Number(f.price), sizes: f.sizes.split(",").map((x) => x.trim()).filter(Boolean), stock: f.stock ? Number(f.stock) : null, image_path: product?.image_path ?? null, visibility: f.pub ? "public" : "private", active: f.active, image: f.image }, product?.id); onSaved(); }}>{t("common.save")}</button>
+      <button className="cta" id="pr-save" disabled={!f.name.trim() || !f.price} onClick={async () => { await api.saveProduct({ name: f.name.trim(), price_dkk: Number(f.price), sizes: f.sizes.split(",").map((x) => x.trim()).filter(Boolean), stock: f.stock ? Number(f.stock) : null, image_path: f.imageUrl.trim() ? f.imageUrl.trim() : (product?.image_path?.startsWith("http") ? null : product?.image_path ?? null), visibility: f.pub ? "public" : "private", active: f.active, image: f.image }, product?.id); onSaved(); }}>{t("common.save")}</button>
     </Sheet>
   );
 }

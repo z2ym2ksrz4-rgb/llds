@@ -247,7 +247,10 @@
     "importRun": "Importér {{n}} billeder",
     "importProgress": "Lægger op… {{n}} af {{total}}",
     "importDone": "Færdig – {{n}} billeder importeret",
-    "importHint": "Store zip-filer tager tid på mobilnet – brug gerne computer. Kan køres igen; eksisterende filer springes over."
+    "importHint": "Store zip-filer tager tid på mobilnet – brug gerne computer. Kan køres igen; eksisterende filer springes over.",
+    "sizeTypes": "Størrelsestyper",
+    "sizeTypesHint": "Vælg et eller flere sæt – ret listen nedenfor, hvis en størrelse mangler eller skal væk.",
+    "imageUrl": "Billed-link (valgfrit)"
   },
   "settings": {
     "language": "Sprog",
@@ -667,5 +670,11 @@
     "notePh": "En lille hilsen (valgfrit)",
     "monthlyHint": "Kan gives én gang om måneden",
     "emptyTeam": "Ingen emblemer endnu – de første kommer, når fremmøde registreres (10 i træk 🔥), eller når træneren giver et."
+  },
+  "catalog": {
+    "title": "Billedkatalog",
+    "pick": "Billede",
+    "auto": "Automatisk",
+    "hint": "{{n}} billeder i kataloget – læg nye i public/art/catalog."
   }
 }

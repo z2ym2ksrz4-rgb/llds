@@ -1,0 +1,216 @@
+{
+ "group-stage": {
+  "title": "Holdet på scenen",
+  "tags": [
+   "event",
+   "team",
+   "post"
+  ]
+ },
+ "solo-spotlight": {
+  "title": "Solo i spotlight",
+  "tags": [
+   "event",
+   "team",
+   "post"
+  ]
+ },
+ "trophy-gold": {
+  "title": "Pokaler",
+  "tags": [
+   "event",
+   "post"
+  ]
+ },
+ "studio-mirror": {
+  "title": "Studiet",
+  "tags": [
+   "team",
+   "post"
+  ]
+ },
+ "light-trails": {
+  "title": "Lysspor",
+  "tags": [
+   "event",
+   "team",
+   "post"
+  ]
+ },
+ "costume-detail": {
+  "title": "Kostume",
+  "tags": [
+   "event",
+   "team",
+   "post"
+  ]
+ },
+ "event-julebal": {
+  "title": "Julebal",
+  "tags": [
+   "event",
+   "post"
+  ]
+ },
+ "event-rangliste-1-junior": {
+  "title": "Rangliste – Junior & Voksen",
+  "tags": [
+   "event",
+   "post"
+  ]
+ },
+ "event-rangliste-1-born": {
+  "title": "Rangliste – Mini Børn & Børn",
+  "tags": [
+   "event",
+   "post"
+  ]
+ },
+ "event-rangliste-2-born2": {
+  "title": "Rangliste 2 – Børn 2 & Junior 2",
+  "tags": [
+   "event",
+   "post"
+  ]
+ },
+ "event-rangliste-2-born1": {
+  "title": "Rangliste 2 – Mini & Børn 1",
+  "tags": [
+   "event",
+   "post"
+  ]
+ },
+ "event-danmark-danser": {
+  "title": "Danmark Danser",
+  "tags": [
+   "event",
+   "post"
+  ]
+ },
+ "event-cph-open": {
+  "title": "CPH Open",
+  "tags": [
+   "event",
+   "post"
+  ]
+ },
+ "event-semifinale": {
+  "title": "Semifinale",
+  "tags": [
+   "event",
+   "post"
+  ]
+ },
+ "event-cph-open-finale": {
+  "title": "CPH Open Finale",
+  "tags": [
+   "event",
+   "post"
+  ]
+ },
+ "event-kc-finale": {
+  "title": "KC Finale",
+  "tags": [
+   "event",
+   "post"
+  ]
+ },
+ "event-dm-junior-voksen": {
+  "title": "DM Showdance",
+  "tags": [
+   "event",
+   "post"
+  ]
+ },
+ "event-dm-mini": {
+  "title": "DM – Mini Børn",
+  "tags": [
+   "event",
+   "post"
+  ]
+ },
+ "event-show-it": {
+  "title": "Show IT",
+  "tags": [
+   "event",
+   "post"
+  ]
+ },
+ "event-afdansningsbal": {
+  "title": "Afdansningsbal",
+  "tags": [
+   "event",
+   "post"
+  ]
+ },
+ "event-dd-finale": {
+  "title": "Danmark Danser Finale",
+  "tags": [
+   "event",
+   "post"
+  ]
+ },
+ "team-mini": {
+  "title": "Mini-hold",
+  "tags": [
+   "team",
+   "post"
+  ]
+ },
+ "team-kids-showdance": {
+  "title": "Børne-showdance",
+  "tags": [
+   "team",
+   "post"
+  ]
+ },
+ "team-junior-elite": {
+  "title": "Junior elite",
+  "tags": [
+   "team",
+   "post"
+  ]
+ },
+ "team-hiphop": {
+  "title": "Hip hop",
+  "tags": [
+   "team",
+   "post"
+  ]
+ },
+ "team-contemporary": {
+  "title": "Contemporary",
+  "tags": [
+   "team",
+   "post"
+  ]
+ },
+ "team-fitness-adult": {
+  "title": "Voksne / fitness",
+  "tags": [
+   "team",
+   "post"
+  ]
+ },
+ "post-news": {
+  "title": "Nyt fra studiet",
+  "tags": [
+   "post",
+   "event"
+  ]
+ },
+ "post-celebration": {
+  "title": "Tillykke",
+  "tags": [
+   "post",
+   "event"
+  ]
+ },
+ "post-reminder": {
+  "title": "Påmindelse",
+  "tags": [
+   "post",
+   "event"
+  ]
+ }
+}
