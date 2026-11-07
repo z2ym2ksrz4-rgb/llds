@@ -933,7 +933,14 @@
       "week": "Your/child's week",
       "payments": "Open payments",
       "badges": "Trophy shelf (badges + milestones)"
-    }
+    },
+    "gallery": "Photo carousel on the website",
+    "gallerySub": "Pick images for the carousel on the website front page – in the order you tap ({{n}} selected). Empty = Line's team photos are shown automatically.",
+    "galleryLine": "Line's photos",
+    "galleryOwn": "Own uploads",
+    "galleryCatalog": "Catalogue",
+    "galleryClear": "Clear",
+    "galleryShuffle": "Shuffle order"
   },
   "week": {
     "training": "Training",

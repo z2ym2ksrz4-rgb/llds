@@ -933,7 +933,14 @@
       "week": "Din/barnets uge",
       "payments": "Åbne betalinger",
       "badges": "Trofæhylde (emblemer + milepæle)"
-    }
+    },
+    "gallery": "Billedkarrusel på websitet",
+    "gallerySub": "Vælg billeder til karrusellen på forsiden af websitet – i den rækkefølge du trykker ({{n}} valgt). Tom = Lines holdfotos vises automatisk.",
+    "galleryLine": "Lines fotos",
+    "galleryOwn": "Egne uploads",
+    "galleryCatalog": "Katalog",
+    "galleryClear": "Ryd valg",
+    "galleryShuffle": "Bland rækkefølgen"
   },
   "week": {
     "training": "Træning",

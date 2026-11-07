@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Appearance, CustomBox } from "@/core/api";
 import { HOME_SECTIONS, homeOrder, useAppearance } from "@/core/appearance";
 import { ImagePicker } from "../components/ImagePicker";
 import { Sheet } from "../components/Sheet";
-import { resolveImage } from "../lib/catalog";
+import { CATALOG, catalogUrl, resolveImage } from "../lib/catalog";
+import { api, type CatalogEntry } from "@/core/api";
+import { useAuth } from "@/core/auth";
 
 const TABS = ["", "home", "rooms", "team", "social", "events", "more"] as const;
 const newId = () => Math.random().toString(36).slice(2, 8);
@@ -16,8 +18,14 @@ export function Customize() {
   const [a, setA] = useState<Appearance>(() => ({ ...store.a, hidden: [...(store.a.hidden ?? [])], boxes: [...(store.a.boxes ?? [])], images: { ...(store.a.images ?? {}) } }));
   const [edit, setEdit] = useState<CustomBox | null>(null);
   const [dirty, setDirty] = useState(false); const [saved, setSaved] = useState(false);
+  const me = useAuth((x) => x.me);
+  const [own, setOwn] = useState<CatalogEntry[]>([]);
+  useEffect(() => { void api.listCatalog().then(setOwn).catch(() => setOwn([])); }, []);
+  const gallery = a.websiteGallery ?? [];
+  const teamPhotos = Array.from(new Set((me?.teams ?? []).flatMap((t) => [...(t.photos ?? []), ...(/^https?:/.test(t.cover_url ?? "") ? [t.cover_url!] : [])])));
   const order = homeOrder(a);
   const upd = (n: Appearance) => { setA(n); setDirty(true); setSaved(false); };
+  const toggleG = (ref: string) => upd({ ...a, websiteGallery: gallery.includes(ref) ? gallery.filter((x) => x !== ref) : [...gallery, ref] });
   const move = (k: string, d: -1 | 1) => { const i = order.indexOf(k); const j = i + d; if (j < 0 || j >= order.length) return; const o = [...order]; [o[i], o[j]] = [o[j], o[i]]; upd({ ...a, home: o }); };
   const toggle = (k: string) => { const h = a.hidden ?? []; upd({ ...a, hidden: h.includes(k) ? h.filter((x) => x !== k) : [...h, k] }); };
   const label = (k: string) => k.startsWith("box:") ? (a.boxes?.find((b) => "box:" + b.id === k)?.title || t("customize.untitled")) : t(`customize.sections.${k}`);
@@ -47,6 +55,15 @@ export function Customize() {
           <ImagePicker tag="post" value={a.images?.login ?? null} onChange={(v) => upd({ ...a, images: { ...(a.images ?? {}), login: v } })} /></div>
         <div className="card"><div className="eyebrow">{t("customize.heroImage")}</div><p className="tiny muted">{t("customize.heroImageSub")}</p>
           <ImagePicker tag="event" value={a.images?.hero ?? null} onChange={(v) => upd({ ...a, images: { ...(a.images ?? {}), hero: v } })} /></div>
+      </div>
+
+      <div className="sec"><h2>{t("customize.gallery")}</h2>
+        <p className="tiny muted" style={{ marginTop: 0 }}>{t("customize.gallerySub", { n: gallery.length })}</p>
+        {[{ key: "line", title: t("customize.galleryLine"), items: teamPhotos.map((u) => ({ ref: u, url: u })) }, { key: "own", title: t("customize.galleryOwn"), items: own.map((c) => ({ ref: c.url, url: c.url })) }, { key: "cat", title: t("customize.galleryCatalog"), items: CATALOG.map((c) => ({ ref: c.key, url: catalogUrl(c.key)! })) }].filter((g) => g.items.length).map((g) => (
+          <div key={g.key} style={{ marginBottom: 10 }}><div className="eyebrow">{g.title}</div>
+            <div className="galpick" data-testid={`gal-${g.key}`}>{g.items.map((it) => { const i = gallery.indexOf(it.ref); return <button key={it.ref} className={"gthumb" + (i >= 0 ? " on" : "")} style={{ backgroundImage: `url(${it.url})` }} onClick={() => toggleG(it.ref)} aria-pressed={i >= 0}>{i >= 0 && <b>{i + 1}</b>}</button>; })}</div></div>
+        ))}
+        <div className="row" style={{ gap: 8 }}><button className="ghost small" onClick={() => upd({ ...a, websiteGallery: [] })}>{t("customize.galleryClear")}</button><button className="ghost small" onClick={() => upd({ ...a, websiteGallery: [...gallery].sort(() => Math.random() - 0.5) })}>{t("customize.galleryShuffle")}</button></div>
       </div>
 
       <div className="row" style={{ gap: 8 }}>

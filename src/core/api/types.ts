@@ -33,6 +33,7 @@ export type Appearance = {
   hidden?: string[];         // section keys hidden for everyone
   boxes?: CustomBox[];
   images?: { login?: string | null; hero?: string | null };  // catalog key or URL
+  websiteGallery?: string[];  // image refs (catalog key, art/catalog path or URL) for the carousel on the website front page
 };
 
 export type Team = {
