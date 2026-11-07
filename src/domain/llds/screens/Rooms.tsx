@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type Absence, type Booking, type Room, type Session } from "@/core/api";
 import { useAuth } from "@/core/auth";
@@ -37,8 +37,10 @@ export function Rooms() {
   const slotH = (a: string, b: string) => Math.max(22, (new Date(b).getTime() - new Date(a).getTime()) / 36e5 * 48 - 2);
   const mine = (s: Session) => s.team_id != null && me.memberships.some((m) => m.person_id === viewing.personId && m.team_id === s.team_id);
 
+  const scroller = useRef<HTMLDivElement>(null);
+  useEffect(() => { const el = scroller.current; if (el) el.scrollTop = (15 - 9) * 48; }, [day.getTime()]); // default to the afternoon where the regular trainings are
   return (
-    <section className="screen">
+    <section className="screen rooms">
       <header className="topbar"><h1 className="display">{t("nav.rooms")}</h1>{isTrainer && <button className="ghost small" onClick={() => setOpen({ kind: "new", room_id: rooms[0]?.id ?? "", start: "16:00" })}>+ {t("session.training")}</button>}</header>
       <div className="days">
         {Array.from({ length: 7 }, (_, i) => addDays(week, i)).map((d) => (
@@ -47,8 +49,11 @@ export function Rooms() {
       </div>
       <div className="row between small muted"><button className="linklike" onClick={() => setDay(addDays(day, -7))}>‹ {t("rooms.prevWeek")}</button><button className="linklike" onClick={() => setDay(startOfDay(new Date()))}>{t("rooms.today")}</button><button className="linklike" onClick={() => setDay(addDays(day, 7))}>{t("rooms.nextWeek")} ›</button></div>
 
-      <div className="cal" style={{ gridTemplateColumns: `44px repeat(${rooms.length}, 1fr)` }}>
+      <div className="cal calhead" style={{ gridTemplateColumns: `44px repeat(${rooms.length}, 1fr)` }}>
         <div />{rooms.map((r) => <div key={r.id} className="h">{r.name}</div>)}
+      </div>
+      <div className="calwrap" ref={scroller} data-testid="calwrap">
+      <div className="cal" style={{ gridTemplateColumns: `44px repeat(${rooms.length}, 1fr)` }}>
         <div className="hours">{HOURS.map((h) => <div key={h} className="t">{h}.00</div>)}</div>
         {rooms.map((r) => (
           <div key={r.id} className="col" style={{ height: HOURS.length * 48 }}>
@@ -67,6 +72,7 @@ export function Rooms() {
         ))}
       </div>
       <p className="tiny">{t("rooms.legend")}</p>
+      </div>
 
       {open?.kind === "session" && <SessionSheet session={open.s} absences={absences} onClose={() => setOpen(null)} onChanged={() => void load()} toast={say} />}
       {open?.kind === "new" && <SessionEditor defaults={{ date: day, room_id: open.room_id, start: open.start }} onClose={() => setOpen(null)} onSaved={() => { setOpen(null); void load(); }} toast={say} />}

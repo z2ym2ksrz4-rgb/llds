@@ -349,3 +349,9 @@ button.cta { box-shadow:0 10px 26px -12px rgba(201,162,74,.7); }
 .chip.small.staff { color:var(--gold2); border-color:rgba(201,162,74,.5); }
 .chip.small.event { background:rgba(201,162,74,.14); border-color:rgba(201,162,74,.5); color:var(--gold2); }
 .chip.small.booking { opacity:.8; }
+
+/* Sale: header, day picker and room names stay fixed – only the day grid scrolls, starting at the afternoon */
+.screen.rooms { height:calc(100dvh - 12px - env(safe-area-inset-top) - 96px - env(safe-area-inset-bottom)); display:flex; flex-direction:column; overflow:hidden; }
+.screen.rooms .calhead { margin-top:10px; }
+.screen.rooms .calwrap { flex:1; min-height:0; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
+.screen.rooms .calwrap .cal { margin-top:0; }
