@@ -25,8 +25,9 @@ await p.click("[data-testid=role-dancer]"); await p.click("[data-testid=role-sta
 const empire = p.locator("[data-testid=teamlist] .trow[data-team=Empire]");
 await empire.locator("button", { hasText: "Danser" }).click();
 await p.locator("[data-testid=teamlist] .trow[data-team='Mini Angels'] button", { hasText: "Hjælpetræner" }).click();
-// parent chip with two children → pick Freja on Empire
-await empire.locator("[data-testid=chip-parent]").click(); await empire.locator(".trow-kids button", { hasText: "Freja" }).click();
+// parent follows the child's dancer teams: The AXIS row shows "forælder til Freja", no parent chip to click
+out.parentMarkerAxis = (await p.locator("[data-testid=teamlist] .trow[data-team='The AXIS'] [data-testid=chip-parent]").innerText()).includes("Freja");
+out.noParentButtons = (await p.locator("[data-testid=teamlist] button", { hasText: /^Forælder$/ }).count()) === 0;
 const acc = await p.locator("[data-testid=access]").innerText();
 out.accessHasEmpireDancer = acc.includes("Empire") && acc.includes("Danser"); out.accessHasAssistant = acc.includes("Hjælpetræner"); out.accessHasFrejaEmpire = acc.includes("forælder til Freja"); out.accessAdmin = acc.includes("administrator");
 out.groups = await p.$$eval("[data-testid=teamlist] .tgroup .eyebrow", e => e.map(x => x.textContent));
@@ -44,5 +45,5 @@ await p.screenshot({ path: "smoke17-2.png" });
 out.errors = errors;
 console.log(JSON.stringify(out, null, 1));
 await b.close();
-const ok = out.parentOn === "true" && out.accessFirst && out.kidsAfter === out.kidsBefore + 1 && out.accessHasNoa && out.accessHasEmpireDancer && out.accessHasAssistant && out.accessHasFrejaEmpire && out.accessAdmin && out.groups.length > 1 && out.persisted && out.adminPersisted === "true" && out.childDancerApexion && out.childParentDisabled && !errors.length;
+const ok = out.parentOn === "true" && out.accessFirst && out.kidsAfter === out.kidsBefore + 1 && out.accessHasNoa && out.accessHasEmpireDancer && out.accessHasAssistant && out.accessHasFrejaEmpire && out.parentMarkerAxis && out.noParentButtons && out.accessAdmin && out.groups.length > 1 && out.persisted && out.adminPersisted === "true" && out.childDancerApexion && out.childParentDisabled && !errors.length;
 process.exit(ok ? 0 : 1);

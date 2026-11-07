@@ -32,7 +32,7 @@ await p.click("text=+ Træning"); await p.waitForSelector("#se-team");
 await p.selectOption("#se-team", { label: "The AXIS" }); await p.selectOption("#se-room", { label: "Store Sal" });
 out.staffAuto = (await p.textContent("[data-testid=se-staff]")).replace(/\s+/g, " ").slice(0, 80);  // trainer follows the team
 out.endDateShown = !!(await p.$("#se-until"));
-await p.click("[data-testid=se-repeat] input"); out.endDateHiddenWhenOnce = !(await p.$("#se-until"));
+await p.click("[data-testid=se-repeat]"); out.endDateHiddenWhenOnce = !(await p.$("#se-until"));
 const tue = new Date(); tue.setDate(tue.getDate() - ((tue.getDay() + 6) % 7) + 1); await p.fill("#se-date", tue.toISOString().slice(0, 10));
 await p.fill("#se-start", "17:00"); await p.fill("#se-end", "18:00"); await p.click("text=Opret træning");
 await p.waitForSelector(".error"); out.clash = await p.textContent(".error");

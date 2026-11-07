@@ -509,3 +509,4 @@ button.cta { box-shadow:0 10px 26px -12px rgba(201,162,74,.7); }
 
 .conflicts{padding:12px 14px;border-color:rgba(224,138,138,.45)}.conflictlist{margin:0;padding-left:18px;font-size:.9rem;line-height:1.5;max-height:200px;overflow:auto}
 .week .col.over{outline:2px dashed var(--gold);outline-offset:2px;border-radius:10px}.week .blk.dragging{opacity:.4}.week .blk[draggable]{cursor:grab}
+.chip.static{cursor:default}

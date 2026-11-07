@@ -90,7 +90,7 @@ export function Home() {
   const ownPhoto = firstTeam && /^https?:/.test(firstTeam.cover_url ?? "") ? firstTeam.cover_url : firstTeam?.photos?.[0] ?? null;
   const heroImg = resolveImage(ownPhoto) ?? catalogUrl(hero?.image_key) ?? catalogUrl(appearance.images?.hero) ?? artFor(viewing.personId, ["group", "trails", "studio"]);
   const hour = new Date().getHours(); const tone = hour < 10 ? "morning" : hour < 17 ? "day" : "evening";
-  const greeting = t(`home.greet.${tone}`, { name: hat ? hat.first_name : me.person.first_name });
+  const greeting = t(`home.greet.${tone}`, { name: me.person.first_name }); // always the logged-in person – the child's name goes on the sections below
   const nextUp = week[0];
   const heroRef = useRef<HTMLDivElement>(null);
   useEffect(() => { // parallax: image moves slower than the page, text fades
