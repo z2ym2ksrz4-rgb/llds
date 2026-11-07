@@ -107,7 +107,7 @@ function BookSheet({ day, rooms, room_id, start, sessions, bookings, isStaff, is
   day: Date; rooms: Room[]; room_id: string; start: string; sessions: Session[]; bookings: Booking[]; isStaff: boolean; isTrainer: boolean; onClose: () => void; onSaved: () => void; onTraining: () => void; toast: (m: string) => void;
 }) {
   const { t } = useTranslation();
-  const me = useAuth((s) => s.me)!; const viewing = useAuth((s) => s.viewing)!;
+  const me = useAuth((s) => s.me)!; const viewing = useAuth((s) => s.viewing)!; const viewAs = useAuth((s) => s.viewAs);
   const who = viewing.isChild ? me.children.find((c) => c.id === viewing.personId)?.first_name : me.person.first_name;
   const [f, setF] = useState({ room_id, start, dur: 60, title: `Solo – ${who}` });
   const [err, setErr] = useState<string | null>(null);
@@ -115,7 +115,7 @@ function BookSheet({ day, rooms, room_id, start, sessions, bookings, isStaff, is
     const s = atTime(day, f.start); const e = new Date(s.getTime() + f.dur * 6e4);
     const sI = s.toISOString(), eI = e.toISOString();
     if (sessions.some((x) => x.room_id === f.room_id && !x.cancelled && overlaps(sI, eI, x.starts_at, x.ends_at)) || bookings.some((x) => x.room_id === f.room_id && x.status !== "rejected" && overlaps(sI, eI, x.starts_at, x.ends_at))) { setErr(t("rooms.taken")); return; }
-    const b = await api.createBooking({ room_id: f.room_id, title: f.title || t("rooms.booking"), starts_at: sI, ends_at: eI, person_id: viewing.personId });
+    const b = await api.createBooking({ room_id: f.room_id, title: f.title || t("rooms.booking"), starts_at: sI, ends_at: eI, person_id: viewing.personId, force_pending: !!viewAs && !["admin", "trainer", "assistant"].includes(viewAs) });
     toast(b.status === "approved" ? t("rooms.booked", { room: b.room_name }) : t("rooms.sentForApproval")); onSaved();
   };
   return (

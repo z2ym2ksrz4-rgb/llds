@@ -87,8 +87,8 @@ export function scheduleOps(get: () => { S: SchedState; persons: Person[]; membe
       g.save(); g.emit();
     },
     async listBookings(from: string, to: string) { return get().S.bookings.filter((b) => b.starts_at >= from && b.starts_at < to); },
-    async createBooking(i: { room_id: string; title: string; starts_at: string; ends_at: string; person_id: string }) {
-      const g = get(); const me = g.me()!; const staff = me.is_admin || g.memberships.some((m) => m.person_id === me.id && m.role !== "dancer");
+    async createBooking({ force_pending, ...i }: { room_id: string; title: string; starts_at: string; ends_at: string; person_id: string; force_pending?: boolean }) {
+      const g = get(); const who = g.persons.find((p) => p.id === i.person_id); const staff = !force_pending && (who?.is_admin || g.memberships.some((m) => m.person_id === i.person_id && m.role !== "dancer"));
       const b: Booking = { id: "b-" + id(), ...i, room_name: g.S.rooms.find((r) => r.id === i.room_id)?.name ?? "", person_name: names(i.person_id) ?? "", status: staff ? "approved" : "pending" };
       g.S.bookings.push(b); g.save(); g.emit(); return b;
     },

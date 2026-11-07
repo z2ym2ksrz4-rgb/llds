@@ -176,7 +176,8 @@ export interface Api {
   deleteSession(id: string, scope?: "one" | "future"): Promise<void>;
   /* bookings */
   listBookings(fromIso: string, toIso: string): Promise<Booking[]>;
-  createBooking(input: { room_id: string; title: string; starts_at: string; ends_at: string; person_id: string }): Promise<Booking>;
+  /** Approval follows the person the room is booked FOR: admin/trainer/assistant → approved at once, everyone else → pending. force_pending (preview as dancer/parent) always queues it. */
+  createBooking(input: { room_id: string; title: string; starts_at: string; ends_at: string; person_id: string; force_pending?: boolean }): Promise<Booking>;
   setBookingStatus(id: string, status: Booking["status"]): Promise<void>;
   deleteBooking(id: string): Promise<void>;
   /* absence & attendance */

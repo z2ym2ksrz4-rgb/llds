@@ -49,13 +49,15 @@ export function supabaseSchedule(sb: SupabaseClient, fail: Fail, schoolId: () =>
     async listBookings(from: string, to: string): Promise<Booking[]> {
       const { data, error } = await sb.from("booking_view").select("*").gte("starts_at", from).lt("starts_at", to).order("starts_at"); fail(error); return (data ?? []) as Booking[];
     },
-    async createBooking(i: { room_id: string; title: string; starts_at: string; ends_at: string; person_id: string }): Promise<Booking> {
-      const { data: me } = await sb.from("person").select("is_admin").eq("id", await myPersonId()).single();
-      const { data: staffRows } = await sb.from("membership").select("role").eq("person_id", await myPersonId()).neq("role", "dancer");
-      const status = me?.is_admin || (staffRows ?? []).length ? "approved" : "pending";
-      const { data, error } = await sb.from("booking").insert({ school_id: await schoolId(), ...i, status }).select("id").single(); fail(error);
+    async createBooking(i: { room_id: string; title: string; starts_at: string; ends_at: string; person_id: string; force_pending?: boolean }): Promise<Booking> {
+      const { force_pending, ...row } = i;
+      const { data: who } = await sb.from("person").select("is_admin").eq("id", i.person_id).single();
+      const { data: staffRows } = await sb.from("membership").select("role").eq("person_id", i.person_id).neq("role", "dancer");
+      const status = !force_pending && (who?.is_admin || (staffRows ?? []).length) ? "approved" : "pending";
+      const { data, error } = await sb.from("booking").insert({ school_id: await schoolId(), ...row, status }).select("id").single(); fail(error);
       const { data: b } = await sb.from("booking_view").select("*").eq("id", data!.id).single(); return b as Booking;
     },
+
     async setBookingStatus(id: string, status: Booking["status"]) { const { error } = await sb.from("booking").update({ status }).eq("id", id); fail(error); },
     async deleteBooking(id: string) { const { error } = await sb.from("booking").delete().eq("id", id); fail(error); },
     async listAbsences(ids: string[]): Promise<Absence[]> { if (!ids.length) return []; const { data, error } = await sb.from("absence").select("id,session_id,person_id,reason,note").in("session_id", ids); fail(error); return (data ?? []) as Absence[]; },
