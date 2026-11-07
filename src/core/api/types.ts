@@ -110,7 +110,12 @@ export interface Api {
   listTeams(): Promise<Team[]>;
   approve(personId: string, memberships: { team_id: string; role: Role }[], isAdmin?: boolean): Promise<void>;
   reject(personId: string): Promise<void>;
+  /** Admin invites a person (optionally a parent with children); everyone is created approved and the adult gets a welcome mail with the app link. */
+  invitePerson(input: InviteInput): Promise<string>;
+  resendInvite(personId: string): Promise<void>;
 }
+
+export type InviteInput = { first_name: string; last_name: string; email: string; phone: string; is_parent: boolean; memberships: { team_id: string; role: Role }[]; children: { first_name: string; birth_date: string; memberships: { team_id: string; role: Role }[] }[]; message?: string | null };
 
 /* ---------------- phase 2: schedule, rooms, bookings, absence, attendance ---------------- */
 export type Room = { id: string; name: string; sort: number };

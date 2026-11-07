@@ -78,10 +78,10 @@
   },
   "pending": {
     "title": "Tak, {{name}}",
-    "body": "Din profil er sendt til Line. Du får besked, så snart den er godkendt – typisk inden for en dag.",
-    "step1": "Line ser din anmodning",
+    "body": "Line har fået din tilmelding og kigger på den – typisk samme dag. Du får en mail og en besked her, så snart du er inde.",
+    "step1": "Line ser din tilmelding",
     "step2": "Du sættes på dine hold med den rigtige rolle",
-    "step3": "Appen åbner automatisk, når du er godkendt",
+    "step3": "Du får en mail – og appen åbner automatisk",
     "refresh": "Tjek igen",
     "rejectedTitle": "Profilen blev ikke godkendt",
     "rejectedBody": "Kontakt LL Dance Studio, hvis du mener det er en fejl."
@@ -292,7 +292,21 @@
     "installments": "Rater tilladt",
     "installmentsHint": "2/4/10 rater à 50 kr. gebyr pr. rate",
     "priceNotePh": "Note, fx “Resterende 975 kr. betales efter 4 prøvegange” eller “Betales med klippekort”",
-    "pricesHint": "Bruges ved tilmelding på websitet og i appen. Tilmeldingspris = det der betales ved tilmelding, hvis det er mindre end hel sæson."
+    "pricesHint": "Bruges ved tilmelding på websitet og i appen. Tilmeldingspris = det der betales ved tilmelding, hvis det er mindre end hel sæson.",
+    "invite": "Inviter til appen",
+    "inviteSub": "Opret en person direkte – de får en mail med link til appen og logger ind med deres e-mail. Ingen godkendelse nødvendig.",
+    "inviteParent": "Forælder (børnene danser)",
+    "inviteDancer": "Danser/træner selv",
+    "inviteChildren": "Børn",
+    "inviteAddChild": "Tilføj barn",
+    "inviteMessage": "Personlig hilsen (valgfri)",
+    "inviteSend": "Send invitation",
+    "invited": "{{name}} er oprettet og har fået en mail.",
+    "inviteExists": "Der findes allerede en person med den e-mail.",
+    "inviteNeedTeam": "Vælg mindst ét hold.",
+    "inviteChildName": "Barnets fornavn",
+    "inviteBirth": "Fødselsdato",
+    "inviteTeam": "Hold"
   },
   "settings": {
     "language": "Sprog",

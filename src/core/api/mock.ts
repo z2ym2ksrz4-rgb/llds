@@ -159,6 +159,20 @@ export const mockApi: Api = {
     save(); emit();
   },
   async reject(personId) { const p = S.persons.find((x) => x.id === personId); if (p) p.status = "rejected"; save(); emit(); },
+  async invitePerson(i) {
+    if (S.persons.some((p) => p.email?.toLowerCase() === i.email.toLowerCase())) throw new Error("email exists");
+    const pid = "p-" + id();
+    S.persons.push({ id: pid, school_id: SCHOOL, user_id: null, first_name: i.first_name, last_name: i.last_name, email: i.email, phone: i.phone || null, birth_year: null, birth_date: null, status: "approved", is_admin: false, photo_consent: null, wished_roles: [i.is_parent ? "parent" : "dancer"], wished_teams: null, supervised_by: null, created_at: now() });
+    for (const m of i.memberships) S.memberships.push({ person_id: pid, team_id: m.team_id, role: m.role });
+    for (const c of i.children) {
+      const cid = "p-" + id();
+      S.persons.push({ id: cid, school_id: SCHOOL, user_id: null, first_name: c.first_name, last_name: i.last_name, email: null, phone: null, birth_year: c.birth_date ? Number(c.birth_date.slice(0, 4)) : null, birth_date: c.birth_date || null, status: "approved", is_admin: false, photo_consent: null, wished_roles: ["dancer"], wished_teams: null, supervised_by: null, created_at: now() });
+      S.guardians.push({ parent_id: pid, child_id: cid });
+      for (const m of c.memberships) S.memberships.push({ person_id: cid, team_id: m.team_id, role: "dancer" });
+    }
+    save(); emit(); return pid;
+  },
+  async resendInvite() { /* mail only */ },
 };
 
 export function mockReset() { try { localStorage.removeItem(KEY); } catch { /* ignore */ } S = load(); emit(); }

@@ -38,6 +38,18 @@ await shot(3);
 await card.locator("button", { hasText: "Godkend" }).click();
 await p.waitForSelector("text=Test er godkendt");
 out.approved = true;
+// 2b. invite a parent with one child directly from Admin (created approved, welcome mail)
+const inv = p.locator("[data-testid=invite]");
+await inv.locator("button.chip").first().click();
+await inv.locator("form .grid2").first().locator("input").nth(0).fill("Inga"); await inv.locator("form .grid2").first().locator("input").nth(1).fill("Inviteret");
+await inv.locator("input[type=email]").fill("inga@demo");
+const kidRow = inv.locator(".kidrow").first();
+await kidRow.locator("input").first().fill("Ida");
+await kidRow.locator("select").selectOption({ label: (await kidRow.locator("select option", { hasText: "Apexion" }).first().textContent()) ?? "Apexion" });
+await inv.locator("button[type=submit]").click();
+await p.waitForSelector("text=Inga er oprettet");
+out.invited = true;
+await shot("3b");
 
 // 3. sign in as the new user → team picker shows both hats
 await p.click("nav.tabbar >> text=Hjem"); await p.click("[data-testid=avatar]"); await p.click("[data-testid=menu-more]"); await p.click("[data-testid=more-settings]"); await p.click("text=Log ud"); await p.waitForSelector("#email");

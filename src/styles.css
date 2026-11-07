@@ -484,3 +484,6 @@ button.cta { box-shadow:0 10px 26px -12px rgba(201,162,74,.7); }
 .gthumb { position:relative; aspect-ratio:1; border-radius:10px; background:center/cover var(--card); border:2px solid transparent; padding:0; cursor:pointer; }
 .gthumb.on { border-color:var(--gold2); box-shadow:0 0 0 2px rgba(201,162,74,.25); }
 .gthumb b { position:absolute; right:4px; top:4px; width:20px; height:20px; border-radius:50%; background:var(--gold2); color:#161206; font-size:.7rem; display:grid; place-items:center; }
+
+/* Admin → Inviter: one child per row – name full width, then birth date + team side by side */
+.kidrow{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px 0;border-top:1px solid rgba(255,255,255,.06)}.kidrow>label:first-child{grid-column:1/-1}.kidrow select,.kidrow input{width:100%;min-width:0}

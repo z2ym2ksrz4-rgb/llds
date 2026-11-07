@@ -78,10 +78,10 @@
   },
   "pending": {
     "title": "Thanks, {{name}}",
-    "body": "Your profile has been sent to Line. You'll be notified as soon as it's approved – usually within a day.",
-    "step1": "Line sees your request",
-    "step2": "You're placed on your teams with the right role",
-    "step3": "The app opens automatically once approved",
+    "body": "Line has received your sign-up and is looking at it – usually the same day. You'll get an e-mail and a message here as soon as you're in.",
+    "step1": "Line sees your sign-up",
+    "step2": "You're put on your teams with the right role",
+    "step3": "You get an e-mail – and the app opens automatically",
     "refresh": "Check again",
     "rejectedTitle": "Profile not approved",
     "rejectedBody": "Contact LL Dance Studio if you think this is a mistake."
@@ -292,7 +292,21 @@
     "installments": "Instalments allowed",
     "installmentsHint": "2/4/10 instalments with a 50 kr. fee per instalment",
     "priceNotePh": "Note, e.g. “Remaining 975 kr. after 4 trial lessons” or “Paid with punch card”",
-    "pricesHint": "Used at sign-up on the website and in the app. Sign-up price = what is paid at sign-up if lower than the full season."
+    "pricesHint": "Used at sign-up on the website and in the app. Sign-up price = what is paid at sign-up if lower than the full season.",
+    "invite": "Invite to the app",
+    "inviteSub": "Create a person directly – they get an e-mail with the app link and sign in with their e-mail. No approval needed.",
+    "inviteParent": "Parent (the children dance)",
+    "inviteDancer": "Dancer/trainer themselves",
+    "inviteChildren": "Children",
+    "inviteAddChild": "Add child",
+    "inviteMessage": "Personal note (optional)",
+    "inviteSend": "Send invitation",
+    "invited": "{{name}} is created and has received an e-mail.",
+    "inviteExists": "A person with that e-mail already exists.",
+    "inviteNeedTeam": "Pick at least one team.",
+    "inviteChildName": "Child's first name",
+    "inviteBirth": "Date of birth",
+    "inviteTeam": "Team"
   },
   "settings": {
     "language": "Language",

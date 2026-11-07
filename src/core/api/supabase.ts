@@ -106,5 +106,10 @@ export function supabaseApi(url: string, anonKey: string): Api {
       const { error } = await sb.rpc("reject_person", { p_id: personId });
       fail(error);
     },
+    async invitePerson(i) {
+      const { data, error } = await sb.rpc("invite_person", { p_first: i.first_name, p_last: i.last_name, p_email: i.email, p_phone: i.phone, p_is_parent: i.is_parent, p_memberships: i.memberships, p_children: i.children, p_message: i.message ?? null });
+      fail(error); return data as string;
+    },
+    async resendInvite(personId) { const { error } = await sb.rpc("resend_invite", { p_id: personId }); fail(error); },
   };
 }
