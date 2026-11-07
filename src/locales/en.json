@@ -122,7 +122,9 @@
     "writeToTeam": "Write to the team",
     "fromTrainer": "To {{team}} – from the trainer",
     "toEveryone": "To everyone – from the school",
-    "noTeamMessages": "No messages to the team yet."
+    "noTeamMessages": "No messages to the team yet.",
+    "childNoDancerTeams": "{{name}} is not a dancer on any team yet – as a parent you only follow teams where {{name}} dances. ({{name}} trains {{teams}}.)",
+    "childNoTeams": "Line has not put {{name}} on a team yet."
   },
   "home": {
     "hi": "Hi {{name}}",

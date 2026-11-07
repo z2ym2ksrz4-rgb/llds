@@ -122,7 +122,9 @@
     "writeToTeam": "Skriv til holdet",
     "fromTrainer": "Til {{team}} – fra træneren",
     "toEveryone": "Til alle – fra skolen",
-    "noTeamMessages": "Ingen beskeder til holdet endnu."
+    "noTeamMessages": "Ingen beskeder til holdet endnu.",
+    "childNoDancerTeams": "{{name}} er ikke danser på noget hold endnu – som forælder følger du kun hold, hvor {{name}} danser. ({{name}} er træner på {{teams}}.)",
+    "childNoTeams": "Line har ikke sat {{name}} på et hold endnu."
   },
   "home": {
     "hi": "Hej {{name}}",

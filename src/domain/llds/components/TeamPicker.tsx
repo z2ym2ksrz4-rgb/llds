@@ -42,7 +42,8 @@ export function TeamPicker() {
                     {x.id === teamId && <span className="gold">✓</span>}
                   </button>
                 ))}
-                {!myTeams.length && <p className="muted">{t("team.noneYet")}</p>}
+                {!myTeams.length && (() => { const kid = viewing.isChild ? me.children.find((c) => c.id === viewing.personId) : null; const staffOn = kid ? me.memberships.filter((m) => m.person_id === kid.id && m.role !== "dancer").map((m) => me.teams.find((x) => x.id === m.team_id)?.name).filter(Boolean) : []; return (
+                  <p className="muted">{kid ? (staffOn.length ? t("team.childNoDancerTeams", { name: kid.first_name, teams: staffOn.join(", ") }) : t("team.childNoTeams", { name: kid.first_name })) : t("team.noneYet")}</p>); })()}
               </div>
             </div>
           </div>
