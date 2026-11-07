@@ -118,7 +118,7 @@ export function supabaseSocial(sb: SupabaseClient, fail: Fail, schoolId: () => P
       await upload(path, file);
       const { error } = await sb.from("video").insert({ team_id: teamId, uploader_id: await myPersonId(), title, storage_path: path }); fail(error);
     },
-    async updateVideo(id: string, patch: { title?: string; formations?: Formation[] }) { const { error } = await sb.from("video").update(patch).eq("id", id); fail(error); },
+    async updateVideo(id: string, patch: { title?: string; formations?: Formation[]; notes?: string | null }) { const { error } = await sb.from("video").update(patch).eq("id", id); fail(error); },
     async deleteVideo(id: string) {
       const { data: v } = await sb.from("video").select("storage_path").eq("id", id).single();
       const { error } = await sb.from("video").delete().eq("id", id); fail(error);

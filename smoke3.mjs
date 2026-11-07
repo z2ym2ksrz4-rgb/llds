@@ -56,9 +56,10 @@ await p.click(".sheet-bg", { position: { x: 5, y: 5 } });
 // team: hidden post visible to admin as hidden; notes; formations
 await p.click("nav.tabbar >> text=Social"); await p.click(".chips .chip:has-text('The AXIS')"); await p.waitForSelector("[data-testid=feed]");
 out.hiddenVisibleToAdmin = await p.$$eval("[data-testid=post].hidden-post", e => e.length);
-await p.click("nav.tabbar >> text=/^(Mit hold|Hold)$/"); await p.waitForSelector("[data-testid=go-notes]"); await p.click("[data-testid=go-notes]"); await p.waitForSelector("#note-body", { state: "attached" }).catch(() => {});
-await p.click(".chips .chip:has-text('Freja')"); await p.fill("#note-body", "Flot fremgang i pirouetter"); await p.click("#note-save"); await p.waitForTimeout(200); out.notes = await p.$$eval("[data-testid=note]", e => e.length);
-await p.click("text=‹ Mit hold"); await p.click("[data-testid=go-choreo]"); await p.waitForSelector("[data-testid=video]"); await p.click("[data-testid=video]");
+await p.click("nav.tabbar >> text=/^(Mit hold|Hold)$/"); await p.waitForSelector("[data-testid=go-choreo]"); out.noNotesBtn = !(await p.$("[data-testid=go-notes]"));
+await p.click("[data-testid=go-choreo]"); await p.waitForSelector("[data-testid=video]"); await p.click("[data-testid=video]");
+// notes on the video (trainer writes)
+await p.waitForSelector("[data-testid=video-notes]"); await p.click("[data-testid=video-notes] .linklike"); await p.fill("[data-testid=video-notes-input]", "Tæl 5-6-7-8 før løftet – Freja starter forrest."); await p.click("[data-testid=video-notes] .cta"); await p.waitForSelector(".toast"); await p.waitForTimeout(300); out.videoNotes = await p.textContent("[data-testid=video-notes] p");
 await p.waitForSelector("[data-testid=stage]"); out.formationDots = await p.$$eval("[data-testid=stage] .dot", e => e.length);
 await p.click("text=Redigér formationer"); await p.click(".chips .chip:has-text('AN')"); await p.click("[data-testid=stage]", { position: { x: 60, y: 60 } }); await p.click("text=Gem"); await p.waitForSelector(".toast"); await shot(5);
 out.dotMoved = await p.$eval("[data-testid=stage] .dot:has-text('AN')", e => e.style.left);

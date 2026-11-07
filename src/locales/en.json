@@ -533,7 +533,10 @@
     "formation": "Formation",
     "pickDancer": "Pick a dancer, tap the stage",
     "removeFromStage": "Remove from stage",
-    "editHint": "Pick initials and tap where the dancer stands. Tap a dot to move it."
+    "editHint": "Pick initials and tap where the dancer stands. Tap a dot to move it.",
+    "notes": "Notes for this video",
+    "addNotes": "Add notes",
+    "notesPh": "Counts, what to practise, who starts where …"
   },
   "notes": {
     "title": "Notes",

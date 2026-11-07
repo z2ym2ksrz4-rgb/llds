@@ -211,7 +211,7 @@ export type ThreadMessage = { id: string; thread_id: string; sender_id: string; 
 export type Folder = { id: string; team_id: string; name: string; staff_only: boolean; media_count: number; cover_path: string | null; cover_url?: string | null; created_at: string };
 export type MediaItem = { id: string; folder_id: string; uploader_id: string; uploader_name: string; storage_path: string; kind: "image" | "video"; url: string; created_at: string; sort?: number };
 export type Formation = { label: string; positions: { initials: string; x: number; y: number }[] };
-export type Video = { id: string; team_id: string; uploader_id: string; uploader_name: string; title: string; storage_path: string; url: string; duration_s: number | null; formations: Formation[]; created_at: string };
+export type Video = { id: string; team_id: string; uploader_id: string; uploader_name: string; title: string; storage_path: string; url: string; duration_s: number | null; formations: Formation[]; notes?: string | null; created_at: string };
 export type Note = { id: string; team_id: string; dancer_id: string; dancer_name: string; author_id: string; author_name: string; body: string; created_at: string };
 
 export interface Api {
@@ -251,7 +251,7 @@ export interface Api {
   /* choreography */
   listVideos(teamId: string): Promise<Video[]>;
   uploadVideo(teamId: string, title: string, file: File): Promise<void>;
-  updateVideo(id: string, patch: { title?: string; formations?: Formation[] }): Promise<void>;
+  updateVideo(id: string, patch: { title?: string; formations?: Formation[]; notes?: string | null }): Promise<void>;
   deleteVideo(id: string): Promise<void>;
   /* trainer notes */
   listNotes(teamId: string, dancerId?: string): Promise<Note[]>;

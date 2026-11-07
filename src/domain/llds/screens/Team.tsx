@@ -121,7 +121,7 @@ export function TeamScreen() {
         <button className={"card tap" + (seesChoreo ? "" : " dim")} disabled={!seesChoreo} onClick={() => setPage("choreo")}><div className="eyebrow">{t("choreo.formations")}</div><div className="big">{t("team.formationsN", { n: stats.formations })}</div></button>
         <button className="card tap" onClick={() => setPage("dancers")} data-testid="go-dancers"><div className="eyebrow">{t("team.dancers")}</div><div className="big">{stats.dancers}{staff ? "" : ""}</div></button>
       </div>
-      {staff && <div className="row" style={{ marginTop: 6 }}><button className="ghost small" onClick={() => setPage("notes")} data-testid="go-notes">{t("notes.title")}</button></div>}
+      
 
       {(team.description || team.price || team.day_time) && (
         <div className="sec"><h2>{t("team.about")}</h2><div className="card" data-testid="team-about">

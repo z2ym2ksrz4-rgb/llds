@@ -533,7 +533,10 @@
     "formation": "Formation",
     "pickDancer": "Vælg danser, tryk på scenen",
     "removeFromStage": "Fjern fra scenen",
-    "editHint": "Vælg initialer og tryk, hvor danseren skal stå. Tryk på en prik for at flytte den."
+    "editHint": "Vælg initialer og tryk, hvor danseren skal stå. Tryk på en prik for at flytte den.",
+    "notes": "Noter til videoen",
+    "addNotes": "Skriv noter",
+    "notesPh": "Tællinger, hvad der skal øves, hvem der starter hvor …"
   },
   "notes": {
     "title": "Noter",

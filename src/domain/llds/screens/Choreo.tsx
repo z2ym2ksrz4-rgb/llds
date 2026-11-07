@@ -72,6 +72,7 @@ function VideoView({ video, teamId, staff, onBack, onChanged, toast }: { video: 
           </div><p className="tiny">{t("choreo.loopHint")}</p></div>
         </>
       ) : <p className="muted">{t("choreo.noFile")}</p>)}
+      <VideoNotes video={video} staff={staff} onChanged={onChanged} toast={toast} />
       {tab === "formations" && <Formations video={video} teamId={teamId} staff={staff} onChanged={onChanged} toast={toast} />}
     </section>
   );
@@ -116,6 +117,21 @@ function Formations({ video, teamId, staff, onChanged, toast }: { video: Video; 
           <div className="row"><button className="small" onClick={() => void save()}>{t("common.save")}</button><button className="ghost small" onClick={() => { setFs(video.formations); setEdit(false); }}>{t("common.cancel")}</button></div>
         </div>
       )}
+    </div>
+  );
+}
+
+/** Notes on this video – counts, cues, what to practise. Trainers write; dancers and parents read. */
+function VideoNotes({ video, staff, onChanged, toast }: { video: Video; staff: boolean; onChanged: () => void; toast: (m: string) => void }) {
+  const { t } = useTranslation();
+  const [edit, setEdit] = useState(false); const [text, setText] = useState(video.notes ?? "");
+  useEffect(() => { setText(video.notes ?? ""); }, [video.id, video.notes]);
+  const save = async () => { await api.updateVideo(video.id, { notes: text.trim() || null }); setEdit(false); toast(t("common.saved")); onChanged(); };
+  if (!staff && !video.notes) return null;
+  return (
+    <div className="card" data-testid="video-notes"><div className="row between"><div className="eyebrow">{t("choreo.notes")}</div>{staff && !edit && <button className="linklike small" onClick={() => setEdit(true)}>{video.notes ? t("common.edit") : t("choreo.addNotes")}</button>}</div>
+      {edit ? (<><textarea rows={4} value={text} placeholder={t("choreo.notesPh")} onChange={(e) => setText(e.target.value)} data-testid="video-notes-input" /><div className="row" style={{ gap: 8 }}><button className="cta small" onClick={() => void save()}>{t("common.save")}</button><button className="ghost small" onClick={() => { setEdit(false); setText(video.notes ?? ""); }}>{t("common.cancel")}</button></div></>)
+        : <p className="small" style={{ margin: 0, whiteSpace: "pre-wrap" }}>{video.notes}</p>}
     </div>
   );
 }
