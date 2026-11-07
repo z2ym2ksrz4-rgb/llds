@@ -40,7 +40,7 @@ export function Home() {
 
   const load = useCallback(async () => {
     const from = startOfDay(new Date()), to = addDays(from, 7);
-    const [s, b, ev, ms, o, c] = await Promise.all([api.listSessions(from.toISOString(), to.toISOString()), isAdmin ? api.listBookings(from.toISOString(), addDays(from, 30).toISOString()) : Promise.resolve([]), api.listEvents(), api.listMilestones(), api.listOrders(), api.listPunchCards()]);
+    const [s, b, ev, ms, o, c] = await Promise.all([api.listSessions(from.toISOString(), to.toISOString()), api.listBookings(from.toISOString(), addDays(from, isAdmin ? 30 : 7).toISOString()).catch(() => [] as Booking[]), api.listEvents(), api.listMilestones(), api.listOrders(), api.listPunchCards()]);
     void api.listPersonBadges().then(setBadges).catch(() => setBadges([]));
     setSessions(s); setBookings(b); setEvents(ev); setMilestones(ms); setOrders(o); setCards(c); setAbsences(await api.listAbsences(s.map((x) => x.id)));
   }, [isAdmin]);
@@ -65,6 +65,24 @@ export function Home() {
   const studioToday = todaysAll.length > 0;
   const studio = (studioToday ? todaysAll : nextDay ? sessions.filter((s) => new Date(s.starts_at).toDateString() === new Date(nextDay).toDateString()) : []).slice(0, 12);
   const upcoming = events.filter((e) => e.id !== hero?.id).slice(0, 4);
+
+  /* "Din uge": everything the viewed person (or I, as staff) has the next 7 days – trainings, teams I train, competitions/events, my room bookings. */
+  type WeekItem = { key: string; at: string; end?: string | null; kind: "training" | "staff" | "event" | "booking"; title: string; sub: string; who?: string; off?: boolean; session?: Session; event?: Event };
+  const weekEnd = addDays(startOfDay(new Date()), 7);
+  const familyIds = viewing.isChild ? [viewing.personId] : [me.person.id, ...me.children.map((c) => c.id)];
+  const familyTeams = (pid: string) => new Set(me.memberships.filter((m) => m.person_id === pid && m.role === "dancer").map((m) => m.team_id));
+  const nameOf = (pid: string) => (pid === me.person.id ? null : me.children.find((c) => c.id === pid)?.first_name ?? null);
+  const week: WeekItem[] = [];
+  for (const s of sessions) {
+    const mineStaff = !viewing.isChild && (s.trainer_id === me.person.id || s.substitute_id === me.person.id || s.assistant_id === me.person.id);
+    if (mineStaff) week.push({ key: "st" + s.id, at: s.starts_at, end: s.ends_at, kind: "staff", title: s.title ?? s.team_name ?? "", sub: `${s.room_name ?? ""}${s.substitute_id === me.person.id ? " · " + t("session.sub") : ""}`, off: s.cancelled, session: s });
+    for (const pid of familyIds) if (s.team_id && familyTeams(pid).has(s.team_id) && !(mineStaff && pid === me.person.id)) { const a = absences.find((x) => x.session_id === s.id && x.person_id === pid); week.push({ key: "tr" + s.id + pid, at: s.starts_at, end: s.ends_at, kind: "training", title: s.team_name ?? "", sub: `${s.room_name ?? ""} · ${s.substitute_name ?? s.trainer_name ?? ""}${a ? " · " + t("session.absenceSentChip") : ""}`, who: nameOf(pid) ?? undefined, off: s.cancelled, session: s }); }
+  }
+  for (const e of events) if (new Date(e.starts_at) < weekEnd && (!e.team_ids.length || e.team_ids.some((id) => myTeamIds.has(id)) || isAdmin)) week.push({ key: "ev" + e.id, at: e.starts_at, end: e.ends_at, kind: "event", title: e.title, sub: `${e.place ?? t(`events.kind.${e.kind}`)}${e.meet_time ? " · " + t("events.meet") + " " + e.meet_time : ""}`, event: e });
+  for (const b of bookings) if (b.person_id === me.person.id && b.status !== "rejected" && new Date(b.starts_at) < weekEnd) week.push({ key: "bk" + b.id, at: b.starts_at, end: b.ends_at, kind: "booking", title: b.title, sub: `${b.room_name}${b.status === "pending" ? " · " + t("rooms.pending") : ""}` });
+  week.sort((a, b) => a.at.localeCompare(b.at));
+  const weekDays = [...new Set(week.map((w) => new Date(w.at).toDateString()))];
+  const KIND_CHIP: Record<WeekItem["kind"], string> = { training: "week.training", staff: "week.youTrain", event: "week.event", booking: "week.booking" };
 
   const SECTIONS: Record<string, () => React.ReactNode> = {
     hero: () => (<>
@@ -123,22 +141,23 @@ export function Home() {
       {(!isAdmin || teamIds.size > 0) && <TeamPicker />}
     </>),
     week: () => (<>
-      {teamIds.size > 0 && (
-        <div className="sec" data-tour="week"><div className="row between"><h2>{hat ? t("home.childsWeek", { name: hat.first_name }) : t("home.yourWeek")}</h2><button className="linklike small" onClick={() => setTab("rooms")}>{t("home.fullSchedule")}</button></div>
-          <div className="card list">
-            {myWeek.map((s) => { const a = myAbs(s); const past = new Date(s.ends_at) < new Date(); return (
-              <div key={s.id} className={"item" + (s.cancelled ? " off" : "")}>
-                <button className="grow row linklike-none" onClick={() => setOpen(s)} style={{ textAlign: "left", background: "none", padding: 0, color: "inherit", fontWeight: 300, fontSize: "1rem", gap: 12 }}>
-                  <span className="time">{dateLabel(s.starts_at)}<br />{hm(s.starts_at)}</span>
-                  <span className="grow">{s.team_name}<div className="tiny">{s.room_name} · {s.substitute_name ?? s.trainer_name}{s.cancelled ? " · " + t("session.cancelled") : ""}</div></span>
-                </button>
-                {a ? <span className="chip warn small">{t("session.absenceSentChip")}</span> : !s.cancelled && !past && <button className="ghost small" onClick={() => setOpen(s)}>{t("session.absenceBtn")}</button>}
+      {(week.length > 0 || teamIds.size > 0) && (
+        <div className="sec" data-tour="week" data-testid="your-week"><div className="row between"><h2>{hat ? t("home.childsWeek", { name: hat.first_name }) : t("home.yourWeek")}</h2><button className="linklike small" onClick={() => setTab("rooms")}>{t("home.fullSchedule")}</button></div>
+          <div className="card list weeklist">
+            {weekDays.map((d) => { const items = week.filter((w) => new Date(w.at).toDateString() === d); const isToday = d === today; return (
+              <div key={d} className="weekday">
+                <div className={"eyebrow" + (isToday ? " gold" : "")}>{isToday ? t("home.today") + " · " : ""}{dateLabel(items[0].at)}</div>
+                {items.map((w) => (
+                  <button key={w.key} className={"item" + (w.off ? " off" : "")} data-kind={w.kind} onClick={() => (w.session ? setOpen(w.session) : w.event ? setOpenEvent(w.event) : setTab("rooms"))}>
+                    <span className="time">{hm(w.at)}{w.end ? <><br /><span className="tiny">{hm(w.end)}</span></> : null}</span>
+                    <span className="grow">{w.title}{w.who ? <span className="chip small" style={{ marginLeft: 6 }}>{w.who}</span> : null}<div className="tiny">{w.sub}{w.off ? " · " + t("session.cancelled") : ""}</div></span>
+                    <span className={"chip small " + w.kind}>{t(KIND_CHIP[w.kind])}</span>
+                  </button>))}
               </div>); })}
-            {!myWeek.length && <p className="muted">{t("home.noTrainings")}</p>}
+            {!week.length && <p className="muted">{t("home.noTrainings")}</p>}
           </div>
         </div>
       )}
-      {!teamIds.size && !isAdmin && <div className="card"><p className="muted">{t("team.noneYet")}</p></div>}
     </>),
     payments: () => (<>
       {openPay.length > 0 && (

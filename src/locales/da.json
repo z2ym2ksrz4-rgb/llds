@@ -126,7 +126,7 @@
     "childsWeek": "{{name}}s uge",
     "yourDay": "Din dag",
     "tapAbsence": "Tryk for afbud",
-    "noTrainings": "Ingen træninger de næste 7 dage.",
+    "noTrainings": "Intet på programmet de næste 7 dage.",
     "trainingsToday": "træninger i dag",
     "absencesToday": "afbud i dag",
     "bookingsPending": "bookinger afventer",
@@ -829,5 +829,11 @@
       "badges": "Emblemer",
       "milestones": "Milepæle"
     }
+  },
+  "week": {
+    "training": "Træning",
+    "youTrain": "Du træner",
+    "event": "Event",
+    "booking": "Booking"
   }
 }

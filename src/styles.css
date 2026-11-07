@@ -336,3 +336,16 @@ button.cta { box-shadow:0 10px 26px -12px rgba(201,162,74,.7); }
 .sheet-hero { margin:0 -20px 4px; border-radius:22px 22px 0 0; border:0; min-height:210px; padding:16px 20px; }
 .sheet-hero::after { border-radius:22px 22px 0 0; }
 .sheet-close { position:absolute; top:12px; right:14px; z-index:3; width:34px; height:34px; border-radius:50%; background:rgba(0,0,0,.5); color:#fff; font-size:22px; line-height:1; border:1px solid rgba(255,255,255,.25); padding:0; }
+
+/* Din uge – one timeline across trainings, teams you train, events and bookings */
+.weeklist .weekday { padding:6px 0 2px; }
+.weeklist .weekday + .weekday { border-top:1px solid var(--line); margin-top:4px; }
+.weeklist .weekday .eyebrow { margin:4px 0 2px; }
+.weeklist .weekday .eyebrow.gold { color:var(--gold2); }
+.weeklist .item { display:flex; gap:12px; align-items:center; width:100%; padding:8px 0; border:0; border-radius:0; background:none; color:var(--fg); text-align:left; font-weight:300; font-size:1rem; box-shadow:none; }
+.weeklist .item .time { display:block; }
+.weeklist .time { min-width:46px; line-height:1.15; }
+.chip.small.training { border-color:var(--line); }
+.chip.small.staff { color:var(--gold2); border-color:rgba(201,162,74,.5); }
+.chip.small.event { background:rgba(201,162,74,.14); border-color:rgba(201,162,74,.5); color:var(--gold2); }
+.chip.small.booking { opacity:.8; }

@@ -126,7 +126,7 @@
     "childsWeek": "{{name}}'s week",
     "yourDay": "Your day",
     "tapAbsence": "Tap to report absence",
-    "noTrainings": "No trainings in the next 7 days.",
+    "noTrainings": "Nothing scheduled the next 7 days.",
     "trainingsToday": "trainings today",
     "absencesToday": "absences today",
     "bookingsPending": "bookings pending",
@@ -829,5 +829,11 @@
       "badges": "Badges",
       "milestones": "Milestones"
     }
+  },
+  "week": {
+    "training": "Training",
+    "youTrain": "You train",
+    "event": "Event",
+    "booking": "Booking"
   }
 }
