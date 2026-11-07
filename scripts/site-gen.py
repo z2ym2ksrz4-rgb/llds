@@ -13,6 +13,8 @@ from datetime import date
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 cfg = json.load(open(os.path.join(ROOT, "app.config.json")))
 OUT = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith("--") else os.path.join(ROOT, "..", "ilumie-site", "llds")
+import time
+BUILD = time.strftime("%Y%m%d%H%M")
 BASE = sys.argv[sys.argv.index("--base") + 1] if "--base" in sys.argv else "/llds"
 SB_URL, SB_KEY, SLUG, SUPPORT = cfg["supabase"]["url"], cfg["supabase"]["anonKey"], cfg["schoolSlug"], cfg["supportEmail"]
 MONTHS = ["januar","februar","marts","april","maj","juni","juli","august","september","oktober","november","december"]
@@ -221,7 +223,7 @@ const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.targ
 // hero parallax
 const hb=document.querySelector(".hero .bg");if(hb&&matchMedia("(prefers-reduced-motion:no-preference)").matches)addEventListener("scroll",()=>{hb.style.translate=`0 ${scrollY*.18}px`},{passive:true});
 // video
-document.querySelectorAll(".vid").forEach(v=>{const m=v.querySelector("video");if(!m)return;m.addEventListener("ended",()=>{v.classList.remove("play");m.removeAttribute("controls")});v.addEventListener("click",e=>{if(v.classList.contains("play")&&e.target===m)return;if(v.classList.contains("play")){if(m.paused)m.play().catch(()=>{});return}v.classList.add("play","loading");m.setAttribute("controls","");m.muted=false;const p=m.play();if(p&&p.catch)p.catch(()=>{m.muted=true;m.play().catch(()=>{v.classList.remove("play","loading")})});m.addEventListener("playing",()=>v.classList.remove("loading"),{once:true})})});
+document.querySelectorAll(".vid").forEach(v=>{const m=v.querySelector("video");if(!m)return;v.addEventListener("click",e=>{if(v.classList.contains("play")&&e.target===m)return;if(v.classList.contains("play")){if(m.paused)m.play().catch(()=>{});return}v.classList.add("play","loading");m.setAttribute("controls","");m.muted=false;const p=m.play();if(p&&p.catch)p.catch(()=>{m.muted=true;m.play().catch(()=>{v.classList.remove("play","loading")})});m.addEventListener("playing",()=>v.classList.remove("loading"),{once:true})})});
 // holdplan: day bar + age filter
 document.querySelectorAll(".bar button[data-day]").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".bar button[data-day]").forEach(x=>x.classList.toggle("on",x===b));document.querySelectorAll(".day").forEach(d=>d.classList.toggle("on",d.dataset.day===b.dataset.day))}));
 const applyAge=a=>{document.querySelectorAll("[data-ages]").forEach(el=>el.classList.toggle("hid",a!=="all"&&!el.dataset.ages.split(" ").includes(a)));document.querySelectorAll(".chips button[data-age]").forEach(x=>x.classList.toggle("on",x.dataset.age===a))};
@@ -293,7 +295,7 @@ def page(title, body, desc, active="", hero=None, hero_title=None, hero_sub=None
     heroh = f'<div class="hero{" small" if small else ""}"><div class="bg" style="background-image:url({hero})"></div><div class="wrap">{"<div class=eyebrow>" + E(hero_sub) + "</div>" if hero_sub else ""}<h1>{hero_title}</h1>{("<p class=lead>" + hero_lead + "</p>") if hero_lead else ""}{extra}</div></div>' if hero else ""
     return f"""<!doctype html><html lang="da"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>{E(title)}</title><meta name="description" content="{E(desc)}"><meta name="theme-color" content="#0a0a0b"><meta property="og:title" content="{E(title)}"><meta property="og:description" content="{E(desc)}">{f'<meta property="og:image" content="{hero}">' if hero else ""}
-<link rel="icon" href="{BASE}/favicon.png" type="image/png"><link rel="apple-touch-icon" href="{BASE}/icons/apple-touch-icon.png"><link rel="stylesheet" href="{BASE}/style.css">
+<link rel="icon" href="{BASE}/favicon.png" type="image/png"><link rel="apple-touch-icon" href="{BASE}/icons/apple-touch-icon.png"><link rel="stylesheet" href="{BASE}/style.css?v={BUILD}">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Outfit:wght@300;400;500&display=swap"></head><body>
 <header class="top"><div class="wrap"><a class="logo" href="{BASE}/">{LOGO}</a><nav class="pill">{pill}</nav><div class="hr"><div class="langs"><a href="__DA__" class="flag on" title="Dansk" aria-label="Dansk">🇩🇰</a><a href="__EN__" class="flag" title="English" aria-label="English">🇬🇧</a></div><a class="btn sm hbtn" href="{BASE}/app/">Åbn appen</a><button class="burger" aria-label="Menu"><i></i>Menu</button></div></div></header>
 <div class="menu"><div class="l"><a class="big" href="{BASE}/" style="transition-delay:40ms"><small>00</small>Forside<span>LL Dance Studio</span></a>{big}<div class="foot"><a class="btn" href="{BASE}/app/">Åbn appen {ICON_ARROW}</a><a class="btn ghost" href="tel:{C["phone"].replace(" ", "")}">{E(C["phone"])}</a></div></div><div class="r" style="background-image:url({ART(6)})"><div><div class="eyebrow">Ulstrup</div><h3>Dans med hjertet.<br><em>Vind med holdet.</em></h3></div></div></div>
@@ -303,7 +305,7 @@ def page(title, body, desc, active="", hero=None, hero_title=None, hero_sub=None
 <div><h4>Appen</h4><a href="{BASE}/app/">Log ind / tilmeld</a><a href="{BASE}/support/">Hjælp &amp; FAQ</a><a href="{BASE}/privacy/">Privatlivspolitik</a><a href="{BASE}/terms/">Vilkår</a></div></div>
 <div class="legal"><span>© {date.today().year} {E(C["name"])}</span><span>App og website af <a href="https://ilumie.com/" style="display:inline">Ilumie</a></span></div></div></footer>
 <div class="stickycta">{sticky}</div>
-<script src="{BASE}/site.js" defer></script></body></html>"""
+<script src="{BASE}/site.js?v={BUILD}" defer></script></body></html>"""
 
 EN = json.load(open(os.path.join(ROOT, "site", "en.json")))
 UI = json.load(open(os.path.join(ROOT, "site", "en-ui.json")))
@@ -388,7 +390,7 @@ home = f"""
 <p class="tiny" style="margin:18px 0 0"><span class="badge aud">Audition</span> = optagelse kun via audition/udtagelse · <span class="badge try">Prøvegange · niveau</span> = åbent hold, men træneren vurderer niveau efter 4 prøvegange</p><p style="margin:18px 0 0"><a class="btn ghost" href="{BASE}/saeson-26-27/">Se hele holdplanen {ICON_ARROW}</a></p></div></div></section>
 <section class="tight"><div class="wrap split"><div class="rv"><div class="eyebrow">Velkommen</div><h2>{E(H["welcome_title"]).replace("LL Dance Studio", "<em>LL Dance Studio</em>")}</h2><p class="lead">{E(H["welcome"])}</p><div class="btns"><a class="btn" href="{BASE}/medlemsskab/">Bliv medlem {ICON_ARROW}</a><a class="btn ghost" href="{BASE}/backstage/">Mød trænerne</a></div></div>
 <div class="tiles rv">{"".join(f'<a class="tile" href="{BASE}{t["href"]}"><div class="bg" style="background-image:url({t["image"]})"></div><div class="in"><h3>{E(t["label"])}</h3><span class="ar">{ICON_ARROW}</span></div></a>' for t in H["tiles"])}</div></div></section>
-<section class="tight"><div class="wrap"><div class="vid rv" style="background-image:url({team_img("the-axis-25-26", 1) or H["hero"]})"><video src="{H["video"]}" playsinline preload="none"></video><div class="pl"><b>Afspil</b></div><div class="cap"><div class="eyebrow">{E(H["universe_title"])}</div><div class="tiny" style="color:var(--muted);margin-top:4px">Se videoen fra studiet · tryk for at afspille med lyd</div></div></div></div></section>
+<section class="tight"><div class="wrap"><div class="vid rv" style="background-image:url({team_img("the-axis-25-26", 1) or H["hero"]})"><video src="{H["video"]}" playsinline preload="none" loop></video><div class="pl"><b>Afspil</b></div><div class="cap"><div class="eyebrow">{E(H["universe_title"])}</div><div class="tiny" style="color:var(--muted);margin-top:4px">Se videoen fra studiet · tryk for at afspille med lyd</div></div></div></div></section>
 <section class="tight gal-sec"><div class="wrap"><div class="head rv"><div><div class="eyebrow">Øjeblikke</div><h2>Fra gulvet, scenen <em>og backstage</em></h2></div></div><div class="gal rv" id="gallery" data-default='{json.dumps(default_gallery, ensure_ascii=False)}'><div class="track"></div><div class="dots"></div></div></div></section>
 <section class="tight"><div class="wrap"><div class="head rv"><div><div class="eyebrow">Kalender</div><h2>Events, shows <em>&amp; workshops</em></h2></div><a class="btn ghost" href="{BASE}/app/">Tilmeld i appen {ICON_ARROW}</a></div><div class="grid rv" id="events"><p class="empty">Henter…</p></div></div></section>
 <section class="tight"><div class="wrap"><div class="eyebrow">Fra studiet</div><h2>Nyt</h2><div id="news"></div></div></section>
