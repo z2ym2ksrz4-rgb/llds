@@ -17,7 +17,9 @@ await p.mouse.move(bb.x + bb.width / 2, bb.y + bb.height / 2); await p.mouse.dow
 out.dragged = await p.$eval("[data-testid=fdot] >> nth=0", (e) => e.style.left + " " + e.style.top);
 await p.click("[data-testid=frame-title]"); await p.fill("[data-testid=frame-label]", "Intro"); await p.fill("[data-testid=frame-at]", "1-8"); await p.click("text=OK");
 await p.click("[data-testid=frame-add]"); await p.waitForTimeout(800); out.frames = await p.$$eval("[data-testid=fthumb]", (e) => e.length);
-await p.click(".chips >> text=Anden markør"); await p.waitForTimeout(300); out.dotsAfterCustom = await p.$$eval("[data-testid=fdot]", (e) => e.length);
+await p.click("[data-testid=marker-new]"); await p.fill("[data-testid=marker-input]", "Rekvisit"); await p.click("[data-testid=marker-add]"); await p.waitForTimeout(300); out.dotsAfterCustom = await p.$$eval("[data-testid=fdot]", (e) => e.length); out.markerChip = await p.$$eval("[data-testid=form-marker]", (e) => e.length);
+await p.click("[data-testid=fthumb] >> nth=0"); await p.click("[data-testid=form-marker]"); await p.waitForTimeout(300); out.markerOnFrame1 = await p.$$eval("[data-testid=fdot].marker", (e) => e.length);
+await p.click("[data-testid=view-stage]"); await p.waitForTimeout(200); out.mirrorLeft = await p.$eval("[data-testid=fdot] >> nth=0", (e) => e.style.left); await p.screenshot({ path: "/tmp/f2.png" }); await p.click("[data-testid=view-audience]");
 await p.click("[data-testid=form-play]"); await p.waitForTimeout(2200); out.playedToFrame = await p.$$eval("[data-testid=fthumb]", (e) => e.findIndex((x) => x.classList.contains("on")));
 await p.screenshot({ path: "/tmp/f1.png" }); await p.click("[data-testid=form-play]");
 out.saved = await p.evaluate(() => (JSON.parse(localStorage.getItem("llds_mock")).X.formationSets || []).map((f) => f.title + ":" + f.frames.length + ":" + f.frames[0].label + "@" + f.frames[0].at));

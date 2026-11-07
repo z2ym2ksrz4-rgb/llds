@@ -26,7 +26,8 @@
     "deleted": "Deleted",
     "newVersion": "✦ New version ready – tap to update",
     "create": "Create",
-    "ok": "OK"
+    "ok": "OK",
+    "add": "Add"
   },
   "lang": {
     "da": "Dansk",
@@ -912,15 +913,22 @@
     "duplicate": "Duplicate",
     "deleteFrame": "Delete frame",
     "dancers": "Dancers",
-    "custom": "Other marker",
-    "customLabel": "Text on the marker (e.g. “Prop” or “Solo”)",
+    "custom": "Marker",
+    "customLabel": "Name, e.g. Prop, Solo, Chair",
     "hint": "Tap a dancer to put her on stage, then drag the dot to where she stands. The dots glide to the next frame when you press ▶.",
     "play": "Play",
     "stop": "Stop",
-    "viewAudience": "Audience view",
-    "viewDancer": "Stage view",
+    "viewAudience": "From audience",
+    "viewDancer": "From stage",
     "mirrorHint": "Mirror – as the dancers see it",
     "deleteSet": "Delete the whole formation",
-    "deleteSetSure": "Delete “{{title}}” with all frames?"
+    "deleteSetSure": "Delete “{{title}}” with all frames?",
+    "view": "View",
+    "viewAudienceHint": "As the audience sees it: audience at the bottom, left/right are the audience's left/right.",
+    "viewDancerHint": "Mirrored, as the dancers experience it standing on stage facing the audience – left and right are swapped.",
+    "stageLeft": "Stage left",
+    "stageRight": "Stage right",
+    "houseLeft": "Left",
+    "houseRight": "Right"
   }
 }

@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Audience, Channel, Comment, Folder, Formation, FormationSet, Frame, TeamDancer, MediaItem, MediaRef, Message, MessageStatus, Note, Post, Report, TeamStaff, Thread, ThreadMessage, Video } from "./types";
+import type { Audience, Channel, Comment, Folder, Formation, FormationSet, Frame, Marker, TeamDancer, MediaItem, MediaRef, Message, MessageStatus, Note, Post, Report, TeamStaff, Thread, ThreadMessage, Video } from "./types";
 import { downscaleImage } from "./image";
 
 type Fail = (e: { message: string } | null) => void;
@@ -139,7 +139,7 @@ export function supabaseSocial(sb: SupabaseClient, fail: Fail, schoolId: () => P
     async deleteResult(id: string) { const { error } = await sb.from("result").delete().eq("id", id); fail(error); },
     async listFormationSets(teamId: string) { const { data, error } = await sb.from("formation_set").select("*").eq("team_id", teamId).order("updated_at", { ascending: false }); fail(error); return (data ?? []) as FormationSet[]; },
     async createFormationSet(teamId: string, title: string) { const { data, error } = await sb.from("formation_set").insert({ team_id: teamId, title, created_by: await myPersonId(), frames: [] }).select("*").single(); fail(error); return data as FormationSet; },
-    async saveFormationSet(id: string, patch: { title?: string; frames?: Frame[] }) { const { error } = await sb.from("formation_set").update({ ...patch, updated_at: new Date().toISOString() }).eq("id", id); fail(error); },
+    async saveFormationSet(id: string, patch: { title?: string; frames?: Frame[]; markers?: Marker[] }) { const { error } = await sb.from("formation_set").update({ ...patch, updated_at: new Date().toISOString() }).eq("id", id); fail(error); },
     async deleteFormationSet(id: string) { const { error } = await sb.from("formation_set").delete().eq("id", id); fail(error); },
     async teamDancers(teamId: string) { const { data, error } = await sb.rpc("team_dancers", { p_team: teamId }); fail(error); return (data ?? []) as TeamDancer[]; },
     async teamStats(teamId: string) {

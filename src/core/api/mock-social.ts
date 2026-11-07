@@ -1,4 +1,4 @@
-import type { Audience, Channel, Comment, Folder, Formation, FormationSet, Frame, TeamDancer, MediaItem, MediaRef, Membership, Message, MessageStatus, Note, Person, Post, Report, Team, TeamStaff, Thread, ThreadMessage, Video } from "./types";
+import type { Audience, Channel, Comment, Folder, Formation, FormationSet, Frame, Marker, TeamDancer, MediaItem, MediaRef, Membership, Message, MessageStatus, Note, Person, Post, Report, Team, TeamStaff, Thread, ThreadMessage, Video } from "./types";
 import { downscaleImage, fileToDataUrl } from "./image";
 
 /** Phase-3 half of the mock. Binary media lives in memory only (data/object URLs), so it is gone after a reload. */
@@ -59,7 +59,7 @@ export function socialOps(get: () => { X: SocialState; notify: (pid: string, kin
   return {
     async listFormationSets(teamId: string): Promise<FormationSet[]> { return (get().X.formationSets ?? []).filter((f) => f.team_id === teamId).sort((a, b) => b.updated_at.localeCompare(a.updated_at)); },
     async createFormationSet(teamId: string, title: string): Promise<FormationSet> { const g = get(); const f: FormationSet = { id: "fs-" + id(), team_id: teamId, title, created_by: g.me()!.id, frames: [], created_at: now(), updated_at: now() }; (g.X.formationSets ??= []).push(f); g.save(); g.emit(); return f; },
-    async saveFormationSet(fid: string, patch: { title?: string; frames?: Frame[] }) { const g = get(); const f = (g.X.formationSets ?? []).find((x) => x.id === fid); if (f) Object.assign(f, patch, { updated_at: now() }); g.save(); g.emit(); },
+    async saveFormationSet(fid: string, patch: { title?: string; frames?: Frame[]; markers?: Marker[] }) { const g = get(); const f = (g.X.formationSets ?? []).find((x) => x.id === fid); if (f) Object.assign(f, patch, { updated_at: now() }); g.save(); g.emit(); },
     async deleteFormationSet(fid: string) { const g = get(); g.X.formationSets = (g.X.formationSets ?? []).filter((x) => x.id !== fid); g.save(); g.emit(); },
     async teamDancers(teamId: string): Promise<TeamDancer[]> { const g = get(); return g.memberships.filter((m) => m.team_id === teamId && m.role === "dancer").map((m) => g.persons.find((p) => p.id === m.person_id)).filter((p): p is Person => !!p && p.status === "approved").map((p) => ({ person_id: p.id, name: name(p), initials: (p.first_name[0] + (p.last_name[0] ?? "")).toUpperCase() })); },
     async teamStaff(teamId: string): Promise<TeamStaff[]> {

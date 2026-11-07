@@ -214,7 +214,8 @@ export type Formation = { label: string; positions: { initials: string; x: numbe
 /* formation tool (own screen, independent of videos) */
 export type Spot = { key: string; label: string; name: string; x: number; y: number };   // x 0..1 left→right, y 0..1 back→front
 export type Frame = { id: string; label: string; at?: string | null; positions: Spot[] };
-export type FormationSet = { id: string; team_id: string; title: string; created_by: string; frames: Frame[]; created_at: string; updated_at: string };
+export type Marker = { key: string; label: string; name: string };
+export type FormationSet = { id: string; team_id: string; title: string; created_by: string; frames: Frame[]; markers?: Marker[]; created_at: string; updated_at: string };
 export type TeamDancer = { person_id: string; name: string; initials: string };
 export type Video = { id: string; team_id: string; uploader_id: string; uploader_name: string; title: string; storage_path: string; url: string; duration_s: number | null; formations: Formation[]; notes?: string | null; created_at: string };
 export type Note = { id: string; team_id: string; dancer_id: string; dancer_name: string; author_id: string; author_name: string; body: string; created_at: string };
@@ -329,7 +330,7 @@ export interface Api {
   /* formation tool */
   listFormationSets(teamId: string): Promise<FormationSet[]>;
   createFormationSet(teamId: string, title: string): Promise<FormationSet>;
-  saveFormationSet(id: string, patch: { title?: string; frames?: Frame[] }): Promise<void>;
+  saveFormationSet(id: string, patch: { title?: string; frames?: Frame[]; markers?: Marker[] }): Promise<void>;
   deleteFormationSet(id: string): Promise<void>;
   teamDancers(teamId: string): Promise<TeamDancer[]>;
 }

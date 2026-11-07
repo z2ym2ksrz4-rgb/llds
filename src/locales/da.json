@@ -26,7 +26,8 @@
     "deleted": "Slettet",
     "newVersion": "✦ Ny version klar – tryk for at opdatere",
     "create": "Opret",
-    "ok": "OK"
+    "ok": "OK",
+    "add": "Tilføj"
   },
   "lang": {
     "da": "Dansk",
@@ -912,15 +913,22 @@
     "duplicate": "Kopiér",
     "deleteFrame": "Slet billede",
     "dancers": "Dansere",
-    "custom": "Anden markør",
-    "customLabel": "Tekst på markøren (fx “Rekvisit” eller “Solo”)",
+    "custom": "Markør",
+    "customLabel": "Navn, fx Rekvisit, Solo, Stol",
     "hint": "Tryk på en danser for at sætte hende på scenen, og træk prikken derhen hun skal stå. Prikkerne glider til næste billede, når man trykker ▶.",
     "play": "Afspil",
     "stop": "Stop",
-    "viewAudience": "Set fra publikum",
-    "viewDancer": "Set fra scenen",
+    "viewAudience": "Fra publikum",
+    "viewDancer": "Fra scenen",
     "mirrorHint": "Spejlvend – som danserne ser det",
     "deleteSet": "Slet hele formationen",
-    "deleteSetSure": "Slet “{{title}}” med alle billeder?"
+    "deleteSetSure": "Slet “{{title}}” med alle billeder?",
+    "view": "Visning",
+    "viewAudienceHint": "Som publikum ser det: publikum er nederst, og højre/venstre er publikums højre/venstre.",
+    "viewDancerHint": "Spejlvendt, som danserne oplever det, når de står på scenen og kigger mod publikum – højre og venstre er byttet om.",
+    "stageLeft": "Scene venstre",
+    "stageRight": "Scene højre",
+    "houseLeft": "Venstre",
+    "houseRight": "Højre"
   }
 }

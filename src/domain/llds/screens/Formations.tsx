@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { api, type FormationSet, type Frame, type Spot, type TeamDancer } from "@/core/api";
+import { api, type FormationSet, type Frame, type Marker, type TeamDancer } from "@/core/api";
 import { Sheet } from "../components/Sheet";
 
 /** Formation tool: a plan per dance with a series of frames; each frame shows where every dancer stands (dot with initials).
@@ -45,12 +45,13 @@ function FormationEditor({ set, teamId, staff, onBack, toast }: { set: Formation
   const [playing, setPlaying] = useState(false);
   const [mirror, setMirror] = useState(false);
   const [editLabel, setEditLabel] = useState(false);
+  const [markers, setMarkers] = useState<Marker[]>(set.markers ?? []);
+  const [addingMarker, setAddingMarker] = useState(false); const [markerName, setMarkerName] = useState("");
   const stage = useRef<HTMLDivElement>(null);
   const saveTimer = useRef<number>(0);
   const dirty = useRef(false);
   useEffect(() => { void api.teamDancers(teamId).then(setDancers).catch(() => setDancers([])); }, [teamId]);
   const frame = frames[i];
-  const custom = (label: string, name: string): Spot => ({ key: "c-" + uid(), label, name, x: 0.5, y: 0.5 });
 
   // autosave (debounced) – staff only
   const commit = (next: Frame[]) => { setFrames(next); if (!staff) return; dirty.current = true; window.clearTimeout(saveTimer.current); saveTimer.current = window.setTimeout(() => { void api.saveFormationSet(set.id, { frames: next }).then(() => { dirty.current = false; }).catch((e) => toast((e as Error).message)); }, 600); };
@@ -62,6 +63,9 @@ function FormationEditor({ set, teamId, staff, onBack, toast }: { set: Formation
   const updFrame = (patch: Partial<Frame>) => commit(frames.map((f, k) => (k === i ? { ...f, ...patch } : f)));
   const setPos = (key: string, x: number, y: number) => updFrame({ positions: frame.positions.map((p) => (p.key === key ? { ...p, x: Math.min(0.97, Math.max(0.03, x)), y: Math.min(0.95, Math.max(0.05, y)) } : p)) });
   const addDancer = (d: TeamDancer) => { if (!frame) return; if (frame.positions.some((p) => p.key === d.person_id)) { setSel(d.person_id); return; } updFrame({ positions: [...frame.positions, { key: d.person_id, label: d.initials, name: d.name, x: 0.5, y: 0.5 }] }); setSel(d.person_id); };
+  const placeMarker = (m: Marker) => { if (!frame) return; if (frame.positions.some((p) => p.key === m.key)) { setSel(m.key); return; } updFrame({ positions: [...frame.positions, { key: m.key, label: m.label, name: m.name, x: 0.5, y: 0.5 }] }); setSel(m.key); };
+  const addMarker = () => { const name = markerName.trim(); if (!name) return; const m: Marker = { key: "m-" + uid(), label: name.replace(/[^\p{L}\p{N}]/gu, "").slice(0, 3).toUpperCase() || "✦", name }; const next = [...markers, m]; setMarkers(next); if (staff) void api.saveFormationSet(set.id, { markers: next }).catch((e) => toast((e as Error).message)); setMarkerName(""); setAddingMarker(false); placeMarker(m); };
+  const removeMarker = (m: Marker) => { const next = markers.filter((x) => x.key !== m.key); setMarkers(next); if (staff) void api.saveFormationSet(set.id, { markers: next }); commit(frames.map((f) => ({ ...f, positions: f.positions.filter((p) => p.key !== m.key) }))); if (sel === m.key) setSel(null); };
   const removeSel = () => { if (!sel || !frame) return; updFrame({ positions: frame.positions.filter((p) => p.key !== sel) }); setSel(null); };
 
   // drag with pointer events (touch + mouse)
@@ -80,7 +84,10 @@ function FormationEditor({ set, teamId, staff, onBack, toast }: { set: Formation
       <button className="linklike" onClick={onBack}>‹ {t("form.title")}</button>
       <header className="topbar"><h1 className="display">{set.title}</h1>
         <div className="row" style={{ gap: 6 }}>
-          <button className={"ghost small" + (mirror ? " on" : "")} onClick={() => setMirror(!mirror)} title={t("form.mirrorHint")}>{mirror ? t("form.viewAudience") : t("form.viewDancer")}</button>
+          <div className="seg2" role="group" aria-label={t("form.view")} title={t("form.mirrorHint")}>
+            <button className={!mirror ? "on" : ""} onClick={() => setMirror(false)} data-testid="view-audience">{t("form.viewAudience")}</button>
+            <button className={mirror ? "on" : ""} onClick={() => setMirror(true)} data-testid="view-stage">{t("form.viewDancer")}</button>
+          </div>
           {frames.length > 1 && <button className={"small" + (playing ? " on" : "")} data-testid="form-play" onClick={() => setPlaying(!playing)}>{playing ? "■ " + t("form.stop") : "▶ " + t("form.play")}</button>}
         </div>
       </header>
@@ -94,11 +101,12 @@ function FormationEditor({ set, teamId, staff, onBack, toast }: { set: Formation
               <button className="linklike-none frame-title" onClick={() => staff && setEditLabel(true)} data-testid="frame-title"><span className="eyebrow">{t("form.frameOf", { i: i + 1, n: frames.length })}</span><strong>{frame.label}{fmtAt}</strong></button>
             )}
           </div>
+          <p className="tiny" style={{ margin: "0 0 6px" }}>{mirror ? t("form.viewDancerHint") : t("form.viewAudienceHint")}</p>
           <div ref={stage} className={"fstage" + (staff ? " editing" : "") + (mirror ? " mirror" : "")} data-testid="fstage" onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp} onClick={(e) => { if (e.target === stage.current) setSel(null); }}>
             <div className="grid" aria-hidden="true" />
-            <div className="fback">{t("form.back")}</div><div className="ffront">{t("form.front")}</div>
+            <div className="fback">{t("form.back")}</div><div className="ffront">{t("form.front")}</div><div className="fside l">{mirror ? t("form.stageRight") : t("form.houseLeft")}</div><div className="fside r">{mirror ? t("form.stageLeft") : t("form.houseRight")}</div>
             {frame.positions.map((p) => (
-              <div key={p.key} className={"fdot" + (sel === p.key ? " sel" : "")} style={{ left: `${(mirror ? 1 - p.x : p.x) * 100}%`, top: `${p.y * 100}%`, background: colorOf(p.key) }} title={p.name} data-testid="fdot" onPointerDown={(e) => onDown(e, p.key)} onClick={(e) => { e.stopPropagation(); setSel(p.key); }}>{p.label}</div>
+              <div key={p.key} className={"fdot" + (sel === p.key ? " sel" : "") + (p.key.startsWith("m-") ? " marker" : "")} style={{ left: `${(mirror ? 1 - p.x : p.x) * 100}%`, top: `${p.y * 100}%`, background: colorOf(p.key) }} title={p.name} data-testid="fdot" onPointerDown={(e) => onDown(e, p.key)} onClick={(e) => { e.stopPropagation(); setSel(p.key); }}>{p.label}</div>
             ))}
           </div>
           {sel && frame.positions.find((p) => p.key === sel) && <div className="row between small" style={{ marginTop: 6 }}><span><span className="fdot inline" style={{ background: colorOf(sel) }}>{frame.positions.find((p) => p.key === sel)!.label}</span> {frame.positions.find((p) => p.key === sel)!.name}</span>{staff && <button className="linklike small danger" onClick={removeSel}>{t("form.removeFromFrame")}</button>}</div>}
@@ -130,7 +138,10 @@ function FormationEditor({ set, teamId, staff, onBack, toast }: { set: Formation
         <div className="sec"><h2>{t("form.dancers")}</h2>
           <div className="chips" data-testid="form-roster">
             {dancers.map((d) => { const onStage = frame.positions.some((p) => p.key === d.person_id); return <button key={d.person_id} className={"chip" + (onStage ? " on" : "")} onClick={() => addDancer(d)} data-testid="form-dancer"><span className="fdot inline" style={{ background: colorOf(d.person_id) }}>{d.initials}</span> {d.name.split(" ")[0]}</button>; })}
-            <button className="chip" onClick={() => { const label = prompt(t("form.customLabel")); if (label) { const s = custom(label.slice(0, 3).toUpperCase(), label); updFrame({ positions: [...frame.positions, s] }); setSel(s.key); } }}>+ {t("form.custom")}</button>
+            {markers.map((m) => { const onStage = frame.positions.some((p) => p.key === m.key); return <button key={m.key} className={"chip marker" + (onStage ? " on" : "")} onClick={() => placeMarker(m)} data-testid="form-marker"><span className="fdot inline marker" style={{ background: colorOf(m.key) }}>{m.label}</span> {m.name}<span className="x" role="button" aria-label={t("common.delete")} onClick={(e) => { e.stopPropagation(); removeMarker(m); }}>×</span></button>; })}
+            {addingMarker ? (
+              <span className="row" style={{ gap: 6 }}><input autoFocus value={markerName} placeholder={t("form.customLabel")} data-testid="marker-input" onChange={(e) => setMarkerName(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") addMarker(); if (e.key === "Escape") setAddingMarker(false); }} style={{ maxWidth: 180 }} /><button className="small" onClick={addMarker} data-testid="marker-add" disabled={!markerName.trim()}>{t("common.add")}</button><button className="ghost small" onClick={() => setAddingMarker(false)}>{t("common.cancel")}</button></span>
+            ) : <button className="chip" onClick={() => setAddingMarker(true)} data-testid="marker-new">+ {t("form.custom")}</button>}
           </div>
           <p className="tiny">{t("form.hint")}</p>
         </div>

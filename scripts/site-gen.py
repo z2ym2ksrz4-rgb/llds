@@ -96,7 +96,7 @@ body.navopen .menu .l a.big{transform:none;opacity:1}.menu .l a.big:hover{color:
 .hero.small{min-height:62svh;padding-bottom:50px}.hero.small .bg{animation-duration:40s}
 .hero .wrap{position:relative;width:100%}
 .hero h1{max-width:16ch}.hero .lead{margin-top:22px}
-.stats{display:flex;gap:28px;flex-wrap:wrap;margin-top:40px;padding-top:26px;border-top:1px solid var(--line2)}.stats div{min-width:110px}.stats b{display:block;font-family:var(--display);font-size:2.2rem;font-weight:500;line-height:1;color:var(--gold2)}.stats span{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.stats{display:flex;gap:0;margin-top:26px;padding-top:14px;border-top:1px solid var(--line2);overflow-x:auto;scrollbar-width:none}.stats::-webkit-scrollbar{display:none}.stats div{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 8px;border-left:1px solid rgba(201,162,74,.25);text-align:center}.stats div:first-child{border-left:0;padding-left:0}.stats b{display:block;font-family:var(--display);font-size:1.5rem;font-weight:500;line-height:1;color:var(--gold2);white-space:nowrap}.stats span{font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);white-space:nowrap}@media(min-width:720px){.stats{gap:0;margin-top:40px;padding-top:22px}.stats div{align-items:flex-start;text-align:left;padding:0 24px}.stats b{font-size:2.2rem}.stats span{font-size:.7rem}}
 .cue{position:absolute;right:clamp(18px,4vw,40px);bottom:28px;width:28px;height:46px;border:1px solid var(--line2);border-radius:999px}.cue:after{content:"";position:absolute;left:50%;top:9px;width:3px;height:8px;margin-left:-1.5px;border-radius:2px;background:var(--gold2);animation:cue 1.8s infinite}@keyframes cue{0%{transform:translateY(0);opacity:1}100%{transform:translateY(16px);opacity:0}}
 /* marquee */
 .marq{overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:16px 0;white-space:nowrap;mask:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
@@ -308,7 +308,7 @@ teams_data = json.dumps([{"slug": t["slug"].strip("/"), "title": short_title(t["
 age_chips = '<button data-age="all" class="on">Alle</button>' + "".join(f'<button data-age="{k}">{v}</button>' for k, v in AGE.items())
 styles = ["Showdance", "Hip Hop", "Contemporary", "Disco", "Ballet", "Spring & Tumbling", "Smidighed & Acro", "Styrketræning", "Hit Fit Dance", "Solo & Duo", "Konkurrencehold"]
 marq = "".join(f"<span>{E(s)}</span>" for s in styles)
-stats = f'<div class="stats"><div><b>{len([t for t in TEAMS if t["slug"].strip("/") != "solo-duo"])}</b><span>hold</span></div><div><b>{len(P["staff"])}</b><span>trænere</span></div><div><b>0–99</b><span>år</span></div><div><b>2</b><span>gratis prøvetimer</span></div></div>'
+stats = f'<div class="stats"><div><b>{len([t for t in TEAMS if t["slug"].strip("/") != "solo-duo"])}</b><span>hold</span></div><div><b>{len(P["staff"])}</b><span>trænere</span></div><div><b>0–99</b><span>år</span></div><div><b>2</b><span>prøvetimer</span></div></div>'
 home = f"""
 <div class="marq"><div>{marq}{marq}</div></div>
 <section id="finder"><div class="wrap"><div class="finder rv"><div class="eyebrow">Find dit hold</div><h2>Hvor gammel er <em>danseren?</em></h2><p class="muted" style="margin:0;max-width:60ch">Vælg alder, så viser vi de hold, der passer – fra forældre-barn-dans til elitehold, der stiller op til DM.</p>

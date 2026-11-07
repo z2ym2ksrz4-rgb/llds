@@ -472,3 +472,10 @@ button.cta { box-shadow:0 10px 26px -12px rgba(201,162,74,.7); }
 .fthumb.on .mini { border-color:var(--gold2); box-shadow:0 0 0 2px rgba(201,162,74,.25); }
 .fthumb.on { color:var(--gold2); }
 .fthumb.add .mini { border-style:dashed; }
+.seg2 { display:inline-flex; border:1px solid var(--line2); border-radius:999px; padding:2px; background:var(--card); }
+.seg2 button { background:none; border:0; color:var(--muted); border-radius:999px; padding:6px 12px; font-size:.78rem; font-weight:400; }
+.seg2 button.on { background:var(--gold-soft); color:var(--gold2); border:1px solid rgba(201,162,74,.5); }
+.fstage .fside { position:absolute; top:50%; transform:translateY(-50%) rotate(-90deg); font-size:.58rem; letter-spacing:.14em; text-transform:uppercase; color:var(--fg3); pointer-events:none; }
+.fstage .fside.l { left:-10px; } .fstage .fside.r { right:-10px; transform:translateY(-50%) rotate(90deg); }
+.fdot.marker { border-radius:8px; }
+.chip.marker .x { margin-left:6px; opacity:.6; font-size:1rem; line-height:1; } .chip.marker .x:hover { opacity:1; color:#e08a8a; }
