@@ -106,7 +106,7 @@ export const useAuth = create<Store>((set, get) => ({
       try { const saved = JSON.parse(localStorage.getItem(VIEW_KEY) ?? "null"); if (saved?.personId && (saved.personId === me.person.id || me.children.some((c) => c.id === saved.personId))) { viewing = saved.viewing; teamId = saved.teamId; } } catch { /* ignore */ }
       const ownTeams = me.memberships.filter((m) => m.person_id === me.person.id);
       if (!ownTeams.length && me.children.length && viewing.personId === me.person.id) viewing = { personId: me.children[0].id, isChild: true };
-      const teamsOf = me.memberships.filter((m) => m.person_id === viewing.personId).map((m) => m.team_id);
+      const teamsOf = me.memberships.filter((m) => m.person_id === viewing.personId && (!viewing.isChild || m.role === "dancer")).map((m) => m.team_id);
       if (!teamId || !teamsOf.includes(teamId)) teamId = teamsOf[0] ?? (real.person.is_admin ? (teamId && real.teams.some((t) => t.id === teamId) ? teamId : real.teams[0]?.id ?? null) : null);
       set({ phase, email, me, realMe: real, viewAs, viewing, teamId, error: null });
       if (phase === "ready") void registerPush();
@@ -124,7 +124,7 @@ export const useAuth = create<Store>((set, get) => ({
     const own = me.memberships.filter((m) => m.person_id === me.person.id);
     const viewing: Viewing = viewAs === "parent" && me.children.length ? { personId: me.children[0].id, isChild: true } : { personId: me.person.id, isChild: false };
     if (viewAs === "parent" && !me.children.length) { set({ viewAs: null, me: real }); return; }
-    const teamsOf = me.memberships.filter((m) => m.person_id === viewing.personId).map((m) => m.team_id);
+    const teamsOf = me.memberships.filter((m) => m.person_id === viewing.personId && (!viewing.isChild || m.role === "dancer")).map((m) => m.team_id);
     const teamId = teamsOf.includes(get().teamId ?? "") ? get().teamId : teamsOf[0] ?? (own[0]?.team_id ?? (real.person.is_admin ? real.teams[0]?.id ?? null : null));
     set({ viewAs, me, viewing, teamId });
     try { if (viewAs) sessionStorage.setItem(ROLE_KEY, viewAs); else sessionStorage.removeItem(ROLE_KEY); } catch { /* ignore */ }
@@ -165,7 +165,8 @@ export const useAuth = create<Store>((set, get) => ({
   roleOn: (teamId, personId) => {
     const me = get().me; if (!me) return null;
     const pid = personId ?? get().viewing?.personId ?? me.person.id;
-    const m = me.memberships.find((x) => x.team_id === teamId && x.person_id === pid);
+    // a parent only follows the teams where the child DANCES – a child's trainer/assistant role is the child's own
+    const m = me.memberships.find((x) => x.team_id === teamId && x.person_id === pid && (pid === me.person.id || x.role === "dancer"));
     if (m) return pid === me.person.id ? m.role : "parent";
     return null;
   },
@@ -174,8 +175,9 @@ export const useAuth = create<Store>((set, get) => ({
     // an admin previewing a role may pick any team – the membership is synthesised on the chosen one
     const real = get().realMe; const va = get().viewAs;
     if (real?.person.is_admin && (!va || va === "admin")) return me.teams;                       // admin: every team's wall
-    if (va && real?.person.is_admin && !real.memberships.some((m) => m.person_id === me.person.id && m.role === (va === "dancerChild" ? "dancer" : va))) return me.teams;
-    const ids = new Set(me.memberships.filter((m) => m.person_id === v.personId).map((m) => m.team_id));
+    if (va === "parent" && real?.person.is_admin && !real.children.length) return me.teams;        // synthetic preview child: any team
+    if (va && va !== "parent" && real?.person.is_admin && !real.memberships.some((m) => m.person_id === me.person.id && m.role === (va === "dancerChild" ? "dancer" : va))) return me.teams;
+    const ids = new Set(me.memberships.filter((m) => m.person_id === v.personId && (!v.isChild || m.role === "dancer")).map((m) => m.team_id));
     return me.teams.filter((t) => ids.has(t.id));
   },
 }));
