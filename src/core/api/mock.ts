@@ -31,7 +31,7 @@ const TEAMS: Team[] = [
   ["Styrketræning Junior & Voksen", "Styrke", "mixed", "Øvet+ & Elite", false, false, false],
 ].map(([name, style, category, level, closed, psv, punch], i) => ({
   id: `team-${i}`, name: name as string, style: style as string, category: category as Team["category"], level: level as string,
-  closed: closed as boolean, parents_see_video: psv as boolean, punch_card_open: punch as boolean, color: null, sort: i,
+  closed: closed as boolean, admission: (closed ? "audition" : "open") as Team["admission"], parents_see_video: psv as boolean, punch_card_open: punch as boolean, color: null, sort: i,
   years: ({ mini: "2017–2020", kids: "2014–2016", junior: "2008–2013", adult: "2007 og ældre (17 år+)", mixed: "Fra årgang 2012" } as Record<string, string>)[category as string],
   description: `${name} er et ${(style as string).toLowerCase()}-hold på niveauet ${level}. Vi træner teknik, udtryk og sammenhold – og glæder os til at se dig på gulvet.`,
 }));

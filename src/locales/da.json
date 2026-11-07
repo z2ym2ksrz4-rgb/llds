@@ -274,7 +274,19 @@
       "full": "Hel sæson",
       "half": "Halv sæson",
       "rates": "Rater (aftal med Line)"
-    }
+    },
+    "admission": "Optagelse",
+    "admissionKind": {
+      "open": "Åbent hold",
+      "tryout": "Prøvegange · niveau",
+      "audition": "Audition"
+    },
+    "admissionHint": {
+      "open": "Alle kan tilmelde sig – 2 gratis prøvetimer.",
+      "tryout": "Åbent hold, men træneren vurderer niveau efter prøvegange. Vises som badge på websitet.",
+      "audition": "Optagelse kun via audition/udtagelse. Vises som badge på websitet og i appen."
+    },
+    "admissionNotePh": "Note, fx “Audition 15. august kl. 10” eller “4 prøvegange”"
   },
   "settings": {
     "language": "Sprog",

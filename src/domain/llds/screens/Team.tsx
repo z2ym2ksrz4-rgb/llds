@@ -112,7 +112,7 @@ export function TeamScreen() {
       <div className="hero photo kb" data-testid="team-hero" data-tour="team-hero"><span className="bg warm" style={{ backgroundImage: `url(${heroUrl})` }} />
         <div><div className="eyebrow">{team.style} · {t(`category.${team.category}`)} · {team.level}</div><h2 className="display">{team.name}</h2>
           <div className="small muted">{t("team.dancersN", { n: stats.dancers })}{trainerName ? ` · ${trainerName}` : ""}{next ? ` · ${DAY_LONG[(new Date(next.starts_at).getDay() + 6) % 7]} ${hm(next.starts_at)} ${next.room_name ?? ""}` : ""}</div>
-          <div className="small muted">{t(`roles.${role ?? "dancer"}`)}{team.closed ? ` · ${t("team.closed")}` : ""}{team.punch_card_open ? ` · ${t("team.punchOpen")}` : ""}</div></div>
+          <div className="small muted">{t(`roles.${role ?? "dancer"}`)}{team.punch_card_open ? ` · ${t("team.punchOpen")}` : ""}{(team.admission === "audition" || (team.closed && !team.admission)) ? <span className="chip gold small" style={{ marginLeft: 8 }}>{t("admin.admissionKind.audition")}</span> : team.admission === "tryout" ? <span className="chip small" style={{ marginLeft: 8 }}>{t("admin.admissionKind.tryout")}</span> : null}</div></div>
       </div>
 
       <div className="grid2 tiles">

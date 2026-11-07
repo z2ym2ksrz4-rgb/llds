@@ -274,7 +274,19 @@
       "full": "Full season",
       "half": "Half season",
       "rates": "Instalments (agree with Line)"
-    }
+    },
+    "admission": "Admission",
+    "admissionKind": {
+      "open": "Open team",
+      "tryout": "Trial · level",
+      "audition": "Audition"
+    },
+    "admissionHint": {
+      "open": "Anyone can sign up – 2 free trial lessons.",
+      "tryout": "Open team, but the trainer assesses level after trial lessons. Shown as a badge on the website.",
+      "audition": "Admission only through audition/selection. Shown as a badge on the website and in the app."
+    },
+    "admissionNotePh": "Note, e.g. “Audition 15 August at 10” or “4 trial lessons”"
   },
   "settings": {
     "language": "Language",

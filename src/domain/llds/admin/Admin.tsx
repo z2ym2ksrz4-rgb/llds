@@ -124,7 +124,7 @@ function Teams() {
 }
 function TeamEditor({ team, onClose, onSaved }: { team: Team | null; onClose: () => void; onSaved: () => void }) {
   const { t } = useTranslation();
-  const [f, setF] = useState<TeamInput & { name: string }>({ name: team?.name ?? "", style: team?.style ?? "Showdance", category: team?.category ?? "junior", level: team?.level ?? "", closed: team?.closed ?? false, parents_see_video: team?.parents_see_video ?? false, punch_card_open: team?.punch_card_open ?? false, visibility: team?.visibility ?? "public", description: team?.description ?? "", cover_url: team?.cover_url ?? null });
+  const [f, setF] = useState<TeamInput & { name: string }>({ name: team?.name ?? "", style: team?.style ?? "Showdance", category: team?.category ?? "junior", level: team?.level ?? "", closed: team?.closed ?? false, parents_see_video: team?.parents_see_video ?? false, punch_card_open: team?.punch_card_open ?? false, visibility: team?.visibility ?? "public", description: team?.description ?? "", cover_url: team?.cover_url ?? null, admission: team?.admission ?? (team?.closed ? "audition" : "open"), admission_note: team?.admission_note ?? "" });
   const Toggle = ({ k, label, hint }: { k: "closed" | "parents_see_video" | "punch_card_open"; label: string; hint: string }) => <label className="toggle"><span>{label}<div className="tiny">{hint}</div></span><input type="checkbox" checked={!!f[k]} onChange={(e) => setF({ ...f, [k]: e.target.checked })} /></label>;
   return (
     <Sheet onClose={onClose} eyebrow={team ? t("common.edit") : t("admin.newTeam")} title={f.name || t("admin.team")}>
@@ -134,7 +134,11 @@ function TeamEditor({ team, onClose, onSaved }: { team: Team | null; onClose: ()
         <label className="field"><span>{t("admin.level")}</span><input value={f.level ?? ""} onChange={(e) => setF({ ...f, level: e.target.value })} /></label>
       </div>
       <div className="field"><span>{t("admin.category")}</span><div className="chips">{CATS.map((c) => <button key={c} className={"chip" + (f.category === c ? " on" : "")} onClick={() => setF({ ...f, category: c, parents_see_video: c === "mini" || c === "kids" ? true : f.parents_see_video })}>{t(`category.${c}`)}</button>)}</div></div>
-      <Toggle k="closed" label={t("admin.closedTeam")} hint={t("admin.closedHint")} />
+      <div className="field"><span>{t("admin.admission")}</span>
+        <div className="chips" data-testid="admission">{(["open", "tryout", "audition"] as const).map((a) => <button key={a} className={"chip" + (f.admission === a ? " on" : "")} onClick={() => setF({ ...f, admission: a, closed: a === "audition" })}>{t(`admin.admissionKind.${a}`)}</button>)}</div>
+        <div className="tiny">{t(`admin.admissionHint.${f.admission ?? "open"}`)}</div>
+        {f.admission !== "open" && <input style={{ marginTop: 6 }} value={f.admission_note ?? ""} placeholder={t("admin.admissionNotePh")} onChange={(e) => setF({ ...f, admission_note: e.target.value })} />}
+      </div>
       <Toggle k="parents_see_video" label={t("admin.parentsSeeVideo")} hint={t("admin.parentsSeeVideoHint")} />
       <Toggle k="punch_card_open" label={t("team.punchOpen")} hint={t("admin.punchHint")} />
       <label className="toggle"><span>{t("admin.teamPublic")}<div className="tiny">{t("admin.teamPublicHint")}</div></span><input type="checkbox" checked={f.visibility === "public"} onChange={(e) => setF({ ...f, visibility: e.target.checked ? "public" : "private" })} /></label>
