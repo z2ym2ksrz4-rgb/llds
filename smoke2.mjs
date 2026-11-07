@@ -17,6 +17,7 @@ await p.click("text=Meld afbud for Freja"); await p.click(".sheet .chip:has-text
 await p.waitForSelector(".toast"); out.absence = await p.textContent(".toast"); await shot(1);
 // 1b. parent books Store Sal for Freja Friday 10:00
 await p.click("nav.tabbar >> text=Sale"); await p.waitForSelector(".cal");
+if ((new Date().getDay() + 6) % 7 >= 4) { await p.click("text=Næste uge"); await p.waitForTimeout(200); }   // Fri–Sun: book next week's Friday so it is in the future
 await p.click(".days .day >> nth=4"); await p.waitForTimeout(200);
 await p.click("button[aria-label='Store Sal 10:00']"); await p.waitForSelector("#bk-title"); await p.click("text=Send til godkendelse");
 await p.waitForSelector(".toast"); out.booking = await p.textContent(".toast"); await shot(2);
