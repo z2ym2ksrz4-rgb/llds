@@ -36,6 +36,7 @@ export type Team = {
   description?: string | null;
   cover_path?: string | null;
   cover_url?: string | null;
+  alt_url?: string | null;      // the raw cover_url when a real cover_path photo overrides it – shown as a mood image on the team page
   price?: string | null;
   years?: string | null;
   day_time?: string | null;
@@ -180,7 +181,7 @@ export type Message = { id: string; author_name: string; title: string; body: st
 export type MessageStatus = { person_id: string; name: string; acted_at: string | null };
 
 export type Folder = { id: string; team_id: string; name: string; staff_only: boolean; media_count: number; cover_path: string | null; cover_url?: string | null; created_at: string };
-export type MediaItem = { id: string; folder_id: string; uploader_id: string; uploader_name: string; storage_path: string; kind: "image" | "video"; url: string; created_at: string };
+export type MediaItem = { id: string; folder_id: string; uploader_id: string; uploader_name: string; storage_path: string; kind: "image" | "video"; url: string; created_at: string; sort?: number };
 export type Formation = { label: string; positions: { initials: string; x: number; y: number }[] };
 export type Video = { id: string; team_id: string; uploader_id: string; uploader_name: string; title: string; storage_path: string; url: string; duration_s: number | null; formations: Formation[]; created_at: string };
 export type Note = { id: string; team_id: string; dancer_id: string; dancer_name: string; author_id: string; author_name: string; body: string; created_at: string };
@@ -208,6 +209,10 @@ export interface Api {
   listMedia(folderId: string): Promise<MediaItem[]>;
   uploadMedia(folderId: string, files: File[]): Promise<void>;
   deleteMedia(id: string): Promise<void>;
+  /** staff: order of images in a folder (ids in display order) */
+  setMediaOrder(folderId: string, ids: string[]): Promise<void>;
+  /** staff: make a folder image the team's front photo (null = back to automatic) */
+  setTeamCover(teamId: string, storagePath: string | null): Promise<void>;
   /* choreography */
   listVideos(teamId: string): Promise<Video[]>;
   uploadVideo(teamId: string, title: string, file: File): Promise<void>;

@@ -1,0 +1,21 @@
+// Team folder: staff picks the front photo and reorders images; catalogue has the 39 sorted AI images.
+import { chromium } from "playwright";
+const base = process.env.BASE ?? "http://localhost:4173/";
+const b = await chromium.launch({ executablePath: process.env.CHROME ?? "/opt/pw-browsers/chromium" });
+const p = await b.newPage({ viewport: { width: 390, height: 844 } }); await p.addInitScript(() => { try { if (!localStorage.getItem("llds_tour")) localStorage.setItem("llds_tour", JSON.stringify({ state: "done", at: Date.now() })); } catch {} }); const out = { errors: [] };
+p.on("pageerror", (e) => out.errors.push(e.message));
+await p.goto(base, { waitUntil: "networkidle" }); await p.evaluate(() => localStorage.clear()); await p.reload({ waitUntil: "networkidle" });
+await p.fill("#email", "admin@demo"); await p.click("form button.cta"); await p.fill("#code", "000000"); await p.click("form button.cta"); await p.waitForSelector("nav.tabbar");
+await p.click("nav.tabbar >> text=/^(Mit hold|Hold)$/"); await p.waitForSelector("[data-testid=team-hero]"); await p.click(".teampick"); await p.click(".sheet .item:has-text('The AXIS')"); await p.waitForTimeout(300);
+out.heroBefore = (await p.getAttribute("[data-testid=team-hero] .bg", "style")).slice(0, 60);
+await p.click("[data-testid=go-folders]"); await p.waitForSelector("[data-testid=folder]"); await p.click("[data-testid=folder] >> nth=0"); await p.waitForSelector("#media-files", { state: "attached" });
+const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFUlEQVR4nGP8z8DwnwEKGGEMEAAATQUDAX7Y1fwAAAAASUVORK5CYII=", "base64");
+await p.setInputFiles("#media-files", [{ name: "a.png", mimeType: "image/png", buffer: png }, { name: "b.png", mimeType: "image/png", buffer: png }]); await p.waitForSelector(".toast"); await p.waitForTimeout(400);
+out.media = await p.$$eval("[data-testid=media]", (e) => e.length);
+await p.click("[data-testid=media] >> nth=1"); await p.waitForSelector("[data-testid=make-cover]"); await p.click("[data-testid=move-first]"); await p.waitForTimeout(300);
+await p.click("[data-testid=make-cover]"); await p.waitForTimeout(500); out.coverToast = await p.textContent(".toast").catch(() => null);
+await p.click(".lightbox", { position: { x: 10, y: 10 } }); await p.click("text=‹ Mapper"); await p.waitForTimeout(300); await p.click("text=‹ Mit hold"); await p.waitForSelector("[data-testid=team-hero]"); await p.waitForTimeout(300);
+out.heroAfter = (await p.getAttribute("[data-testid=team-hero] .bg", "style")).slice(0, 60);
+await p.click("nav.tabbar >> text=Events"); await p.click("text=Nyt event"); await p.waitForSelector("[data-testid=image-picker]"); out.catalogCount = await p.$$eval("[data-testid=image-option]", (e) => e.length);
+console.log(JSON.stringify(out, null, 1)); await b.close();
+if (out.errors.length || out.media < 2 || out.heroAfter === out.heroBefore || !out.heroAfter.includes("data:image/png") || out.catalogCount < 30) process.exit(1);

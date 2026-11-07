@@ -1,11 +1,196 @@
 [
  {
+  "key": "contemporary-flow",
+  "file": "contemporary-flow.jpg",
+  "title": "Contemporary – flow",
+  "tags": [
+   "team",
+   "event",
+   "post"
+  ]
+ },
+ {
+  "key": "contemporary-green",
+  "file": "contemporary-green.jpg",
+  "title": "Contemporary – grøn",
+  "tags": [
+   "team",
+   "event",
+   "post"
+  ]
+ },
+ {
+  "key": "contemporary-grey",
+  "file": "contemporary-grey.jpg",
+  "title": "Contemporary – grå",
+  "tags": [
+   "team",
+   "event",
+   "post"
+  ]
+ },
+ {
+  "key": "contemporary-olive",
+  "file": "contemporary-olive.jpg",
+  "title": "Contemporary – oliven",
+  "tags": [
+   "team",
+   "event",
+   "post"
+  ]
+ },
+ {
   "key": "costume-detail",
   "file": "costume-detail.jpg",
   "title": "Kostume",
   "tags": [
    "event",
    "team",
+   "post"
+  ]
+ },
+ {
+  "key": "dance-white",
+  "file": "dance-white.jpg",
+  "title": "Dans i hvidt",
+  "tags": [
+   "team",
+   "event",
+   "post"
+  ]
+ },
+ {
+  "key": "event-afdansningsbal",
+  "file": "event-afdansningsbal.jpg",
+  "title": "Afdansningsbal",
+  "tags": [
+   "event",
+   "post"
+  ]
+ },
+ {
+  "key": "event-cph-open-finale",
+  "file": "event-cph-open-finale.jpg",
+  "title": "CPH Open Finale",
+  "tags": [
+   "event",
+   "post"
+  ]
+ },
+ {
+  "key": "event-cph-open",
+  "file": "event-cph-open.jpg",
+  "title": "CPH Open",
+  "tags": [
+   "event",
+   "post"
+  ]
+ },
+ {
+  "key": "event-danmark-danser",
+  "file": "event-danmark-danser.jpg",
+  "title": "Danmark Danser",
+  "tags": [
+   "event",
+   "post"
+  ]
+ },
+ {
+  "key": "event-dd-finale",
+  "file": "event-dd-finale.jpg",
+  "title": "Danmark Danser Finale",
+  "tags": [
+   "event",
+   "post"
+  ]
+ },
+ {
+  "key": "event-dm-junior-voksen",
+  "file": "event-dm-junior-voksen.jpg",
+  "title": "DM Showdance",
+  "tags": [
+   "event",
+   "post"
+  ]
+ },
+ {
+  "key": "event-dm-mini",
+  "file": "event-dm-mini.jpg",
+  "title": "DM – Mini Børn",
+  "tags": [
+   "event",
+   "post"
+  ]
+ },
+ {
+  "key": "event-julebal",
+  "file": "event-julebal.jpg",
+  "title": "Julebal",
+  "tags": [
+   "event",
+   "post"
+  ]
+ },
+ {
+  "key": "event-kc-finale",
+  "file": "event-kc-finale.jpg",
+  "title": "KC Finale",
+  "tags": [
+   "event",
+   "post"
+  ]
+ },
+ {
+  "key": "event-rangliste-1-born",
+  "file": "event-rangliste-1-born.jpg",
+  "title": "Rangliste – Mini Børn & Børn",
+  "tags": [
+   "event",
+   "post"
+  ]
+ },
+ {
+  "key": "event-rangliste-1-junior",
+  "file": "event-rangliste-1-junior.jpg",
+  "title": "Rangliste – Junior & Voksen",
+  "tags": [
+   "event",
+   "post"
+  ]
+ },
+ {
+  "key": "event-rangliste-2-born1",
+  "file": "event-rangliste-2-born1.jpg",
+  "title": "Rangliste 2 – Mini & Børn 1",
+  "tags": [
+   "event",
+   "post"
+  ]
+ },
+ {
+  "key": "event-rangliste-2-born2",
+  "file": "event-rangliste-2-born2.jpg",
+  "title": "Rangliste 2 – Børn 2 & Junior 2",
+  "tags": [
+   "event",
+   "post"
+  ]
+ },
+ {
+  "key": "event-semifinale",
+  "file": "event-semifinale.jpg",
+  "title": "Semifinale",
+  "tags": [
+   "event",
+   "post"
+  ]
+ },
+ {
+  "key": "event-show-it",
+  "file": "event-show-it.jpg",
+  "title": "Show IT",
+  "tags": [
+   "event",
    "post"
   ]
  },
@@ -20,12 +205,139 @@
   ]
  },
  {
+  "key": "hiphop-burgundy",
+  "file": "hiphop-burgundy.jpg",
+  "title": "Hip hop – bordeaux",
+  "tags": [
+   "team",
+   "event",
+   "post"
+  ]
+ },
+ {
+  "key": "hiphop-daylight",
+  "file": "hiphop-daylight.jpg",
+  "title": "Hip hop – dagslys",
+  "tags": [
+   "team",
+   "event",
+   "post"
+  ]
+ },
+ {
+  "key": "hiphop-gold",
+  "file": "hiphop-gold.jpg",
+  "title": "Hip hop – guld",
+  "tags": [
+   "team",
+   "event",
+   "post"
+  ]
+ },
+ {
+  "key": "hiphop-magenta",
+  "file": "hiphop-magenta.jpg",
+  "title": "Hip hop – magenta",
+  "tags": [
+   "team",
+   "event",
+   "post"
+  ]
+ },
+ {
+  "key": "hiphop-neon",
+  "file": "hiphop-neon.jpg",
+  "title": "Hip hop – neon",
+  "tags": [
+   "team",
+   "event",
+   "post"
+  ]
+ },
+ {
+  "key": "hiphop-red",
+  "file": "hiphop-red.jpg",
+  "title": "Hip hop – rød",
+  "tags": [
+   "team",
+   "event",
+   "post"
+  ]
+ },
+ {
+  "key": "hiphop-silver-pink",
+  "file": "hiphop-silver-pink.jpg",
+  "title": "Hip hop – sølv & pink",
+  "tags": [
+   "team",
+   "event",
+   "post"
+  ]
+ },
+ {
+  "key": "hiphop-studio",
+  "file": "hiphop-studio.jpg",
+  "title": "Hip hop i studiet",
+  "tags": [
+   "team",
+   "event",
+   "post"
+  ]
+ },
+ {
+  "key": "lift-white",
+  "file": "lift-white.jpg",
+  "title": "Løft i hvidt",
+  "tags": [
+   "team",
+   "event",
+   "post"
+  ]
+ },
+ {
   "key": "light-trails",
   "file": "light-trails.jpg",
   "title": "Lysspor",
   "tags": [
    "event",
    "team",
+   "post"
+  ]
+ },
+ {
+  "key": "post-celebration",
+  "file": "post-celebration.jpg",
+  "title": "Tillykke",
+  "tags": [
+   "post",
+   "event"
+  ]
+ },
+ {
+  "key": "post-news",
+  "file": "post-news.jpg",
+  "title": "Nyt fra studiet",
+  "tags": [
+   "post",
+   "event"
+  ]
+ },
+ {
+  "key": "post-reminder",
+  "file": "post-reminder.jpg",
+  "title": "Påmindelse",
+  "tags": [
+   "post",
+   "event"
+  ]
+ },
+ {
+  "key": "showdance-gold-solo",
+  "file": "showdance-gold-solo.jpg",
+  "title": "Showdance – solo i guld",
+  "tags": [
+   "team",
+   "event",
    "post"
   ]
  },
@@ -43,6 +355,60 @@
   "key": "studio-mirror",
   "file": "studio-mirror.jpg",
   "title": "Studiet",
+  "tags": [
+   "team",
+   "post"
+  ]
+ },
+ {
+  "key": "team-contemporary",
+  "file": "team-contemporary.jpg",
+  "title": "Contemporary",
+  "tags": [
+   "team",
+   "post"
+  ]
+ },
+ {
+  "key": "team-fitness-adult",
+  "file": "team-fitness-adult.jpg",
+  "title": "Voksne / fitness",
+  "tags": [
+   "team",
+   "post"
+  ]
+ },
+ {
+  "key": "team-hiphop",
+  "file": "team-hiphop.jpg",
+  "title": "Hip hop",
+  "tags": [
+   "team",
+   "post"
+  ]
+ },
+ {
+  "key": "team-junior-elite",
+  "file": "team-junior-elite.jpg",
+  "title": "Junior elite",
+  "tags": [
+   "team",
+   "post"
+  ]
+ },
+ {
+  "key": "team-kids-showdance",
+  "file": "team-kids-showdance.jpg",
+  "title": "Børne-showdance",
+  "tags": [
+   "team",
+   "post"
+  ]
+ },
+ {
+  "key": "team-mini",
+  "file": "team-mini.jpg",
+  "title": "Mini-hold",
   "tags": [
    "team",
    "post"

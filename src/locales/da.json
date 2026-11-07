@@ -470,7 +470,11 @@
     "uploaded": "{{n}} filer lagt op",
     "noMedia": "Ingen billeder endnu.",
     "privacy": "Billederne er kun synlige for holdet, forældre og trænere – aldrig offentligt.",
-    "download": "Hent"
+    "download": "Hent",
+    "makeCover": "Brug som forsidebillede",
+    "coverSet": "Forsidebilledet er skiftet",
+    "moveFirst": "Flyt først",
+    "moved": "Rækkefølgen er gemt"
   },
   "choreo": {
     "upload": "Ny video",

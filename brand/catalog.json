@@ -212,5 +212,125 @@
    "post",
    "event"
   ]
+ },
+ "contemporary-green": {
+  "title": "Contemporary – grøn",
+  "tags": [
+   "team",
+   "event",
+   "post"
+  ]
+ },
+ "hiphop-burgundy": {
+  "title": "Hip hop – bordeaux",
+  "tags": [
+   "team",
+   "event",
+   "post"
+  ]
+ },
+ "contemporary-grey": {
+  "title": "Contemporary – grå",
+  "tags": [
+   "team",
+   "event",
+   "post"
+  ]
+ },
+ "lift-white": {
+  "title": "Løft i hvidt",
+  "tags": [
+   "team",
+   "event",
+   "post"
+  ]
+ },
+ "hiphop-red": {
+  "title": "Hip hop – rød",
+  "tags": [
+   "team",
+   "event",
+   "post"
+  ]
+ },
+ "dance-white": {
+  "title": "Dans i hvidt",
+  "tags": [
+   "team",
+   "event",
+   "post"
+  ]
+ },
+ "hiphop-gold": {
+  "title": "Hip hop – guld",
+  "tags": [
+   "team",
+   "event",
+   "post"
+  ]
+ },
+ "hiphop-studio": {
+  "title": "Hip hop i studiet",
+  "tags": [
+   "team",
+   "event",
+   "post"
+  ]
+ },
+ "hiphop-silver-pink": {
+  "title": "Hip hop – sølv & pink",
+  "tags": [
+   "team",
+   "event",
+   "post"
+  ]
+ },
+ "contemporary-olive": {
+  "title": "Contemporary – oliven",
+  "tags": [
+   "team",
+   "event",
+   "post"
+  ]
+ },
+ "hiphop-neon": {
+  "title": "Hip hop – neon",
+  "tags": [
+   "team",
+   "event",
+   "post"
+  ]
+ },
+ "hiphop-magenta": {
+  "title": "Hip hop – magenta",
+  "tags": [
+   "team",
+   "event",
+   "post"
+  ]
+ },
+ "showdance-gold-solo": {
+  "title": "Showdance – solo i guld",
+  "tags": [
+   "team",
+   "event",
+   "post"
+  ]
+ },
+ "contemporary-flow": {
+  "title": "Contemporary – flow",
+  "tags": [
+   "team",
+   "event",
+   "post"
+  ]
+ },
+ "hiphop-daylight": {
+  "title": "Hip hop – dagslys",
+  "tags": [
+   "team",
+   "event",
+   "post"
+  ]
  }
 }

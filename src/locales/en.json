@@ -470,7 +470,11 @@
     "uploaded": "{{n}} files uploaded",
     "noMedia": "No photos yet.",
     "privacy": "Photos are visible to the team, parents and trainers only – never public.",
-    "download": "Download"
+    "download": "Download",
+    "makeCover": "Use as front photo",
+    "coverSet": "Front photo changed",
+    "moveFirst": "Move first",
+    "moved": "Order saved"
   },
   "choreo": {
     "upload": "New video",

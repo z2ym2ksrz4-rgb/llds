@@ -318,3 +318,4 @@ button.cta { box-shadow:0 10px 26px -12px rgba(201,162,74,.7); }
 .tour-card .cta.small { padding:10px 14px; }
 .imgpick .ip.upload { border:1px dashed rgba(201,162,74,.55); background:var(--card); }
 .imgpick .ip.upload .auto { font-size:1.6rem; }
+.card .mood { aspect-ratio:16/7; border-radius:12px; background:center/cover; margin:-4px 0 6px; filter:sepia(.12) saturate(.95); }

@@ -117,6 +117,7 @@ export function TeamScreen() {
 
       {(team.description || team.price || team.day_time) && (
         <div className="sec"><h2>{t("team.about")}</h2><div className="card" data-testid="team-about">
+          {team.cover_path && resolveImage(team.alt_url) && <div className="mood" style={{ backgroundImage: `url(${resolveImage(team.alt_url)})` }} />}
           {(team.day_time || team.years) && <div className="small muted" style={{ marginBottom: 8 }}>{[team.day_time, team.years].filter(Boolean).join(" · ")}</div>}
           {team.description && <About text={team.description} />}
           {team.price && (staff || role === "parent") && <div className="row between" style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid var(--line)" }}><span className="tiny">{t("team.price")}</span><span className="gold small">{team.price}</span></div>}

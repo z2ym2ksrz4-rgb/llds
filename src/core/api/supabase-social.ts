@@ -75,10 +75,12 @@ export function supabaseSocial(sb: SupabaseClient, fail: Fail, schoolId: () => P
     },
     async createFolder(teamId: string, name: string, staffOnly: boolean) { const { error } = await sb.from("folder").insert({ school_id: await schoolId(), team_id: teamId, name, staff_only: staffOnly }); fail(error); },
     async listMedia(folderId: string): Promise<MediaItem[]> {
-      const { data, error } = await sb.from("media_view").select("*").eq("folder_id", folderId).order("created_at", { ascending: false }); fail(error);
+      const { data, error } = await sb.from("media_view").select("*").eq("folder_id", folderId).order("sort").order("created_at", { ascending: false }); fail(error);
       const rows = (data ?? []) as MediaItem[]; const urls = await sign(rows.map((m) => m.storage_path));
       return rows.map((m) => ({ ...m, url: urls[m.storage_path] ?? "" }));
     },
+    async setMediaOrder(folderId: string, ids: string[]) { for (let i = 0; i < ids.length; i++) { const { error } = await sb.from("media").update({ sort: i }).eq("id", ids[i]).eq("folder_id", folderId); fail(error); } },
+    async setTeamCover(teamId: string, storagePath: string | null) { const { error } = await sb.from("team").update({ cover_path: storagePath }).eq("id", teamId); fail(error); },
     async uploadMedia(folderId: string, files: File[]) {
       const pid = await myPersonId();
       for (const f of files) {

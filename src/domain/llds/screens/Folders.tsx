@@ -41,6 +41,7 @@ export function Folders({ teamId, staff, onBack, toast }: { teamId: string; staf
 function FolderView({ folder, staff, canUpload, onBack, toast }: { folder: Folder; staff: boolean; canUpload: boolean; onBack: () => void; toast: (m: string) => void }) {
   const { t } = useTranslation();
   const me = useAuth((s) => s.me)!;
+  const refresh = useAuth((s) => s.refresh);
   const [items, setItems] = useState<MediaItem[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
   const [view, setView] = useState<MediaItem | null>(null);
@@ -69,6 +70,14 @@ function FolderView({ folder, staff, canUpload, onBack, toast }: { folder: Folde
           {view.kind === "video" ? <video src={view.url} controls autoPlay playsInline onClick={(e) => e.stopPropagation()} /> : <img src={view.url} alt="" />}
           <div className="lightbox-bar" onClick={(e) => e.stopPropagation()}>
             <span className="tiny">{view.uploader_name} · {ago(view.created_at)}</span>
+            {staff && view.kind === "image" && (
+              <div className="row" style={{ gap: 6, flexWrap: "wrap", marginBottom: 6 }}>
+                <button className="ghost small gold" data-testid="make-cover" onClick={async () => { await api.setTeamCover(folder.team_id, view.storage_path); toast(t("folders.coverSet")); await refresh(); }}>★ {t("folders.makeCover")}</button>
+                <button className="ghost small" data-testid="move-first" onClick={async () => { const ids = [view.id, ...items.filter((x) => x.id !== view.id).map((x) => x.id)]; await api.setMediaOrder(folder.id, ids); await load(); toast(t("folders.moved")); }}>⇤ {t("folders.moveFirst")}</button>
+                <button className="ghost small" onClick={async () => { const i = items.findIndex((x) => x.id === view.id); if (i <= 0) return; const ids = items.map((x) => x.id); [ids[i - 1], ids[i]] = [ids[i], ids[i - 1]]; await api.setMediaOrder(folder.id, ids); await load(); }}>←</button>
+                <button className="ghost small" onClick={async () => { const i = items.findIndex((x) => x.id === view.id); if (i < 0 || i >= items.length - 1) return; const ids = items.map((x) => x.id); [ids[i + 1], ids[i]] = [ids[i], ids[i + 1]]; await api.setMediaOrder(folder.id, ids); await load(); }}>→</button>
+              </div>
+            )}
             <div className="row"><a className="ghost small" href={view.url} download target="_blank" rel="noreferrer">{t("folders.download")}</a>
               {(staff || view.uploader_id === me.person.id) && <button className="ghost small danger" onClick={async () => { await api.deleteMedia(view.id); setView(null); void load(); }}>{t("common.delete")}</button>}</div>
           </div>
