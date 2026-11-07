@@ -11,6 +11,7 @@ export default defineConfig({
   define: {
     __RELEASE__: JSON.stringify(isRelease),
     __APP_VERSION__: JSON.stringify(process.env.npm_package_version ?? "0.0.0"),
+    __BUILD__: JSON.stringify(process.env.BUILD_ID ?? "dev"),
   },
   build: { target: "es2022", sourcemap: false },
   server: { port: 5173, host: true },

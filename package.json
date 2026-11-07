@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "node scripts/catalog.mjs && vite",
-    "build": "node scripts/catalog.mjs && tsc -b && vite build",
+    "build": "BUILD_ID=$(date +%s) && export BUILD_ID && node scripts/catalog.mjs && tsc -b && vite build",
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit",
     "lint": "eslint src",
@@ -16,9 +16,9 @@
     "android:apk": "npm run cap:sync && cd android && ./gradlew assembleDebug",
     "new-app": "node scripts/new-app.mjs",
     "smoke": "node smoke.mjs && node smoke2.mjs && node smoke3.mjs && node smoke4.mjs && node smoke5.mjs && node smoke6.mjs && node smoke7.mjs && node smoke8.mjs && node smoke9.mjs && node smoke10.mjs && node smoke11.mjs && node smoke12.mjs",
-    "build:mock": "node scripts/catalog.mjs && VITE_MOCK=1 vite build",
+    "build:mock": "BUILD_ID=$(date +%s) && export BUILD_ID && node scripts/catalog.mjs && VITE_MOCK=1 vite build",
     "dev:mock": "node scripts/catalog.mjs && VITE_MOCK=1 vite",
-    "build:web": "node scripts/catalog.mjs && RELEASE=1 vite build --base=/llds/app/",
+    "build:web": "BUILD_ID=$(date +%s) && export BUILD_ID && node scripts/catalog.mjs && RELEASE=1 vite build --base=/llds/app/",
     "site": "python3 scripts/site-gen.py ../ilumie-site/llds && npm run build:web && rm -rf ../ilumie-site/llds/app && cp -r dist ../ilumie-site/llds/app",
     "catalog": "node scripts/catalog.mjs"
   },

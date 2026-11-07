@@ -5,4 +5,5 @@ const meta = existsSync("brand/catalog.json") ? JSON.parse(readFileSync("brand/c
 const files = readdirSync("public/art/catalog").filter((f) => /\.(jpe?g|png|webp)$/i.test(f)).sort();
 const list = files.map((file) => { const key = file.replace(/\.\w+$/, ""); const m = meta[key] ?? {}; return { key, file, title: m.title ?? key.replace(/-/g, " "), tags: m.tags ?? ["event", "team", "post"] }; });
 writeFileSync("src/domain/llds/lib/catalog.generated.json", JSON.stringify(list, null, 1) + "\n");
-console.log(`catalog: ${list.length} images`);
+const build = process.env.BUILD_ID ?? String(Date.now()); writeFileSync("public/version.json", JSON.stringify({ build }));
+console.log(`catalog: ${list.length} images, build ${build}`);
