@@ -88,6 +88,7 @@ export interface Api {
   /** me */
   getMe(): Promise<Me | null>; // null = signed in but no person yet
   updateNotifyPrefs(prefs: NotifyPrefs): Promise<void>;
+  deleteMyAccount(): Promise<void>;   // person + children without own login + auth user; throws 'last admin'
   getAppearance(): Promise<Appearance>;      // works before login (anon)
   saveAppearance(a: Appearance): Promise<void>; // admin
   signUp(input: SignUpInput): Promise<void>;
@@ -197,6 +198,10 @@ export type Report = {
 export type Audience = { all?: boolean; teams?: string[] };
 export type Message = { id: string; author_name: string; title: string; body: string; audience: Audience; needs: "read" | "accept"; created_at: string; acted_at: string | null };
 export type MessageStatus = { person_id: string; name: string; acted_at: string | null };
+/* direct conversations ("Skriv til træneren") */
+export type TeamStaff = { person_id: string; name: string; role: "trainer" | "assistant" | "admin"; is_admin: boolean };
+export type Thread = { id: string; team_id: string | null; subject: string; created_by: string; created_by_name: string; participants: string[]; participant_names: string[]; last_body: string | null; last_sender_name: string | null; message_count: number; unread: boolean; created_at: string; last_at: string };
+export type ThreadMessage = { id: string; thread_id: string; sender_id: string; sender_name: string; body: string; created_at: string };
 
 export type Folder = { id: string; team_id: string; name: string; staff_only: boolean; media_count: number; cover_path: string | null; cover_url?: string | null; created_at: string };
 export type MediaItem = { id: string; folder_id: string; uploader_id: string; uploader_name: string; storage_path: string; kind: "image" | "video"; url: string; created_at: string; sort?: number };
@@ -221,6 +226,13 @@ export interface Api {
   sendMessage(input: { title: string; body: string; audience: Audience; needs: "read" | "accept" }): Promise<void>;
   ackMessage(id: string): Promise<void>;
   messageStatus(id: string): Promise<MessageStatus[]>;
+  /* conversations */
+  teamStaff(teamId: string): Promise<TeamStaff[]>;
+  listThreads(): Promise<Thread[]>;
+  createThread(input: { team_id: string | null; subject: string; body: string; participant_ids: string[] }): Promise<Thread>;
+  listThreadMessages(threadId: string): Promise<ThreadMessage[]>;
+  replyThread(threadId: string, body: string): Promise<void>;
+  markThreadRead(threadId: string): Promise<void>;
   /* folders & media */
   listFolders(teamId: string): Promise<Folder[]>;
   createFolder(teamId: string, name: string, staffOnly: boolean): Promise<void>;

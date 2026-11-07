@@ -113,7 +113,12 @@
     "about": "About the team",
     "price": "Season price",
     "noTrophiesYet": "No trophies yet – first competition is {{event}} on {{date}}.",
-    "noTrophies": "No trophies yet."
+    "noTrophies": "No trophies yet.",
+    "messages": "Messages",
+    "writeToTeam": "Write to the team",
+    "fromTrainer": "To {{team}} – from the trainer",
+    "toEveryone": "To everyone – from the school",
+    "noTeamMessages": "No messages to the team yet."
   },
   "home": {
     "hi": "Hi {{name}}",
@@ -278,7 +283,13 @@
     "childLoginGranted": "{{name}} can now sign in – the code goes to the child's e-mail",
     "childConsent": "By giving access you consent as a parent to your child using the app. You can close the profile at any time.",
     "childTooYoung": "Child profiles start at age {{age}}.",
-    "childOwnAccount": "From 13 the dancer creates their own profile."
+    "childOwnAccount": "From 13 the dancer creates their own profile.",
+    "dangerTitle": "Account",
+    "deleteAccount": "Delete my account",
+    "deleteSure": "Are you sure you want to delete your account?",
+    "deleteExplain": "Your profile, your children's profiles without their own login, posts, photos and sign-ups are deleted permanently. This cannot be undone.",
+    "deleteYes": "Yes, delete my account",
+    "deleteLastAdmin": "You are the school's only admin – make someone else admin first."
   },
   "category": {
     "mini": "Mini kids",
@@ -843,5 +854,26 @@
     "youTrain": "You train",
     "event": "Event",
     "booking": "Booking"
+  },
+  "threads": {
+    "title": "Conversations",
+    "writeTo": "Write to the trainer",
+    "newConversation": "New conversation",
+    "to": "To",
+    "toHint": "Pick one or more – only the people you pick get the message.",
+    "noStaff": "No trainers on this team yet.",
+    "subject": "Subject",
+    "defaultSubject": "Question about {{team}}",
+    "message": "Message",
+    "send": "Send",
+    "sent": "Sent",
+    "none": "No conversations yet. Write to the trainer from the team page.",
+    "reply": "Reply",
+    "replyPlaceholder": "Write a reply …",
+    "role": {
+      "trainer": "Trainer",
+      "assistant": "Assistant",
+      "admin": "Admin"
+    }
   }
 }

@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Audience, Channel, Comment, Folder, Formation, MediaItem, MediaRef, Message, MessageStatus, Note, Post, Report, Video } from "./types";
+import type { Audience, Channel, Comment, Folder, Formation, MediaItem, MediaRef, Message, MessageStatus, Note, Post, Report, TeamStaff, Thread, ThreadMessage, Video } from "./types";
 import { downscaleImage } from "./image";
 
 type Fail = (e: { message: string } | null) => void;
@@ -67,6 +67,18 @@ export function supabaseSocial(sb: SupabaseClient, fail: Fail, schoolId: () => P
     },
     async ackMessage(id: string) { const { error } = await sb.from("message_receipt").upsert({ message_id: id, person_id: await myPersonId() }, { onConflict: "message_id,person_id" }); fail(error); },
     async messageStatus(id: string): Promise<MessageStatus[]> { const { data, error } = await sb.rpc("message_status", { p_message: id }); fail(error); return (data ?? []) as MessageStatus[]; },
+
+    async teamStaff(teamId) { const { data, error } = await sb.rpc("team_staff", { p_team: teamId }); fail(error); return (data ?? []) as TeamStaff[]; },
+    async listThreads() { const { data, error } = await sb.from("thread_view").select("*").order("last_at", { ascending: false }).limit(100); fail(error); return (data ?? []) as Thread[]; },
+    async createThread(i) {
+      const me = await myPersonId(); const ids = Array.from(new Set([me!, ...i.participant_ids]));
+      const { data, error } = await sb.from("thread").insert({ school_id: await schoolId(), team_id: i.team_id, subject: i.subject, created_by: me, participants: ids }).select("id").single(); fail(error);
+      const { error: e2 } = await sb.from("thread_message").insert({ thread_id: data!.id, sender_id: me, body: i.body }); fail(e2);
+      const { data: t, error: e3 } = await sb.from("thread_view").select("*").eq("id", data!.id).single(); fail(e3); return t as Thread;
+    },
+    async listThreadMessages(threadId) { const { data, error } = await sb.from("thread_message_view").select("*").eq("thread_id", threadId).order("created_at"); fail(error); return (data ?? []) as ThreadMessage[]; },
+    async replyThread(threadId, body) { const { error } = await sb.from("thread_message").insert({ thread_id: threadId, sender_id: await myPersonId(), body }); fail(error); },
+    async markThreadRead(threadId) { const { error } = await sb.from("thread_read").upsert({ thread_id: threadId, person_id: await myPersonId(), read_at: new Date().toISOString() }, { onConflict: "thread_id,person_id" }); fail(error); },
 
     async listFolders(teamId: string): Promise<Folder[]> {
       const { data, error } = await sb.from("folder_view").select("*").eq("team_id", teamId).order("created_at"); fail(error);

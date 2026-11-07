@@ -1,4 +1,4 @@
-import type { Audience, Channel, Comment, Folder, Formation, MediaItem, MediaRef, Membership, Message, MessageStatus, Note, Person, Post, Report, Team, Video } from "./types";
+import type { Audience, Channel, Comment, Folder, Formation, MediaItem, MediaRef, Membership, Message, MessageStatus, Note, Person, Post, Report, Team, TeamStaff, Thread, ThreadMessage, Video } from "./types";
 import { downscaleImage, fileToDataUrl } from "./image";
 
 /** Phase-3 half of the mock. Binary media lives in memory only (data/object URLs), so it is gone after a reload. */
@@ -6,6 +6,7 @@ export type SocialState = {
   results?: { id: string; team_id: string | null; event_title: string; placed: string; held_on: string; visibility: "private" | "public" }[];
   posts: Post[]; comments: Comment[]; reports: Report[]; messages: Message[]; receipts: { message_id: string; person_id: string; acted_at: string }[];
   folders: Folder[]; media: MediaItem[]; videos: Video[]; notes: Note[];
+  threads?: Thread[]; threadMsgs?: ThreadMessage[]; threadReads?: { thread_id: string; person_id: string; read_at: string }[];
 };
 const id = () => Math.random().toString(36).slice(2, 10);
 const now = () => new Date().toISOString();
@@ -46,7 +47,30 @@ export function socialOps(get: () => { X: SocialState; notify: (pid: string, kin
   const withUrls = (m: MediaRef[]) => m.map((x) => ({ ...x, url: urls.get(x.path) ?? x.url }));
   const store = async (path: string, f: File) => { urls.set(path, f.type.startsWith("video/") ? URL.createObjectURL(f) : await fileToDataUrl(await downscaleImage(f, 1200, 0.8))); };
 
+  const pname = (pid: string) => name(get().persons.find((p) => p.id === pid));
+  const threadOf = (t: Thread): Thread => { const g = get(); const me = g.me()!; const ms = (g.X.threadMsgs ?? []).filter((m) => m.thread_id === t.id).sort((a, b) => a.created_at.localeCompare(b.created_at)); const last = ms[ms.length - 1]; const r = (g.X.threadReads ?? []).find((x) => x.thread_id === t.id && x.person_id === me.id);
+    return { ...t, participant_names: t.participants.map(pname).sort(), created_by_name: pname(t.created_by), last_body: last?.body ?? null, last_sender_name: last ? pname(last.sender_id) : null, message_count: ms.length, unread: !r || r.read_at < t.last_at }; };
+  const postMsg = (threadId: string, body: string) => { const g = get(); const me = g.me()!; const t = g.X.threads!.find((x) => x.id === threadId)!; const at = now();
+    (g.X.threadMsgs ??= []).push({ id: "tm-" + id(), thread_id: threadId, sender_id: me.id, sender_name: name(me), body, created_at: at }); t.last_at = at;
+    g.X.threadReads = (g.X.threadReads ?? []).filter((x) => !(x.thread_id === threadId && x.person_id === me.id)).concat({ thread_id: threadId, person_id: me.id, read_at: at });
+    for (const pid of t.participants) if (pid !== me.id) g.notify(pid, "message", `${name(me)}: ${t.subject}`, body.slice(0, 120), { thread_id: threadId }); };
+
   return {
+    async teamStaff(teamId: string): Promise<TeamStaff[]> {
+      const g = get(); const out: TeamStaff[] = [];
+      for (const m of g.memberships.filter((m) => m.team_id === teamId && m.role !== "dancer")) { const p = g.persons.find((x) => x.id === m.person_id); if (p && p.status === "approved") out.push({ person_id: p.id, name: name(p), role: m.role as "trainer" | "assistant", is_admin: p.is_admin }); }
+      for (const p of g.persons.filter((p) => p.is_admin && p.status === "approved")) if (!out.some((x) => x.person_id === p.id)) out.push({ person_id: p.id, name: name(p), role: "admin", is_admin: true });
+      return out;
+    },
+    async listThreads(): Promise<Thread[]> { const g = get(); const me = g.me()!; return (g.X.threads ?? []).filter((t) => t.participants.includes(me.id)).map(threadOf).sort((a, b) => b.last_at.localeCompare(a.last_at)); },
+    async createThread(i: { team_id: string | null; subject: string; body: string; participant_ids: string[] }): Promise<Thread> {
+      const g = get(); const me = g.me()!; const t: Thread = { id: "th-" + id(), team_id: i.team_id, subject: i.subject, created_by: me.id, created_by_name: name(me), participants: Array.from(new Set([me.id, ...i.participant_ids])), participant_names: [], last_body: null, last_sender_name: null, message_count: 0, unread: false, created_at: now(), last_at: now() };
+      (g.X.threads ??= []).push(t); postMsg(t.id, i.body); g.save(); g.emit(); return threadOf(t);
+    },
+    async listThreadMessages(threadId: string): Promise<ThreadMessage[]> { return (get().X.threadMsgs ?? []).filter((m) => m.thread_id === threadId).sort((a, b) => a.created_at.localeCompare(b.created_at)); },
+    async replyThread(threadId: string, body: string) { postMsg(threadId, body); get().save(); get().emit(); },
+    async markThreadRead(threadId: string) { const g = get(); const me = g.me()!; g.X.threadReads = (g.X.threadReads ?? []).filter((x) => !(x.thread_id === threadId && x.person_id === me.id)).concat({ thread_id: threadId, person_id: me.id, read_at: now() }); g.save(); g.emit(); },
+
     async listPosts(channel: Channel, teamId?: string | null): Promise<Post[]> {
       const g = get(); const admin = !!g.me()?.is_admin;
       return g.X.posts.filter((p) => p.channel === channel && (channel !== "team" || p.team_id === teamId) && (!p.hidden || admin || staffOf(p.team_id)))

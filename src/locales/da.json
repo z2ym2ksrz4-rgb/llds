@@ -113,7 +113,12 @@
     "about": "Om holdet",
     "price": "Pris pr. sæson",
     "noTrophiesYet": "Ingen pokaler endnu – første stævne er {{event}} den {{date}}.",
-    "noTrophies": "Ingen pokaler endnu."
+    "noTrophies": "Ingen pokaler endnu.",
+    "messages": "Beskeder",
+    "writeToTeam": "Skriv til holdet",
+    "fromTrainer": "Til {{team}} – fra træneren",
+    "toEveryone": "Til alle – fra skolen",
+    "noTeamMessages": "Ingen beskeder til holdet endnu."
   },
   "home": {
     "hi": "Hej {{name}}",
@@ -278,7 +283,13 @@
     "childLoginGranted": "{{name}} kan nu logge ind – koden sendes til barnets e-mail",
     "childConsent": "Ved at give adgang samtykker du som forælder til, at dit barn bruger appen. Du kan lukke profilen når som helst.",
     "childTooYoung": "Børneprofil kan gives fra {{age}} år.",
-    "childOwnAccount": "Fra 13 år opretter danseren sin egen profil."
+    "childOwnAccount": "Fra 13 år opretter danseren sin egen profil.",
+    "dangerTitle": "Konto",
+    "deleteAccount": "Slet min konto",
+    "deleteSure": "Er du sikker på, at du vil slette din konto?",
+    "deleteExplain": "Din profil, dine børns profiler uden eget login, opslag, billeder og tilmeldinger slettes permanent. Det kan ikke fortrydes.",
+    "deleteYes": "Ja, slet min konto",
+    "deleteLastAdmin": "Du er skolens eneste admin – gør en anden til admin først."
   },
   "category": {
     "mini": "Mini børn",
@@ -843,5 +854,26 @@
     "youTrain": "Du træner",
     "event": "Event",
     "booking": "Booking"
+  },
+  "threads": {
+    "title": "Samtaler",
+    "writeTo": "Skriv til træneren",
+    "newConversation": "Ny samtale",
+    "to": "Til",
+    "toHint": "Vælg én eller flere – beskeden går kun til dem, du vælger.",
+    "noStaff": "Ingen trænere tilknyttet endnu.",
+    "subject": "Emne",
+    "defaultSubject": "Spørgsmål om {{team}}",
+    "message": "Besked",
+    "send": "Send",
+    "sent": "Sendt",
+    "none": "Ingen samtaler endnu. Skriv til træneren fra holdsiden.",
+    "reply": "Svar",
+    "replyPlaceholder": "Skriv et svar …",
+    "role": {
+      "trainer": "Træner",
+      "assistant": "Hjælpetræner",
+      "admin": "Admin"
+    }
   }
 }

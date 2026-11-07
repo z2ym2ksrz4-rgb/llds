@@ -428,3 +428,14 @@ button.cta { box-shadow:0 10px 26px -12px rgba(201,162,74,.7); }
 .cal .ev b { color:var(--fg); }
 .cal .nowline { position:absolute; left:0; right:0; height:1px; background:var(--gold2); z-index:3; box-shadow:0 0 6px rgba(201,162,74,.9); pointer-events:none; }
 .cal .nowline::before { content:""; position:absolute; left:-4px; top:-3px; width:7px; height:7px; border-radius:50%; background:var(--gold2); }
+
+/* conversations */
+.bubbles { display:flex; flex-direction:column; gap:8px; max-height:50dvh; overflow:auto; padding:2px 0; }
+.bubble { align-self:flex-start; max-width:86%; background:var(--card2); border:1px solid var(--line); border-radius:14px 14px 14px 4px; padding:8px 12px; font-weight:300; font-size:.95rem; }
+.bubble.me { align-self:flex-end; background:rgba(201,162,74,.16); border-color:rgba(201,162,74,.4); border-radius:14px 14px 4px 14px; }
+.bubble .tiny { margin-bottom:2px; }
+.teammsgs .group + .group { margin-top:14px; }
+.teammsgs .group .eyebrow { margin:0 0 4px; display:flex; align-items:center; gap:8px; }
+.teammsgs .group.all .eyebrow { color:var(--fg3); }
+.teammsgs .group.all .eyebrow::before { content:""; width:18px; height:1px; background:var(--fg3); }
+.teammsgs .group.team .eyebrow::before { content:""; width:18px; height:1px; background:var(--gold); }

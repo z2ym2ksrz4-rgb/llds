@@ -19,6 +19,7 @@ export function SettingsScreen() {
   const signOut = useAuth((a) => a.signOut);
   const [childEmail, setChildEmail] = useState<Record<string, string>>({});
   const [msg, setMsg] = useState<string | null>(null);
+  const [confirmDel, setConfirmDel] = useState(false); const [delErr, setDelErr] = useState<string | null>(null);
   const year = new Date().getFullYear();
   return (
     <section className="screen">
@@ -52,6 +53,18 @@ export function SettingsScreen() {
         </select>
       </label>
       <button className="ghost" onClick={() => void signOut()}>{t("common.signOut")}</button>
+      <div className="sec"><h2>{t("settings.dangerTitle")}</h2>
+        {!confirmDel ? <button className="ghost danger small" data-testid="delete-account" onClick={() => setConfirmDel(true)}>{t("settings.deleteAccount")}</button> : (
+          <div className="card" style={{ borderColor: "#7a3b3b" }} data-testid="delete-confirm">
+            <strong>{t("settings.deleteSure")}</strong>
+            <p className="small muted" style={{ margin: 0 }}>{t("settings.deleteExplain")}</p>
+            {delErr && <p className="small warn" style={{ margin: 0 }}>{delErr}</p>}
+            <div className="row" style={{ gap: 8 }}>
+              <button className="danger" data-testid="delete-yes" onClick={async () => { try { await api.deleteMyAccount(); await signOut(); } catch (e) { setDelErr((e as Error).message.includes("last admin") ? t("settings.deleteLastAdmin") : (e as Error).message); } }}>{t("settings.deleteYes")}</button>
+              <button className="ghost" onClick={() => { setConfirmDel(false); setDelErr(null); }}>{t("common.cancel")}</button>
+            </div>
+          </div>)}
+      </div>
       <p className="muted small">
         <a href={appConfig.privacyUrl}>{t("settings.privacy")}</a> · <a href={appConfig.termsUrl}>{t("settings.terms")}</a> · {appConfig.supportEmail} · v{appVersion}
       </p>

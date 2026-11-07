@@ -115,6 +115,7 @@ export const mockApi: Api = {
     save(); emit();
   },
   async updateNotifyPrefs(prefs) { const me = meRow(); if (me) me.notify_prefs = prefs; save(); emit(); },
+  async deleteMyAccount() { const me = meRow(); if (!me) return; const kids = S.guardians.filter((g) => g.parent_id === me.id).map((g) => g.child_id); S.persons = S.persons.filter((p) => p.id !== me.id && !kids.includes(p.id)); S.guardians = S.guardians.filter((g) => g.parent_id !== me.id); S.memberships = S.memberships.filter((m) => m.person_id !== me.id && !kids.includes(m.person_id)); S.email = null; save(); emit(); },
   async getAppearance() { return S.appearance ?? {}; },
   async saveAppearance(a) { S.appearance = a; save(); emit(); },
 
