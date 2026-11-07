@@ -47,8 +47,9 @@ await p.click("text=Næste uge"); await p.waitForTimeout(200); await p.click(".d
 await p.click(".cal .ev:has-text('Hip Hop Junior & Voksen Elite')"); await p.waitForSelector(".sheet");
 await p.click("text=Bed om vikar"); await p.waitForSelector(".toast"); out.sub = await p.textContent(".toast");
 await p.click(".days .day >> nth=1"); await p.waitForTimeout(200);
-await p.click(".cal .ev:has-text('Styrketræning Junior & Voksen')"); await p.waitForSelector(".sheet"); await p.click("text=Fremmøde"); await p.waitForSelector(".sheet .list");
-out.rosterSize = await p.$$eval(".sheet .list .item", e => e.length); await p.click("text=Gem fremmøde"); await p.waitForSelector(".toast");
+await p.click(".cal .ev:has-text('Styrketræning Junior & Voksen')"); await p.waitForSelector(".sheet"); await p.waitForTimeout(300);
+out.noAttendanceBtn = !(await p.$(".sheet button:has-text('Fremmøde')")); // presence is assumed unless absent – no tick needed on non-punch teams
+await p.mouse.click(195, 140); await p.waitForTimeout(300);
 await shot(4); await logout();
 
 // 4. Sofie (trainer) sees substitute wanted on Home and takes it

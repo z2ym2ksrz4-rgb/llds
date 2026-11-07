@@ -16,7 +16,8 @@ export function SessionSheet({ session, absences, onClose, onChanged, toast }: {
   const staffOf = me.person.is_admin || (session.team_id != null && me.memberships.some((m) => m.person_id === me.person.id && m.team_id === session.team_id && m.role !== "dancer"));
   const trainerOf = me.person.is_admin || (session.team_id != null && me.memberships.some((m) => m.person_id === me.person.id && m.team_id === session.team_id && m.role === "trainer"));
   const isSub = session.substitute_id === me.person.id;
-  const canAttend = staffOf || isSub;
+  const punchTeam = !!session.team_id && !!me.teams.find((x) => x.id === session.team_id)?.punch_card_open;
+  const canAttend = (staffOf || isSub) && punchTeam;   // presence is assumed unless absent (settle_attendance); only punch-card teams need the trainer's tick (a punch is paid)
   const isStaffAnywhere = me.person.is_admin || me.memberships.some((m) => m.person_id === me.person.id && m.role !== "dancer");
   const dancerHere = session.team_id != null && me.memberships.some((m) => m.person_id === viewing.personId && m.team_id === session.team_id && m.role === "dancer");
   const myAbsence = absences.find((a) => a.session_id === session.id && a.person_id === viewing.personId);
