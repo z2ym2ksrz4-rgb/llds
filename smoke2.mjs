@@ -11,8 +11,8 @@ await p.goto(base, { waitUntil: "networkidle" }); await p.evaluate(() => localSt
 
 // 1. parent: Freja's week, report absence on first training
 await login("parent@demo");
-await p.waitForSelector(".sec .item"); out.parentWeek = await p.$$eval(".sec .item", e => e.length);
-await p.click(".sec .item >> nth=0"); await p.waitForSelector(".sheet");
+await p.waitForSelector("[data-testid=your-week] .item"); out.parentWeek = await p.$$eval("[data-testid=your-week] .item", e => e.length);
+await p.click("[data-testid=your-week] .item >> nth=0"); await p.waitForSelector(".sheet");
 await p.click("text=Meld afbud for Freja"); await p.click(".sheet .chip:has-text('Syg')"); await p.fill("#absNote", "Feber"); await p.click("text=Send afbud");
 await p.waitForSelector(".toast"); out.absence = await p.textContent(".toast"); await shot(1);
 // 1b. parent books Store Sal for Freja Friday 10:00
