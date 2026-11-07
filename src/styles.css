@@ -412,8 +412,8 @@ button.cta { box-shadow:0 10px 26px -12px rgba(201,162,74,.7); }
 @keyframes fadeout { from { opacity:1; } to { opacity:0; } }
 
 /* ===== Sale v2: photo backdrop, glass grid, team colours, now-line ===== */
-.rooms-bg { position:fixed; inset:0; z-index:-1; background:center/cover no-repeat; filter:blur(3px) brightness(.38) saturate(.8) sepia(.15); transform:scale(1.06); pointer-events:none; }
-.rooms-bg::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(10,10,11,.2), rgba(10,10,11,.75) 45%, var(--bg) 100%); }
+.rooms-bg { position:fixed; inset:0; z-index:-1; background:center 25%/cover no-repeat; filter:brightness(.62) saturate(.9) sepia(.12) contrast(1.05); transform:scale(1.03); pointer-events:none; }
+.rooms-bg::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(10,10,11,.15) 0%, rgba(10,10,11,.3) 40%, rgba(10,10,11,.8) 100%); }
 .screen.rooms .days .day { background:rgba(16,15,13,.55); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); position:relative; }
 .screen.rooms .days .day i { display:block; width:5px; height:5px; border-radius:50%; margin:3px auto 0; background:transparent; }
 .screen.rooms .days .day i.any { background:var(--fg3); }
@@ -422,7 +422,7 @@ button.cta { box-shadow:0 10px 26px -12px rgba(201,162,74,.7); }
 .dayhead { display:flex; flex-direction:column; gap:2px; margin-top:12px; }
 .dayhead h2.display { margin:0; font-size:1.3rem; }
 .screen.rooms .calhead { margin-top:6px; }
-.screen.rooms .calwrap { background:rgba(12,11,10,.62); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border:1px solid rgba(201,162,74,.18); border-radius:14px; padding:4px 6px 0; }
+.screen.rooms .calwrap { background:rgba(12,11,10,.55); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border:1px solid rgba(201,162,74,.18); border-radius:14px; padding:4px 6px 0; }
 .screen.rooms .calwrap .tiny { padding:8px 4px 10px; }
 .cal .col { background:repeating-linear-gradient(180deg, transparent 0 47px, rgba(255,255,255,.06) 47px 48px); border-left:1px solid rgba(255,255,255,.08); }
 .cal .ev { background:rgba(28,26,22,.92); border:1px solid rgba(255,255,255,.08); border-left:3px solid var(--accent2, var(--gold3)); backdrop-filter:blur(4px); box-shadow:0 8px 20px -12px rgba(0,0,0,.8); }
