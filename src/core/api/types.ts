@@ -166,6 +166,7 @@ export interface Api {
   withdrawAbsence(sessionId: string, personId: string): Promise<void>;
   roster(sessionId: string): Promise<RosterEntry[]>;
   saveAttendance(sessionId: string, entries: { person_id: string; present: boolean }[]): Promise<void>;
+  settleAttendance(): Promise<number>;   // "present unless absent": records presence for ended trainings so emblems count by themselves (idempotent)
   /* teams & members (admin/staff) */
   createTeam(input: TeamInput & { name: string }): Promise<Team>;
   updateTeam(id: string, patch: TeamInput): Promise<void>;

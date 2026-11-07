@@ -42,7 +42,7 @@ export function Home() {
   const load = useCallback(async () => {
     const from = startOfDay(new Date()), to = addDays(from, 7);
     const [s, b, ev, ms, o, c] = await Promise.all([api.listSessions(from.toISOString(), to.toISOString()), api.listBookings(from.toISOString(), addDays(from, isAdmin ? 30 : 7).toISOString()).catch(() => [] as Booking[]), api.listEvents(), api.listMilestones(), api.listOrders(), api.listPunchCards()]);
-    void api.listPersonBadges().then(setBadges).catch(() => setBadges([]));
+    void api.settleAttendance().catch(() => 0).then(() => api.listPersonBadges()).then(setBadges).catch(() => setBadges([]));
     setSessions(s); setBookings(b); setEvents(ev); setMilestones(ms); setOrders(o); setCards(c); setAbsences(await api.listAbsences(s.map((x) => x.id)));
   }, [isAdmin]);
   useEffect(() => { void load(); }, [load, viewing.personId]);

@@ -108,6 +108,18 @@ export function scheduleOps(get: () => { S: SchedState; persons: Person[]; membe
         return { person_id: p.id, name: `${p.first_name} ${p.last_name}`, birth_year: p.birth_year, role: m.role, present: a ? a.present : null, absence: g.S.absences.find((x) => x.session_id === session_id && x.person_id === p.id) ?? null, via_punch: !!a?.via_punch };
       }).filter((r) => g.persons.find((p) => p.id === r.person_id)?.status === "approved");
     },
+    async settleAttendance() {
+      const g = get(); const cut = Date.now() - 3600e3; let n = 0;
+      for (const s of g.S.sessions) {
+        if (!s.team_id || s.cancelled || new Date(s.ends_at).getTime() > cut) continue;
+        const team = g.teams.find((t) => t.id === s.team_id); if (!team || team.punch_card_open) continue;
+        for (const m of g.memberships.filter((m) => m.team_id === s.team_id && m.role === "dancer")) {
+          if (g.S.attendance.some((a) => a.session_id === s.id && a.person_id === m.person_id) || g.S.absences.some((a) => a.session_id === s.id && a.person_id === m.person_id)) continue;
+          g.S.attendance.push({ session_id: s.id, person_id: m.person_id, present: true, via_punch: false }); g.awardAuto(m.person_id); n++;
+        }
+      }
+      if (n) { g.save(); g.emit(); } return n;
+    },
     async saveAttendance(session_id: string, entries: { person_id: string; present: boolean }[]) {
       const g = get(); const s = g.S.sessions.find((x) => x.id === session_id);
       g.S.attendance = g.S.attendance.filter((a) => a.session_id !== session_id).concat(entries.map((e) => ({ session_id, ...e, via_punch: e.present && g.punchFor(s?.team_id ?? null, e.person_id, session_id) }))); for (const e of entries) g.awardAuto(e.person_id); g.save(); g.emit();

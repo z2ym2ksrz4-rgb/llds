@@ -68,6 +68,7 @@ export function supabaseSchedule(sb: SupabaseClient, fail: Fail, schoolId: () =>
       return (data ?? []).map((r: Record<string, unknown>) => ({ person_id: r.person_id as string, name: r.name as string, birth_year: r.birth_year as number | null, role: r.role as Role, present: r.present as boolean | null, via_punch: !!r.via_punch,
         absence: r.absence_id ? { id: r.absence_id as string, session_id, person_id: r.person_id as string, reason: r.reason as string | null, note: r.note as string | null } : null }));
     },
+    async settleAttendance() { const { data, error } = await sb.rpc("settle_attendance"); fail(error); return (data as number) ?? 0; },
     async saveAttendance(session_id: string, entries: { person_id: string; present: boolean }[]) {
       const { error } = await sb.from("attendance").upsert(entries.map((e) => ({ session_id, ...e })), { onConflict: "session_id,person_id" }); fail(error);
     },

@@ -399,10 +399,8 @@ button.cta { box-shadow:0 10px 26px -12px rgba(201,162,74,.7); }
 .shelf .trophy .n { font-size:.68rem; letter-spacing:.05em; text-transform:uppercase; color:var(--fg2); text-align:center; line-height:1.2; max-width:100px; }
 .shelf .trophy .tiny { color:var(--fg3); }
 .shelf-board { position:absolute; left:0; right:0; bottom:8px; height:6px; border-radius:3px; background:linear-gradient(90deg, rgba(201,162,74,.05), rgba(201,162,74,.45), rgba(201,162,74,.05)); pointer-events:none; }
-/* tabbar: label only on the active tab */
-.tabbar button span { opacity:1; transform:none; transition:opacity .25s, transform .25s; }
-.tabbar button:not(.active) span { opacity:0; transform:translateY(-4px) scale(.85); }
-@media (min-width:900px) { .tabbar button:not(.active) span { opacity:1; transform:none; } }
+/* tabbar: labels always on; the active tab lights up */
+.tabbar button.active .ico { filter:drop-shadow(0 0 6px rgba(201,162,74,.8)); }
 /* welcome: logo drawn in gold once a day */
 .welcome { position:fixed; inset:0; z-index:60; display:grid; place-items:center; background:var(--bg); pointer-events:none; animation:fadein .4s ease; }
 .welcome.out { animation:fadeout .8s ease forwards; }
