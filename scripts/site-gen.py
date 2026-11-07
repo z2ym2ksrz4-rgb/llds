@@ -50,7 +50,7 @@ for c in SCHED["classes"] + SCHED["monthly"]:
 team_ages["solo-duo"] = {"born", "junior", "voksen"}
 
 LOGO = f'<img class="mark" src="{BASE}/brand/logo-white.png" alt="LL Dance Studio">'
-NAV = [("Holdplan", "/saeson-26-27/", "Alle hold, dag for dag"), ("Medlemsskab", "/medlemsskab/", "Priser, rater og prøvetimer"), ("Stjerneshoppen", "/merchandise/", "Tøj og merchandise"), ("Backstage", "/backstage/", "Trænerne bag studiet"), ("Kontakt", "/kontakt/", "Find os i Ulstrup")]
+NAV = [("Holdplan", "/saeson-26-27/", "Alle hold, dag for dag"), ("Medlemsskab", "/medlemsskab/", "Priser, rater og prøvetimer"), ("Stjerneshoppen", "/merchandise/", "Tøj og merchandise"), ("Backstage", "/backstage/", "Trænerne bag studiet"), ("Kontakt", "/kontakt/", "Find os i Ulstrup"), ("Appen", "/hent/", "Hent eller åbn appen")]
 ICON_ARROW = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>'
 
 CSS = r"""
@@ -177,6 +177,12 @@ section{padding:clamp(64px,9vw,120px) 0;position:relative}section.tight{padding-
 .gal .dots{display:flex;justify-content:center;gap:6px;margin-top:12px}.gal .dots i{width:6px;height:6px;border-radius:50%;background:var(--fg3);transition:all .3s}.gal .dots i.on{background:var(--gold2);width:18px;border-radius:3px}
 .pay .qr{width:168px;height:168px;margin:14px auto 6px;padding:10px;background:#fff;border-radius:14px}.pay .qr svg{width:100%;height:100%;display:block}
 .evnext{grid-column:1/-1;position:relative;min-height:340px;border-radius:26px;overflow:hidden;background-size:cover;background-position:center;border:1px solid rgba(201,162,74,.3);display:flex;align-items:flex-end}.evnext::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,12,0) 0%,rgba(10,10,12,.55) 40%,rgba(10,10,12,.97) 75%)}.evnext-in{position:relative;padding:28px 26px 26px;max-width:620px}.evnext-in h3{font-size:clamp(28px,5vw,42px);margin:6px 0 8px;line-height:1.05}.evnext-in .btn{margin-top:16px}
+.hent{display:grid;gap:34px;grid-template-columns:1fr;align-items:start}@media(min-width:900px){.hent{grid-template-columns:1.4fr .8fr}}
+.hent-ios,.hent-android,.hent-web{margin-top:22px;padding-top:18px;border-top:1px solid rgba(201,162,74,.18)}.hent .eyebrow{margin-bottom:10px}.hent .tiny{margin-top:10px}
+.hent-qr{text-align:center;padding:26px}.hent-qr .qr{width:200px;height:200px;margin:14px auto 10px;padding:12px;background:#fff;border-radius:16px}.hent-qr .qr svg{width:100%;height:100%;display:block}
+@media(max-width:899px){.hent-qr{display:none}}
+.hent-ios,.hent-android,.hent-web{display:none}html[data-os=ios] .hent-ios,html[data-os=android] .hent-android,html[data-os=desktop] .hent-web,html[data-os=desktop] .hent-ios,html[data-os=desktop] .hent-android{display:block}
+.btn.hbtn{white-space:nowrap}
 .bar{position:sticky;top:64px;z-index:20;background:rgba(10,10,11,.8);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:999px;padding:6px;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;margin:0 0 28px}.bar::-webkit-scrollbar{display:none}
 .bar button{flex:1 0 auto;background:none;border:0;color:var(--muted);border-radius:999px;padding:11px 20px;font-family:inherit;font-size:.9rem;cursor:pointer;transition:all .3s;white-space:nowrap}.bar button.on{color:#161206;background:linear-gradient(135deg,var(--gold2),var(--gold))}
 .day{display:none}.day.on{display:grid;grid-template-columns:1fr 1fr;gap:28px}@media(max-width:760px){.day.on{grid-template-columns:1fr}}
@@ -278,6 +284,9 @@ box.querySelector("#wm-b").onsubmit=async ev=>{ev.preventDefault();const f=new F
 try{const r=await rpc("web_order",{p_school_slug:SLUG,p_name:g("nm"),p_email:g("em"),p_phone:g("ph"),p_lines:[{product_id:pr.id,size,qty}]});payView(W.orderOk.replace("{n}",r.number),r.total_dkk,r.reference,r.mobilepay,g("ph"),W.pickup,W.buy)}
 catch(x){const m=String(x.message||"");err.textContent=m.includes("email")?W.errMail:m.includes("too many")?W.errMany:W.err+" "+SUPPORT;btn.disabled=false;btn.innerHTML=W.order+" "+ICON}}}))}
 
+// Hent appen: show the right store for the visitor's phone; everything on desktop + QR to this page
+{const ua=navigator.userAgent,os=/iPhone|iPad|iPod/i.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1)?"ios":/Android/i.test(ua)?"android":"desktop";document.documentElement.dataset.os=os;
+const hq=document.getElementById("hent-qr");if(hq&&os==="desktop"){try{const qr=qrcode(0,"M");qr.addData(hq.dataset.url);qr.make();hq.querySelector(".qr").innerHTML=qr.createSvgTag({cellSize:4,margin:0,scalable:true})}catch{hq.remove()}}}
 // photo carousel on the front page: Line picks the images in the app (Admin → Tilpas appen → Billedkarrusel); falls back to her team photos
 const gal=document.getElementById("gallery");if(gal){const CM=%(catmap)s;const resolve=r=>/^https?:|^data:/.test(r)?r:r.startsWith("art/")?`${BASE}/${r}`:CM[r]?`${BASE}/app/art/catalog/${CM[r]}`:null;
 const render=list=>{const tr=gal.querySelector(".track"),dots=gal.querySelector(".dots");tr.innerHTML=list.map((u,i)=>`<img src="${esc(u)}" alt="" loading="${i<2?"eager":"lazy"}">`).join("");dots.innerHTML=list.map((_,i)=>`<i class="${i?"":"on"}"></i>`).join("");
@@ -302,7 +311,7 @@ def page(title, body, desc, active="", hero=None, hero_title=None, hero_sub=None
 {heroh}{body}
 <footer><div class="wrap"><div class="cols3"><div><img src="{BASE}/brand/logo-white.png" alt="LL Dance Studio" style="width:180px;margin-bottom:14px"><p class="muted small">{E(C["address"])}<br><a href="tel:{C["phone"].replace(" ", "")}" style="display:inline">{E(C["phone"])}</a> · {E(C["hours"])}<br><a href="mailto:{C["email"]}" style="display:inline">{C["email"]}</a></p></div>
 <div><h4>Sider</h4>{"".join(f'<a href="{BASE}{h}">{l}</a>' for l, h, _ in NAV)}<a href="{BASE}/solo-duo/">Solo / Duo</a></div>
-<div><h4>Appen</h4><a href="{BASE}/app/">Log ind / tilmeld</a><a href="{BASE}/support/">Hjælp &amp; FAQ</a><a href="{BASE}/privacy/">Privatlivspolitik</a><a href="{BASE}/terms/">Vilkår</a></div></div>
+<div><h4>Appen</h4><a href="{BASE}/hent/">Hent / åbn appen</a><a href="{BASE}/support/">Hjælp &amp; FAQ</a><a href="{BASE}/privacy/">Privatlivspolitik</a><a href="{BASE}/terms/">Vilkår</a></div></div>
 <div class="legal"><span>© {date.today().year} {E(C["name"])}</span><span>App og website af <a href="https://ilumie.com/" style="display:inline">Ilumie</a></span></div></div></footer>
 <div class="stickycta">{sticky}</div>
 <script src="{BASE}/site.js?v={BUILD}" defer></script></body></html>"""
@@ -403,7 +412,7 @@ home = f"""
 <div class="band rv"><div class="bg" style="background-image:url({H["welcome_band_image"]})"></div><div><div class="eyebrow">Kom forbi</div><h2>{E(H["welcome_band_title"])}</h2><p class="muted small">{E(H["welcome_band"])}</p><a class="btn ghost" href="{BASE}/kontakt/">Kontakt os {ICON_ARROW}</a></div></div></div></section>
 <script type="application/json" id="teams-data">{teams_data}</script>
 """
-write("index.html", page("LL Dance Studio – danseskole i Ulstrup", home, "Showdance, hip hop, contemporary, disco, ballet og spring for alle aldre i Ulstrup. Find dit hold, bliv medlem og følg med i appen.", "/", hero=H["hero"], hero_title="Dans med hjertet.<br><em>Vind med holdet.</em>", hero_sub="LL Dance Studio · Ulstrup", hero_lead="Danseskole for alle aldre – fra de allermindste til elitehold, der stiller op til DM. Showdance, hip hop, contemporary, disco, ballet og spring.", small=False, extra=f'<div class="btns" style="margin-top:6px"><a class="btn" href="#finder">Find dit hold {ICON_ARROW}</a><a class="btn ghost" href="{BASE}/app/">Log ind i appen</a></div>{stats}<div class="cue"></div>'))
+write("index.html", page("LL Dance Studio – danseskole i Ulstrup", home, "Showdance, hip hop, contemporary, disco, ballet og spring for alle aldre i Ulstrup. Find dit hold, bliv medlem og følg med i appen.", "/", hero=H["hero"], hero_title="Dans med hjertet.<br><em>Vind med holdet.</em>", hero_sub="LL Dance Studio · Ulstrup", hero_lead="Danseskole for alle aldre – fra de allermindste til elitehold, der stiller op til DM. Showdance, hip hop, contemporary, disco, ballet og spring.", small=False, extra=f'<div class="btns" style="margin-top:6px"><a class="btn" href="#finder">Find dit hold {ICON_ARROW}</a><a class="btn ghost" href="{BASE}/app/">Åbn appen</a></div>{stats}<div class="cue"></div>'))
 
 # ---------------- holdplan
 days = "".join(f'<button data-day="{i}" class="{"on" if i == 0 else ""}">{d}</button>' for i, d in enumerate(SCHED["days"]))
@@ -460,7 +469,7 @@ write("merchandise/index.html", page("Stjerneshoppen – LL Dance Studio", shop,
 # ---------------- backstage
 staff = "".join(f'<div class="card rv"><img src="{s["image"]}" alt="{E(s["name"])}" loading="lazy"><div class="in"><h3>{E(s["name"])}</h3><div class="tiny" style="color:var(--gold)">{E(s["role"])}</div>{("<div class=tiny style=margin-top:4px>" + E(s["teaches"]) + "</div>") if s.get("teaches") else ""}<p class="small muted" style="margin:10px 0 0">{E(s["bio"])}</p></div></div>' for s in P["staff"])
 back = f"""<section class="tight"><div class="wrap"><div class="staff">{staff}</div>
-<div class="app rv" style="margin-top:40px"><div class="txt"><div class="eyebrow">For dansere, forældre og trænere</div><h2>Backstage er <em>appen</em></h2><p class="muted">Træninger, afbud, koreografi, holdets mapper, beskeder og tilmeldinger – alt det, der før lå spredt, ligger nu ét sted.</p><a class="btn" href="{BASE}/app/">Log ind i appen {ICON_ARROW}</a></div><div class="pic" style="background-image:url({ART(4)})"></div></div></div></section>"""
+<div class="app rv" style="margin-top:40px"><div class="txt"><div class="eyebrow">For dansere, forældre og trænere</div><h2>Backstage er <em>appen</em></h2><p class="muted">Træninger, afbud, koreografi, holdets mapper, beskeder og tilmeldinger – alt det, der før lå spredt, ligger nu ét sted.</p><a class="btn" href="{BASE}/hent/">Hent appen {ICON_ARROW}</a></div><div class="pic" style="background-image:url({ART(4)})"></div></div></div></section>"""
 write("backstage/index.html", page("Backstage – LL Dance Studio", back, "Trænerne bag LL Dance Studio – og indgangen til appen for dansere, forældre og trænere.", "/backstage/", hero=P["staff"][0]["image"], hero_title="Mød <em>trænerne</em>", hero_sub="Backstage", hero_lead="Holdet bag LL Dance Studio – dansere og undervisere med erfaring fra konkurrencer, shows og mange års undervisning."))
 
 # ---------------- kontakt
@@ -486,12 +495,33 @@ TERMS = f"""<h1 style="font-size:2.6rem">Vilkår for brug</h1><p class="muted">S
 <h2>Køb og medlemsskab</h2><p>Priser er i danske kroner inkl. moms. Shop og klippekort betales via MobilePay; ordren bekræftes, når LL Dance Studio har registreret betalingen. Klippekort gælder 12 måneder fra aktivering. Sæsonpris, rater, prøvetimer og fortrydelsesret: se <a href="{BASE}/medlemsskab/">Medlemsskab</a>.</p>
 <h2>Drift</h2><p>Appen leveres som den er; vi tilstræber høj oppetid, men garanterer den ikke. Ilumie kan opdatere appen og disse vilkår – væsentlige ændringer meldes i appen.</p><p>Kontakt: <a href="mailto:{SUPPORT}">{SUPPORT}</a></p>"""
 SUPPORTP = f"""<h1 style="font-size:2.6rem">Hjælp</h1>
-<h2>Sådan kommer du i gang</h2><ol><li>Åbn <a href="{BASE}/app/">appen</a> og skriv din e-mail – du får en 6-cifret kode (tjek spam første gang).</li><li>Udfyld din profil og dine børn, vælg hold og tryk Send.</li><li>Line godkender – typisk samme dag.</li></ol>
-<h2>Føj appen til hjemmeskærmen</h2><p><b>iPhone:</b> åbn linket i Safari → Del → “Føj til hjemmeskærm”. <b>Android:</b> menuen (⋮) → “Installér app”.</p>
-<h2>Ofte stillede spørgsmål</h2><p><b>Jeg får ingen kode.</b> Tjek spam/kampagner og stavningen. Koden gælder i 1 time.</p><p><b>Mit barn er 10–12 år – kan det få sit eget login?</b> Ja: Mere → Indstillinger → dit barn → “Giv login”.</p><p><b>Jeg ser ikke koreografi-videoer.</b> På junior- og voksenhold er videoer kun for danserne selv.</p><p><b>Betaling.</b> Shop, klippekort og egenbetaling betales med MobilePay i appen – tryk “Jeg har betalt”, Line bekræfter.</p>
+<h2>Sådan kommer du i gang</h2>
+<p><b>Ny hos LL Dance Studio?</b> Tilmeld dig på <a href="{BASE}/">forsiden</a> (Find dit hold → Tilmeld). Du betaler med Vipps MobilePay, og når Line har registreret betalingen, får du en kvittering på mail med et link til appen. Er du i tvivl om hold, så kontakt Line først.</p>
+<p><b>Allerede medlem?</b> Så er du oprettet. <a href="{BASE}/hent/">Åbn appen</a> og log ind med den e-mail, Line har – du får en 6-cifret kode på mail (tjek spam første gang). Ingen adgangskode at huske.</p>
+<p><b>Inviteret af Line?</b> Brug linket i hendes besked eller gå til <a href="{BASE}/hent/">Hent appen</a>, og log ind med din e-mail.</p>
+<h2>Hent appen</h2>
+<p>Appen virker på telefon, tablet og computer. <b>Telefon:</b> <a href="{BASE}/hent/">Hent appen</a> – i App Store og Google Play, når den er udgivet; indtil da føjer du den til hjemmeskærmen (iPhone: Safari → Del → “Føj til hjemmeskærm”, Android: menuen ⋮ → “Installér app”). <b>Computer:</b> <a href="{BASE}/app/">åbn appen i browseren</a> – samme login, samme indhold.</p>
+<h2>Ofte stillede spørgsmål</h2>
+<p><b>Jeg får ingen kode.</b> Tjek spam/kampagner og stavningen. Koden gælder i 1 time. Bruger du en anden e-mail end den, Line har? Så kan appen ikke finde dig – skriv til Line.</p>
+<p><b>Jeg kan logge ind, men ser ingen hold.</b> Line skal godkende dig først – typisk samme dag. Du får besked i appen, når det er sket.</p>
+<p><b>Mit barn er 10–12 år – kan det få sit eget login?</b> Ja: Mere → Indstillinger → dit barn → “Giv login”. Børn under 10 ser appen gennem en forælder.</p>
+<p><b>Jeg ser ikke koreografi-videoer.</b> På junior- og voksenhold er videoer kun for danserne selv.</p>
+<p><b>Betaling.</b> Hold, klippekort og shop betales med Vipps MobilePay til studiets nummer med den reference, du får vist. På telefonen åbner appen MobilePay direkte; på computeren scanner du en QR-kode. Line registrerer betalingen, og du får en kvittering på mail.</p>
+<p><b>Slet min konto.</b> Mere → Indstillinger → Slet konto. Dine data slettes med det samme.</p>
 <h2>Kontakt</h2><p>Hold, priser og betaling: Line Lund Olesen, {E(C["phone"])}. Tekniske problemer: <a href="mailto:{SUPPORT}">{SUPPORT}</a>.</p>"""
+
 write("privacy/index.html", plain("Privatlivspolitik – LL Dance Studio", PRIVACY, "Sådan behandler LL Dance Studio-appen dine data."))
 write("terms/index.html", plain("Vilkår – LL Dance Studio", TERMS, "Vilkår for brug af LL Dance Studio-appen."))
+
+STORE = P.get("store", {})
+_badge = lambda url, label: (f'<a class="btn" href="{url}" rel="noopener">{label} {ICON_ARROW}</a>' if url else f'<span class="btn ghost" style="opacity:.6;cursor:default">{label} · kommer snart</span>')
+HENT = f"""<section class="tight" style="padding-top:110px"><div class="wrap"><div class="hent"><div><div class="eyebrow">Appen</div><h1>Hent <em>appen</em></h1><p class="lead">Træninger, afbud, beskeder, koreografi og betalinger – på telefonen, tabletten og computeren. Log ind med den e-mail, Line har – du får en kode på mail, ingen adgangskode at huske.</p>
+<div class="hent-ios"><div class="eyebrow">iPhone &amp; iPad</div>{_badge(STORE.get("app_store"), "App Store")}<p class="tiny">Indtil appen er i App Store: <a href="{BASE}/app/">åbn den her i Safari</a> → Del → “Føj til hjemmeskærm”.</p></div>
+<div class="hent-android"><div class="eyebrow">Android</div>{_badge(STORE.get("play"), "Google Play")}<p class="tiny">Indtil appen er i Google Play: <a href="{BASE}/app/">åbn den her i Chrome</a> → menuen ⋮ → “Installér app”.</p></div>
+<div class="hent-web"><div class="eyebrow">Computer</div><a class="btn" href="{BASE}/app/">Åbn appen i browseren {ICON_ARROW}</a><p class="tiny">Samme login og indhold som på telefonen.</p></div>
+<p class="tiny" style="margin-top:18px">Ny hos os? <a href="{BASE}/">Tilmeld dig på forsiden</a> først – du får et link til appen i din kvittering.</p></div>
+<div class="hent-qr card" id="hent-qr" data-url="https://ilumie.com{BASE}/hent/"><div class="eyebrow">Scan med telefonen</div><div class="qr"></div><p class="tiny">Åbner denne side på din telefon</p></div></div></div></section>"""
+write("hent/index.html", page("Hent appen – LL Dance Studio", HENT, "Hent LL Dance Studio-appen til iPhone, Android eller computer.", "/hent/"))
 write("support/index.html", plain("Hjælp – LL Dance Studio", SUPPORTP, "Kom i gang med LL Dance Studio-appen."))
 
 write("style.css", CSS)
