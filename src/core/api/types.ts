@@ -299,3 +299,12 @@ export interface Api {
   giveBadge(personId: string, badgeId: string, teamId: string | null, note?: string): Promise<void>;
   removeBadge(id: string): Promise<void>;
 }
+
+/* ---------------- image catalogue (admin uploads, in folders) ---------------- */
+export type CatalogEntry = { id: string; folder: string; title: string | null; url: string; created_at: string };
+export interface Api {
+  listCatalog(): Promise<CatalogEntry[]>;
+  uploadCatalog(files: File[], folder: string): Promise<CatalogEntry[]>;
+  renameCatalogFolder(from: string, to: string): Promise<void>;
+  deleteCatalog(id: string): Promise<void>;
+}

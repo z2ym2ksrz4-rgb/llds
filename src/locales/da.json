@@ -22,7 +22,8 @@
     "back": "Tilbage",
     "saved": "Gemt",
     "more": "Læs mere",
-    "less": "Vis mindre"
+    "less": "Vis mindre",
+    "deleted": "Slettet"
   },
   "lang": {
     "da": "Dansk",
@@ -675,7 +676,21 @@
     "title": "Billedkatalog",
     "pick": "Billede",
     "auto": "Automatisk",
-    "hint": "{{n}} billeder i kataloget – læg nye i public/art/catalog."
+    "hint": "{{n}} billeder i kataloget – læg nye i public/art/catalog.",
+    "upload": "Upload eget",
+    "all": "Alle",
+    "ownFolder": "Egne billeder",
+    "bundled": "Indbygget",
+    "adminTitle": "Billedkatalog",
+    "adminSub": "Upload billeder og organisér i mapper",
+    "newFolder": "Ny mappe",
+    "folderName": "Mappenavn",
+    "uploadTo": "Upload til {{folder}}",
+    "rename": "Omdøb mappe",
+    "delete": "Slet billede",
+    "empty": "Ingen egne billeder endnu – upload det første.",
+    "bundledHint": "Indbyggede illustrationer følger med appen og kan ikke slettes.",
+    "uploaded": "{{n}} billede(r) lagt i {{folder}}"
   },
   "tour": {
     "eyebrow": "Velkommen",

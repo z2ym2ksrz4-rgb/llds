@@ -316,3 +316,5 @@ button.cta { box-shadow:0 10px 26px -12px rgba(201,162,74,.7); }
 .tour-card.bottom, .tour-card.top { position:fixed; left:14px; right:14px; width:auto; margin:0 auto; }
 .tour-card h3 { font-family:var(--display); font-size:1.4rem; margin:0; }
 .tour-card .cta.small { padding:10px 14px; }
+.imgpick .ip.upload { border:1px dashed rgba(201,162,74,.55); background:var(--card); }
+.imgpick .ip.upload .auto { font-size:1.6rem; }

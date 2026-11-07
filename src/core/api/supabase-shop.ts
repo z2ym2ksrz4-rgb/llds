@@ -1,4 +1,4 @@
-import type { Badge, PersonBadge, SupabaseClient } from "@supabase/supabase-js";
+import type { CatalogEntry, Badge, PersonBadge, SupabaseClient } from "@supabase/supabase-js";
 import type { Event, EventInput, EventSignup, Milestone, Notification, Order, OrderLine, Product, PunchCard, PunchCardType } from "./types";
 import { downscaleImage } from "./image";
 
@@ -76,6 +76,24 @@ export function supabaseShop(sb: SupabaseClient, fail: Fail, schoolId: () => Pro
     },
     async giveMilestone(personId: string, title: string, teamId: string | null) { const { error } = await sb.from("milestone").insert({ person_id: personId, title, team_id: teamId, reached_on: new Date().toISOString().slice(0, 10), given_by: await myPersonId() }); fail(error); },
     async deleteMilestone(id: string) { const { error } = await sb.from("milestone").delete().eq("id", id); fail(error); },
+
+    /* image catalogue */
+    async listCatalog() {
+      const { data, error } = await sb.from("catalog_image").select("*").order("folder").order("created_at", { ascending: false }); fail(error);
+      return (data ?? []).map((r: { id: string; folder: string; title: string | null; storage_path: string; created_at: string }) => ({ id: r.id, folder: r.folder, title: r.title, url: pubUrl(r.storage_path)!, created_at: r.created_at }));
+    },
+    async uploadCatalog(files, folder) {
+      const sid = await schoolId(); const pid = await myPersonId(); const out: CatalogEntry[] = [];
+      for (const f of files) {
+        const path = `${schoolSlug}/catalog/${folder.replace(/[^\w\-æøåÆØÅ ]/g, "_")}/${crypto.randomUUID()}.jpg`;
+        const { error: ue } = await sb.storage.from("public").upload(path, await downscaleImage(f, 1600), { contentType: "image/jpeg" }); fail(ue);
+        const { data, error } = await sb.from("catalog_image").insert({ school_id: sid, folder, title: f.name.replace(/\.\w+$/, ""), storage_path: path, created_by: pid }).select("*").single(); fail(error);
+        out.push({ id: data.id, folder: data.folder, title: data.title, url: pubUrl(data.storage_path)!, created_at: data.created_at });
+      }
+      return out;
+    },
+    async renameCatalogFolder(from, to) { const { error } = await sb.from("catalog_image").update({ folder: to }).eq("folder", from); fail(error); },
+    async deleteCatalog(id) { const { data } = await sb.from("catalog_image").select("storage_path").eq("id", id).single(); if (data?.storage_path) await sb.storage.from("public").remove([data.storage_path]); const { error } = await sb.from("catalog_image").delete().eq("id", id); fail(error); },
 
     /* emblems */
     async listBadges() { const { data, error } = await sb.from("badge").select("*").eq("active", true).order("sort"); fail(error); return (data ?? []) as Badge[]; },

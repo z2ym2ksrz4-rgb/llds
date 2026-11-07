@@ -1,11 +1,11 @@
-import type { PersonBadge, Event, EventInput, EventSignup, Membership, Milestone, Notification, Order, OrderLine, Person, Product, PunchCard, PunchCardType, Team } from "./types";
+import type { CatalogEntry, PersonBadge, Event, EventInput, EventSignup, Membership, Milestone, Notification, Order, OrderLine, Person, Product, PunchCard, PunchCardType, Team } from "./types";
 import { downscaleImage, fileToDataUrl } from "./image";
 import { BADGES, monthKey, totalBadge } from "@/domain/llds/lib/badges";
 
 /** Phase-4 half of the mock: events, shop, punch cards, milestones, notifications. */
 export type ShopState = {
   events: Event[]; signups: EventSignup[]; products: Product[]; orders: Order[]; orderSeq: number;
-  cardTypes: PunchCardType[]; cards: PunchCard[]; punches: { card_id: string; session_id: string }[]; milestones: Milestone[]; notifications: Notification[]; badges?: PersonBadge[];
+  cardTypes: PunchCardType[]; cards: PunchCard[]; punches: { card_id: string; session_id: string }[]; milestones: Milestone[]; notifications: Notification[]; badges?: PersonBadge[]; catalog?: CatalogEntry[];
 };
 const id = () => Math.random().toString(36).slice(2, 10);
 const now = () => new Date().toISOString();
@@ -108,6 +108,16 @@ export function shopOps(get: () => { Y: ShopState; persons: Person[]; membership
       const g = get(); const me = g.me()!; const m: Milestone = { id: "ms-" + id(), person_id: personId, person_name: name(personId), title, reached_on: now().slice(0, 10), team_id: teamId, team_name: g.teams.find((t) => t.id === teamId)?.name ?? null, given_by_name: name(me.id), created_at: now() };
       g.Y.milestones.push(m); for (const pid of family(personId)) g.notify(pid, "milestone", "Ny milepæl 🏅", title, { milestone_id: m.id }); g.save(); g.emit();
     },
+    /* image catalogue */
+    async listCatalog() { return (get().Y.catalog ?? []).slice().sort((a, b) => a.folder.localeCompare(b.folder) || b.created_at.localeCompare(a.created_at)); },
+    async uploadCatalog(files: File[], folder: string) {
+      const g = get(); if (!g.Y.catalog) g.Y.catalog = []; const out: CatalogEntry[] = [];
+      for (const f of files) { const e: CatalogEntry = { id: "cat-" + id(), folder, title: f.name.replace(/\.\w+$/, ""), url: await fileToDataUrl(await downscaleImage(f, 800, 0.8)), created_at: now() }; g.Y.catalog.push(e); out.push(e); }
+      g.save(); g.emit(); return out;
+    },
+    async renameCatalogFolder(from: string, to: string) { const g = get(); for (const e of g.Y.catalog ?? []) if (e.folder === from) e.folder = to; g.save(); g.emit(); },
+    async deleteCatalog(cid: string) { const g = get(); g.Y.catalog = (g.Y.catalog ?? []).filter((e) => e.id !== cid); g.save(); g.emit(); },
+
     /* emblems */
     async listBadges() { return BADGES.map((b, i) => ({ id: "b-" + b.key, key: b.key, name: b.name, emoji: b.emoji, description: b.desc, kind: b.kind, monthly: !!b.monthly, sort: i })); },
     async listPersonBadges(filter?: { personId?: string; teamId?: string }) {

@@ -22,7 +22,8 @@
     "back": "Back",
     "saved": "Saved",
     "more": "Read more",
-    "less": "Show less"
+    "less": "Show less",
+    "deleted": "Deleted"
   },
   "lang": {
     "da": "Dansk",
@@ -675,7 +676,21 @@
     "title": "Image catalogue",
     "pick": "Image",
     "auto": "Automatic",
-    "hint": "{{n}} images in the catalogue – add new ones in public/art/catalog."
+    "hint": "{{n}} images in the catalogue – add new ones in public/art/catalog.",
+    "upload": "Upload own",
+    "all": "All",
+    "ownFolder": "Own images",
+    "bundled": "Built-in",
+    "adminTitle": "Image catalogue",
+    "adminSub": "Upload images and organise in folders",
+    "newFolder": "New folder",
+    "folderName": "Folder name",
+    "uploadTo": "Upload to {{folder}}",
+    "rename": "Rename folder",
+    "delete": "Delete image",
+    "empty": "No own images yet – upload the first one.",
+    "bundledHint": "Built-in illustrations ship with the app and cannot be deleted.",
+    "uploaded": "{{n}} image(s) added to {{folder}}"
   },
   "tour": {
     "eyebrow": "Welcome",

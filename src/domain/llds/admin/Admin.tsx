@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { api, type Booking, type Member, type Message, type Order, type Product, type PunchCard, type PunchCardType, type Report, type Role, type Session, type Team, type TeamInput } from "@/core/api";
 import { Events } from "../screens/Events";
 import { ImportPhotos } from "./ImportPhotos";
+import { CatalogAdmin } from "./Catalog";
 import { MessageComposer, MessageSheet } from "../components/Messages";
 import { ago } from "../lib/time";
 import { AdminUsers } from "./Users";
@@ -13,7 +14,7 @@ import { ImagePicker } from "../components/ImagePicker";
 import { CATALOG, catalogUrl } from "../lib/catalog";
 import { addDays, DAY_LONG, hm, mondayOf, startOfDay } from "../lib/time";
 
-type Page = "menu" | "users" | "members" | "teams" | "season" | "bookings" | "messages" | "reports" | "events" | "shop" | "punch" | "import";
+type Page = "menu" | "users" | "members" | "teams" | "season" | "bookings" | "messages" | "reports" | "events" | "shop" | "punch" | "import" | "catalog";
 const CATS = ["mini", "kids", "junior", "adult", "mixed"] as const;
 
 /** Admin: the one place Line runs the school from. Everything else in the app reads what she sets here. */
@@ -37,11 +38,13 @@ export function Admin() {
   if (page === "shop") return <Back onBack={() => setPage("menu")}><ShopAdmin /></Back>;
   if (page === "punch") return <Back onBack={() => setPage("menu")}><PunchAdmin /></Back>;
   if (page === "import") return <Back onBack={() => setPage("menu")}><ImportPhotos /></Back>;
+  if (page === "catalog") return <Back onBack={() => setPage("menu")}><CatalogAdmin /></Back>;
   const items: [Page, string, string, number][] = [
     ["users", t("admin.users"), t("admin.usersSub"), counts.pending], ["members", t("admin.members"), t("admin.membersSub"), 0], ["teams", t("admin.teams"), t("admin.teamsSub"), 0],
     ["season", t("admin.season"), t("admin.seasonSub"), counts.subs], ["bookings", t("admin.bookings"), t("admin.bookingsSub"), counts.bookings],
     ["messages", t("admin.messages"), t("admin.messagesSub"), 0], ["reports", t("admin.reports"), t("admin.reportsSub"), counts.reports],
     ["events", t("events.title"), t("admin.eventsSub"), 0], ["shop", t("admin.shop"), t("admin.shopSub"), counts.orders], ["punch", t("punch.title"), t("admin.punchSub"), counts.cards],
+    ["catalog", t("catalog.adminTitle"), t("catalog.adminSub"), 0],
     ["import", t("admin.importPhotos"), t("admin.importSub"), 0],
   ];
   return (
@@ -132,7 +135,7 @@ function TeamEditor({ team, onClose, onSaved }: { team: Team | null; onClose: ()
       <Toggle k="parents_see_video" label={t("admin.parentsSeeVideo")} hint={t("admin.parentsSeeVideoHint")} />
       <Toggle k="punch_card_open" label={t("team.punchOpen")} hint={t("admin.punchHint")} />
       <label className="toggle"><span>{t("admin.teamPublic")}<div className="tiny">{t("admin.teamPublicHint")}</div></span><input type="checkbox" checked={f.visibility === "public"} onChange={(e) => setF({ ...f, visibility: e.target.checked ? "public" : "private" })} /></label>
-      <ImagePicker tag="team" value={f.cover_url?.startsWith("art/catalog/") ? f.cover_url.replace("art/catalog/", "").replace(/\.\w+$/, "") : null} onChange={(k) => setF({ ...f, cover_url: k ? `art/catalog/${CATALOG.find((c) => c.key === k)?.file}` : (team?.cover_url?.startsWith("art/catalog/") ? null : team?.cover_url ?? null) })} />
+      <ImagePicker tag="team" value={f.cover_url?.startsWith("art/catalog/") ? f.cover_url.replace("art/catalog/", "").replace(/\.\w+$/, "") : f.cover_url?.startsWith("http") && f.cover_url !== team?.cover_url ? f.cover_url : null} onChange={(k) => setF({ ...f, cover_url: !k ? (team?.cover_url?.startsWith("art/catalog/") ? null : team?.cover_url ?? null) : k.startsWith("http") ? k : `art/catalog/${CATALOG.find((c) => c.key === k)?.file}` })} />
       <label className="field"><span>{t("admin.teamDescription")}</span><textarea rows={3} value={f.description ?? ""} onChange={(e) => setF({ ...f, description: e.target.value })} placeholder={t("admin.teamDescriptionPh")} /></label>
       <div className="row"><button className="cta grow" disabled={!f.name.trim()} onClick={async () => { if (team) await api.updateTeam(team.id, f); else await api.createTeam(f); onSaved(); }}>{t("common.save")}</button>
         {team && <button className="ghost danger" onClick={async () => { await api.updateTeam(team.id, { archived: true }); onSaved(); }}>{t("admin.archive")}</button>}</div>
