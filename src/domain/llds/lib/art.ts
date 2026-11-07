@@ -1,4 +1,5 @@
 /** Stock art (AI-generated, no real people) shipped with the app. Used where no real photo exists yet. */
+import { catalogFor } from "./catalog";
 export type ArtKey = "group" | "solo" | "trophy" | "studio" | "trails" | "costume";
 const N: Record<ArtKey, number> = { group: 1, solo: 2, trophy: 3, studio: 4, trails: 5, costume: 6 };
 export const art = (k: ArtKey, small = false) => `${import.meta.env.BASE_URL}art/${N[k]}${small ? "s" : ""}.jpg`;
@@ -12,4 +13,16 @@ export function teamAccent(team: { id: string; color: string | null }): Record<s
   if (team.color) return { "--accent": team.color, "--accent2": team.color } as Record<string, string>;
   let h = 0; for (const c of team.id) h = (h * 31 + c.charCodeAt(0)) >>> 0; const [a, b] = METALS[h % METALS.length];
   return { "--accent": a, "--accent2": b } as Record<string, string>;
+}
+
+/** Image for the "Om holdet" card: another of Line's own photos when the team has any; otherwise a catalogue image for the category that differs from the hero. Never AI next to real photos. */
+export function aboutImage(team: { id: string; category: string; cover_url?: string | null; alt_url?: string | null; cover_path?: string | null; photos?: string[] }, heroUrl: string | null): string | null {
+  const own = (team.photos ?? []).filter((p) => p !== heroUrl && p !== team.cover_url);
+  if (/^https?:\/\/(?!.*supabase)/.test(team.alt_url ?? "") && !own.includes(team.alt_url!)) own.push(team.alt_url!); // website photo displaced by an uploaded cover
+  const hasOwn = !!team.cover_path || (team.photos?.length ?? 0) > 0 || /^https?:/.test(team.cover_url ?? "");
+  if (hasOwn) return own[0] ?? null;
+  const pool = catalogFor("team").map((c) => `${import.meta.env.BASE_URL}art/catalog/${c.file}`).filter((u) => u !== heroUrl);
+  if (!pool.length) return null;
+  let h = 7; for (const c of team.id) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  return pool[h % pool.length];
 }

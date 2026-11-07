@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type Absence, type Event, type Member, type PersonBadge, type Result, type Session } from "@/core/api";
 import { resolveImage } from "../lib/catalog";
-import { teamAccent } from "../lib/art";
+import { aboutImage, teamAccent } from "../lib/art";
 import { confetti } from "../lib/confetti";
 import { EmblemRow, EmblemSheet, GiveEmblemSheet } from "../components/Emblems";
 import { useAuth } from "@/core/auth";
@@ -97,11 +97,13 @@ export function TeamScreen() {
     </section>
   );
 
+  const heroUrl = resolveImage(team.cover_url) ?? artForCategory(team.category);
+  const aboutImg = aboutImage(team, heroUrl);
   return (
     <section className="screen" style={teamAccent(team)}>
       <header className="topbar"><h1 className="display">{team.name}</h1><TopRight /></header>
       <TeamPicker />
-      <div className="hero photo kb" data-testid="team-hero" data-tour="team-hero"><span className="bg warm" style={{ backgroundImage: `url(${resolveImage(team.cover_url) ?? artForCategory(team.category)})` }} />
+      <div className="hero photo kb" data-testid="team-hero" data-tour="team-hero"><span className="bg warm" style={{ backgroundImage: `url(${heroUrl})` }} />
         <div><div className="eyebrow">{team.style} · {t(`category.${team.category}`)} · {team.level}</div><h2 className="display">{team.name}</h2>
           <div className="small muted">{t("team.dancersN", { n: stats.dancers })}{trainerName ? ` · ${trainerName}` : ""}{next ? ` · ${DAY_LONG[(new Date(next.starts_at).getDay() + 6) % 7]} ${hm(next.starts_at)} ${next.room_name ?? ""}` : ""}</div>
           <div className="small muted">{t(`roles.${role ?? "dancer"}`)}{team.closed ? ` · ${t("team.closed")}` : ""}{team.punch_card_open ? ` · ${t("team.punchOpen")}` : ""}</div></div>
@@ -117,6 +119,7 @@ export function TeamScreen() {
 
       {(team.description || team.price || team.day_time) && (
         <div className="sec"><h2>{t("team.about")}</h2><div className="card" data-testid="team-about">
+          {aboutImg && <div className="mood" data-testid="team-about-img" style={{ backgroundImage: `url(${aboutImg})` }} />}
           {(team.day_time || team.years) && <div className="small muted" style={{ marginBottom: 8 }}>{[team.day_time, team.years].filter(Boolean).join(" · ")}</div>}
           {team.description && <About text={team.description} />}
           {team.price && (staff || role === "parent") && <div className="row between" style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid var(--line)" }}><span className="tiny">{t("team.price")}</span><span className="gold small">{team.price}</span></div>}

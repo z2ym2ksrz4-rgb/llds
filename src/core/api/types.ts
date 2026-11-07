@@ -49,6 +49,7 @@ export type Team = {
   description?: string | null;
   cover_path?: string | null;
   cover_url?: string | null;
+  photos?: string[];            // Line's own photos of the team (website URLs); a second one is shown under "Om holdet"
   alt_url?: string | null;      // the raw cover_url when a real cover_path photo overrides it – shown as a mood image on the team page
   price?: string | null;
   years?: string | null;
