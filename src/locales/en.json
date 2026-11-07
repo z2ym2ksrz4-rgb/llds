@@ -286,7 +286,13 @@
       "tryout": "Open team, but the trainer assesses level after trial lessons. Shown as a badge on the website.",
       "audition": "Admission only through audition/selection. Shown as a badge on the website and in the app."
     },
-    "admissionNotePh": "Note, e.g. “Audition 15 August at 10” or “4 trial lessons”"
+    "admissionNotePh": "Note, e.g. “Audition 15 August at 10” or “4 trial lessons”",
+    "prices": "Prices",
+    "priceSignup": "Sign-up price (kr.)",
+    "installments": "Instalments allowed",
+    "installmentsHint": "2/4/10 instalments with a 50 kr. fee per instalment",
+    "priceNotePh": "Note, e.g. “Remaining 975 kr. after 4 trial lessons” or “Paid with punch card”",
+    "pricesHint": "Used at sign-up on the website and in the app. Sign-up price = what is paid at sign-up if lower than the full season."
   },
   "settings": {
     "language": "Language",
@@ -686,6 +692,9 @@
       "full": "Full season",
       "half": "Half season",
       "rates": "Instalments (agreed)",
+      "rates2": "2 instalments",
+      "rates4": "4 instalments",
+      "rates10": "10 instalments",
       "custom": "Other amount"
     },
     "join": "Join a new team",
@@ -720,7 +729,17 @@
     "perDancer": "Per dancer",
     "total": "Total ({{n}} dancers)",
     "send": "Send to {{n}}",
-    "sentN": "{{n}} payment requests sent."
+    "sentN": "{{n}} payment requests sent.",
+    "ratesPaid": "{{paid}}/{{n}} instalments paid",
+    "perRate": "per instalment",
+    "feeIncl": "incl. {{fee}} kr. instalment fee",
+    "rateN": "Pay instalment {{k}}",
+    "ofN": "of {{n}}",
+    "seeNote": "See note",
+    "requested": "Sign-up sent",
+    "ratesText": "Line gets back to you about payment.",
+    "feeHint": "Instalments: {{fee}} kr. per instalment – only one fee per instalment, however many teams.",
+    "markRate": "Mark instalment {{k}} paid"
   },
   "milestones": {
     "title": "Milestones",

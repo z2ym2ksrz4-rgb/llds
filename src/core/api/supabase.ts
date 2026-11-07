@@ -68,9 +68,9 @@ export function supabaseApi(url: string, anonKey: string): Api {
     async listWebSignups() { const { data, error } = await sb.from("web_signup_view").select("*").order("created_at", { ascending: false }).limit(200); fail(error); return (data ?? []) as WebSignup[]; },
     async listMyPayments() { const { data, error } = await sb.from("web_signup_view").select("*").order("created_at", { ascending: false }); fail(error); return (data ?? []) as WebSignup[]; },
     async claimPaymentPaid(id) { const { error } = await sb.rpc("web_signup_claim_paid", { p_id: id }); fail(error); },
-    async appSignupTeam(teamId, personId, plan) { const { data, error } = await sb.rpc("app_signup_team", { p_team: teamId, p_person: personId, p_plan: plan }); fail(error); return data as { id: string; reference: string; amount_dkk: number | null; amount_before_dkk: number | null; discount_pct: number; team: string }; },
+    async appSignupTeam(teamId, personId, plan) { const { data, error } = await sb.rpc("app_signup_team", { p_team: teamId, p_person: personId, p_plan: plan }); fail(error); return data as { id: string; reference: string; amount_dkk: number | null; amount_before_dkk: number | null; discount_pct: number; team: string; installments?: number; fee_dkk?: number; per_rate_dkk?: number | null; note?: string | null }; },
     async requestPayment(i) { const { data, error } = await sb.rpc("request_payment", { p_team: i.team_id, p_person_ids: i.person_ids, p_plan: i.plan, p_amount: i.amount_dkk, p_discount_pct: i.discount_pct, p_message: i.message ?? null }); fail(error); return (data as number) ?? 0; },
-    async setWebSignupStatus(id, status) { const { error } = await sb.from("web_signup").update({ status }).eq("id", id); fail(error); },
+    async setWebSignupStatus(id, status) { if (status === "paid") { const { error } = await sb.rpc("mark_payment_paid", { p_id: id }); fail(error); return; } const { error } = await sb.from("web_signup").update({ status }).eq("id", id); fail(error); },
     async signUp(i) {
       const { error } = await sb.rpc("sign_up", {
         p_school_slug: schoolSlug, p_first: i.firstName, p_last: i.lastName, p_phone: i.phone, p_birth_year: i.birthYear, p_birth_date: i.birthDate,

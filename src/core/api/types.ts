@@ -50,6 +50,7 @@ export type Team = {
   description?: string | null;
   cover_path?: string | null;
   cover_url?: string | null;
+  price_full?: number | null; price_half?: number | null; price_signup?: number | null; price_note?: string | null; installments_allowed?: boolean;
   admission?: "open" | "tryout" | "audition";   // how dancers get on the team (badge on website + app)
   admission_note?: string | null;
   photos?: string[];            // Line's own photos of the team (website URLs); a second one is shown under "Om holdet"
@@ -80,7 +81,7 @@ export type SignUpInput = {
 };
 
 export type PendingPerson = Person & { children: Person[] };
-export type WebSignup = { id: string; dancer_id: string; contact_id: string; team_id: string; team_name: string; dancer_name: string; contact_name: string; email: string | null; phone: string | null; plan: "full" | "half" | "rates" | string | null; amount_dkk: number | null; amount_before_dkk?: number | null; discount_pct?: number; source?: "web" | "admin" | "app"; message?: string | null; reference: string; note: string | null; status: "awaiting_payment" | "paid" | "cancelled"; claimed_paid_at: string | null; created_at: string };
+export type WebSignup = { id: string; dancer_id: string; contact_id: string; team_id: string; team_name: string; dancer_name: string; contact_name: string; email: string | null; phone: string | null; plan: "full" | "half" | "rates" | string | null; amount_dkk: number | null; amount_before_dkk?: number | null; discount_pct?: number; source?: "web" | "admin" | "app"; message?: string | null; installments?: number; fee_dkk?: number; per_rate_dkk?: number | null; rates_paid?: number; price_note?: string | null; reference: string; note: string | null; status: "awaiting_payment" | "paid" | "cancelled"; claimed_paid_at: string | null; created_at: string };
 
 export interface Api {
   /** auth */
@@ -98,7 +99,7 @@ export interface Api {
   setWebSignupStatus(id: string, status: "awaiting_payment" | "paid" | "cancelled"): Promise<void>;
   listMyPayments(): Promise<WebSignup[]>;                       // season payments for me / my children (web sign-ups + admin requests)
   claimPaymentPaid(id: string): Promise<void>;                  // "Jeg har betalt" on a season payment
-  appSignupTeam(teamId: string, personId: string, plan: string): Promise<{ id: string; reference: string; amount_dkk: number | null; amount_before_dkk: number | null; discount_pct: number; team: string }>;
+  appSignupTeam(teamId: string, personId: string, plan: string): Promise<{ id: string; reference: string; amount_dkk: number | null; amount_before_dkk: number | null; discount_pct: number; team: string; installments?: number; fee_dkk?: number; per_rate_dkk?: number | null; note?: string | null }>;
   requestPayment(input: { team_id: string; person_ids: string[]; plan: string; amount_dkk: number; discount_pct: number; message?: string | null }): Promise<number>;   // person + children without own login + auth user; throws 'last admin'
   getAppearance(): Promise<Appearance>;      // works before login (anon)
   saveAppearance(a: Appearance): Promise<void>; // admin
@@ -156,7 +157,7 @@ export type Absence = { id: string; session_id: string; person_id: string; reaso
 
 export type RosterEntry = { person_id: string; name: string; birth_year: number | null; role: Role; present: boolean | null; absence: Absence | null; via_punch: boolean };
 
-export type TeamInput = Partial<Pick<Team, "name" | "style" | "category" | "level" | "closed" | "parents_see_video" | "punch_card_open" | "color" | "description" | "cover_url" | "admission" | "admission_note">> & { max_dancers?: number | null; visibility?: "public" | "private"; archived?: boolean };
+export type TeamInput = Partial<Pick<Team, "name" | "style" | "category" | "level" | "closed" | "parents_see_video" | "punch_card_open" | "color" | "description" | "cover_url" | "admission" | "admission_note" | "price_full" | "price_half" | "price_signup" | "price_note" | "installments_allowed" | "price">> & { max_dancers?: number | null; visibility?: "public" | "private"; archived?: boolean };
 
 export type Member = Person & { memberships: Membership[]; children: Person[]; parents: Person[] };
 

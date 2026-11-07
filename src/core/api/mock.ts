@@ -34,6 +34,7 @@ const TEAMS: Team[] = [
   closed: closed as boolean, admission: (closed ? "audition" : "open") as Team["admission"], parents_see_video: psv as boolean, punch_card_open: punch as boolean, color: null, sort: i,
   years: ({ mini: "2017–2020", kids: "2014–2016", junior: "2008–2013", adult: "2007 og ældre (17 år+)", mixed: "Fra årgang 2012" } as Record<string, string>)[category as string],
   price: ({ mini: "2.400 kr. for hel sæson, eller 1.750 kr. for halv sæson", kids: "2.650 kr. for hel sæson, eller 1.900 kr. for halv sæson", junior: "3.200 kr. for hel sæson, eller 2.250 kr. for halv sæson", adult: "2.900 kr. for hel sæson", mixed: "2.250 kr. for hel sæson, eller 1.550 kr. for halv sæson" } as Record<string, string>)[category as string],
+  price_full: ({ mini: 2400, kids: 2650, junior: 3200, adult: 2900, mixed: 2250 } as Record<string, number>)[category as string], price_half: ({ mini: 1750, kids: 1900, junior: 2250, mixed: 1550 } as Record<string, number>)[category as string] ?? null, installments_allowed: true,
   description: `${name} er et ${(style as string).toLowerCase()}-hold på niveauet ${level}. Vi træner teknik, udtryk og sammenhold – og glæder os til at se dig på gulvet.`,
 }));
 
@@ -117,19 +118,21 @@ export const mockApi: Api = {
   },
   async updateNotifyPrefs(prefs) { const me = meRow(); if (me) me.notify_prefs = prefs; save(); emit(); },
   async listWebSignups() { return S.payments ?? []; },
-  async setWebSignupStatus(id, status) { const p = (S.payments ?? []).find((x) => x.id === id); if (p) { p.status = status; if (status === "paid") { if (!S.memberships.some((m) => m.person_id === p.dancer_id && m.team_id === p.team_id)) S.memberships.push({ person_id: p.dancer_id, team_id: p.team_id, role: "dancer" }); for (const pid of new Set([p.dancer_id, p.contact_id])) notify(pid, "payment", "Betaling modtaget ✓", `${p.team_name} · ${p.amount_dkk} kr.`, { payment_id: p.id }); } } save(); emit(); },
+  async setWebSignupStatus(id, status) { const p = (S.payments ?? []).find((x) => x.id === id); if (p) { if (status === "paid" && (p.installments ?? 1) > 1) { p.rates_paid = Math.min(p.installments!, (p.rates_paid ?? 0) + 1); p.claimed_paid_at = null; if (!S.memberships.some((m) => m.person_id === p.dancer_id && m.team_id === p.team_id)) S.memberships.push({ person_id: p.dancer_id, team_id: p.team_id, role: "dancer" }); if (p.rates_paid! < p.installments!) { save(); emit(); return; } } p.status = status; if (status === "paid") { if (!S.memberships.some((m) => m.person_id === p.dancer_id && m.team_id === p.team_id)) S.memberships.push({ person_id: p.dancer_id, team_id: p.team_id, role: "dancer" }); for (const pid of new Set([p.dancer_id, p.contact_id])) notify(pid, "payment", "Betaling modtaget ✓", `${p.team_name} · ${p.amount_dkk} kr.`, { payment_id: p.id }); } } save(); emit(); },
   async listMyPayments() { const me = meRow(); if (!me) return []; const mine = new Set([me.id, ...S.guardians.filter((g) => g.parent_id === me.id).map((g) => g.child_id)]); return (S.payments ?? []).filter((p) => mine.has(p.dancer_id) || mine.has(p.contact_id)); },
   async claimPaymentPaid(id) { const p = (S.payments ?? []).find((x) => x.id === id); if (p && !p.claimed_paid_at) { p.claimed_paid_at = now(); for (const a of S.persons.filter((x) => x.is_admin && x.status === "approved")) notify(a.id, "payment", "Betaling meldt", `${p.dancer_name} · ${p.team_name} · ${p.amount_dkk} kr.`, { payment_id: p.id }); } save(); emit(); },
   async appSignupTeam(teamId, personId, plan) {
     const me = meRow()!; const team = S.teams.find((t) => t.id === teamId)!; const p = S.persons.find((x) => x.id === personId)!;
     if (S.memberships.some((m) => m.person_id === personId && m.team_id === teamId)) throw new Error("already member");
-    const amounts = (team.price ?? "").match(/([0-9][0-9.]*) kr/g)?.map((x) => parseInt(x.replace(/\D/g, ""), 10)) ?? [2400, 1750];
-    const before = plan === "full" ? amounts[0] : plan === "half" ? amounts[1] ?? amounts[0] : null;
+    const n = plan === "rates2" ? 2 : plan === "rates4" ? 4 : plan === "rates10" ? 10 : 1;
+    const before = plan === "half" && team.price_half ? team.price_half : team.price_signup ?? team.price_full ?? null;
     const pct = before != null && (S.payments ?? []).some((w) => w.contact_id === me.id && w.status !== "cancelled" && (w.amount_before_dkk ?? w.amount_dkk ?? 0) >= before) ? 10 : 0;
-    const amount = before == null ? null : Math.round(before * (100 - pct) / 100); const reference = `${team.name.slice(0, 18)} ${p.first_name}`; const pid = "pay-" + id();
-    (S.payments ??= []).push({ id: pid, dancer_id: p.id, contact_id: me.id, team_id: team.id, team_name: team.name, dancer_name: `${p.first_name} ${p.last_name}`, contact_name: `${me.first_name} ${me.last_name}`, email: me.email, phone: me.phone, plan, amount_dkk: amount, amount_before_dkk: before, discount_pct: pct, source: "app", message: null, reference, note: null, status: "awaiting_payment", claimed_paid_at: null, created_at: now() });
+    const net = before == null ? null : Math.round(before * (100 - pct) / 100);
+    const fee = n > 1 && !(S.payments ?? []).some((w) => w.contact_id === me.id && w.status !== "cancelled" && w.installments === n) ? 50 * n : 0;
+    const amount = net == null ? null : net + fee; const perRate = amount == null ? null : n > 1 ? Math.ceil(amount / n) : amount; const reference = `${team.name.slice(0, 18)} ${p.first_name}`; const pid = "pay-" + id();
+    (S.payments ??= []).push({ id: pid, dancer_id: p.id, contact_id: me.id, team_id: team.id, team_name: team.name, dancer_name: `${p.first_name} ${p.last_name}`, contact_name: `${me.first_name} ${me.last_name}`, email: me.email, phone: me.phone, plan, amount_dkk: amount, amount_before_dkk: before, discount_pct: pct, installments: n, fee_dkk: fee, per_rate_dkk: perRate, rates_paid: 0, price_note: team.price_note ?? null, source: "app", message: null, reference, note: null, status: "awaiting_payment", claimed_paid_at: null, created_at: now() });
     for (const a of S.persons.filter((x) => x.is_admin && x.status === "approved")) notify(a.id, "signup", "Ny holdtilmelding i appen 📝", `${p.first_name} → ${team.name}`, { payment_id: pid });
-    save(); emit(); return { id: pid, reference, amount_dkk: amount, amount_before_dkk: before, discount_pct: pct, team: team.name };
+    save(); emit(); return { id: pid, reference, amount_dkk: amount, amount_before_dkk: before, discount_pct: pct, team: team.name, installments: n, fee_dkk: fee, per_rate_dkk: perRate, note: team.price_note ?? null };
   },
   async requestPayment(i) {
     const team = S.teams.find((t) => t.id === i.team_id); if (!team) return 0; let n = 0;

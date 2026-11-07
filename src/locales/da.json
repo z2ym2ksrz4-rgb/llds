@@ -286,7 +286,13 @@
       "tryout": "Åbent hold, men træneren vurderer niveau efter prøvegange. Vises som badge på websitet.",
       "audition": "Optagelse kun via audition/udtagelse. Vises som badge på websitet og i appen."
     },
-    "admissionNotePh": "Note, fx “Audition 15. august kl. 10” eller “4 prøvegange”"
+    "admissionNotePh": "Note, fx “Audition 15. august kl. 10” eller “4 prøvegange”",
+    "prices": "Priser",
+    "priceSignup": "Tilmeldingspris (kr.)",
+    "installments": "Rater tilladt",
+    "installmentsHint": "2/4/10 rater à 50 kr. gebyr pr. rate",
+    "priceNotePh": "Note, fx “Resterende 975 kr. betales efter 4 prøvegange” eller “Betales med klippekort”",
+    "pricesHint": "Bruges ved tilmelding på websitet og i appen. Tilmeldingspris = det der betales ved tilmelding, hvis det er mindre end hel sæson."
   },
   "settings": {
     "language": "Sprog",
@@ -686,6 +692,9 @@
       "full": "Hel sæson",
       "half": "Halv sæson",
       "rates": "Rater (aftales)",
+      "rates2": "2 rater",
+      "rates4": "4 rater",
+      "rates10": "10 rater",
       "custom": "Andet beløb"
     },
     "join": "Tilmeld nyt hold",
@@ -720,7 +729,17 @@
     "perDancer": "Pr. danser",
     "total": "I alt ({{n}} dansere)",
     "send": "Send til {{n}}",
-    "sentN": "{{n}} betalingsanmodninger sendt."
+    "sentN": "{{n}} betalingsanmodninger sendt.",
+    "ratesPaid": "{{paid}}/{{n}} rater betalt",
+    "perRate": "pr. rate",
+    "feeIncl": "inkl. {{fee}} kr. rategebyr",
+    "rateN": "Betal rate {{k}}",
+    "ofN": "af {{n}}",
+    "seeNote": "Se note",
+    "requested": "Tilmelding sendt",
+    "ratesText": "Line vender tilbage om betalingen.",
+    "feeHint": "Ratebetaling: {{fee}} kr. pr. rate – kun ét gebyr pr. rate, uanset hvor mange hold.",
+    "markRate": "Markér rate {{k}} betalt"
   },
   "milestones": {
     "title": "Milepæle",
