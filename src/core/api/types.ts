@@ -250,7 +250,7 @@ export interface Api {
   setTeamCover(teamId: string, storagePath: string | null): Promise<void>;
   /* choreography */
   listVideos(teamId: string): Promise<Video[]>;
-  uploadVideo(teamId: string, title: string, file: File): Promise<void>;
+  uploadVideo(teamId: string, title: string, file: File, notes?: string | null): Promise<void>;
   updateVideo(id: string, patch: { title?: string; formations?: Formation[]; notes?: string | null }): Promise<void>;
   deleteVideo(id: string): Promise<void>;
   /* trainer notes */

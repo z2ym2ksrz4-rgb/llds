@@ -68,17 +68,17 @@ export function supabaseSocial(sb: SupabaseClient, fail: Fail, schoolId: () => P
     async ackMessage(id: string) { const { error } = await sb.from("message_receipt").upsert({ message_id: id, person_id: await myPersonId() }, { onConflict: "message_id,person_id" }); fail(error); },
     async messageStatus(id: string): Promise<MessageStatus[]> { const { data, error } = await sb.rpc("message_status", { p_message: id }); fail(error); return (data ?? []) as MessageStatus[]; },
 
-    async teamStaff(teamId) { const { data, error } = await sb.rpc("team_staff", { p_team: teamId }); fail(error); return (data ?? []) as TeamStaff[]; },
+    async teamStaff(teamId: string) { const { data, error } = await sb.rpc("team_staff", { p_team: teamId }); fail(error); return (data ?? []) as TeamStaff[]; },
     async listThreads() { const { data, error } = await sb.from("thread_view").select("*").order("last_at", { ascending: false }).limit(100); fail(error); return (data ?? []) as Thread[]; },
-    async createThread(i) {
+    async createThread(i: { team_id: string | null; subject: string; body: string; participant_ids: string[] }) {
       const me = await myPersonId(); const ids = Array.from(new Set([me!, ...i.participant_ids]));
       const { data, error } = await sb.from("thread").insert({ school_id: await schoolId(), team_id: i.team_id, subject: i.subject, created_by: me, participants: ids }).select("id").single(); fail(error);
       const { error: e2 } = await sb.from("thread_message").insert({ thread_id: data!.id, sender_id: me, body: i.body }); fail(e2);
       const { data: t, error: e3 } = await sb.from("thread_view").select("*").eq("id", data!.id).single(); fail(e3); return t as Thread;
     },
-    async listThreadMessages(threadId) { const { data, error } = await sb.from("thread_message_view").select("*").eq("thread_id", threadId).order("created_at"); fail(error); return (data ?? []) as ThreadMessage[]; },
-    async replyThread(threadId, body) { const { error } = await sb.from("thread_message").insert({ thread_id: threadId, sender_id: await myPersonId(), body }); fail(error); },
-    async markThreadRead(threadId) { const { error } = await sb.from("thread_read").upsert({ thread_id: threadId, person_id: await myPersonId(), read_at: new Date().toISOString() }, { onConflict: "thread_id,person_id" }); fail(error); },
+    async listThreadMessages(threadId: string) { const { data, error } = await sb.from("thread_message_view").select("*").eq("thread_id", threadId).order("created_at"); fail(error); return (data ?? []) as ThreadMessage[]; },
+    async replyThread(threadId: string, body: string) { const { error } = await sb.from("thread_message").insert({ thread_id: threadId, sender_id: await myPersonId(), body }); fail(error); },
+    async markThreadRead(threadId: string) { const { error } = await sb.from("thread_read").upsert({ thread_id: threadId, person_id: await myPersonId(), read_at: new Date().toISOString() }, { onConflict: "thread_id,person_id" }); fail(error); },
 
     async listFolders(teamId: string): Promise<Folder[]> {
       const { data, error } = await sb.from("folder_view").select("*").eq("team_id", teamId).order("created_at"); fail(error);
@@ -113,10 +113,10 @@ export function supabaseSocial(sb: SupabaseClient, fail: Fail, schoolId: () => P
       const rows = (data ?? []) as Video[]; const urls = await sign(rows.map((v) => v.storage_path));
       return rows.map((v) => ({ ...v, url: urls[v.storage_path] ?? "", formations: (v.formations ?? []) as Formation[] }));
     },
-    async uploadVideo(teamId: string, title: string, file: File) {
+    async uploadVideo(teamId: string, title: string, file: File, notes?: string | null) {
       const path = `${schoolSlug}/videos/${teamId}/${uid()}.${ext(file)}`;
       await upload(path, file);
-      const { error } = await sb.from("video").insert({ team_id: teamId, uploader_id: await myPersonId(), title, storage_path: path }); fail(error);
+      const { error } = await sb.from("video").insert({ team_id: teamId, uploader_id: await myPersonId(), title, storage_path: path, notes: notes || null }); fail(error);
     },
     async updateVideo(id: string, patch: { title?: string; formations?: Formation[]; notes?: string | null }) { const { error } = await sb.from("video").update(patch).eq("id", id); fail(error); },
     async deleteVideo(id: string) {

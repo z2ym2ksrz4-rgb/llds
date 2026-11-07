@@ -70,7 +70,7 @@ function applyView(real: Me, viewAs: ViewRole | null, teamId: string | null): Me
     const child = { ...real.person, id: PREVIEW_CHILD, first_name: "Barnet", last_name: real.person.last_name, email: null, user_id: null, is_admin: false, birth_year: new Date().getFullYear() - Math.min(age ?? 8, 12), birth_date: `${new Date().getFullYear() - Math.min(age ?? 8, 12)}-01-15`, supervised_by: null };
     return { ...real, person, children: [child], memberships: tid ? [{ person_id: PREVIEW_CHILD, team_id: tid, role: "dancer" as Role }] : [] };
   }
-  const role: Role = viewAs === "dancerChild" ? "dancer" : viewAs;
+  const role: Role = viewAs === "dancerChild" || viewAs === "admin" ? "dancer" : viewAs;
   let mine = own.filter((m) => m.role === role);
   if (!mine.length && real.person.is_admin && tid) mine = [{ person_id: real.person.id, team_id: tid, role }];
   // a dancer on a team whose oldest dancers are 10–12 only has a supervised child login (no photo upload)

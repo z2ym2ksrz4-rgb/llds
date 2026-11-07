@@ -1,5 +1,5 @@
-import type { CatalogEntry, Badge, PersonBadge, SupabaseClient } from "@supabase/supabase-js";
-import type { Event, EventInput, EventSignup, Milestone, Notification, Order, OrderLine, Product, PunchCard, PunchCardType } from "./types";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { CatalogEntry, Badge, PersonBadge, Event, EventInput, EventSignup, Milestone, Notification, Order, OrderLine, Product, PunchCard, PunchCardType } from "./types";
 import { downscaleImage } from "./image";
 
 type Fail = (e: { message: string } | null) => void;
@@ -82,7 +82,7 @@ export function supabaseShop(sb: SupabaseClient, fail: Fail, schoolId: () => Pro
       const { data, error } = await sb.from("catalog_image").select("*").order("folder").order("created_at", { ascending: false }); fail(error);
       return (data ?? []).map((r: { id: string; folder: string; title: string | null; storage_path: string; created_at: string }) => ({ id: r.id, folder: r.folder, title: r.title, url: pubUrl(r.storage_path)!, created_at: r.created_at }));
     },
-    async uploadCatalog(files, folder) {
+    async uploadCatalog(files: File[], folder: string) {
       const sid = await schoolId(); const pid = await myPersonId(); const out: CatalogEntry[] = [];
       for (const f of files) {
         const path = `${schoolSlug}/catalog/${folder.replace(/[^\w\-æøåÆØÅ ]/g, "_")}/${crypto.randomUUID()}.jpg`;
@@ -92,22 +92,22 @@ export function supabaseShop(sb: SupabaseClient, fail: Fail, schoolId: () => Pro
       }
       return out;
     },
-    async renameCatalogFolder(from, to) { const { error } = await sb.from("catalog_image").update({ folder: to }).eq("folder", from); fail(error); },
-    async deleteCatalog(id) { const { data } = await sb.from("catalog_image").select("storage_path").eq("id", id).single(); if (data?.storage_path) await sb.storage.from("public").remove([data.storage_path]); const { error } = await sb.from("catalog_image").delete().eq("id", id); fail(error); },
+    async renameCatalogFolder(from: string, to: string) { const { error } = await sb.from("catalog_image").update({ folder: to }).eq("folder", from); fail(error); },
+    async deleteCatalog(id: string) { const { data } = await sb.from("catalog_image").select("storage_path").eq("id", id).single(); if (data?.storage_path) await sb.storage.from("public").remove([data.storage_path]); const { error } = await sb.from("catalog_image").delete().eq("id", id); fail(error); },
 
     /* emblems */
     async listBadges() { const { data, error } = await sb.from("badge").select("*").eq("active", true).order("sort"); fail(error); return (data ?? []) as Badge[]; },
-    async listPersonBadges(filter) {
+    async listPersonBadges(filter?: { personId?: string; teamId?: string }) {
       let q = sb.from("person_badge_view").select("*").order("created_at", { ascending: false });
       if (filter?.personId) q = q.eq("person_id", filter.personId); else if (filter?.teamId) q = q.eq("team_id", filter.teamId);
       const { data, error } = await q.limit(200); fail(error); return (data ?? []) as PersonBadge[];
     },
-    async giveBadge(personId, badgeId, teamId, note) {
+    async giveBadge(personId: string, badgeId: string, teamId: string | null, note?: string) {
       const { data: b } = await sb.from("badge").select("monthly").eq("id", badgeId).single();
       const period = b?.monthly ? new Date().toISOString().slice(0, 7) : null;
       const { error } = await sb.from("person_badge").insert({ person_id: personId, badge_id: badgeId, team_id: teamId, period, note: note || null, given_by: await myPersonId() }); fail(error);
     },
-    async removeBadge(id) { const { error } = await sb.from("person_badge").delete().eq("id", id); fail(error); },
+    async removeBadge(id: string) { const { error } = await sb.from("person_badge").delete().eq("id", id); fail(error); },
 
     async listNotifications(): Promise<Notification[]> { const { data, error } = await sb.from("notification").select("*").order("created_at", { ascending: false }).limit(60); fail(error); return (data ?? []) as Notification[]; },
     async markNotificationsRead(ids?: string[]) {

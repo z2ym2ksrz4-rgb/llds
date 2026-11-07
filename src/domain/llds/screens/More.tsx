@@ -12,10 +12,8 @@ type Page = "menu" | "shop" | "punch" | "milestones" | "settings";
 /** "Mere": events, shop, punch cards, milestones, settings. */
 export function More() {
   const { t } = useTranslation();
-  const me = useAuth((s) => s.me)!;
   const [page, setPage] = useState<Page>("menu");
   const setTab = useNav((s) => s.setTab);
-  const hasPunch = me.teams.some((x) => x.punch_card_open);
   if (page === "shop") return <Shop onBack={() => setPage("menu")} />;
   if (page === "punch") return <PunchCards onBack={() => setPage("menu")} />;
   if (page === "milestones") return <Milestones onBack={() => setPage("menu")} />;

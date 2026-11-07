@@ -13,7 +13,6 @@ import { Sheet, Toast } from "../components/Sheet";
 import { MessageComposer, MessageSheet } from "../components/Messages";
 import { ThreadComposer } from "../components/Threads";
 import { ScrollList } from "../components/ScrollList";
-import { ago } from "../lib/time";
 import { TopRight } from "../components/ProfileMenu";
 import { Folders } from "./Folders";
 import { Choreo } from "./Choreo";
@@ -22,7 +21,7 @@ import { MILESTONE_IDEAS } from "../lib/milestones";
 import { artForCategory } from "../lib/art";
 import { ageOf, addDays, ago, dateLabel, DAY_LONG, hm, startOfDay } from "../lib/time";
 
-type Page = "team" | "folders" | "choreo" | "notes" | "dancers";
+type Page = "team" | "folders" | "choreo" | "formations" | "notes" | "dancers";
 
 /** "Mit hold" like the demo: photo hero, four tiles, next events, trophy shelf, then feed, trainings and (staff) roster. */
 export function TeamScreen() {
@@ -33,7 +32,6 @@ export function TeamScreen() {
   const roleOn = useAuth((s) => s.roleOn);
   const team = me.teams.find((x) => x.id === teamId);
   const staff = me.person.is_admin || (teamId != null && me.memberships.some((m) => m.person_id === me.person.id && m.team_id === teamId && m.role !== "dancer"));
-  const isStaffAnywhere = me.person.is_admin || me.memberships.some((m) => m.person_id === me.person.id && m.role !== "dancer");
   const [page, setPage] = useState<Page>("team");
   const [sessions, setSessions] = useState<Session[]>([]);
   const [absences, setAbsences] = useState<Absence[]>([]);
@@ -71,6 +69,7 @@ export function TeamScreen() {
   if (!team) return <section className="screen"><header className="topbar"><h1 className="display">{t("team.myTeam")}</h1><TopRight /></header><TeamPicker /><p className="muted">{t("team.noneYet")}</p></section>;
   if (page === "folders") return <><Folders teamId={team.id} staff={staff} onBack={() => { setPage("team"); void load(); }} toast={say} /><Toast msg={toast} /></>;
   if (page === "choreo") return <><Choreo teamId={team.id} staff={staff} onBack={() => { setPage("team"); void load(); }} toast={say} /><Toast msg={toast} /></>;
+  if (page === "formations") return <><Choreo mode="formations" teamId={team.id} staff={staff} onBack={() => { setPage("team"); void load(); }} toast={say} /><Toast msg={toast} /></>;
   if (page === "notes") return <Notes teamId={team.id} staff={staff} onBack={() => setPage("team")} />;
 
   const role = roleOn(team.id);
@@ -118,7 +117,7 @@ export function TeamScreen() {
       <div className="grid2 tiles">
         <button className={"card tap" + (seesChoreo ? "" : " dim")} disabled={!seesChoreo} onClick={() => setPage("choreo")} data-testid="go-choreo"><div className="eyebrow">{t("team.choreo")}</div><div className="big">{seesChoreo ? t("team.videosN", { n: stats.videos }) : t("team.choreoLocked")}</div></button>
         <button className="card tap" onClick={() => setPage("folders")} data-testid="go-folders"><div className="eyebrow">{t("team.folders")}</div><div className="big">{t("team.mediaN", { n: stats.media })}</div></button>
-        <button className={"card tap" + (seesChoreo ? "" : " dim")} disabled={!seesChoreo} onClick={() => setPage("choreo")}><div className="eyebrow">{t("choreo.formations")}</div><div className="big">{t("team.formationsN", { n: stats.formations })}</div></button>
+        <button className={"card tap" + (seesChoreo ? "" : " dim")} disabled={!seesChoreo} onClick={() => setPage("formations")} data-testid="go-formations"><div className="eyebrow">{t("choreo.formations")}</div><div className="big">{t("team.formationsN", { n: stats.formations })}</div></button>
         <button className="card tap" onClick={() => setPage("dancers")} data-testid="go-dancers"><div className="eyebrow">{t("team.dancers")}</div><div className="big">{stats.dancers}{staff ? "" : ""}</div></button>
       </div>
       

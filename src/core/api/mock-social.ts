@@ -144,7 +144,7 @@ export function socialOps(get: () => { X: SocialState; notify: (pid: string, kin
       if (!(staffOf(teamId) || dancerHere || parentOk)) return [];
       return g.X.videos.filter((v) => v.team_id === teamId).map((v) => ({ ...v, url: urls.get(v.storage_path) ?? "" }));
     },
-    async uploadVideo(teamId: string, title: string, file: File) { const g = get(); const me = g.me()!; const path = `mock/videos/${id()}`; await store(path, file); g.X.videos.push({ id: "v-" + id(), team_id: teamId, uploader_id: me.id, uploader_name: name(me), title, storage_path: path, url: "", duration_s: null, formations: [], created_at: now() }); g.save(); g.emit(); },
+    async uploadVideo(teamId: string, title: string, file: File, notes?: string | null) { const g = get(); const me = g.me()!; const path = `mock/videos/${id()}`; await store(path, file); g.X.videos.push({ id: "v-" + id(), team_id: teamId, uploader_id: me.id, uploader_name: name(me), title, storage_path: path, url: "", duration_s: null, formations: [], notes: notes || null, created_at: now() }); g.save(); g.emit(); },
     async updateVideo(vid: string, patch: { title?: string; formations?: Formation[] }) { const g = get(); const v = g.X.videos.find((x) => x.id === vid); if (v) Object.assign(v, patch); g.save(); g.emit(); },
     async deleteVideo(vid: string) { const g = get(); g.X.videos = g.X.videos.filter((v) => v.id !== vid); g.save(); g.emit(); },
 

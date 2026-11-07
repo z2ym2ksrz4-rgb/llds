@@ -7,7 +7,6 @@ import appConfig from "../../../../app.config.json";
 
 type R = SignUpInput["roles"][number];
 const ROLES: R[] = ["parent", "dancer", "trainer", "assistant"];
-const thisYear = new Date().getFullYear();
 
 /** Self-registration. The admin approves and places people on teams afterwards. */
 export function Register() {

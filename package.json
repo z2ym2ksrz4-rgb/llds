@@ -19,7 +19,7 @@
     "build:mock": "BUILD_ID=$(date +%s) && export BUILD_ID && node scripts/catalog.mjs && VITE_MOCK=1 vite build",
     "dev:mock": "node scripts/catalog.mjs && VITE_MOCK=1 vite",
     "build:web": "BUILD_ID=$(date +%s) && export BUILD_ID && node scripts/catalog.mjs && RELEASE=1 vite build --base=/llds/app/",
-    "site": "python3 scripts/site-gen.py ../ilumie-site/llds && npm run build:web && rm -rf ../ilumie-site/llds/app && cp -r dist ../ilumie-site/llds/app",
+    "site": "npm run typecheck && python3 scripts/site-gen.py ../ilumie-site/llds && npm run build:web && rm -rf ../ilumie-site/llds/app && cp -r dist ../ilumie-site/llds/app",
     "catalog": "node scripts/catalog.mjs"
   },
   "dependencies": {

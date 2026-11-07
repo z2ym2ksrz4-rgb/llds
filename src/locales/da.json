@@ -523,10 +523,10 @@
     "loop": "Loop",
     "eightCount": "8-tæller herfra",
     "clearLoop": "Fjern loop",
-    "loopHint": "Tryk A ved start og B ved slut – videoen gentager stykket. “8-tæller” sætter 8 sekunder fra nu.",
+    "loopHint": "Tryk A ved start og B ved slut – videoen gentager stykket. “8-tæller” looper 8 tæller fra nu ved den valgte tempo (BPM).",
     "noFile": "Ingen videofil på denne.",
     "front": "Scenens forkant / publikum",
-    "noFormations": "Ingen formationer endnu.",
+    "noFormations": "Ingen formationer endnu – træneren laver dem på en koreografi-video.",
     "editFormations": "Redigér formationer",
     "addFormation": "Tilføj formation",
     "formationName": "Navn på formation",
@@ -536,7 +536,8 @@
     "editHint": "Vælg initialer og tryk, hvor danseren skal stå. Tryk på en prik for at flytte den.",
     "notes": "Noter til videoen",
     "addNotes": "Skriv noter",
-    "notesPh": "Tællinger, hvad der skal øves, hvem der starter hvor …"
+    "notesPh": "Tællinger, hvad der skal øves, hvem der starter hvor …",
+    "formationsIntro": "Formationerne hører til koreografi-videoerne. Vælg en video for at se eller redigere dens formationer."
   },
   "notes": {
     "title": "Noter",

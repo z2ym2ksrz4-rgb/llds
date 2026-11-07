@@ -49,12 +49,10 @@ export function Home() {
   useEffect(() => { void load(); }, [load, viewing.personId]);
 
   const teamIds = new Set(me.memberships.filter((m) => m.person_id === viewing.personId).map((m) => m.team_id));
-  const myWeek = sessions.filter((s) => s.team_id && teamIds.has(s.team_id));
   const today = new Date().toDateString();
   const staffToday = sessions.filter((s) => (s.trainer_id === me.person.id || s.substitute_id === me.person.id) && new Date(s.starts_at).toDateString() === today);
   const subWanted = sessions.filter((s) => s.substitute_wanted && !s.substitute_id && !s.cancelled);
   const hat = viewing.isChild ? me.children.find((c) => c.id === viewing.personId) : null;
-  const myAbs = (s: Session) => absences.find((a) => a.session_id === s.id && a.person_id === viewing.personId);
   const todayAbs = absences.filter((a) => sessions.some((s) => s.id === a.session_id && new Date(s.starts_at).toDateString() === today));
   const myTeamIds = new Set(me.memberships.map((m) => m.team_id));
   const hero = events.find((e) => !e.team_ids.length || e.team_ids.some((id) => myTeamIds.has(id))) ?? events[0];

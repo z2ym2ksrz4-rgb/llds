@@ -55,6 +55,18 @@ export function supabaseApi(url: string, anonKey: string): Api {
       return { person: person as Person, children, memberships, teams };
     },
 
+    async updateNotifyPrefs(prefs) {
+      const pid = await myPersonId(); if (!pid) return;
+      const { error } = await sb.from("person").update({ notify_prefs: prefs }).eq("id", pid); fail(error);
+    },
+    async getAppearance() {
+      const { data } = await sb.from("school").select("appearance").eq("slug", schoolSlug).maybeSingle();
+      return ((data as { appearance?: Appearance } | null)?.appearance ?? {}) as Appearance;
+    },
+    async saveAppearance(a) { const { error } = await sb.from("school").update({ appearance: a }).eq("slug", schoolSlug); fail(error); },
+    async deleteMyAccount() { const { error } = await sb.rpc("delete_my_account"); fail(error); await sb.auth.signOut(); },
+    async listWebSignups() { const { data, error } = await sb.from("web_signup_view").select("*").order("created_at", { ascending: false }).limit(200); fail(error); return (data ?? []) as WebSignup[]; },
+    async setWebSignupStatus(id, status) { const { error } = await sb.from("web_signup").update({ status }).eq("id", id); fail(error); },
     async signUp(i) {
       const { error } = await sb.rpc("sign_up", {
         p_school_slug: schoolSlug, p_first: i.firstName, p_last: i.lastName, p_phone: i.phone, p_birth_year: i.birthYear, p_birth_date: i.birthDate,

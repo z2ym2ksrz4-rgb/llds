@@ -523,10 +523,10 @@
     "loop": "Loop",
     "eightCount": "8-count from here",
     "clearLoop": "Clear loop",
-    "loopHint": "Tap A at the start and B at the end – the video repeats that part. “8-count” sets 8 seconds from now.",
+    "loopHint": "Press A at the start and B at the end – the video repeats that part. “8 counts” loops 8 counts from now at the chosen tempo (BPM).",
     "noFile": "No video file on this one.",
     "front": "Front of stage / audience",
-    "noFormations": "No formations yet.",
+    "noFormations": "No formations yet – the trainer makes them on a choreography video.",
     "editFormations": "Edit formations",
     "addFormation": "Add formation",
     "formationName": "Formation name",
@@ -536,7 +536,8 @@
     "editHint": "Pick initials and tap where the dancer stands. Tap a dot to move it.",
     "notes": "Notes for this video",
     "addNotes": "Add notes",
-    "notesPh": "Counts, what to practise, who starts where …"
+    "notesPh": "Counts, what to practise, who starts where …",
+    "formationsIntro": "Formations belong to the choreography videos. Pick a video to see or edit its formations."
   },
   "notes": {
     "title": "Notes",

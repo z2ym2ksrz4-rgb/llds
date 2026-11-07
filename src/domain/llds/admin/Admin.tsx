@@ -12,7 +12,7 @@ import { useAuth } from "@/core/auth";
 import { Sheet, Toast } from "../components/Sheet";
 import { SessionEditor } from "../components/SessionSheet";
 import { ImagePicker } from "../components/ImagePicker";
-import { CATALOG, catalogUrl } from "../lib/catalog";
+import { CATALOG } from "../lib/catalog";
 import { addDays, DAY_LONG, hm, mondayOf, startOfDay } from "../lib/time";
 
 type Page = "menu" | "users" | "members" | "teams" | "season" | "bookings" | "messages" | "reports" | "events" | "shop" | "punch" | "import" | "catalog" | "customize";

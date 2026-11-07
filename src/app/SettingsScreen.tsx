@@ -20,7 +20,6 @@ export function SettingsScreen() {
   const [childEmail, setChildEmail] = useState<Record<string, string>>({});
   const [msg, setMsg] = useState<string | null>(null);
   const [confirmDel, setConfirmDel] = useState(false); const [delErr, setDelErr] = useState<string | null>(null);
-  const year = new Date().getFullYear();
   return (
     <section className="screen">
       <header className="topbar"><h1 className="display">{t("nav.settings")}</h1></header>
