@@ -5,10 +5,16 @@ export function Sheet({ onClose, children, title, eyebrow, photo }: { onClose: (
   return (
     <div className="sheet-bg" onClick={onClose}>
       <div className={"sheet" + (photo ? " withphoto" : "")} role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
-        {photo && <div className="sheet-photo" style={{ backgroundImage: `url(${photo})` }}><button className="sheet-close" aria-label="Luk" onClick={onClose}>×</button></div>}
-        <div className="handle" />
-        {eyebrow && <div className="eyebrow">{eyebrow}</div>}
-        {title && <h2 className="display" style={{ margin: 0 }}>{title}</h2>}
+        {photo ? (
+          <div className="hero photo kb sheet-hero" data-testid="sheet-hero"><span className="bg warm" style={{ backgroundImage: `url(${photo})` }} />
+            <button className="sheet-close" aria-label="Luk" onClick={onClose}>×</button>
+            <div>{eyebrow && <div className="eyebrow">{eyebrow}</div>}{title && <h2 className="display">{title}</h2>}</div>
+          </div>
+        ) : (<>
+          <div className="handle" />
+          {eyebrow && <div className="eyebrow">{eyebrow}</div>}
+          {title && <h2 className="display" style={{ margin: 0 }}>{title}</h2>}
+        </>)}
         {children}
       </div>
     </div>
