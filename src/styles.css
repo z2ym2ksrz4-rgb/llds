@@ -278,3 +278,29 @@ button.cta { box-shadow:0 10px 26px -12px rgba(201,162,74,.7); }
 .sheet { border-top:1px solid rgba(201,162,74,.35); box-shadow:0 -20px 60px -30px rgba(201,162,74,.35); }
 .emblem .e { box-shadow:0 0 0 3px rgba(201,162,74,.12), 0 6px 18px -8px rgba(201,162,74,.6), inset 0 1px 0 rgba(255,243,196,.25); }
 @media (prefers-reduced-motion: reduce) { .card.tap:active { transform:none; } }
+
+/* (a) Ken Burns heroes, (e) warm photo tone */
+.hero.photo.kb { background:none; }
+.hero.photo .bg { position:absolute; inset:-4%; background:center/cover; z-index:0; animation:kb 28s ease-in-out infinite alternate; }
+.hero.photo .bg.warm { filter:sepia(.18) saturate(.95) contrast(1.05) brightness(.95); }
+.hero.photo .bg.warm::after { content:""; position:absolute; inset:0; background:linear-gradient(135deg, rgba(201,162,74,.18), transparent 55%); mix-blend-mode:soft-light; }
+@keyframes kb { from { transform:scale(1) translate(0,0); } to { transform:scale(1.08) translate(-1.5%, 1%); } }
+.tcard img, .cls .img, .folder .cover img { filter:sepia(.12) saturate(.95); }
+/* (c) team accent (set as --accent on the Mit hold screen) */
+.screen[style*="--accent"] .eyebrow, .screen[style*="--accent"] .gold, .screen[style*="--accent"] .item .time { color:var(--accent2); }
+.screen[style*="--accent"] .teampick strong { background:linear-gradient(90deg,var(--fg),var(--accent2)); -webkit-background-clip:text; background-clip:text; }
+.screen[style*="--accent"] .hero.photo { border-color:color-mix(in srgb, var(--accent) 45%, transparent); box-shadow:0 18px 40px -24px color-mix(in srgb, var(--accent) 60%, transparent); }
+.screen[style*="--accent"] .chip.gold { color:var(--accent2); border-color:color-mix(in srgb, var(--accent) 60%, transparent); }
+.screen[style*="--accent"] .sec h2::after { background:linear-gradient(90deg, color-mix(in srgb, var(--accent) 45%, transparent), transparent); }
+/* (b) gold-drawn logo on the loading screen and login */
+.logo-draw { position:relative; display:inline-block; }
+.logo-draw img { display:block; }
+.logo-draw::after { content:""; position:absolute; inset:0; background:linear-gradient(110deg, transparent 30%, rgba(230,200,122,.9) 50%, transparent 70%); background-size:250% 100%; mix-blend-mode:screen; animation:sweep 2.4s ease-in-out infinite; -webkit-mask:var(--mask) center/contain no-repeat; mask:var(--mask) center/contain no-repeat; }
+@keyframes sweep { 0% { background-position:120% 0; } 100% { background-position:-120% 0; } }
+.login .brand { animation:fadeup .9s var(--ease, ease) both; }
+@keyframes fadeup { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+/* (d) gold confetti */
+.confetti { position:fixed; inset:0; pointer-events:none; z-index:200; overflow:hidden; }
+.confetti i { position:absolute; top:-10px; width:8px; height:14px; border-radius:2px; background:var(--c, var(--gold2)); animation:fall var(--d, 1.6s) ease-in forwards; transform:rotate(var(--r, 0deg)); }
+@keyframes fall { 0% { transform:translateY(0) rotate(0); opacity:1; } 100% { transform:translateY(105vh) rotate(720deg); opacity:.2; } }
+@media (prefers-reduced-motion: reduce) { .hero.photo .bg, .logo-draw::after, .confetti i { animation:none; } }

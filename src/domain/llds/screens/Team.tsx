@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type Absence, type Event, type Member, type PersonBadge, type Result, type Session } from "@/core/api";
 import { resolveImage } from "../lib/catalog";
+import { teamAccent } from "../lib/art";
+import { confetti } from "../lib/confetti";
 import { EmblemRow, EmblemSheet, GiveEmblemSheet } from "../components/Emblems";
 import { useAuth } from "@/core/auth";
 import { useNav } from "@/core/nav";
@@ -83,7 +85,7 @@ export function TeamScreen() {
           <div className="tiny">{p.parents.map((g) => `${g.first_name} ${g.phone ?? ""}`).join(" · ") || p.phone || ""}{p.photo_consent === false ? " · " + t("team.noPhotoConsent") : ""}</div><EmblemRow badges={badges.filter((b) => b.person_id === p.id)} size="sm" /></span>{p.supervised_by && <span className="chip small">{t("team.childAccount")}</span>}<button className="ghost small" aria-label={t("badges.give")} data-testid="give-badge" onClick={() => setGiveTo(p)}>🎖</button><button className="ghost small" aria-label={t("milestones.give")} data-testid="give-milestone" onClick={() => { setAward(p); setAwardTitle(""); }}>🏅</button></div>)}
         {!staff && <p className="muted">{t("team.rosterStaffOnly")}</p>}
       </div>
-      {giveTo && <GiveEmblemSheet personId={giveTo.id} personName={giveTo.first_name} teamId={team.id} onClose={() => setGiveTo(null)} onGiven={(b) => { setGiveTo(null); say(t("badges.given", { name: giveTo.first_name, badge: `${b.emoji} ${b.name}` })); void load(); }} />}
+      {giveTo && <GiveEmblemSheet personId={giveTo.id} personName={giveTo.first_name} teamId={team.id} onClose={() => setGiveTo(null)} onGiven={(b) => { setGiveTo(null); confetti(); say(t("badges.given", { name: giveTo.first_name, badge: `${b.emoji} ${b.name}` })); void load(); }} />}
       {award && (
         <Sheet onClose={() => setAward(null)} eyebrow={t("milestones.give")} title={award.first_name}>
           <div className="chips">{MILESTONE_IDEAS.map((m) => <button key={m} className={"chip" + (awardTitle === m ? " on" : "")} onClick={() => setAwardTitle(m)}>{m}</button>)}</div>
@@ -96,10 +98,10 @@ export function TeamScreen() {
   );
 
   return (
-    <section className="screen">
+    <section className="screen" style={teamAccent(team)}>
       <header className="topbar"><h1 className="display">{team.name}</h1><TopRight /></header>
       <TeamPicker />
-      <div className="hero photo" data-testid="team-hero" style={{ backgroundImage: `url(${resolveImage(team.cover_url) ?? artForCategory(team.category)})` }}>
+      <div className="hero photo kb" data-testid="team-hero" data-tour="team-hero"><span className="bg warm" style={{ backgroundImage: `url(${resolveImage(team.cover_url) ?? artForCategory(team.category)})` }} />
         <div><div className="eyebrow">{team.style} · {t(`category.${team.category}`)} · {team.level}</div><h2 className="display">{team.name}</h2>
           <div className="small muted">{t("team.dancersN", { n: stats.dancers })}{trainerName ? ` · ${trainerName}` : ""}{next ? ` · ${DAY_LONG[(new Date(next.starts_at).getDay() + 6) % 7]} ${hm(next.starts_at)} ${next.room_name ?? ""}` : ""}</div>
           <div className="small muted">{t(`roles.${role ?? "dancer"}`)}{team.closed ? ` · ${t("team.closed")}` : ""}{team.punch_card_open ? ` · ${t("team.punchOpen")}` : ""}</div></div>

@@ -5,6 +5,7 @@ import { useNav, type Tab } from "@/core/nav";
 import { isRelease } from "@/core/release";
 import { Home, Login, Register, Pending, Rooms, TeamScreen, Admin, More, Social, Events } from "@/domain";
 import { Icon } from "@/domain/llds/components/Icons";
+import { Logo } from "@/domain/llds/components/Logo";
 import { TestMenu } from "./TestMenu";
 
 export default function App() {
@@ -21,7 +22,7 @@ export default function App() {
   useEffect(() => { if ((tab === "admin" && !isAdmin) || (tab === "team" && !hasTeams)) setTab("home"); }, [tab, isAdmin, hasTeams, setTab]); // every sign-in starts on Home
 
   let body: React.ReactNode;
-  if (phase === "loading") body = <section className="screen centered"><div className="spinner" aria-label={t("common.loading")} /></section>;
+  if (phase === "loading") body = <section className="screen centered"><Logo size={150} draw /></section>;
   else if (phase === "signedOut") body = <Login />;
   else if (phase === "register") body = <Register />;
   else if (phase === "pending") body = <Pending />;

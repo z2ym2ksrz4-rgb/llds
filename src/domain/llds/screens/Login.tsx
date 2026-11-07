@@ -28,7 +28,7 @@ export function Login() {
       <img className="login-bg" src={art("trails")} alt="" aria-hidden="true" /><div className="login-art" aria-hidden="true" />
       <LangFlags className="login-lang" />
       <div className="login-body">
-        <Logo />
+        <Logo draw />
         <h1 className="display">{t("login.welcome")} <em>{t("login.backstage")}</em></h1>
         <p className="muted">{t("login.tagline")}</p>
         {step === "email" ? (
