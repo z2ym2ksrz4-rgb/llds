@@ -524,3 +524,8 @@ button.cta { box-shadow:0 10px 26px -12px rgba(201,162,74,.7); }
 .tick .box{width:18px;height:18px;border-radius:6px;border:1.5px solid rgba(255,255,255,.35);display:grid;place-items:center;font-size:12px;font-weight:700;color:#0a0a0b}
 .tick.on{border-color:rgba(201,162,74,.6);background:rgba(201,162,74,.1)}.tick.on .box{background:linear-gradient(135deg,#e6c87a,#c9a24a);border-color:transparent}
 .tick:disabled{opacity:.45}
+
+.statline.adminline button{background:none;border:0;color:inherit;font:inherit;padding:0;display:inline-flex;gap:4px;align-items:baseline;cursor:pointer}.statline.adminline button b{color:var(--gold2)}
+
+/* lists on Home scroll vertically only */
+.scrolllist{overflow-x:hidden;overscroll-behavior-x:none;touch-action:pan-y}.scrolllist .item{min-width:0;max-width:100%}.scrolllist .item .grow{min-width:0;overflow-wrap:anywhere}

@@ -36,6 +36,8 @@ export function Home() {
   const [badges, setBadges] = useState<PersonBadge[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [cards, setCards] = useState<PunchCard[]>([]);
+  const [adminOpen, setAdminOpen] = useState({ orders: 0, cards: 0 });
+  const openAdmin = useNav((n) => n.openAdmin);
   const [open, setOpen] = useState<Session | null>(null);
   const [openEvent, setOpenEvent] = useState<Event | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -45,7 +47,8 @@ export function Home() {
     const from = startOfDay(new Date()), to = addDays(from, 7);
     const [s, b, ev, ms, o, c] = await Promise.all([api.listSessions(from.toISOString(), to.toISOString()), api.listBookings(from.toISOString(), addDays(from, isAdmin ? 30 : 7).toISOString()).catch(() => [] as Booking[]), api.listEvents(), api.listMilestones(), api.listOrders(), api.listPunchCards()]);
     void api.settleAttendance().catch(() => 0).then(() => api.listPersonBadges()).then(setBadges).catch(() => setBadges([]));
-    setSessions(s); setBookings(b); setEvents(ev); setMilestones(ms); setOrders(o); setCards(c); setAbsences(await api.listAbsences(s.map((x) => x.id)));
+    setSessions(s); setBookings(b); setEvents(ev); setMilestones(ms); setOrders(o); setCards(c);
+    if (isAdmin) { const [ao, ac] = await Promise.all([api.listOrders(true).catch(() => [] as Order[]), api.listPunchCards(true).catch(() => [] as PunchCard[])]); setAdminOpen({ orders: ao.filter((x) => x.status === "awaiting_payment" || x.status === "paid").length, cards: ac.filter((x) => x.status === "awaiting_payment").length }); } setAbsences(await api.listAbsences(s.map((x) => x.id)));
   }, [isAdmin]);
   useEffect(() => { void load(); }, [load, viewing.personId]);
 
@@ -127,6 +130,12 @@ export function Home() {
           <span className="eyebrow">{t("home.today")}</span>
           <span><b>{sessions.filter((s) => new Date(s.starts_at).toDateString() === today && !s.cancelled).length}</b> {t("home.trainingsToday")}</span><i /><span><b>{todayAbs.length}</b> {t("home.absencesToday")}</span><i /><span><b>{bookings.filter((b) => b.status === "pending").length}</b> {t("home.bookingsPending")}</span><i /><span><b>{subWanted.length}</b> {t("home.subsWanted")}</span>
         </button>
+      )}
+      {isAdmin && (
+        <div className="statline adminline" data-testid="adminline">
+          <span className="eyebrow">{t("home.adminTodo")}</span>
+          <button type="button" onClick={() => openAdmin("shop")}><b>{adminOpen.orders}</b> {t("home.openOrders")}</button><i /><button type="button" onClick={() => openAdmin("punch")}><b>{adminOpen.cards}</b> {t("home.cardsWaiting")}</button>
+        </div>
       )}
     </>),
     messages: () => (<>

@@ -11,6 +11,7 @@ import { ago, isoDate } from "../lib/time";
 import { AdminUsers } from "./Users";
 import { MemberSheet } from "./MemberSheet";
 import { Sheet, Toast } from "../components/Sheet";
+import { useNav } from "@/core/nav";
 import { SessionEditor } from "../components/SessionSheet";
 import { ImagePicker } from "../components/ImagePicker";
 import { CATALOG } from "../lib/catalog";
@@ -22,12 +23,14 @@ const CATS = ["mini", "kids", "junior", "adult", "mixed"] as const;
 /** Admin: the one place Line runs the school from. Everything else in the app reads what she sets here. */
 export function Admin() {
   const { t } = useTranslation();
-  const [page, setPage] = useState<Page>("menu");
+  const [page, setPage] = useState<Page>(() => (useNav.getState().takeAdminPage() as Page | null) ?? "menu");
+  const adminPage = useNav((n) => n.adminPage);
+  useEffect(() => { const p = useNav.getState().takeAdminPage(); if (p) setPage(p as Page); }, [adminPage]);
   const [counts, setCounts] = useState({ pending: 0, bookings: 0, subs: 0, reports: 0, orders: 0, cards: 0 });
   useEffect(() => { void (async () => {
     const from = startOfDay(new Date());
     const [p, b, s, r, o, c] = await Promise.all([api.listPending(), api.listBookings(from.toISOString(), addDays(from, 60).toISOString()), api.listSessions(from.toISOString(), addDays(from, 14).toISOString()), api.listReports(), api.listOrders(true), api.listPunchCards(true)]);
-    setCounts({ pending: p.length, bookings: b.filter((x) => x.status === "pending").length, subs: s.filter((x) => x.substitute_wanted && !x.substitute_id).length, reports: r.filter((x) => !x.resolved_at).length, orders: o.filter((x) => x.status === "awaiting_payment" && x.claimed_paid_at).length, cards: c.filter((x) => x.status === "awaiting_payment" && x.claimed_paid_at).length });
+    setCounts({ pending: p.length, bookings: b.filter((x) => x.status === "pending").length, subs: s.filter((x) => x.substitute_wanted && !x.substitute_id).length, reports: r.filter((x) => !x.resolved_at).length, orders: o.filter((x) => x.status === "awaiting_payment" || x.status === "paid").length, cards: c.filter((x) => x.status === "awaiting_payment" && x.claimed_paid_at).length });
   })(); }, [page]);
   if (page === "users") return <Back onBack={() => setPage("menu")}><AdminUsers /></Back>;
   if (page === "members") return <Back onBack={() => setPage("menu")}><Members /></Back>;
@@ -308,6 +311,7 @@ function PunchAdmin() {
   const { t } = useTranslation();
   const [types, setTypes] = useState<PunchCardType[]>([]); const [cards, setCards] = useState<PunchCard[]>([]); const [edit, setEdit] = useState<PunchCardType | "new" | null>(null);
   const [f, setF] = useState({ name: "", punches: "10", valid_days: "365", price: "" });
+  const [toast, setToast] = useState<string | null>(null); const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 3200); };
   const load = useCallback(async () => { const [ty, c] = await Promise.all([api.listPunchCardTypes(), api.listPunchCards(true)]); setTypes(ty); setCards(c); }, []);
   useEffect(() => { void load(); }, [load]);
   const waiting = cards.filter((c) => c.status === "awaiting_payment"), active = cards.filter((c) => c.status === "active");
@@ -315,7 +319,7 @@ function PunchAdmin() {
     <section className="screen">
       <header className="topbar"><h1 className="display">{t("punch.title")}</h1><button className="ghost small" onClick={() => { setF({ name: "", punches: "10", valid_days: "365", price: "" }); setEdit("new"); }}>+ {t("admin.newType")}</button></header>
       <div className="sec"><h2>{t("admin.cardsWaiting")} · {waiting.length}</h2><div className="card list">
-        {waiting.map((c) => <div key={c.id} className="item" data-testid="admin-card"><span className="grow">{c.person_name}<div className="tiny">{c.type_name} · {c.price_dkk} kr. · {ago(c.created_at)}{c.claimed_paid_at ? ` · ${t("punch.status.claimed")}` : ` · ${t("punch.status.awaiting_payment")}`}</div></span><button className="small" onClick={async () => { await api.activatePunchCard(c.id); void load(); }}>{t("admin.activate")}</button></div>)}
+        {waiting.map((c) => <div key={c.id} className="item" data-testid="admin-card"><span className="grow">{c.person_name}<div className="tiny">{c.type_name} · {c.price_dkk} kr. · {ago(c.created_at)}{c.claimed_paid_at ? ` · ${t("punch.status.claimed")}` : ` · ${t("punch.status.awaiting_payment")}`}</div></span><button className="small" onClick={async () => { try { await api.activatePunchCard(c.id); say(t("admin.cardActivated", { name: c.person_name })); } catch (x) { say(t("common.error") + ": " + String((x as Error).message ?? x)); } void load(); }}>{t("admin.activate")}</button></div>)}
         {!waiting.length && <p className="muted">{t("admin.noCards")}</p>}</div></div>
       <div className="sec"><h2>{t("admin.cardsActive")} · {active.length}</h2><div className="card list">{active.map((c) => <div key={c.id} className="item"><span className="grow">{c.person_name}<div className="tiny">{c.type_name} · {t("punch.left", { n: c.punches_left, total: c.punches_total })} · {t("punch.validUntil")} {new Date(c.expires_on).toLocaleDateString("da-DK")}</div></span></div>)}</div></div>
       <div className="sec"><h2>{t("admin.cardTypes")}</h2><div className="card list">{types.map((ty) => <button key={ty.id} className={"item" + (ty.active ? "" : " off")} onClick={() => { setF({ name: ty.name, punches: String(ty.punches), valid_days: String(ty.valid_days), price: String(ty.price_dkk) }); setEdit(ty); }}><span className="grow">{ty.name}<div className="tiny">{ty.punches} {t("punch.punches")} · {ty.valid_days} {t("admin.days")} · {ty.price_dkk} kr.</div></span><span className="gold">›</span></button>)}</div></div>
@@ -329,6 +333,7 @@ function PunchAdmin() {
             {edit !== "new" && <button className="ghost danger" onClick={async () => { await api.savePunchCardType({ name: edit.name, punches: edit.punches, valid_days: edit.valid_days, price_dkk: edit.price_dkk, active: !edit.active }, edit.id); setEdit(null); void load(); }}>{edit.active ? t("admin.deactivate") : t("admin.activate")}</button>}</div>
         </Sheet>
       )}
+      <Toast msg={toast} />
     </section>
   );
 }

@@ -11,7 +11,6 @@ export function MessageBanner({ toast }: { toast: (m: string) => void }) {
   const { t } = useTranslation();
   const [list, setList] = useState<Message[]>([]);
   const [open, setOpen] = useState<Message | null>(null);
-  const [all, setAll] = useState(false);
   const load = useCallback(async () => setList(await api.listMessages()), []);
   useEffect(() => { void load(); }, [load]);
   const due = list.filter((m) => !m.acted_at);
@@ -23,13 +22,6 @@ export function MessageBanner({ toast }: { toast: (m: string) => void }) {
         <div className="sec" data-testid="msg-banner"><h2>{due.length ? t("msg.needsYou", { n: due.length }) : t("msg.title")}</h2>
           <ScrollList testId="msg-list">{shown.map((m) => <button key={m.id} className={"item" + (m.acted_at ? "" : " due")} onClick={() => setOpen(m)}><span className="grow">{m.title}<div className="tiny">{m.author_name} · {ago(m.created_at)} · {m.acted_at ? t(`msg.done.${m.needs}`) : t(`msg.needs.${m.needs}`)}</div></span><span className="gold">{m.acted_at ? "" : "●"} ›</span></button>)}</ScrollList>
         </div>
-      )}
-      <button className="linklike small" onClick={() => setAll(true)}>{t("msg.all", { n: list.length })}</button>
-      {all && (
-        <Sheet onClose={() => setAll(false)} eyebrow={t("msg.eyebrow")} title={t("msg.title")}>
-          <div className="list">{list.map((m) => <button key={m.id} className="item" onClick={() => { setAll(false); setOpen(m); }}><span className="grow">{m.title}<div className="tiny">{m.author_name} · {ago(m.created_at)}</div></span>{m.acted_at ? <span className="chip ok small">{t(`msg.done.${m.needs}`)}</span> : <span className="chip warn small">{t(`msg.needs.${m.needs}`)}</span>}</button>)}
-            {!list.length && <p className="muted">{t("msg.none")}</p>}</div>
-        </Sheet>
       )}
       {open && <MessageSheet message={open} onClose={() => { setOpen(null); void load(); }} toast={toast} />}
     </>

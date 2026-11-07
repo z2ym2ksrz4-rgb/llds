@@ -162,7 +162,10 @@
     },
     "nextUp": "Next",
     "yourShelf": "Your trophy shelf",
-    "childsShelf": "{{name}}'s trophy shelf"
+    "childsShelf": "{{name}}'s trophy shelf",
+    "adminTodo": "For you",
+    "openOrders": "open orders in the shop",
+    "cardsWaiting": "punch cards awaiting activation"
   },
   "admin": {
     "users": "New users",
@@ -347,7 +350,8 @@
     "seasonDragHint": "On a computer: drag a training to another day to move it – you are asked whether it applies to all weeks and warned about conflicts.",
     "teamsParentOnly": "The parent automatically follows the teams where the children dance (marked below).",
     "childrenHint": "The parent gets access to exactly the teams where the child is a dancer – not teams where the child is a trainer. Teams are chosen on the child (Edit).",
-    "deliverNeedsPaid": "Tick Paid first"
+    "deliverNeedsPaid": "Tick Paid first",
+    "cardActivated": "Punch card activated – {{name}} has the punches"
   },
   "settings": {
     "language": "Language",

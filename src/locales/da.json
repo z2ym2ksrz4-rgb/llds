@@ -162,7 +162,10 @@
     },
     "nextUp": "Næste",
     "yourShelf": "Din trofæhylde",
-    "childsShelf": "{{name}}s trofæhylde"
+    "childsShelf": "{{name}}s trofæhylde",
+    "adminTodo": "Til dig",
+    "openOrders": "åbne ordrer i Stjerneshoppen",
+    "cardsWaiting": "klippekort venter på aktivering"
   },
   "admin": {
     "users": "Nye brugere",
@@ -347,7 +350,8 @@
     "seasonDragHint": "På computer: træk en træning til en anden dag for at flytte den – du bliver spurgt, om det gælder alle uger, og advaret om konflikter.",
     "teamsParentOnly": "Forælderen følger automatisk de hold, hvor børnene er dansere (markeret nedenfor).",
     "childrenHint": "Forælderen får adgang til præcis de hold, hvor barnet er danser – ikke hold hvor barnet er træner. Hold vælges på barnet (Redigér).",
-    "deliverNeedsPaid": "Kryds Betalt af først"
+    "deliverNeedsPaid": "Kryds Betalt af først",
+    "cardActivated": "Klippekortet er aktiveret – {{name}} har sine klip"
   },
   "settings": {
     "language": "Sprog",
