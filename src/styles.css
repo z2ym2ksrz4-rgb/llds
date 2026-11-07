@@ -101,7 +101,7 @@ label.check input { width:20px; height:20px; accent-color:var(--gold); }
 
 /* ---------- phase 2: calendar, week, hero, misc ---------- */
 .days { display:flex; gap:6px; margin:4px 0 8px; }
-.days .day { flex:1; padding:8px 0; border-radius:10px; border:1px solid var(--line); background:none; color:var(--muted); display:flex; flex-direction:column; align-items:center; gap:2px; font-size:.75rem; font-weight:300; }
+.days .day { position:relative; flex:1; padding:8px 0; border-radius:10px; border:1px solid var(--line); background:none; color:var(--muted); display:flex; flex-direction:column; align-items:center; gap:2px; font-size:.75rem; font-weight:300; }
 .days .day b { font-weight:500; color:var(--fg); font-size:1rem; }
 .days .day.on { border-color:var(--gold3); background:var(--gold-soft); color:var(--gold2); }
 .cal { display:grid; gap:4px; font-size:.75rem; margin-top:10px; }
@@ -510,3 +510,10 @@ button.cta { box-shadow:0 10px 26px -12px rgba(201,162,74,.7); }
 .conflicts{padding:12px 14px;border-color:rgba(224,138,138,.45)}.conflictlist{margin:0;padding-left:18px;font-size:.9rem;line-height:1.5;max-height:200px;overflow:auto}
 .week .col.over{outline:2px dashed var(--gold);outline-offset:2px;border-radius:10px}.week .blk.dragging{opacity:.4}.week .blk[draggable]{cursor:grab}
 .chip.static{cursor:default}
+
+/* Sale: events of the day as a strip above the room grid; star dot in the day picker */
+.evstrip{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;margin:8px 0 10px;padding-bottom:2px}.evstrip::-webkit-scrollbar{display:none}
+.evcard-mini{flex:none;position:relative;min-width:220px;max-width:280px;min-height:84px;border-radius:16px;overflow:hidden;background:#000 center/cover;border:1px solid rgba(201,162,74,.4);color:#fff;text-align:left;padding:12px 14px;display:flex;flex-direction:column;justify-content:flex-end;gap:2px;isolation:isolate}
+.evcard-mini::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,12,.1),rgba(10,10,12,.85));z-index:-1}
+.evcard-mini .eyebrow{font-size:.62rem;margin:0}.evcard-mini b{font-size:1rem;line-height:1.1}.evcard-mini small{color:var(--muted);font-size:.75rem}
+.daypick .day .evdot,.days .day .evdot{position:absolute;top:4px;right:6px;font-style:normal;font-size:.6rem;color:var(--gold2)}

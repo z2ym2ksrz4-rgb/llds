@@ -563,7 +563,14 @@
     "everyone": "Everyone in the studio",
     "parentsToo": "Parents of dancers on the team get the message too.",
     "sendBtn": "Send message",
-    "sent": "Message sent"
+    "sent": "Message sent",
+    "missing": "Missing",
+    "doneList": {
+      "read": "Have read",
+      "accept": "Have accepted"
+    },
+    "nobodyMissing": "Everyone has responded 🎉",
+    "nobodyYet": "Nobody yet."
   },
   "folders": {
     "new": "New folder",

@@ -563,7 +563,14 @@
     "everyone": "Alle i studiet",
     "parentsToo": "Forældre til dansere på holdet får også beskeden.",
     "sendBtn": "Send besked",
-    "sent": "Beskeden er sendt"
+    "sent": "Beskeden er sendt",
+    "missing": "Mangler",
+    "doneList": {
+      "read": "Har læst",
+      "accept": "Har accepteret"
+    },
+    "nobodyMissing": "Alle har reageret 🎉",
+    "nobodyYet": "Ingen endnu."
   },
   "folders": {
     "new": "Ny mappe",

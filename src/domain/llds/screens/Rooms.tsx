@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { api, type Absence, type Booking, type Room, type Session } from "@/core/api";
+import { api, type Absence, type Booking, type Event, type Room, type Session } from "@/core/api";
+import { EventSheet } from "./Events";
+import { catalogUrl as catUrl } from "../lib/catalog";
+import { artFor } from "../lib/art";
 import { useAuth } from "@/core/auth";
 import { Sheet, Toast } from "../components/Sheet";
 import { SessionSheet, SessionEditor } from "../components/SessionSheet";
@@ -29,6 +32,10 @@ export function Rooms() {
   const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
   const week = mondayOf(day);
   const [weekSessions, setWeekSessions] = useState<Session[]>([]);   // for the dots in the day picker
+  const [events, setEvents] = useState<Event[]>([]);                   // events live in the calendar automatically – created, moved or deleted in Admin → Events
+  const [openEvent, setOpenEvent] = useState<Event | null>(null);
+  useEffect(() => { void api.listEvents(true).then(setEvents).catch(() => setEvents([])); }, [day.getTime()]); // eslint-disable-line react-hooks/exhaustive-deps
+  const dayEvents = events.filter((e) => sameDay(new Date(e.starts_at), day));
   const bgImg = useAppearance((a) => catalogUrl(a.a.images?.hero)) ?? art("studio");
   const myTeamIds = new Set(me.memberships.filter((m) => m.person_id === viewing.personId || m.person_id === me.person.id).map((m) => m.team_id));
   const accentOf = (teamId: string | null) => { const tm = teamId ? me.teams.find((x) => x.id === teamId) : null; return tm ? teamAccent(tm) : {}; };
@@ -55,12 +62,13 @@ export function Rooms() {
       <header className="topbar"><h1 className="display">{t("nav.rooms")}</h1>{isTrainer && <button className="ghost small" onClick={() => setOpen({ kind: "new", room_id: rooms[0]?.id ?? "", start: "16:00" })}>+ {t("session.training")}</button>}</header>
       <div className="days">
         {Array.from({ length: 7 }, (_, i) => addDays(week, i)).map((d) => (
-          <button key={d.toISOString()} className={"day" + (sameDay(d, day) ? " on" : "") + (sameDay(d, new Date()) ? " today" : "")} onClick={() => setDay(d)}><span>{dayLabel(d).split(" ")[0]}</span><b>{d.getDate()}</b><i className={weekSessions.some((x) => sameDay(new Date(x.starts_at), d) && x.team_id && myTeamIds.has(x.team_id)) ? "mine" : weekSessions.some((x) => sameDay(new Date(x.starts_at), d)) ? "any" : ""} /></button>
+          <button key={d.toISOString()} className={"day" + (sameDay(d, day) ? " on" : "") + (sameDay(d, new Date()) ? " today" : "")} onClick={() => setDay(d)}><span>{dayLabel(d).split(" ")[0]}</span><b>{d.getDate()}</b><i className={weekSessions.some((x) => sameDay(new Date(x.starts_at), d) && x.team_id && myTeamIds.has(x.team_id)) ? "mine" : weekSessions.some((x) => sameDay(new Date(x.starts_at), d)) ? "any" : ""} />{events.some((e) => sameDay(new Date(e.starts_at), d)) && <em className="evdot" aria-label="event">★</em>}</button>
         ))}
       </div>
       <div className="row between small muted"><button className="linklike" onClick={() => setDay(addDays(day, -7))}>‹ {t("rooms.prevWeek")}</button><button className="linklike" onClick={() => setDay(startOfDay(new Date()))}>{t("rooms.today")}</button><button className="linklike" onClick={() => setDay(addDays(day, 7))}>{t("rooms.nextWeek")} ›</button></div>
 
       <div className="dayhead"><h2 className="display">{DAY_LONG[(day.getDay() + 6) % 7]} {day.getDate()}. {day.toLocaleDateString("da-DK", { month: "long" })}</h2><span className="small muted">{t("rooms.countLine", { n: sessions.filter((x) => !x.cancelled).length, b: bookings.filter((x) => x.status !== "rejected").length })}</span></div>
+      {dayEvents.length > 0 && <div className="evstrip" data-testid="day-events">{dayEvents.map((e) => <button key={e.id} className="evcard-mini" style={{ backgroundImage: `url(${catUrl(e.image_key) ?? artFor(e.id)})` }} onClick={() => setOpenEvent(e)}><span className="eyebrow">{t(`events.kind.${e.kind}`)} · {hm(e.starts_at)}{e.ends_at ? `–${hm(e.ends_at)}` : ""}</span><b>{e.title}</b>{e.place && <small>{e.place}</small>}</button>)}</div>}
       <div className="cal calhead" style={{ gridTemplateColumns: `44px repeat(${rooms.length}, 1fr)` }}>
         <div />{rooms.map((r) => <div key={r.id} className="h">{r.name}</div>)}
       </div>
@@ -87,6 +95,7 @@ export function Rooms() {
       <p className="tiny">{t("rooms.legend")}</p>
       </div>
 
+      {openEvent && <EventSheet event={openEvent} staff={isStaff} onClose={() => setOpenEvent(null)} onChanged={() => void api.listEvents(true).then(setEvents)} toast={say} />}
       {open?.kind === "session" && <SessionSheet session={open.s} absences={absences} onClose={() => setOpen(null)} onChanged={() => void load()} toast={say} />}
       {open?.kind === "new" && <SessionEditor defaults={{ date: day, room_id: open.room_id, start: open.start }} onClose={() => setOpen(null)} onSaved={() => { setOpen(null); void load(); }} toast={say} />}
       {open?.kind === "book" && <BookSheet day={day} rooms={rooms} room_id={open.room_id} start={open.start} sessions={sessions} bookings={bookings} isStaff={isStaff} isTrainer={isTrainer}

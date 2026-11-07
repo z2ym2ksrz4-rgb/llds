@@ -43,6 +43,7 @@ export function MessageSheet({ message, onClose, toast }: { message: Message; on
   // "read" messages are marked read the moment they are opened – no button; only "accept" asks for a tap
   useEffect(() => { if (message.needs === "read" && !message.acted_at) void api.ackMessage(message.id).then(() => setActed(new Date().toISOString())).catch(() => { /* ignore */ }); }, [message.id]); // eslint-disable-line react-hooks/exhaustive-deps
   const done = status?.filter((s) => s.acted_at).length ?? 0;
+  const [showMissing, setShowMissing] = useState(true);
   return (
     <Sheet onClose={onClose} eyebrow={`${message.author_name} · ${ago(message.created_at)}`} title={message.title}>
       <p style={{ whiteSpace: "pre-wrap", margin: 0 }}>{message.body}</p>
@@ -51,7 +52,13 @@ export function MessageSheet({ message, onClose, toast }: { message: Message; on
       {isStaff && (status ? (
         <div className="card" style={{ margin: 0 }}>
           <div className="eyebrow">{t("msg.status", { done, total: status.length })}</div>
-          <div className="chips">{status.map((s) => <span key={s.person_id} className={"chip small" + (s.acted_at ? " ok" : " warn")}>{s.name}</span>)}</div>
+          <div className="seg2" style={{ margin: "8px 0" }} data-testid="msg-status-seg">
+            <button type="button" className={showMissing ? "on" : ""} onClick={() => setShowMissing(true)}>{t("msg.missing")} · {status.length - done}</button>
+            <button type="button" className={!showMissing ? "on" : ""} onClick={() => setShowMissing(false)}>{t(`msg.doneList.${message.needs}`)} · {done}</button>
+          </div>
+          {(() => { const list = status.filter((s) => (showMissing ? !s.acted_at : !!s.acted_at)); return list.length
+            ? <div className="chips">{list.map((s) => <span key={s.person_id} className={"chip small" + (s.acted_at ? " ok" : " warn")}>{s.name}{s.acted_at ? <span className="tiny"> · {ago(s.acted_at)}</span> : null}</span>)}</div>
+            : <p className="tiny muted" style={{ margin: 0 }}>{showMissing ? t("msg.nobodyMissing") : t("msg.nobodyYet")}</p>; })()}
         </div>
       ) : <button className="ghost small" onClick={async () => setStatus(await api.messageStatus(message.id))}>{t("msg.showStatus")}</button>)}
     </Sheet>
