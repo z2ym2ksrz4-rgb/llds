@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { api, type PendingPerson, type Role, type Team } from "@/core/api";
+import { api, type WebSignup, type PendingPerson, type Role, type Team } from "@/core/api";
 import { useAuth } from "@/core/auth";
 
 type Draft = Record<string, { team_id: string; role: Role }[]>; // personId -> memberships
@@ -10,13 +10,14 @@ export function AdminUsers() {
   const { t } = useTranslation();
   const refresh = useAuth((s) => s.refresh);
   const [pending, setPending] = useState<PendingPerson[]>([]);
+  const [web, setWeb] = useState<WebSignup[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
   const [draft, setDraft] = useState<Draft>({});
   const [admin, setAdmin] = useState<Record<string, boolean>>({});
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
 
-  const load = async () => { const [p, tm] = await Promise.all([api.listPending(), api.listTeams()]); setPending(p); setTeams(tm); };
+  const load = async () => { const [p, tm, w] = await Promise.all([api.listPending(), api.listTeams(), api.listWebSignups().catch(() => [] as WebSignup[])]); setPending(p); setTeams(tm); setWeb(w); };
   useEffect(() => { void load(); }, []);
 
   const toggle = (pid: string, team_id: string, role: Role) => setDraft((d) => {
@@ -44,8 +45,10 @@ export function AdminUsers() {
       <p className="muted">{t("admin.usersIntro")}</p>
       {msg && <p className="ok" role="status">{msg}</p>}
       {!pending.length && <div className="card"><p className="muted">{t("admin.noPending")}</p></div>}
-      {pending.map((p) => (
+      {pending.map((p) => { const ws = web.filter((w) => w.contact_id === p.id || w.dancer_id === p.id || p.children.some((c) => c.id === w.dancer_id)); return (
         <article className="card stack" key={p.id} data-testid="pending">
+          {ws.map((w) => <div key={w.id} className="row between small" data-testid="web-signup" style={{ background: "var(--gold-soft)", borderRadius: 10, padding: "6px 10px" }}><span>🌐 {t("admin.webSignup")}: <b>{w.dancer_name}</b> → {w.team_name} · {w.plan === "rates" ? t("admin.plan.rates") : `${t(`admin.plan.${w.plan}`)} ${w.amount_dkk ?? "?"} kr.`}{w.note ? <div className="tiny">“{w.note}”</div> : null}</span>
+            {w.status === "paid" ? <span className="chip ok small">{t("shop.status.paid")}</span> : <button className={"chip small" + (w.claimed_paid_at ? " warn" : "")} onClick={async () => { await api.setWebSignupStatus(w.id, "paid"); await load(); }}>{w.claimed_paid_at ? t("shop.status.claimed") + " · " + t("events.markPaid") : t("events.markPaid")}</button>}</div>)}
           <div className="row between">
             <div><strong>{p.first_name} {p.last_name}</strong><div className="tiny">{p.email} · {p.phone}{p.birth_year ? ` · ${p.birth_year}` : ""}</div></div>
             <span className="chip warn">{t("admin.pending")}</span>
@@ -79,7 +82,7 @@ export function AdminUsers() {
             <button className="ghost danger" disabled={busy === p.id} onClick={() => void reject(p)}>{t("admin.reject")}</button>
           </div>
         </article>
-      ))}
+      ); })}
     </section>
   );
 }

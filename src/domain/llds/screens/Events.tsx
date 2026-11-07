@@ -9,7 +9,6 @@ import { PaySheet } from "../components/Pay";
 import { dateLabel, hm, isoDate } from "../lib/time";
 import { artFor } from "../lib/art";
 import { TopRight } from "../components/ProfileMenu";
-import { Shop } from "./Shop";
 
 const KINDS = ["competition", "show", "workshop", "social"] as const;
 
@@ -20,10 +19,9 @@ export function Events({ admin }: { admin?: boolean }) {
   return (
     <section className="screen">
       <header className="topbar"><h1 className="display">{t("events.title")}</h1>{!admin && <TopRight />}</header>
-      <div className="subtabs"><button className={tab === "upcoming" ? "on" : ""} onClick={() => setTab("upcoming")}>{t("events.upcoming")}</button><button className={tab === "results" ? "on" : ""} onClick={() => setTab("results")}>{t("events.results")}</button><button className={tab === "shop" ? "on" : ""} onClick={() => setTab("shop")}>{t("events.shopTab")}</button></div>
+      <div className="subtabs"><button className={tab === "upcoming" ? "on" : ""} onClick={() => setTab("upcoming")}>{t("events.upcoming")}</button><button className={tab === "results" ? "on" : ""} onClick={() => setTab("results")}>{t("events.results")}</button></div>
       {tab === "upcoming" && <EventsList admin={admin} />}
       {tab === "results" && <Results />}
-      {tab === "shop" && <Shop embedded />}
     </section>
   );
 }

@@ -20,7 +20,7 @@ export function More() {
   if (page === "punch") return <PunchCards onBack={() => setPage("menu")} />;
   if (page === "milestones") return <Milestones onBack={() => setPage("menu")} />;
   if (page === "settings") return <div><button className="linklike" onClick={() => setPage("menu")}>‹ {t("nav.more")}</button><SettingsScreen /></div>;
-  const items: [Page, string, string][] = [["shop", t("shop.title"), t("more.shopSub")], ...(hasPunch ? [["punch", t("punch.title"), t("more.punchSub")] as [Page, string, string]] : []), ["milestones", t("milestones.title"), t("more.milestonesSub")], ["settings", t("nav.settings"), t("more.settingsSub")]];
+  const items: [Page, string, string][] = [["milestones", t("milestones.title"), t("more.milestonesSub")], ["settings", t("nav.settings"), t("more.settingsSub")]];
   return (
     <section className="screen">
       <button className="linklike" onClick={() => setTab("home")}>‹ {t("nav.home")}</button>

@@ -449,3 +449,4 @@ button.cta { box-shadow:0 10px 26px -12px rgba(201,162,74,.7); }
 .scrolllist .scroll-more span { color:var(--gold2); font-size:1.1rem; line-height:1; padding-bottom:6px; animation:nudge 1.6s ease-in-out infinite; }
 .screen.home .scrolllist .scroll-more { background:linear-gradient(180deg, transparent, var(--bg) 70%); }
 @keyframes nudge { 0%,100% { transform:translateY(0); opacity:.7; } 50% { transform:translateY(3px); opacity:1; } }
+.bell .dot { position:absolute; top:4px; right:4px; width:8px; height:8px; border-radius:50%; background:var(--gold2); box-shadow:0 0 8px rgba(201,162,74,.9); }

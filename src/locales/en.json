@@ -265,7 +265,13 @@
     "importHint": "Large zips take time on mobile data – use a computer. Safe to run again; existing files are skipped.",
     "sizeTypes": "Size types",
     "sizeTypesHint": "Pick one or more sets – adjust the list below if a size is missing or should go.",
-    "imageUrl": "Image link (optional)"
+    "imageUrl": "Image link (optional)",
+    "webSignup": "Signed up on the website",
+    "plan": {
+      "full": "Full season",
+      "half": "Half season",
+      "rates": "Instalments (agree with Line)"
+    }
   },
   "settings": {
     "language": "Language",
@@ -646,7 +652,9 @@
     "buyBtn": "Buy",
     "none": "No punch cards for sale right now.",
     "hint": "Line activates the card once payment is received – then you are on the team automatically.",
-    "claimed": "Thanks – Line activates the card once payment is received."
+    "claimed": "Thanks – Line activates the card once payment is received.",
+    "forTeams": "Punch cards are only for:",
+    "notForOthers": "Other teams pay a season fee and do not use punches."
   },
   "pay": {
     "eyebrow": "MobilePay",

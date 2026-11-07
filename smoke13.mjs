@@ -18,8 +18,8 @@ out.prefs = await p.evaluate(() => JSON.parse(localStorage.getItem("llds_mock"))
 // 3) parent buys a punch card + signs up for an event -> admin gets punch + signup notifications, but no order (we'll place an order too and check it is filtered)
 await p.click("text=Log ud"); await p.waitForSelector("#email"); await login("parent@demo");
 await p.waitForSelector("[data-testid=notif-prompt]", { timeout: 5000 }); await p.click("[data-testid=notif-later]"); await p.waitForTimeout(200);
-await p.click("[data-testid=avatar]"); await p.click("[data-testid=menu-more]"); const hasPunch = await p.$("[data-testid=more-punch]");
-if (hasPunch) { await hasPunch.click(); await p.waitForSelector("[data-testid=buy-card]"); await p.click("[data-testid=buy-card] >> nth=0"); await p.waitForTimeout(500); await p.mouse.click(195, 140); await p.waitForTimeout(200); }
+await p.click("[data-testid=shop]"); await p.waitForSelector("[data-testid=shop-screen]"); const hasPunch = await p.$("[data-testid=buy-card]");
+if (hasPunch) { await p.waitForSelector("[data-testid=buy-card]"); await p.click("[data-testid=buy-card] >> nth=0"); await p.waitForTimeout(500); await p.mouse.click(195, 140); await p.waitForTimeout(200); }
 out.hasPunch = !!hasPunch;
 // event overlay from Home: open + close in place
 await p.click("nav.tabbar >> text=Hjem"); await p.click("[data-testid=upcoming] .item >> nth=0"); await p.waitForSelector("[data-testid=event-facts]"); out.eventOverlay = (await p.textContent(".sheet h2")).length > 0; out.eventPhoto = !!(await p.$(".sheet-photo"));

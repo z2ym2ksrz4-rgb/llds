@@ -1,6 +1,6 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import appConfig from "../../../app.config.json";
-import type { Api, Appearance, Membership, PendingPerson, Person, Role, Team } from "./types";
+import type { Api, Appearance, WebSignup, Membership, PendingPerson, Person, Role, Team } from "./types";
 import { supabaseSchedule } from "./supabase-schedule";
 import { supabaseSocial } from "./supabase-social";
 import { supabaseShop } from "./supabase-shop";
@@ -66,7 +66,7 @@ export function supabaseApi(url: string, anonKey: string): Api {
 
     async listPending() {
       // adults = pending people with a login; their children ride along via guardian
-      const { data: adults, error } = await sb.from("person").select("*").eq("status", "pending").not("user_id", "is", null).order("created_at");
+      const { data: adults, error } = await sb.from("person").select("*").eq("status", "pending").or("user_id.not.is.null,source.eq.web").is("supervised_by", null).order("created_at");
       fail(error);
       const out: PendingPerson[] = [];
       for (const p of (adults ?? []) as Person[]) {

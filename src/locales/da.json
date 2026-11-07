@@ -265,7 +265,13 @@
     "importHint": "Store zip-filer tager tid på mobilnet – brug gerne computer. Kan køres igen; eksisterende filer springes over.",
     "sizeTypes": "Størrelsestyper",
     "sizeTypesHint": "Vælg et eller flere sæt – ret listen nedenfor, hvis en størrelse mangler eller skal væk.",
-    "imageUrl": "Billed-link (valgfrit)"
+    "imageUrl": "Billed-link (valgfrit)",
+    "webSignup": "Tilmeldt via websitet",
+    "plan": {
+      "full": "Hel sæson",
+      "half": "Halv sæson",
+      "rates": "Rater (aftal med Line)"
+    }
   },
   "settings": {
     "language": "Sprog",
@@ -646,7 +652,9 @@
     "buyBtn": "Køb",
     "none": "Ingen klippekort til salg lige nu.",
     "hint": "Kortet aktiveres af Line, når betalingen er modtaget – så er du automatisk på holdet.",
-    "claimed": "Tak – Line aktiverer kortet, når betalingen er modtaget."
+    "claimed": "Tak – Line aktiverer kortet, når betalingen er modtaget.",
+    "forTeams": "Klippekort gælder kun på:",
+    "notForOthers": "Andre hold betaler sæsonpris og skal ikke bruge klip."
   },
   "pay": {
     "eyebrow": "MobilePay",

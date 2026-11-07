@@ -18,6 +18,7 @@ export type Person = {
   wished_roles: string[];
   wished_teams: string | null;
   supervised_by: string | null;
+  source?: "app" | "web";
   notify_prefs?: NotifyPrefs | null;  // {on, kinds:{message:false,…}} – missing kind = on
   created_at: string;
 };
@@ -77,6 +78,7 @@ export type SignUpInput = {
 };
 
 export type PendingPerson = Person & { children: Person[] };
+export type WebSignup = { id: string; dancer_id: string; contact_id: string; team_id: string; team_name: string; dancer_name: string; contact_name: string; email: string | null; phone: string | null; plan: "full" | "half" | "rates"; amount_dkk: number | null; reference: string; note: string | null; status: "awaiting_payment" | "paid" | "cancelled"; claimed_paid_at: string | null; created_at: string };
 
 export interface Api {
   /** auth */
@@ -88,7 +90,10 @@ export interface Api {
   /** me */
   getMe(): Promise<Me | null>; // null = signed in but no person yet
   updateNotifyPrefs(prefs: NotifyPrefs): Promise<void>;
-  deleteMyAccount(): Promise<void>;   // person + children without own login + auth user; throws 'last admin'
+  deleteMyAccount(): Promise<void>;
+  /* sign-ups made on the website (no app): season payment via MobilePay, Line confirms */
+  listWebSignups(): Promise<WebSignup[]>;
+  setWebSignupStatus(id: string, status: "awaiting_payment" | "paid" | "cancelled"): Promise<void>;   // person + children without own login + auth user; throws 'last admin'
   getAppearance(): Promise<Appearance>;      // works before login (anon)
   saveAppearance(a: Appearance): Promise<void>; // admin
   signUp(input: SignUpInput): Promise<void>;
@@ -265,7 +270,7 @@ export type Event = {
 export type EventInput = Omit<Event, "id" | "signups" | "team_names" | "created_at" | "mySignups">;
 export type EventSignup = { event_id: string; person_id: string; person_name: string; team_name: string | null; paid: boolean; created_at: string };
 
-export type Product = { id: string; name: string; price_dkk: number; sizes: string[]; stock: number | null; image_path: string | null; image_url?: string | null; visibility: "private" | "public"; active: boolean };
+export type Product = { id: string; name: string; price_dkk: number; sizes: string[]; stock: number | null; image_path: string | null; image_url?: string | null; visibility: "private" | "public"; active: boolean; created_at?: string };
 export type OrderLine = { product_id: string; name: string; size: string | null; qty: number; price_dkk: number };
 export type Order = { id: string; person_id: string; person_name: string; number: number; lines: OrderLine[]; total_dkk: number; status: "awaiting_payment" | "paid" | "delivered" | "cancelled"; claimed_paid_at: string | null; created_at: string };
 
