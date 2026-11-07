@@ -506,3 +506,6 @@ button.cta { box-shadow:0 10px 26px -12px rgba(201,162,74,.7); }
 .trow{padding:8px 10px;border-radius:12px;border:1px solid transparent}.trow+.trow{margin-top:4px}.trow.on{background:rgba(201,162,74,.08);border-color:rgba(201,162,74,.35)}
 .trow-main{display:flex;flex-direction:column;align-items:stretch;gap:6px}.trow .tname{font-weight:500}.trow .chips.tight{flex-wrap:wrap;justify-content:flex-start}.trow-main>.grow{display:flex;align-items:baseline;gap:6px}
 .trow-kids{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:6px 0 2px 4px}
+
+.conflicts{padding:12px 14px;border-color:rgba(224,138,138,.45)}.conflictlist{margin:0;padding-left:18px;font-size:.9rem;line-height:1.5;max-height:200px;overflow:auto}
+.week .col.over{outline:2px dashed var(--gold);outline-offset:2px;border-radius:10px}.week .blk.dragging{opacity:.4}.week .blk[draggable]{cursor:grab}

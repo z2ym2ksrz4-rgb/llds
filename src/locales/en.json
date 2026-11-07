@@ -341,7 +341,8 @@
     "otherStyle": "Other",
     "whichChild": "Which child?",
     "addChildFirst": "Add a child under Children first",
-    "notSelf": "You cannot change your own admin status"
+    "notSelf": "You cannot change your own admin status",
+    "seasonDragHint": "On a computer: drag a training to another day to move it – you are asked whether it applies to all weeks and warned about conflicts."
   },
   "settings": {
     "language": "Language",
@@ -449,7 +450,15 @@
     "once": "– this one time only",
     "changeStaff": "Change",
     "useTeamStaff": "Use the team's trainer and assistant",
-    "badUntil": "End date must be after start date"
+    "badUntil": "End date must be after start date",
+    "futureHint": "If you change day or time, every future week moves too – you are told about conflicts first.",
+    "oneHint": "Only this one training changes.",
+    "conflictsHead": "Conflict in {{n}} weeks",
+    "conflictsSub": "The room is taken at the new time in these weeks:",
+    "booking": "booking",
+    "moveSkip": "Move all except those {{n}} weeks",
+    "moveOverride": "Move all – reject the {{n}} bookings",
+    "moveAnyway": "Move anyway (double booking)"
   },
   "rooms": {
     "prevWeek": "Previous week",

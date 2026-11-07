@@ -7,7 +7,7 @@ import { Customize } from "./Customize";
 import { PaymentsAdmin } from "../screens/Payments";
 import { CatalogAdmin } from "./Catalog";
 import { MessageComposer, MessageSheet } from "../components/Messages";
-import { ago } from "../lib/time";
+import { ago, isoDate } from "../lib/time";
 import { AdminUsers } from "./Users";
 import { MemberSheet } from "./MemberSheet";
 import { Sheet, Toast } from "../components/Sheet";
@@ -147,6 +147,7 @@ function Season() {
   const { t } = useTranslation();
   const [week, setWeek] = useState(mondayOf(new Date()));
   const [sessions, setSessions] = useState<Session[]>([]); const [open, setOpen] = useState<Session | "new" | null>(null);
+  const [moveTo, setMoveTo] = useState<{ date: string } | null>(null); const [dragId, setDragId] = useState<string | null>(null); const [over, setOver] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null); const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
   const load = useCallback(async () => setSessions(await api.listSessions(week.toISOString(), addDays(week, 7).toISOString())), [week]);
   useEffect(() => { void load(); }, [load]);
@@ -155,17 +156,19 @@ function Season() {
     <section className="screen">
       <header className="topbar"><h1 className="display">{t("admin.season")}</h1><button className="ghost small" onClick={() => setOpen("new")}>+ {t("session.training")}</button></header>
       <div className="row between small muted"><button className="linklike" onClick={() => setWeek(addDays(week, -7))}>‹</button><span>{t("admin.week")} {weekNo(week)} · {week.toLocaleDateString("da-DK", { day: "numeric", month: "short" })}</span><button className="linklike" onClick={() => setWeek(addDays(week, 7))}>›</button></div>
-      <p className="tiny">{t("admin.seasonHint")}</p>
+      <p className="tiny">{t("admin.seasonHint")} {t("admin.seasonDragHint")}</p>
       {rooms.map((room) => (
         <div className="sec" key={room}><div className="eyebrow">{room}</div>
           <div className="week">
             {[0, 1, 2, 3, 4, 5, 6].map((d) => { const day = addDays(week, d); const list = sessions.filter((s) => s.room_name === room && new Date(s.starts_at).toDateString() === day.toDateString()); return list.length || d < 5 ? (
-              <div className="col" key={d}><h4>{DAY_LONG[d].slice(0, 3)}</h4>{list.map((s) => <button key={s.id} className={"blk" + (s.cancelled ? " off" : "")} onClick={() => setOpen(s)}><b>{s.title ?? s.team_name}</b>{hm(s.starts_at)}–{hm(s.ends_at)}</button>)}</div>) : null; })}
+              <div className={"col" + (over === room + d ? " over" : "")} key={d} onDragOver={(e) => { if (dragId) { e.preventDefault(); setOver(room + d); } }} onDragLeave={() => setOver(null)}
+                onDrop={(e) => { e.preventDefault(); setOver(null); const s = sessions.find((x) => x.id === dragId); setDragId(null); if (!s) return; if (new Date(s.starts_at).toDateString() === day.toDateString()) return; setMoveTo({ date: isoDate(day) }); setOpen(s); }}>
+                <h4>{DAY_LONG[d].slice(0, 3)}</h4>{list.map((s) => <button key={s.id} className={"blk" + (s.cancelled ? " off" : "") + (dragId === s.id ? " dragging" : "")} draggable onDragStart={(e) => { setDragId(s.id); e.dataTransfer.effectAllowed = "move"; }} onDragEnd={() => { setDragId(null); setOver(null); }} onClick={() => { setMoveTo(null); setOpen(s); }}><b>{s.title ?? s.team_name}</b>{hm(s.starts_at)}–{hm(s.ends_at)}</button>)}</div>) : null; })}
           </div>
         </div>
       ))}
       {open === "new" && <SessionEditor defaults={{ date: week, room_id: "", start: "16:00" }} onClose={() => setOpen(null)} onSaved={() => { setOpen(null); void load(); }} toast={say} />}
-      {open && open !== "new" && <SessionEditor session={open} onClose={() => setOpen(null)} onSaved={() => { setOpen(null); void load(); }} toast={say} />}
+      {open && open !== "new" && <SessionEditor key={open.id + (moveTo?.date ?? "")} session={open} moveTo={moveTo ?? undefined} onClose={() => { setOpen(null); setMoveTo(null); }} onSaved={() => { setOpen(null); setMoveTo(null); void load(); }} toast={say} />}
       <Toast msg={toast} />
     </section>
   );

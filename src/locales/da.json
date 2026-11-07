@@ -341,7 +341,8 @@
     "otherStyle": "Andet",
     "whichChild": "Hvilket barn?",
     "addChildFirst": "Tilføj et barn under Børn først",
-    "notSelf": "Du kan ikke ændre din egen admin-status"
+    "notSelf": "Du kan ikke ændre din egen admin-status",
+    "seasonDragHint": "På computer: træk en træning til en anden dag for at flytte den – du bliver spurgt, om det gælder alle uger, og advaret om konflikter."
   },
   "settings": {
     "language": "Sprog",
@@ -449,7 +450,15 @@
     "once": "– kun denne ene gang",
     "changeStaff": "Skift",
     "useTeamStaff": "Brug holdets træner og hjælpetræner",
-    "badUntil": "Slutdato skal være efter startdato"
+    "badUntil": "Slutdato skal være efter startdato",
+    "futureHint": "Flytter du dag eller tid, flyttes alle kommende uger med – du får besked om konflikter først.",
+    "oneHint": "Kun denne ene træning ændres.",
+    "conflictsHead": "Konflikt i {{n}} uger",
+    "conflictsSub": "Salen er optaget på det nye tidspunkt i disse uger:",
+    "booking": "booking",
+    "moveSkip": "Flyt alle undtagen de {{n}} uger",
+    "moveOverride": "Flyt alle – afvis de {{n}} bookinger",
+    "moveAnyway": "Flyt alligevel (dobbeltbooking)"
   },
   "rooms": {
     "prevWeek": "Forrige uge",

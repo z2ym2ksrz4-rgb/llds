@@ -25,3 +25,6 @@ export function ago(iso: string) {
   if (m < 1) return "nu"; if (m < 60) return `${m} min`; const h = Math.round(m / 60); if (h < 24) return `${h} t`;
   const d = Math.round(h / 24); if (d < 7) return `${d} d`; return new Date(iso).toLocaleDateString("da-DK", { day: "numeric", month: "short" });
 }
+
+/** HH:MM for <input type="time"> (hm() gives the Danish "16.00" display form, which the input rejects). */
+export function hhmm(iso: string) { const d = new Date(iso); return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; }

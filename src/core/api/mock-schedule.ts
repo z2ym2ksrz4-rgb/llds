@@ -1,3 +1,4 @@
+import { shiftOccurrence } from "./schedule-util";
 import type { Absence, Booking, Member, Membership, Person, PersonStatus, Role, Room, RosterEntry, Session, SessionInput, Team, TeamInput } from "./types";
 
 /** Phase-2 half of the mock. Seeds this week's schedule from the season plan (Mon–Thu, two rooms). */
@@ -60,15 +61,13 @@ export function scheduleOps(get: () => { S: SchedState; persons: Person[]; membe
       }
       g.save(); g.emit();
     },
-    async updateSession(sid: string, patch: Record<string, unknown>, scope: "one" | "future" = "one") {
+    async updateSession(sid: string, patch: Record<string, unknown>, scope: "one" | "future" = "one", opts: { skipIds?: string[] } = {}) {
       const g = get(); const s0 = g.S.sessions.find((s) => s.id === sid); if (!s0) return;
-      const targets = scope === "future" && s0.weekly_rule_id ? g.S.sessions.filter((s) => s.weekly_rule_id === s0.weekly_rule_id && s.starts_at >= s0.starts_at) : [s0];
+      const orig = { starts_at: s0.starts_at, ends_at: s0.ends_at };
+      const targets = (scope === "future" && s0.weekly_rule_id ? g.S.sessions.filter((s) => s.weekly_rule_id === s0.weekly_rule_id && s.starts_at >= s0.starts_at) : [s0]).filter((s) => !opts.skipIds?.includes(s.id));
       for (const s of targets) {
         const p = { ...patch } as Partial<Session> & { starts_at?: string; ends_at?: string };
-        if (scope === "future" && patch.starts_at && patch.ends_at && s !== s0) { // shift time of day only
-          const d = new Date(s.starts_at); const ns = new Date(patch.starts_at as string); d.setHours(ns.getHours(), ns.getMinutes()); p.starts_at = d.toISOString();
-          const d2 = new Date(s.ends_at); const ne = new Date(patch.ends_at as string); d2.setHours(ne.getHours(), ne.getMinutes()); p.ends_at = d2.toISOString();
-        }
+        if (scope === "future" && patch.starts_at && patch.ends_at && s !== s0) Object.assign(p, shiftOccurrence(s.starts_at, s.ends_at, orig.starts_at, patch.starts_at as string, patch.ends_at as string)); // same weekday shift + new time
         const wasSub = s.substitute_wanted, wasCancelled = s.cancelled;
         Object.assign(s, p);
         if (patch.substitute_wanted && !wasSub) for (const st of g.persons.filter((x) => x.status === "approved" && (x.is_admin || g.memberships.some((m) => m.person_id === x.id && m.role !== "dancer")) && x.id !== s.trainer_id)) g.notify(st.id, "substitute", "Vikar søges", `${s.team_name ?? ""} · ${new Date(s.starts_at).toLocaleString("da-DK", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}`, { session_id: s.id });

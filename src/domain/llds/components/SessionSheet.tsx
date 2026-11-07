@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { api, type Member, type Absence, type Person, type Session, type Team, type Room } from "@/core/api";
+import { api, type Member, type Absence, type Person, type Session, type SessionInput, type Team, type Room } from "@/core/api";
 import { useAuth } from "@/core/auth";
 import { Sheet } from "./Sheet";
-import { dateLabel, hm, SEASON_END, isoDate } from "../lib/time";
+import { dateLabel, hm, hhmm, SEASON_END, isoDate } from "../lib/time";
+import { shiftOccurrence } from "@/core/api/schedule-util";
+
+type Conflict = { occId: string; date: string; what: string; from: string; to: string; bookingId?: string };
 
 const REASONS = ["sick", "school", "injury", "holiday", "other"] as const;
 
@@ -134,7 +137,7 @@ export function AttendanceSheet({ session, onClose, toast }: { session: Session;
 }
 
 /** Create/edit a training. Admin and trainers of the team. Repeat weekly generates the whole season. */
-export function SessionEditor({ session, defaults, onClose, onSaved, toast }: { session?: Session; defaults?: { date: Date; room_id: string; start: string }; onClose: () => void; onSaved: () => void; toast: (m: string) => void }) {
+export function SessionEditor({ session, defaults, moveTo, onClose, onSaved, toast }: { session?: Session; defaults?: { date: Date; room_id: string; start: string }; moveTo?: { date: string; start?: string }; onClose: () => void; onSaved: () => void; toast: (m: string) => void }) {
   const { t } = useTranslation();
   const me = useAuth((s) => s.me)!;
   const isAdmin = me.person.is_admin;
@@ -143,11 +146,13 @@ export function SessionEditor({ session, defaults, onClose, onSaved, toast }: { 
   const s0 = session ? new Date(session.starts_at) : defaults!.date;
   const [f, setF] = useState({
     team_id: session?.team_id ?? "", room_id: session?.room_id ?? defaults?.room_id ?? "", title: session?.title ?? "",
-    date: isoDate(s0), until: SEASON_END, start: session ? hm(session.starts_at) : defaults!.start, end: session ? hm(session.ends_at) : addMin(defaults!.start, 60),
-    trainer_id: session?.trainer_id ?? (isAdmin ? "" : me.person.id), assistant_id: session?.assistant_id ?? "", repeat: !session, scope: "one" as "one" | "future",
+    date: moveTo?.date ?? isoDate(s0), until: SEASON_END, start: session ? (moveTo?.start ?? hhmm(session.starts_at)) : defaults!.start, end: session ? (moveTo?.start ? addMin(moveTo.start, Math.round((new Date(session.ends_at).getTime() - new Date(session.starts_at).getTime()) / 60000)) : hhmm(session.ends_at)) : addMin(defaults!.start, 60),
+    trainer_id: session?.trainer_id ?? (isAdmin ? "" : me.person.id), assistant_id: session?.assistant_id ?? "", repeat: !session, scope: (moveTo && session?.weekly_rule_id ? "future" : "one") as "one" | "future",
   });
   const [editStaff, setEditStaff] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [conflicts, setConflicts] = useState<Conflict[] | null>(null);
+  const [pending, setPending] = useState<{ starts_at: string; ends_at: string; payload: Record<string, unknown> } | null>(null);
   useEffect(() => { void Promise.all([api.listTeams(), api.listRooms(), api.staffList(), api.listMembers()]).then(([tm, r, st, mb]) => { setTeams(isAdmin ? tm : tm.filter((x) => myTrainerTeams.includes(x.id))); setRooms(r); setStaff(st); setMembers(mb); }); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   /** the team's own trainer + assistant follow the team automatically; "Skift" overrides for this training */
   const teamStaff = (teamId: string) => {
@@ -162,13 +167,29 @@ export function SessionEditor({ session, defaults, onClose, onSaved, toast }: { 
     const starts_at = new Date(`${f.date}T${f.start}:00`).toISOString(), ends_at = new Date(`${f.date}T${f.end}:00`).toISOString();
     if (ends_at <= starts_at) { setErr(t("session.badTime")); return; }
     if (!session && f.repeat && f.until < f.date) { setErr(t("session.badUntil")); return; }
-    // clash check in the same room
-    const day0 = new Date(f.date); const next = new Date(day0); next.setDate(next.getDate() + 1);
-    const [ss, bs] = await Promise.all([api.listSessions(day0.toISOString(), next.toISOString()), api.listBookings(day0.toISOString(), next.toISOString())]);
-    const clash = ss.find((x) => x.room_id === f.room_id && x.id !== session?.id && !x.cancelled && x.starts_at < ends_at && starts_at < x.ends_at) || bs.find((x) => x.room_id === f.room_id && x.status !== "rejected" && x.starts_at < ends_at && starts_at < x.ends_at);
-    if (clash) { setErr(t("session.clash", { what: ("team_name" in clash ? clash.team_name : clash.title) ?? "", from: hm(clash.starts_at), to: hm(clash.ends_at) })); return; }
     const payload = { team_id: f.team_id || null, room_id: f.room_id || null, title: f.title || null, starts_at, ends_at, trainer_id: f.trainer_id || null, assistant_id: f.assistant_id || null };
-    if (session) await api.updateSession(session.id, payload, f.scope); else await api.createSession({ ...payload, repeatWeeklyUntil: f.repeat ? f.until : null });
+    // conflict check in the same room – for every week the change touches (one day, or the whole series when "Denne og alle fremover")
+    const series = session && f.scope === "future" && session.weekly_rule_id;
+    const from = new Date(f.date); from.setHours(0, 0, 0, 0);
+    const to = series ? new Date(SEASON_END + "T23:59:59") : new Date(from.getTime() + 86400000);
+    const [ss, bs] = await Promise.all([api.listSessions(from.toISOString(), to.toISOString()), api.listBookings(from.toISOString(), to.toISOString())]);
+    const occ = series ? ss.filter((x) => x.weekly_rule_id === session.weekly_rule_id && x.starts_at >= session.starts_at) : [];
+    const slots = session && series ? occ.map((o) => ({ id: o.id, ...(o.id === session.id ? { starts_at, ends_at } : shiftOccurrence(o.starts_at, o.ends_at, session.starts_at, starts_at, ends_at)) })) : [{ id: session?.id ?? "new", starts_at, ends_at }];
+    const seriesIds = new Set(occ.map((o) => o.id));
+    const found: Conflict[] = [];
+    for (const sl of slots) {
+      for (const x of ss) if (x.room_id === f.room_id && x.id !== session?.id && !seriesIds.has(x.id) && !x.cancelled && x.starts_at < sl.ends_at && sl.starts_at < x.ends_at) found.push({ occId: sl.id, date: sl.starts_at, what: x.team_name ?? x.title ?? "", from: hm(x.starts_at), to: hm(x.ends_at) });
+      for (const x of bs) if (x.room_id === f.room_id && x.status !== "rejected" && x.starts_at < sl.ends_at && sl.starts_at < x.ends_at) found.push({ occId: sl.id, date: sl.starts_at, what: `${x.title} (${x.person_name})`, from: hm(x.starts_at), to: hm(x.ends_at), bookingId: x.id });
+    }
+    if (found.length) {
+      if (!series) { const c = found[0]; setErr(t("session.clash", { what: c.what, from: c.from, to: c.to })); return; }
+      setPending({ starts_at, ends_at, payload }); setConflicts(found); return;
+    }
+    await commit(payload);
+  };
+  const commit = async (payload: Record<string, unknown>, opts: { skipIds?: string[]; rejectBookings?: string[] } = {}) => {
+    for (const bid of opts.rejectBookings ?? []) await api.setBookingStatus(bid, "rejected");
+    if (session) await api.updateSession(session.id, payload as Partial<SessionInput>, f.scope, { skipIds: opts.skipIds }); else await api.createSession({ ...(payload as SessionInput), repeatWeeklyUntil: f.repeat ? f.until : null });
     toast(session ? t("session.saved") : t("session.created")); onSaved();
   };
   return (
@@ -176,20 +197,19 @@ export function SessionEditor({ session, defaults, onClose, onSaved, toast }: { 
       <label className="field"><span>{t("session.team")}</span>
         <select id="se-team" value={f.team_id} onChange={(e) => pickTeam(e.target.value)}><option value="">{t("session.noTeam")}</option>{teams.map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</select></label>
       {!f.team_id && <label className="field"><span>{t("session.title")}</span><input id="se-title" value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} placeholder={t("session.titlePh")} /></label>}
+      {!session ? (
+        <button type="button" className={"checkrow" + (f.repeat ? " on" : "")} role="checkbox" aria-checked={f.repeat} data-testid="se-repeat" onClick={() => setF({ ...f, repeat: !f.repeat })}>
+          <span className="box" aria-hidden>{f.repeat ? "✓" : ""}</span><span className="grow"><span className="lbl">{t("session.repeatWeekly")}</span><span className="tiny">{f.repeat ? t("session.repeatHint", { date: new Date(f.until).toLocaleDateString("da-DK", { day: "numeric", month: "short" }) }) : t("session.once")}</span></span></button>
+      ) : session.weekly_rule_id ? (
+        <div className="field"><span>{t("session.applyTo")}</span><div className="seg2"><button type="button" className={f.scope === "one" ? "on" : ""} onClick={() => setF({ ...f, scope: "one" })}>{t("session.onlyThis")}</button><button type="button" className={f.scope === "future" ? "on" : ""} onClick={() => setF({ ...f, scope: "future" })}>{t("session.thisAndFuture")}</button></div><p className="tiny muted" style={{ margin: "6px 0 0" }}>{f.scope === "future" ? t("session.futureHint") : t("session.oneHint")}</p></div>
+      ) : null}
       <label className="field"><span>{t("session.room")}</span><select id="se-room" value={f.room_id} onChange={(e) => setF({ ...f, room_id: e.target.value })}>{rooms.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}</select></label>
-
       <label className="field"><span>{session || !f.repeat ? t("session.date") : t("session.startDate")}</span><input id="se-date" type="date" value={f.date} onChange={(e) => setF({ ...f, date: e.target.value })} /></label>
       {!session && f.repeat && <label className="field"><span>{t("session.endDate")}</span><input id="se-until" type="date" value={f.until} min={f.date} onChange={(e) => setF({ ...f, until: e.target.value })} /></label>}
       <div className="grid2">
         <label className="field"><span>{t("session.start")}</span><input id="se-start" type="time" value={f.start} onChange={(e) => setF({ ...f, start: e.target.value })} /></label>
         <label className="field"><span>{t("session.end")}</span><input id="se-end" type="time" value={f.end} onChange={(e) => setF({ ...f, end: e.target.value })} /></label>
       </div>
-      {!session ? (
-        <label className="check" data-testid="se-repeat"><input type="checkbox" checked={f.repeat} onChange={(e) => setF({ ...f, repeat: e.target.checked })} /> {t("session.repeatWeekly")}<span className="tiny" style={{ marginLeft: 6 }}>{f.repeat ? t("session.repeatHint", { date: new Date(f.until).toLocaleDateString("da-DK", { day: "numeric", month: "short" }) }) : t("session.once")}</span></label>
-      ) : session.weekly_rule_id && (
-        <div className="field"><span>{t("session.applyTo")}</span><div className="chips"><button className={"chip" + (f.scope === "one" ? " on" : "")} onClick={() => setF({ ...f, scope: "one" })}>{t("session.onlyThis")}</button><button className={"chip" + (f.scope === "future" ? " on" : "")} onClick={() => setF({ ...f, scope: "future" })}>{t("session.thisAndFuture")}</button></div></div>
-      )}
-
       <div className="card" style={{ padding: 12 }} data-testid="se-staff">
         {!editStaff ? (
           <div className="row between"><div><div className="tiny">{t("session.trainer")}</div><div>{nameOf(f.trainer_id) ?? <span className="muted">–</span>}</div>{(f.assistant_id || f.team_id) && <><div className="tiny" style={{ marginTop: 6 }}>{t("roles.assistant")}</div><div>{nameOf(f.assistant_id) ?? <span className="muted">–</span>}</div></>}</div><button className="ghost small" onClick={() => setEditStaff(true)} data-testid="se-change-staff">{t("session.changeStaff")}</button></div>
@@ -203,8 +223,19 @@ export function SessionEditor({ session, defaults, onClose, onSaved, toast }: { 
       </div>
       <p className="tiny">{t("session.autoBook")}</p>
       {err && <p className="error" role="alert">{err}</p>}
-      <div className="row"><button className="cta grow" disabled={!f.room_id || (!f.team_id && !f.title)} onClick={() => void save()}>{session ? t("common.save") : t("session.create")}</button>
-        {session && <button className="ghost danger" onClick={async () => { await api.deleteSession(session.id, f.scope); toast(t("session.deleted")); onSaved(); }}>{t("common.delete")}</button>}</div>
+      {conflicts && pending && (() => { const weeks = Array.from(new Set(conflicts.map((c) => c.occId))); const bookings = conflicts.filter((c) => c.bookingId).map((c) => c.bookingId!); const sessionsOnly = conflicts.some((c) => !c.bookingId); return (
+        <div className="card conflicts" data-testid="se-conflicts">
+          <div className="eyebrow">{t("session.conflictsHead", { n: weeks.length })}</div>
+          <p className="tiny" style={{ margin: "4px 0 8px" }}>{t("session.conflictsSub")}</p>
+          <ul className="conflictlist">{conflicts.map((c, i) => <li key={i}><b>{dateLabel(c.date)}</b> · {c.what} {c.from}–{c.to}{c.bookingId ? ` · ${t("session.booking")}` : ` · ${t("session.training")}`}</li>)}</ul>
+          <div className="stack" style={{ marginTop: 10 }}>
+            <button type="button" className="cta" onClick={() => void commit(pending.payload, { skipIds: weeks.filter((id) => id !== session?.id) })} data-testid="se-skip">{t("session.moveSkip", { n: weeks.length })}</button>
+            <button type="button" className="ghost" onClick={() => void commit(pending.payload, { rejectBookings: bookings })} data-testid="se-override">{sessionsOnly ? t("session.moveAnyway") : t("session.moveOverride", { n: bookings.length })}</button>
+            <button type="button" className="ghost" onClick={() => { setConflicts(null); setPending(null); }}>{t("common.cancel")}</button>
+          </div>
+        </div>); })()}
+      {!conflicts && <div className="row"><button className="cta grow" disabled={!f.room_id || (!f.team_id && !f.title)} onClick={() => void save()}>{session ? t("common.save") : t("session.create")}</button>
+        {session && <button className="ghost danger" onClick={async () => { await api.deleteSession(session.id, f.scope); toast(t("session.deleted")); onSaved(); }}>{t("common.delete")}</button>}</div>}
     </Sheet>
   );
 }

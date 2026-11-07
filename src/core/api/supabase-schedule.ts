@@ -1,3 +1,4 @@
+import { shiftOccurrence } from "./schedule-util";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Absence, Booking, Member, Membership, Person, PersonStatus, Role, Room, RosterEntry, Session, SessionInput, Team, TeamInput } from "./types";
 
@@ -24,21 +25,20 @@ export function supabaseSchedule(sb: SupabaseClient, fail: Fail, schoolId: () =>
         const { error } = await sb.from("session").insert({ school_id: await schoolId(), team_id: i.team_id, room_id: i.room_id, title: i.title ?? null, starts_at: i.starts_at, ends_at: i.ends_at, trainer_id: i.trainer_id ?? null, assistant_id: i.assistant_id ?? null }); fail(error);
       }
     },
-    async updateSession(id: string, patch: Record<string, unknown>, scope: "one" | "future" = "one") {
+    async updateSession(id: string, patch: Record<string, unknown>, scope: "one" | "future" = "one", opts: { skipIds?: string[] } = {}) {
       const { repeatWeeklyUntil: _r, ...p } = patch as Record<string, unknown> & { repeatWeeklyUntil?: unknown }; void _r;
       if (scope === "one") { const { error } = await sb.from("session").update(p).eq("id", id); fail(error); return; }
       const { data: s0 } = await sb.from("session").select("weekly_rule_id,starts_at").eq("id", id).single();
       if (!s0?.weekly_rule_id) { const { error } = await sb.from("session").update(p).eq("id", id); fail(error); return; }
       const { data: all } = await sb.from("session").select("id,starts_at,ends_at").eq("weekly_rule_id", s0.weekly_rule_id).gte("starts_at", s0.starts_at);
       for (const s of all ?? []) {
+        if (opts.skipIds?.includes(s.id)) continue;
         const q = { ...p };
-        if (p.starts_at && p.ends_at) {
-          const d = new Date(s.starts_at); const ns = new Date(p.starts_at as string); d.setHours(ns.getHours(), ns.getMinutes()); q.starts_at = d.toISOString();
-          const d2 = new Date(s.ends_at); const ne = new Date(p.ends_at as string); d2.setHours(ne.getHours(), ne.getMinutes()); q.ends_at = d2.toISOString();
-        }
+        if (p.starts_at && p.ends_at && s.id !== id) Object.assign(q, shiftOccurrence(s.starts_at, s.ends_at, s0.starts_at, p.starts_at as string, p.ends_at as string));
         const { error } = await sb.from("session").update(q).eq("id", s.id); fail(error);
       }
     },
+
     async deleteSession(id: string, scope: "one" | "future" = "one") {
       if (scope === "future") {
         const { data: s0 } = await sb.from("session").select("weekly_rule_id,starts_at").eq("id", id).single();
