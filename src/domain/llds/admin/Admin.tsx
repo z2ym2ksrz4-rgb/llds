@@ -248,12 +248,19 @@ function ShopAdmin() {
   const [toast, setToast] = useState<string | null>(null); const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
   const load = useCallback(async () => { const [p, o] = await Promise.all([api.listProducts(true), api.listOrders(true)]); setProducts(p); setOrders(o); }, []);
   useEffect(() => { void load(); }, [load]);
-  const open = orders.filter((o) => o.status === "awaiting_payment"), rest = orders.filter((o) => o.status !== "awaiting_payment");
-  const OrderRow = ({ o }: { o: Order }) => (
-    <div className="item" data-testid="admin-order"><span className="grow">#{o.number} · {o.person_name}<div className="tiny">{o.lines.map((l) => `${l.qty}× ${l.name}${l.size ? ` (${l.size})` : ""}`).join(", ")} · {o.total_dkk} kr. · {ago(o.created_at)}{o.claimed_paid_at && o.status === "awaiting_payment" ? ` · ${t("shop.status.claimed")}` : ""}</div></span>
-      {o.status === "awaiting_payment" ? <div className="row"><button className="small" onClick={async () => { await api.setOrderStatus(o.id, "paid"); void load(); }}>{t("admin.markPaid")}</button><button className="ghost small danger" onClick={async () => { await api.setOrderStatus(o.id, "cancelled"); void load(); }}>×</button></div>
-        : o.status === "paid" ? <button className="ghost small" onClick={async () => { await api.setOrderStatus(o.id, "delivered"); void load(); }}>{t("admin.markDelivered")}</button> : <span className="chip small ok">{t(`shop.status.${o.status}`)}</span>}</div>
-  );
+  // open = not yet handed over (awaiting payment OR paid). Two independent ticks: "Betalt" (Line confirmed the money in her books) and "Udleveret" (moves the order down).
+  const open = orders.filter((o) => o.status === "awaiting_payment" || o.status === "paid"), rest = orders.filter((o) => o.status !== "awaiting_payment" && o.status !== "paid");
+  const OrderRow = ({ o }: { o: Order }) => {
+    const isOpen = o.status === "awaiting_payment" || o.status === "paid"; const paid = o.status === "paid";
+    return (
+      <div className={"item orderrow" + (isOpen ? "" : " done")} data-testid="admin-order"><span className="grow">#{o.number} · {o.person_name}<div className="tiny">{o.lines.map((l) => `${l.qty}× ${l.name}${l.size ? ` (${l.size})` : ""}`).join(", ")} · {o.total_dkk} kr. · {ago(o.created_at)}{o.claimed_paid_at && o.status === "awaiting_payment" ? ` · ${t("shop.status.claimed")}` : ""}</div></span>
+        {isOpen ? <div className="ticks">
+          <button type="button" className={"tick" + (paid ? " on" : "")} role="checkbox" aria-checked={paid} onClick={async () => { await api.setOrderStatus(o.id, paid ? "awaiting_payment" : "paid"); void load(); }} data-testid="tick-paid"><span className="box">{paid ? "✓" : ""}</span>{t("admin.markPaid")}</button>
+          <button type="button" className="tick" role="checkbox" aria-checked={false} disabled={!paid} title={!paid ? t("admin.deliverNeedsPaid") : undefined} onClick={async () => { await api.setOrderStatus(o.id, "delivered"); void load(); }} data-testid="tick-delivered"><span className="box" /> {t("admin.markDelivered")}</button>
+          <button type="button" className="ghost small danger" aria-label={t("shop.status.cancelled")} onClick={async () => { await api.setOrderStatus(o.id, "cancelled"); void load(); }}>×</button>
+        </div> : <span className={"chip small" + (o.status === "delivered" ? " ok" : "")}>{t(`shop.status.${o.status}`)}</span>}</div>
+    );
+  };
   return (
     <section className="screen">
       <header className="topbar"><h1 className="display">{t("admin.shop")}</h1><button className="ghost small" id="product-new" onClick={() => setEdit("new")}>+ {t("admin.newProduct")}</button></header>

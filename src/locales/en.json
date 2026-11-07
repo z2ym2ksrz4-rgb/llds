@@ -228,12 +228,12 @@
     "markPaid": "Paid",
     "markDelivered": "Handed out",
     "newProduct": "New product",
-    "ordersOpen": "Orders – pending",
+    "ordersOpen": "Open orders",
     "noOrders": "No open orders.",
     "products": "Products",
     "oneSize": "One size",
     "stock": "Stock",
-    "ordersDone": "Completed orders",
+    "ordersDone": "Delivered and cancelled",
     "productName": "Name",
     "price": "Price (DKK)",
     "sizes": "Sizes (comma separated)",
@@ -344,7 +344,8 @@
     "notSelf": "You cannot change your own admin status",
     "seasonDragHint": "On a computer: drag a training to another day to move it – you are asked whether it applies to all weeks and warned about conflicts.",
     "teamsParentOnly": "The parent automatically follows the teams where the children dance (marked below).",
-    "childrenHint": "The parent gets access to exactly the teams where the child is a dancer – not teams where the child is a trainer. Teams are chosen on the child (Edit)."
+    "childrenHint": "The parent gets access to exactly the teams where the child is a dancer – not teams where the child is a trainer. Teams are chosen on the child (Edit).",
+    "deliverNeedsPaid": "Tick Paid first"
   },
   "settings": {
     "language": "Language",

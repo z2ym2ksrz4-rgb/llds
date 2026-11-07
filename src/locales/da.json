@@ -228,12 +228,12 @@
     "markPaid": "Betalt",
     "markDelivered": "Udleveret",
     "newProduct": "Ny vare",
-    "ordersOpen": "Ordrer – afventer",
+    "ordersOpen": "Åbne ordrer",
     "noOrders": "Ingen åbne ordrer.",
     "products": "Varer",
     "oneSize": "Én størrelse",
     "stock": "Lager",
-    "ordersDone": "Afsluttede ordrer",
+    "ordersDone": "Udleverede og annullerede",
     "productName": "Navn",
     "price": "Pris (kr.)",
     "sizes": "Størrelser (kommasepareret)",
@@ -344,7 +344,8 @@
     "notSelf": "Du kan ikke ændre din egen admin-status",
     "seasonDragHint": "På computer: træk en træning til en anden dag for at flytte den – du bliver spurgt, om det gælder alle uger, og advaret om konflikter.",
     "teamsParentOnly": "Forælderen følger automatisk de hold, hvor børnene er dansere (markeret nedenfor).",
-    "childrenHint": "Forælderen får adgang til præcis de hold, hvor barnet er danser – ikke hold hvor barnet er træner. Hold vælges på barnet (Redigér)."
+    "childrenHint": "Forælderen får adgang til præcis de hold, hvor barnet er danser – ikke hold hvor barnet er træner. Hold vælges på barnet (Redigér).",
+    "deliverNeedsPaid": "Kryds Betalt af først"
   },
   "settings": {
     "language": "Sprog",

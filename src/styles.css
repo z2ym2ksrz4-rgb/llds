@@ -517,3 +517,10 @@ button.cta { box-shadow:0 10px 26px -12px rgba(201,162,74,.7); }
 .evcard-mini::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,12,.1),rgba(10,10,12,.85));z-index:-1}
 .evcard-mini .eyebrow{font-size:.62rem;margin:0}.evcard-mini b{font-size:1rem;line-height:1.1}.evcard-mini small{color:var(--muted);font-size:.75rem}
 .daypick .day .evdot,.days .day .evdot{position:absolute;top:4px;right:6px;font-style:normal;font-size:.6rem;color:var(--gold2)}
+
+/* Admin → Shop: two ticks per open order */
+.orderrow{flex-wrap:wrap}.orderrow .ticks{display:flex;gap:6px;align-items:center;width:100%;margin-top:8px}
+.tick{display:inline-flex;align-items:center;gap:8px;padding:7px 12px 7px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:var(--fg);font:inherit;font-size:.85rem}
+.tick .box{width:18px;height:18px;border-radius:6px;border:1.5px solid rgba(255,255,255,.35);display:grid;place-items:center;font-size:12px;font-weight:700;color:#0a0a0b}
+.tick.on{border-color:rgba(201,162,74,.6);background:rgba(201,162,74,.1)}.tick.on .box{background:linear-gradient(135deg,#e6c87a,#c9a24a);border-color:transparent}
+.tick:disabled{opacity:.45}

@@ -28,7 +28,9 @@ await p.click("text=‹ Tilbage"); await p.click("nav.tabbar >> text=Hjem"); awa
 
 // 2. admin: badge, shop → mark paid, punch → activate, events → new, team → milestone, attendance → punch
 await login("admin@demo"); await p.waitForSelector("[data-testid=badge]"); out.adminBadge = await p.textContent("[data-testid=badge]");
-await p.click("nav.tabbar >> text=Admin"); await p.click(".item:has-text('Shop')"); await p.waitForSelector("[data-testid=admin-order]"); await p.click("[data-testid=admin-order] button >> nth=0"); await p.waitForTimeout(200);
+await p.click("nav.tabbar >> text=Admin"); await p.click(".item:has-text('Shop')"); await p.waitForSelector("[data-testid=admin-order]"); await p.click("[data-testid=admin-order] [data-testid=tick-paid]"); await p.waitForTimeout(200);
+out.adminPaidTick = await p.getAttribute("[data-testid=admin-order] [data-testid=tick-paid]", "aria-checked");
+await p.click("[data-testid=admin-order] [data-testid=tick-delivered]"); await p.waitForTimeout(200);
 out.adminOrderAfter = await p.textContent("[data-testid=admin-order]");
 await p.click("text=‹ Admin"); await p.click(".item:has-text('Klippekort')"); await p.waitForSelector("[data-testid=admin-card]"); await p.click("[data-testid=admin-card] button"); await p.waitForTimeout(200); out.cardsWaitingAfter = await p.$$eval("[data-testid=admin-card]", e => e.length);
 await p.click("text=‹ Admin"); await p.click(".item:has-text('Events')"); await p.waitForSelector("#event-new"); await p.click("#event-new");
