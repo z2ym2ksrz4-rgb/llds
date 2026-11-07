@@ -14,7 +14,7 @@ await p.waitForSelector("[data-testid=role-parent]");
 out.parentOn = await p.getAttribute("[data-testid=role-parent]", "aria-checked");
 out.kidsBefore = await p.$$eval("[data-testid=kids] .checkrow", e => e.length);
 // create a new child on Apexion
-await p.click("text=Nyt barn"); await p.fill("[data-testid=new-kid] input:not([type=date])", "Noa");
+await p.click("text=Nyt barn"); await p.fill("[data-testid=new-kid] input:not([type=date])", "Noa"); await p.fill("[data-testid=new-kid] input[type=date]", "2016-05-01");
 await p.locator("[data-testid=new-kid] .checkrow", { hasText: "Apexion" }).click();
 await p.click("[data-testid=new-kid] button.cta"); await p.waitForSelector("text=Noa er oprettet");
 out.kidsAfter = await p.$$eval("[data-testid=kids] .checkrow", e => e.length);
@@ -31,7 +31,7 @@ const acc = await p.locator("[data-testid=access]").innerText(); out.persisted =
 await p.locator("[data-testid=kids] .checkrow", { hasText: "Noa" }).locator("button", { hasText: "Redigér" }).click();
 await p.waitForSelector("[data-testid=dancer-teams]");
 out.childDancerApexion = await p.locator("[data-testid=dancer-teams] .checkrow.on", { hasText: "Apexion" }).count();
-out.childHasNoParentToggle = (await p.locator("[data-testid=role-parent]").count()) === 0;
+out.childHasNoParentToggle = (await p.getAttribute("[data-testid=role-parent]", "aria-disabled")) === "true";
 await p.screenshot({ path: "smoke17-2.png" });
 out.errors = errors;
 console.log(JSON.stringify(out, null, 1));

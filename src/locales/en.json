@@ -330,7 +330,11 @@
     "newChild": "New child",
     "createChild": "Create child",
     "childCreated": "{{name}} created and linked",
-    "deactivateConfirm": "Tap again to deactivate"
+    "deactivateConfirm": "Tap again to deactivate",
+    "needsAge": "Requires age {{min}}+ – fix the birth date if it is wrong",
+    "needsAgeUnknown": "Birth date missing",
+    "loginPending": "Signs in with {{email}} – has not logged in yet",
+    "loginNoEmail": "No e-mail – cannot sign in"
   },
   "settings": {
     "language": "Language",

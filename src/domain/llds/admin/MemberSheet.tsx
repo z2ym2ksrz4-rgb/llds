@@ -6,10 +6,10 @@ import { Sheet } from "../components/Sheet";
 
 type Props = { member: Member; all: Member[]; teams: Team[]; onClose: () => void; onChanged: () => void; onOpen: (m: Member) => void; toast: (m: string) => void };
 
-const Check = ({ on, children, sub, onChange, testId }: { on: boolean; children: ReactNode; sub?: string; onChange: () => void; testId?: string }) => (
-  <button type="button" className={"checkrow" + (on ? " on" : "")} role="checkbox" aria-checked={on} onClick={onChange} data-testid={testId}>
+const Check = ({ on, children, sub, sub2, onChange, testId, disabled }: { on: boolean; children: ReactNode; sub?: string; sub2?: string; onChange: () => void; testId?: string; disabled?: boolean }) => (
+  <button type="button" className={"checkrow" + (on ? " on" : "") + (disabled ? " off" : "")} role="checkbox" aria-checked={on} aria-disabled={disabled} disabled={disabled} onClick={onChange} data-testid={testId}>
     <span className="box" aria-hidden>{on ? "✓" : ""}</span>
-    <span className="grow"><span className="lbl">{children}</span>{sub && <span className="tiny">{sub}</span>}</span>
+    <span className="grow"><span className="lbl">{children}</span>{(sub2 ?? sub) && <span className="tiny">{sub2 ?? sub}</span>}</span>
   </button>
 );
 
@@ -19,8 +19,12 @@ const Check = ({ on, children, sub, onChange, testId }: { on: boolean; children:
 export function MemberSheet({ member: p, all, teams, onClose, onChanged, onOpen, toast }: Props) {
   const { t } = useTranslation();
   const me = useAuth((s) => s.me)!;
-  const isChild = !p.user_id || !!p.supervised_by;
-  const canStaff = !isChild;
+  // Eligibility follows age (and child login), never whether the person has logged in yet – seeded trainers have no login until first sign-in.
+  const age = p.birth_date ? Math.floor((Date.now() - new Date(p.birth_date).getTime()) / 31557600000) : p.birth_year ? new Date().getFullYear() - p.birth_year : null;
+  const canStaff = !p.supervised_by && (age === null || age >= 15);         // trainer / assistant from 15
+  const canParent = !p.supervised_by && (age === null || age >= 18);        // parent / admin from 18
+  const canAdmin = canParent;
+  const why = (ok: boolean, min: number) => (ok ? undefined : age === null ? t("admin.needsAgeUnknown") : t("admin.needsAge", { min }));
 
   const [dancer, setDancer] = useState(p.memberships.some((m) => m.role === "dancer"));
   const [parent, setParent] = useState(p.children.length > 0);
@@ -59,7 +63,7 @@ export function MemberSheet({ member: p, all, teams, onClose, onChanged, onOpen,
     try {
       const ms: { team_id: string; role: Role }[] = [...(dancer ? dancerTeams.map((team_id) => ({ team_id, role: "dancer" as Role })) : []), ...(staff ? staffTeams.filter((m) => !dancer || !dancerTeams.includes(m.team_id)) : [])];
       await api.setMemberships(p.id, ms);
-      if (!isChild) await api.setGuardians(p.id, parent ? kids : []);
+      if (canParent) await api.setGuardians(p.id, parent ? kids : []);
       toast(t("common.saved")); onChanged(); onClose();
     } finally { setBusy(false); }
   };
@@ -70,7 +74,7 @@ export function MemberSheet({ member: p, all, teams, onClose, onChanged, onOpen,
     finally { setBusy(false); }
   };
 
-  const login = p.supervised_by ? t("admin.loginChild") : p.user_id ? t("admin.loginOwn", { email: p.email ?? "" }) : t("admin.loginNone");
+  const login = p.supervised_by ? t("admin.loginChild") : p.user_id ? t("admin.loginOwn", { email: p.email ?? "" }) : p.email ? t("admin.loginPending", { email: p.email }) : p.parents.length ? t("admin.loginNone") : t("admin.loginNoEmail");
   const year = p.birth_date ? new Date(p.birth_date).getFullYear() : p.birth_year;
 
   return (
@@ -82,9 +86,9 @@ export function MemberSheet({ member: p, all, teams, onClose, onChanged, onOpen,
       <div className="field"><span>{t("admin.rolesHead")}</span>
         <div className="checklist">
           <Check on={dancer} onChange={() => setDancer((v) => !v)} sub={t("admin.roleDancerSub")} testId="role-dancer">{t("roles.dancer")}</Check>
-          {!isChild && <Check on={parent} onChange={() => setParent((v) => !v)} sub={t("admin.roleParentSub")} testId="role-parent">{t("roles.parent")}</Check>}
-          {canStaff && <Check on={staff} onChange={() => setStaff((v) => !v)} sub={t("admin.roleStaffSub")} testId="role-staff">{t("admin.roleStaff")}</Check>}
-          {canStaff && p.id !== me.person.id && <Check on={p.is_admin} onChange={async () => { await api.setAdmin(p.id, !p.is_admin); toast(!p.is_admin ? t("admin.adminGiven", { name: p.first_name }) : t("admin.adminRemoved", { name: p.first_name })); onChanged(); }} sub={t("admin.isAdminHint")} testId="admin-toggle">{t("admin.isAdmin")}</Check>}
+          <Check on={parent} disabled={!canParent} onChange={() => setParent((v) => !v)} sub={why(canParent, 18) ?? t("admin.roleParentSub")} testId="role-parent">{t("roles.parent")}</Check>
+          <Check on={staff} disabled={!canStaff} onChange={() => setStaff((v) => !v)} sub={why(canStaff, 15) ?? t("admin.roleStaffSub")} testId="role-staff">{t("admin.roleStaff")}</Check>
+          {p.id !== me.person.id && <Check on={p.is_admin} disabled={!canAdmin} sub2={why(canAdmin, 18)} onChange={async () => { await api.setAdmin(p.id, !p.is_admin); toast(!p.is_admin ? t("admin.adminGiven", { name: p.first_name }) : t("admin.adminRemoved", { name: p.first_name })); onChanged(); }} sub={t("admin.isAdminHint")} testId="admin-toggle">{t("admin.isAdmin")}</Check>}
         </div>
       </div>
 
@@ -100,7 +104,7 @@ export function MemberSheet({ member: p, all, teams, onClose, onChanged, onOpen,
       </div>}
 
       {/* 4. Children */}
-      {parent && !isChild && <div className="field"><span>{t("admin.childrenHead")}</span>
+      {parent && canParent && <div className="field"><span>{t("admin.childrenHead")}</span>
         <div className="checklist" data-testid="kids">
           {kids.map((id) => { const c = byId(id); if (!c) return null; const tms = c.memberships.filter((m) => m.role === "dancer").map((m) => teamName(m.team_id)); return (
             <div key={id} className="checkrow on static"><span className="box" aria-hidden>✓</span><span className="grow"><span className="lbl">{c.first_name} {c.last_name}</span><span className="tiny">{[c.birth_year ? String(c.birth_year) : null, tms.length ? tms.join(" · ") : t("admin.noTeams")].filter(Boolean).join(" · ")}</span></span>

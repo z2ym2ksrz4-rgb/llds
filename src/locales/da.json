@@ -330,7 +330,11 @@
     "newChild": "Nyt barn",
     "createChild": "Opret barn",
     "childCreated": "{{name}} er oprettet og koblet på",
-    "deactivateConfirm": "Tryk igen for at deaktivere"
+    "deactivateConfirm": "Tryk igen for at deaktivere",
+    "needsAge": "Kræver alder {{min}}+ – ret fødselsdatoen, hvis den er forkert",
+    "needsAgeUnknown": "Fødselsdato mangler",
+    "loginPending": "Logger ind med {{email}} – har ikke været inde endnu",
+    "loginNoEmail": "Ingen e-mail – kan ikke logge ind selv"
   },
   "settings": {
     "language": "Sprog",
