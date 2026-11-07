@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/core/auth";
 import { useNav, type Tab } from "@/core/nav";
+import { useBadges } from "@/core/badges";
 import { isRelease } from "@/core/release";
 import { Home, Login, Register, Pending, Rooms, TeamScreen, Admin, More, Social, Events } from "@/domain";
 import { Icon } from "@/domain/llds/components/Icons";
@@ -24,6 +25,10 @@ export default function App() {
   const blocked = useAuth((s) => s.previewBlocked)();
   const tab = useNav((s) => s.tab); const setTab = useNav((s) => s.setTab);
   useEffect(() => { if (phase !== "ready") setTab("home"); }, [phase, setTab]);
+  // unread counters on the tabs: refresh when ready, every minute, and on every tab change; opening a tab marks its notifications seen
+  const badges = useBadges((b) => b.tabs); const refreshBadges = useBadges((b) => b.refresh); const seenTab = useBadges((b) => b.seen);
+  useEffect(() => { if (phase !== "ready") return; void refreshBadges(); const i = setInterval(() => void refreshBadges(), 60_000); return () => clearInterval(i); }, [phase, me?.person.id, refreshBadges]);
+  useEffect(() => { if (phase !== "ready") return; void seenTab(tab).then(() => refreshBadges()); }, [tab, phase, seenTab, refreshBadges]);
   useEffect(() => { if ((tab === "admin" && !isAdmin) || (tab === "team" && !hasTeams)) setTab("home"); }, [tab, isAdmin, hasTeams, setTab]); // every sign-in starts on Home
 
   let body: React.ReactNode;
@@ -46,7 +51,7 @@ export default function App() {
       <UpdateBanner />
       {phase === "ready" && (
         <nav className="tabbar">
-          {tabs.map(([k, label, icon]) => <button key={k} className={tab === k ? "active" : ""} data-tour={`tab-${k}`} onClick={() => setTab(k)}><Icon name={icon} /><span>{label}</span></button>)}
+          {tabs.map(([k, label, icon]) => <button key={k} className={tab === k ? "active" : ""} data-tour={`tab-${k}`} onClick={() => setTab(k)}><Icon name={icon} />{(badges[k] ?? 0) > 0 && <em className="tabbadge" data-testid={`tabbadge-${k}`}>{badges[k]! > 99 ? "99+" : badges[k]}</em>}<span>{label}</span></button>)}
         </nav>
       )}
       {!isRelease && <TestMenu />}

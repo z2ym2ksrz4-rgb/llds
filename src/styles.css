@@ -529,3 +529,6 @@ button.cta { box-shadow:0 10px 26px -12px rgba(201,162,74,.7); }
 
 /* lists on Home scroll vertically only */
 .scrolllist{overflow-x:hidden;overscroll-behavior-x:none;touch-action:pan-y}.scrolllist .item{min-width:0;max-width:100%}.scrolllist .item .grow{min-width:0;overflow-wrap:anywhere}
+
+/* unread counters on the tab bar */
+.tabbar button{position:relative}.tabbar .tabbadge{position:absolute;top:4px;left:calc(50% + 6px);min-width:17px;height:17px;padding:0 5px;border-radius:999px;background:#d9534f;color:#fff;font:600 .66rem/17px Outfit,system-ui,sans-serif;font-style:normal;text-align:center;box-shadow:0 0 0 2px #0a0a0b}

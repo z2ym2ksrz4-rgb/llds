@@ -12,6 +12,7 @@ import { AdminUsers } from "./Users";
 import { MemberSheet } from "./MemberSheet";
 import { Sheet, Toast } from "../components/Sheet";
 import { useNav } from "@/core/nav";
+import { useBadges } from "@/core/badges";
 import { SessionEditor } from "../components/SessionSheet";
 import { ImagePicker } from "../components/ImagePicker";
 import { CATALOG } from "../lib/catalog";
@@ -26,12 +27,8 @@ export function Admin() {
   const [page, setPage] = useState<Page>(() => (useNav.getState().takeAdminPage() as Page | null) ?? "menu");
   const adminPage = useNav((n) => n.adminPage);
   useEffect(() => { const p = useNav.getState().takeAdminPage(); if (p) setPage(p as Page); }, [adminPage]);
-  const [counts, setCounts] = useState({ pending: 0, bookings: 0, subs: 0, reports: 0, orders: 0, cards: 0 });
-  useEffect(() => { void (async () => {
-    const from = startOfDay(new Date());
-    const [p, b, s, r, o, c] = await Promise.all([api.listPending(), api.listBookings(from.toISOString(), addDays(from, 60).toISOString()), api.listSessions(from.toISOString(), addDays(from, 14).toISOString()), api.listReports(), api.listOrders(true), api.listPunchCards(true)]);
-    setCounts({ pending: p.length, bookings: b.filter((x) => x.status === "pending").length, subs: s.filter((x) => x.substitute_wanted && !x.substitute_id).length, reports: r.filter((x) => !x.resolved_at).length, orders: o.filter((x) => x.status === "awaiting_payment" || x.status === "paid").length, cards: c.filter((x) => x.status === "awaiting_payment" && x.claimed_paid_at).length });
-  })(); }, [page]);
+  const counts = useBadges((b) => b.admin); const refreshBadges = useBadges((b) => b.refresh);
+  useEffect(() => { void refreshBadges(); }, [page, refreshBadges]); // every return to the menu re-counts
   if (page === "users") return <Back onBack={() => setPage("menu")}><AdminUsers /></Back>;
   if (page === "members") return <Back onBack={() => setPage("menu")}><Members /></Back>;
   if (page === "teams") return <Back onBack={() => setPage("menu")}><Teams /></Back>;
@@ -52,7 +49,7 @@ export function Admin() {
     ["messages", t("admin.messages"), t("admin.messagesSub"), 0], ["reports", t("admin.reports"), t("admin.reportsSub"), counts.reports],
     ["events", t("events.title"), t("admin.eventsSub"), 0], ["shop", t("admin.shop"), t("admin.shopSub"), counts.orders], ["punch", t("punch.title"), t("admin.punchSub"), counts.cards],
     ["catalog", t("catalog.adminTitle"), t("catalog.adminSub"), 0],
-    ["payments", t("pay.adminTitle"), t("pay.adminSub"), 0],
+    ["payments", t("pay.adminTitle"), t("pay.adminSub"), counts.payments],
     ["customize", t("customize.title"), t("customize.sub"), 0],
     ["import", t("admin.importPhotos"), t("admin.importSub"), 0],
   ];

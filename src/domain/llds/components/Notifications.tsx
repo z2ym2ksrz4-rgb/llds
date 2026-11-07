@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useBadges } from "@/core/badges";
 import { api, type Notification } from "@/core/api";
 import { Sheet } from "./Sheet";
 import { Icon } from "./Icons";
@@ -19,7 +20,7 @@ export function Bell() {
   }, []);
   useEffect(() => { void load(); const i = setInterval(() => void load(), 60_000); return () => clearInterval(i); }, [load]);
   const unread = list.filter((n) => !n.read_at).length;
-  const openIt = async () => { setOpen(true); if (unread) { await api.markNotificationsRead(); setTimeout(() => void load(), 400); } };
+  const openIt = async () => { setOpen(true); if (unread) { await api.markNotificationsRead(); setTimeout(() => { void load(); void useBadges.getState().refresh(); }, 400); } };
   return (
     <>
       <button className="bell" aria-label={t("notif.title")} data-testid="bell" data-tour="bell" onClick={() => void openIt()}><Icon name="bell" />{unread > 0 && <span className="badge" data-testid="badge">{unread}</span>}</button>
