@@ -135,6 +135,15 @@ export function scheduleOps(get: () => { S: SchedState; persons: Person[]; membe
         children: g.persons.filter((c) => g.guardians.some((x) => x.parent_id === p.id && x.child_id === c.id)), parents: g.persons.filter((c) => g.guardians.some((x) => x.child_id === p.id && x.parent_id === c.id)) }));
     },
     async setMemberships(pid: string, ms: { team_id: string; role: Role }[]) { const g = get(); g.memberships = g.memberships.filter((m) => m.person_id !== pid).concat(ms.map((m) => ({ person_id: pid, ...m }))); g.save(); g.emit(); },
+    async setGuardians(parentId: string, childIds: string[]) { const g = get(); g.guardians = g.guardians.filter((x) => x.parent_id !== parentId).concat(childIds.map((child_id) => ({ parent_id: parentId, child_id }))); g.save(); g.emit(); },
+    async createChild(i: { parent_id: string; first_name: string; last_name: string; birth_date: string | null; team_ids: string[] }) {
+      const g = get(); const parent = g.persons.find((x) => x.id === i.parent_id)!; const cid = "p-" + id();
+      g.persons.push({ ...parent, id: cid, user_id: null, email: null, phone: null, first_name: i.first_name.trim(), last_name: i.last_name.trim(), birth_date: i.birth_date || null, birth_year: i.birth_date ? Number(i.birth_date.slice(0, 4)) : null, status: "approved", is_admin: false, supervised_by: null, wished_roles: ["dancer"], wished_teams: null, source: "admin" } as Person);
+      g.guardians.push({ parent_id: i.parent_id, child_id: cid });
+      for (const team_id of i.team_ids) g.memberships.push({ person_id: cid, team_id, role: "dancer" });
+      g.save(); g.emit(); return cid;
+    },
+    async updatePerson(pid: string, patch: { first_name?: string; last_name?: string; birth_date?: string | null; phone?: string | null }) { const g = get(); const p = g.persons.find((x) => x.id === pid); if (p) { Object.assign(p, patch); if ("birth_date" in patch) p.birth_year = patch.birth_date ? Number(patch.birth_date.slice(0, 4)) : null; } g.save(); g.emit(); },
     async setPersonStatus(pid: string, status: PersonStatus) { const g = get(); const p = g.persons.find((x) => x.id === pid); if (p) p.status = status; g.save(); g.emit(); },
     async setAdmin(pid: string, isAdmin: boolean) { const g = get(); const p = g.persons.find((x) => x.id === pid); if (p) p.is_admin = isAdmin; g.save(); g.emit(); },
     async staffList() { const g = get(); return g.persons.filter((p) => p.status === "approved" && (p.is_admin || g.memberships.some((m) => m.person_id === p.id && m.role !== "dancer"))); },

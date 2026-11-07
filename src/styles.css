@@ -487,3 +487,15 @@ button.cta { box-shadow:0 10px 26px -12px rgba(201,162,74,.7); }
 
 /* Admin → Inviter: one child per row – name full width, then birth date + team side by side */
 .kidrow{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px 0;border-top:1px solid rgba(255,255,255,.06)}.kidrow>label:first-child{grid-column:1/-1}.kidrow select,.kidrow input{width:100%;min-width:0}
+
+/* Admin → Medlemmer: explicit check rows so roles and access are unambiguous */
+.checklist{display:flex;flex-direction:column;gap:6px}.checklist.cols{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.checkrow{display:flex;align-items:center;gap:10px;text-align:left;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:var(--fg);font:inherit;cursor:pointer;min-height:44px}
+.checkrow.on{border-color:rgba(201,162,74,.55);background:rgba(201,162,74,.08)}.checkrow.static{cursor:default}
+.checkrow .box{flex:none;width:22px;height:22px;border-radius:7px;border:1.5px solid rgba(255,255,255,.3);display:grid;place-items:center;font-size:14px;font-weight:700;color:#0a0a0b}
+.checkrow.on .box,.accessrow .box.on{background:linear-gradient(135deg,#e6c87a,#c9a24a);border-color:transparent}
+.checkrow .lbl{display:block;font-weight:500}.checkrow .tiny{display:block;margin-top:1px}
+.checkrow .chip.small.danger{color:#e08a8a;border-color:rgba(224,138,138,.4)}
+.access{padding:12px 14px}.accessrow{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06)}.accessrow:last-of-type{border-bottom:0}
+.accessrow .box{flex:none;width:18px;height:18px;border-radius:6px;display:grid;place-items:center;font-size:12px;font-weight:700;color:#0a0a0b}
+.rolechips{display:flex;flex-wrap:wrap;gap:4px 10px}.rolechips .rc{color:var(--gold2)}.rolechips .rc.off{color:var(--muted)}

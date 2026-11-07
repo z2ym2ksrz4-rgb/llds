@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { api, type Booking, type Member, type Message, type Order, type Product, type PunchCard, type PunchCardType, type Report, type Role, type Session, type Team, type TeamInput } from "@/core/api";
+import { api, type Booking, type Member, type Message, type Order, type Product, type PunchCard, type PunchCardType, type Report, type Session, type Team, type TeamInput } from "@/core/api";
 import { Events } from "../screens/Events";
 import { ImportPhotos } from "./ImportPhotos";
 import { Customize } from "./Customize";
@@ -9,7 +9,7 @@ import { CatalogAdmin } from "./Catalog";
 import { MessageComposer, MessageSheet } from "../components/Messages";
 import { ago } from "../lib/time";
 import { AdminUsers } from "./Users";
-import { useAuth } from "@/core/auth";
+import { MemberSheet } from "./MemberSheet";
 import { Sheet, Toast } from "../components/Sheet";
 import { SessionEditor } from "../components/SessionSheet";
 import { ImagePicker } from "../components/ImagePicker";
@@ -79,32 +79,11 @@ function Members() {
       <input id="mq" placeholder={t("admin.search")} value={q} onChange={(e) => setQ(e.target.value)} />
       <div className="card list">
         {list.map((p) => <button key={p.id} className="item" onClick={() => setOpen(p)}><span className="avatar">{p.first_name[0]}</span><span className="grow">{p.first_name} {p.last_name}{p.is_admin ? <span className="chip gold small" style={{ marginLeft: 6 }}>Admin</span> : ""}
-          <div className="tiny">{p.memberships.map((m) => `${teams.find((x) => x.id === m.team_id)?.name ?? "?"} (${t(`roles.${m.role}`)})`).join(" · ") || (p.children.length ? t("admin.parentOf", { names: p.children.map((c) => c.first_name).join(", ") }) : t("admin.noTeams"))}</div></span><span className="gold">›</span></button>)}
+          <div className="tiny rolechips">{[p.memberships.some((m) => m.role === "dancer") ? t("roles.dancer") : null, p.children.length ? t("admin.parentOf", { names: p.children.map((c) => c.first_name).join(", ") }) : null, p.memberships.some((m) => m.role === "trainer") ? t("roles.trainer") : null, p.memberships.some((m) => m.role === "assistant") ? t("roles.assistant") : null].filter(Boolean).map((x, i) => <span key={i} className="rc">✓ {x}</span>)}{!p.memberships.length && !p.children.length && <span className="rc off">{t("admin.noTeams")}</span>}</div></span><span className="gold">›</span></button>)}
       </div>
-      {open && <MemberSheet member={open} teams={teams} onClose={() => setOpen(null)} onChanged={() => { void load(); }} toast={say} />}
+      {open && <MemberSheet key={open.id} member={all.find((m) => m.id === open.id) ?? open} all={all} teams={teams} onClose={() => setOpen(null)} onChanged={() => { void load(); }} onOpen={(m) => setOpen(m)} toast={say} />}
       <Toast msg={toast} />
     </section>
-  );
-}
-function MemberSheet({ member: p, teams, onClose, onChanged, toast }: { member: Member; teams: Team[]; onClose: () => void; onChanged: () => void; toast: (m: string) => void }) {
-  const { t } = useTranslation();
-  const me = useAuth((s) => s.me)!;
-  const [ms, setMs] = useState(p.memberships.map((m) => ({ team_id: m.team_id, role: m.role })));
-  const roleOf = (tid: string) => ms.find((m) => m.team_id === tid)?.role ?? null;
-  const toggle = (tid: string, role: Role) => setMs((cur) => cur.some((m) => m.team_id === tid && m.role === role) ? cur.filter((m) => m.team_id !== tid) : [...cur.filter((m) => m.team_id !== tid), { team_id: tid, role }]);
-  const roles: Role[] = p.user_id && !p.supervised_by ? ["dancer", "trainer", "assistant"] : ["dancer"];
-  return (
-    <Sheet onClose={onClose} eyebrow={t("admin.member")} title={`${p.first_name} ${p.last_name}`}>
-      <div className="tiny">{p.email ?? "–"} · {p.phone ?? "–"}{p.birth_year ? ` · ${p.birth_year}` : ""}{p.parents.length ? ` · ${t("admin.parents")}: ${p.parents.map((g) => g.first_name).join(", ")}` : ""}</div>
-      <div className="field"><span>{t("admin.teamsAndRoles")}</span>
-        <div className="teamgrid">{teams.map((tm) => { const r = roleOf(tm.id); return <div key={tm.id} className={"teamrow" + (r ? " on" : "")}><span className="grow">{tm.name}</span><div className="chips tight">{roles.map((role) => <button key={role} className={"chip small" + (r === role ? " on" : "")} onClick={() => toggle(tm.id, role)}>{t(`roles.${role}`)}</button>)}</div></div>; })}</div>
-      </div>
-      {p.user_id && !p.supervised_by && p.id !== me.person.id && (
-        <label className="toggle"><span>{t("admin.isAdmin")}<div className="tiny">{t("admin.isAdminHint")}</div></span><input type="checkbox" checked={p.is_admin} data-testid="admin-toggle" onChange={async (e) => { await api.setAdmin(p.id, e.target.checked); toast(e.target.checked ? t("admin.adminGiven", { name: p.first_name }) : t("admin.adminRemoved", { name: p.first_name })); onChanged(); }} /></label>
-      )}
-      <div className="row"><button className="cta grow" onClick={async () => { await api.setMemberships(p.id, ms); toast(t("common.saved")); onChanged(); onClose(); }}>{t("common.save")}</button>
-        <button className="ghost danger" onClick={async () => { await api.setPersonStatus(p.id, "inactive"); toast(t("admin.deactivated")); onChanged(); onClose(); }}>{t("admin.deactivate")}</button></div>
-    </Sheet>
   );
 }
 

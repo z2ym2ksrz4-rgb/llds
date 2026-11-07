@@ -18,7 +18,7 @@ export type Person = {
   wished_roles: string[];
   wished_teams: string | null;
   supervised_by: string | null;
-  source?: "app" | "web";
+  source?: "app" | "web" | "invite" | "admin";
   notify_prefs?: NotifyPrefs | null;  // {on, kinds:{message:false,…}} – missing kind = on
   created_at: string;
 };
@@ -191,6 +191,12 @@ export interface Api {
   updateTeam(id: string, patch: TeamInput): Promise<void>;
   listMembers(): Promise<Member[]>;
   setMemberships(personId: string, memberships: { team_id: string; role: Role }[]): Promise<void>;
+  /** Admin: replace the set of children linked to a parent (guardian rows). */
+  setGuardians(parentId: string, childIds: string[]): Promise<void>;
+  /** Admin: create a child without login, linked to a parent, on the given teams as dancer. Returns the child's id. */
+  createChild(input: { parent_id: string; first_name: string; last_name: string; birth_date: string | null; team_ids: string[] }): Promise<string>;
+  /** Admin: edit basic person fields. */
+  updatePerson(personId: string, patch: { first_name?: string; last_name?: string; birth_date?: string | null; phone?: string | null }): Promise<void>;
   setPersonStatus(personId: string, status: PersonStatus): Promise<void>;
   setAdmin(personId: string, isAdmin: boolean): Promise<void>;
   staffList(): Promise<Person[]>; // trainers + assistants + admins (for trainer/substitute pickers)

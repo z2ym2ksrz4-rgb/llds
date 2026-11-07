@@ -87,6 +87,22 @@ export function supabaseSchedule(sb: SupabaseClient, fail: Fail, schoolId: () =>
       const { error } = await sb.from("membership").delete().eq("person_id", pid); fail(error);
       if (ms.length) { const { error: e2 } = await sb.from("membership").insert(ms.map((m) => ({ person_id: pid, ...m }))); fail(e2); }
     },
+    async setGuardians(parentId: string, childIds: string[]) {
+      const { error } = await sb.from("guardian").delete().eq("parent_id", parentId); fail(error);
+      if (childIds.length) { const { error: e2 } = await sb.from("guardian").insert(childIds.map((child_id) => ({ parent_id: parentId, child_id, confirmed: true }))); fail(e2); }
+    },
+    async createChild(i: { parent_id: string; first_name: string; last_name: string; birth_date: string | null; team_ids: string[] }) {
+      const { data: parent, error: e0 } = await sb.from("person").select("school_id").eq("id", i.parent_id).single(); fail(e0);
+      const { data, error } = await sb.from("person").insert({ school_id: parent!.school_id, first_name: i.first_name.trim(), last_name: i.last_name.trim(), birth_date: i.birth_date || null, birth_year: i.birth_date ? Number(i.birth_date.slice(0, 4)) : null, status: "approved", wished_roles: ["dancer"], source: "admin" }).select("id").single(); fail(error);
+      const cid = data!.id as string;
+      const { error: e2 } = await sb.from("guardian").insert({ parent_id: i.parent_id, child_id: cid, confirmed: true }); fail(e2);
+      if (i.team_ids.length) { const { error: e3 } = await sb.from("membership").insert(i.team_ids.map((team_id) => ({ person_id: cid, team_id, role: "dancer" }))); fail(e3); }
+      return cid;
+    },
+    async updatePerson(pid: string, patch: { first_name?: string; last_name?: string; birth_date?: string | null; phone?: string | null }) {
+      const row: Record<string, unknown> = { ...patch }; if ("birth_date" in patch) row.birth_year = patch.birth_date ? Number(patch.birth_date.slice(0, 4)) : null;
+      const { error } = await sb.from("person").update(row).eq("id", pid); fail(error);
+    },
     async setPersonStatus(pid: string, status: PersonStatus) { const { error } = await sb.from("person").update({ status }).eq("id", pid); fail(error); },
     async setAdmin(pid: string, isAdmin: boolean) { const { error } = await sb.from("person").update({ is_admin: isAdmin }).eq("id", pid); fail(error); },
     async staffList(): Promise<Person[]> {
