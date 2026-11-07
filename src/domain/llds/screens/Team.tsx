@@ -12,6 +12,7 @@ import { SessionSheet } from "../components/SessionSheet";
 import { Sheet, Toast } from "../components/Sheet";
 import { MessageComposer, MessageSheet } from "../components/Messages";
 import { ThreadComposer } from "../components/Threads";
+import { ScrollList } from "../components/ScrollList";
 import { ago } from "../lib/time";
 import { TopRight } from "../components/ProfileMenu";
 import { Folders } from "./Folders";
@@ -131,18 +132,18 @@ export function TeamScreen() {
         </div></div>
       )}
       {events.length > 0 && (
-        <div className="sec"><h2>{t("team.nextForTeam")}</h2><div className="card list">
-          {events.slice(0, 3).map((e) => <div key={e.id} className="item"><span className="time">{dateLabel(e.starts_at)}</span><span className="grow">{e.title}<div className="tiny">{e.place ?? t(`events.kind.${e.kind}`)}</div></span><span className="gold">›</span></div>)}
-        </div></div>
+        <div className="sec"><h2>{t("team.nextForTeam")}</h2><ScrollList>
+          {events.map((e) => <div key={e.id} className="item"><span className="time">{dateLabel(e.starts_at)}</span><span className="grow">{e.title}<div className="tiny">{e.place ?? t(`events.kind.${e.kind}`)}</div></span><span className="gold">›</span></div>)}
+        </ScrollList></div>
       )}
 
-      <div className="sec"><div className="row between"><h2>{t("team.trophies")}</h2>{staff && <button className="linklike small" onClick={() => setTab("events")}>+ {t("events.addResult")}</button>}</div><div className="card list" data-testid="trophies">
+      <div className="sec"><div className="row between"><h2>{t("team.trophies")}</h2>{staff && <button className="linklike small" onClick={() => setTab("events")}>+ {t("events.addResult")}</button>}</div><ScrollList testId="trophies">
         {results.map((r) => <div key={r.id} className="item" data-testid="result"><span className="time">{new Date(r.held_on).toLocaleDateString("da-DK", { month: "short", year: "numeric" })}</span><span className="grow">{r.event_title}</span><span className="chip gold small">{r.placed}</span></div>)}
         {!results.length && <p className="muted small" style={{ margin: 0 }}>{events.find((e) => e.kind === "competition") ? t("team.noTrophiesYet", { event: events.find((e) => e.kind === "competition")!.title, date: dateLabel(events.find((e) => e.kind === "competition")!.starts_at) }) : t("team.noTrophies")}</p>}
-      </div></div>
+      </ScrollList></div>
 
       <div className="sec"><div className="row between"><h2>{t("badges.title")}</h2>{staff && <button className="linklike small" onClick={() => setPage("dancers")}>{t("badges.give")}</button>}</div><div className="card" data-testid="team-badges">
-        {badges.slice(0, 8).map((b) => <button key={b.id} className="item" onClick={() => setOpenBadge(b)}><span className="emblem sm"><span className="e">{b.emoji}</span></span><span className="grow">{b.person_name}<div className="tiny">{b.name}{b.note ? ` · “${b.note}”` : ""} · {ago(b.created_at)}</div></span></button>)}
+        {badges.map((b) => <button key={b.id} className="item" onClick={() => setOpenBadge(b)}><span className="emblem sm"><span className="e">{b.emoji}</span></span><span className="grow">{b.person_name}<div className="tiny">{b.name}{b.note ? ` · “${b.note}”` : ""} · {ago(b.created_at)}</div></span></button>)}
         {!badges.length && <p className="muted small" style={{ margin: 0 }}>{t("badges.emptyTeam")}</p>}
       </div></div>
       {openBadge && <EmblemSheet b={openBadge} onClose={() => setOpenBadge(null)} onRemove={staff ? async () => { await api.removeBadge(openBadge.id); setOpenBadge(null); void load(); } : undefined} />}
@@ -152,18 +153,18 @@ export function TeamScreen() {
         <div className="row between"><h2>{t("team.messages")}</h2>
           <div className="row" style={{ gap: 6 }}>{staff && <button className="small" data-testid="write-team" onClick={() => setCompose(true)}>{t("team.writeToTeam")}</button>}<button className="ghost small" data-testid="write-trainer" onClick={() => setWrite(true)}>{staff ? t("threads.newConversation") : t("threads.writeTo")}</button></div></div>
         <div className="group team"><div className="eyebrow">{t("team.fromTrainer", { team: team.name })}</div>
-          <div className="card list" style={{ margin: 0 }}>{teamMsgs.slice(0, 6).map((m) => <Row key={m.id} m={m} />)}{!teamMsgs.length && <p className="muted small" style={{ margin: 0 }}>{t("team.noTeamMessages")}</p>}</div></div>
+          <ScrollList className="m0">{teamMsgs.map((m) => <Row key={m.id} m={m} />)}{!teamMsgs.length && <p className="muted small" style={{ margin: 0 }}>{t("team.noTeamMessages")}</p>}</ScrollList></div>
         {allMsgs.length > 0 && <div className="group all"><div className="eyebrow">{t("team.toEveryone")}</div>
-          <div className="card list" style={{ margin: 0 }}>{allMsgs.slice(0, 4).map((m) => <Row key={m.id} m={m} />)}</div></div>}
+          <ScrollList className="m0">{allMsgs.map((m) => <Row key={m.id} m={m} />)}</ScrollList></div>}
       </div>); })()}
       {openMsg && <MessageSheet message={openMsg} onClose={() => { setOpenMsg(null); void load(); }} toast={say} />}
       {write && <ThreadComposer teamId={team.id} teamName={team.name} onClose={() => setWrite(false)} toast={say} />}
 
       <div className="sec"><h2>{t("team.upcoming")}</h2>
-        <div className="card list">
-          {sessions.slice(0, 6).map((s) => <button key={s.id} className={"item" + (s.cancelled ? " off" : "")} onClick={() => setOpen(s)}><span className="time">{dateLabel(s.starts_at)}<br />{hm(s.starts_at)}</span><span className="grow">{s.title ?? s.team_name}<div className="tiny">{s.room_name} · {s.substitute_name ?? s.trainer_name}{s.cancelled ? " · " + t("session.cancelled") : ""}</div></span>{staff && <span className="tiny">{absences.filter((a) => a.session_id === s.id).length} {t("team.absent")}</span>}</button>)}
+        <ScrollList>
+          {sessions.map((s) => <button key={s.id} className={"item" + (s.cancelled ? " off" : "")} onClick={() => setOpen(s)}><span className="time">{dateLabel(s.starts_at)}<br />{hm(s.starts_at)}</span><span className="grow">{s.title ?? s.team_name}<div className="tiny">{s.room_name} · {s.substitute_name ?? s.trainer_name}{s.cancelled ? " · " + t("session.cancelled") : ""}</div></span>{staff && <span className="tiny">{absences.filter((a) => a.session_id === s.id).length} {t("team.absent")}</span>}</button>)}
           {!sessions.length && <p className="muted">{t("home.noTrainings")}</p>}
-        </div>
+        </ScrollList>
       </div>
 
       {open && <SessionSheet session={open} absences={absences} onClose={() => setOpen(null)} onChanged={() => void load()} toast={say} />}

@@ -439,3 +439,13 @@ button.cta { box-shadow:0 10px 26px -12px rgba(201,162,74,.7); }
 .teammsgs .group.all .eyebrow { color:var(--fg3); }
 .teammsgs .group.all .eyebrow::before { content:""; width:18px; height:1px; background:var(--fg3); }
 .teammsgs .group.team .eyebrow::before { content:""; width:18px; height:1px; background:var(--gold); }
+
+/* lists that show 3 rows and scroll for the history */
+.scrolllist.m0 { margin:0; }
+.scrolllist { position:relative; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+.scrolllist::-webkit-scrollbar { display:none; }
+.scrolllist { padding-bottom:0 !important; }
+.scrolllist .scroll-more { position:sticky; bottom:0; left:0; right:0; flex:none; height:40px; margin:-40px -16px 0; display:flex; align-items:flex-end; justify-content:center; pointer-events:none; background:linear-gradient(180deg, transparent, var(--card) 75%); z-index:1; }
+.scrolllist .scroll-more span { color:var(--gold2); font-size:1.1rem; line-height:1; padding-bottom:6px; animation:nudge 1.6s ease-in-out infinite; }
+.screen.home .scrolllist .scroll-more { background:linear-gradient(180deg, transparent, var(--bg) 70%); }
+@keyframes nudge { 0%,100% { transform:translateY(0); opacity:.7; } 50% { transform:translateY(3px); opacity:1; } }

@@ -15,6 +15,7 @@ import { addDays, dateLabel, DAY_SHORT, hm, startOfDay } from "../lib/time";
 import { boxOf, homeOrder, isHidden, useAppearance } from "@/core/appearance";
 import { resolveImage } from "../lib/catalog";
 import { TrophyShelf } from "../components/Emblems";
+import { ScrollList } from "../components/ScrollList";
 import { CustomBoxCard } from "../admin/Customize";
 
 /** Home, laid out like the approved demo: next event as a photo hero, messages that need you, your (child's) week with absence buttons, open payments. */
@@ -65,7 +66,7 @@ export function Home() {
   const nextDay = sessions.find((s) => new Date(s.starts_at) > new Date())?.starts_at;
   const studioToday = todaysAll.length > 0;
   const studio = (studioToday ? todaysAll : nextDay ? sessions.filter((s) => new Date(s.starts_at).toDateString() === new Date(nextDay).toDateString()) : []).slice(0, 12);
-  const upcoming = events.slice(0, 5);
+  const upcoming = events;
 
   /* "Din uge": everything the viewed person (or I, as staff) has the next 7 days – trainings, teams I train, competitions/events, my room bookings. */
   type WeekItem = { key: string; at: string; end?: string | null; kind: "training" | "staff" | "event" | "booking"; title: string; sub: string; who?: string; off?: boolean; session?: Session; event?: Event };
@@ -150,16 +151,16 @@ export function Home() {
     studio: () => (<>
       {isAdmin && studio.length > 0 && (
         <div className="sec" data-tour="week"><h2>{studioToday ? t("home.todayInStudio") : t("home.nextInStudio")}</h2>
-          <div className="card list" data-testid="studio-today">
+          <ScrollList testId="studio-today">
             {studio.map((s) => <button key={s.id} className={"item" + (s.cancelled ? " off" : "")} onClick={() => setOpen(s)}><span className="time">{studioToday ? hm(s.starts_at) : <>{dateLabel(s.starts_at)}<br />{hm(s.starts_at)}</>}</span><span className="grow">{s.title ?? s.team_name}<div className="tiny">{s.room_name}{s.trainer_name ? ` · ${s.substitute_name ?? s.trainer_name}` : ""}{s.cancelled ? " · " + t("session.cancelled") : ""}</div></span><span className="gold">›</span></button>)}
-          </div>
+          </ScrollList>
         </div>
       )}
     </>),
     upcoming: () => (<>
       {upcoming.length > 0 && (
         <div className="sec"><h2>{t("home.upcoming")}</h2>
-          <div className="card list" data-testid="upcoming">{upcoming.map((e) => <button key={e.id} className="item" onClick={() => setOpenEvent(e)}><span className="time">{dateLabel(e.starts_at)}</span><span className="grow">{e.title}<div className="tiny">{e.place ?? t(`events.kind.${e.kind}`)}{e.team_names?.length ? ` · ${e.team_names.slice(0, 3).join(", ")}${e.team_names.length > 3 ? " …" : ""}` : ""}</div></span><span className="gold">›</span></button>)}</div>
+          <ScrollList testId="upcoming">{upcoming.map((e) => <button key={e.id} className="item" onClick={() => setOpenEvent(e)}><span className="time">{dateLabel(e.starts_at)}</span><span className="grow">{e.title}<div className="tiny">{e.place ?? t(`events.kind.${e.kind}`)}{e.team_names?.length ? ` · ${e.team_names.slice(0, 3).join(", ")}${e.team_names.length > 3 ? " …" : ""}` : ""}</div></span><span className="gold">›</span></button>)}</ScrollList>
         </div>
       )}
     </>),
@@ -169,7 +170,7 @@ export function Home() {
     week: () => (<>
       {(week.length > 0 || teamIds.size > 0) && (
         <div className="sec" data-tour="week" data-testid="your-week"><h2>{hat ? t("home.childsWeek", { name: hat.first_name }) : t("home.yourWeek")}</h2>
-          <div className="card list weeklist">
+          <ScrollList className="weeklist">
             {weekDays.map((d) => { const items = week.filter((w) => new Date(w.at).toDateString() === d); const isToday = d === today; return (
               <div key={d} className="weekday">
                 <div className={"eyebrow" + (isToday ? " gold" : "")}>{isToday ? t("home.today") + " · " : ""}{dateLabel(items[0].at)}</div>
@@ -181,15 +182,15 @@ export function Home() {
                   </button>))}
               </div>); })}
             {!week.length && <p className="muted">{t("home.noTrainings")}</p>}
-          </div>
+          </ScrollList>
         </div>
       )}
     </>),
     payments: () => (<>
       {openPay.length > 0 && (
-        <div className="sec"><h2>{t("home.payments")}</h2><div className="card list">
+        <div className="sec"><h2>{t("home.payments")}</h2><ScrollList>
           {openPay.map((p) => <button key={p.id} className="item" onClick={() => setTab("more")}><span className="grow">{p.label}<div className="tiny">{p.sub}</div></span><span className="gold">{p.amount} kr.</span></button>)}
-        </div></div>
+        </ScrollList></div>
       )}
     </>),
     badges: () => (<>
