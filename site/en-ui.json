@@ -250,5 +250,17 @@
   "år": "yrs",
   "mdr\\.": "months"
  },
- "prøvetimer": "trial lessons"
+ "prøvetimer": "trial lessons",
+ "Audition": "Audition",
+ "Prøvegange · niveau": "Trial · level",
+ "= optagelse kun via audition/udtagelse": "= admission only through audition/selection",
+ "= åbent hold, men træneren vurderer niveau efter 4 prøvegange": "= open team, but the trainer assesses level after 4 trial lessons",
+ "Optagelse kun via audition/udtagelse – se datoer på forsiden eller skriv til Line.": "Admission only through audition/selection – see dates on the front page or write to Line.",
+ "Tryk på en stilart for at se alle dens hold.": "Tap a style to see all its teams.",
+ "Vælg alder, så viser vi alle hold på tværs af stilarter, der passer.": "Pick an age and we show every matching team across styles.",
+ "Stilarter": "Styles",
+ "Efter alder": "By age",
+ "stilart": "style",
+ "– eller se alle hold for en alder": "– or see all teams for an age",
+ "hold ·": "teams ·"
 }
