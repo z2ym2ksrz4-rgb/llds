@@ -7,6 +7,7 @@ export function ageOf(p: { birth_date?: string | null; birth_year: number | null
 }
 export const DAY_NAMES = ["Man", "Tir", "Ons", "Tor", "Fre", "Lør", "Søn"];
 export const DAY_LONG = ["Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag", "Søndag"];
+export const DAY_SHORT = ["man", "tir", "ons", "tor", "fre", "lør", "søn"];
 
 export function startOfDay(d: Date) { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; }
 export function addDays(d: Date, n: number) { const x = new Date(d); x.setDate(x.getDate() + n); return x; }

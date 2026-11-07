@@ -143,7 +143,15 @@
     "todayInStudio": "Today in the studio",
     "nextInStudio": "Next trainings",
     "upcoming": "Upcoming events",
-    "teamsCount": "{{n}} teams"
+    "teamsCount": "{{n}} teams",
+    "greet": {
+      "morning": "Good morning, {{name}}",
+      "day": "Hi {{name}}",
+      "evening": "Good evening, {{name}}"
+    },
+    "nextUp": "Next",
+    "yourShelf": "Your trophy shelf",
+    "childsShelf": "{{name}}'s trophy shelf"
   },
   "admin": {
     "users": "Users",
@@ -382,7 +390,8 @@
     "book": "Book room",
     "sendForApproval": "Send for approval",
     "booked": "{{room}} is booked",
-    "sentForApproval": "Sent for approval – you'll be notified"
+    "sentForApproval": "Sent for approval – you'll be notified",
+    "countLine": "{{n}} trainings · {{b}} bookings"
   },
   "feed": {
     "title": "Posts",
@@ -826,8 +835,7 @@
       "teampick": "Team picker",
       "week": "Your/child's week",
       "payments": "Open payments",
-      "badges": "Badges",
-      "milestones": "Milestones"
+      "badges": "Trophy shelf (badges + milestones)"
     }
   },
   "week": {

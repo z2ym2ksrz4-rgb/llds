@@ -22,8 +22,8 @@ await p.click("[data-testid=avatar]"); await p.click("[data-testid=menu-more]");
 if (hasPunch) { await hasPunch.click(); await p.waitForSelector("[data-testid=buy-card]"); await p.click("[data-testid=buy-card] >> nth=0"); await p.waitForTimeout(500); await p.mouse.click(195, 140); await p.waitForTimeout(200); }
 out.hasPunch = !!hasPunch;
 // event overlay from Home: open + close in place
-await p.click("nav.tabbar >> text=Hjem"); await p.click("[data-testid=hero]"); await p.waitForSelector("[data-testid=event-facts]"); out.eventOverlay = (await p.textContent(".sheet h2")).length > 0; out.eventPhoto = !!(await p.$(".sheet-photo"));
-await p.click(".sheet-close"); await p.waitForTimeout(200); out.stillHome = !!(await p.$("[data-testid=hero]")) && !(await p.$(".sheet"));
+await p.click("nav.tabbar >> text=Hjem"); await p.click("[data-testid=upcoming] .item >> nth=0"); await p.waitForSelector("[data-testid=event-facts]"); out.eventOverlay = (await p.textContent(".sheet h2")).length > 0; out.eventPhoto = !!(await p.$(".sheet-photo"));
+await p.click(".sheet-close"); await p.waitForTimeout(200); out.stillHome = !!(await p.$("[data-testid=upcoming]")) && !(await p.$(".sheet"));
 const notifs = await p.evaluate(() => JSON.parse(localStorage.getItem("llds_mock")).Y.notifications.filter((n) => n.person_id === "p-line").map((n) => n.kind + ":" + n.title));
 out.adminPunchNotif = notifs.some((n) => n.startsWith("punch:Nyt klippekort"));
 out.adminNotifs = notifs.slice(-4);

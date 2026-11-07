@@ -15,7 +15,7 @@ export function Login() {
   const [step, setStep] = useState<"email" | "code">("email");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  const loginImg = useAppearance((s) => catalogUrl(s.a.images?.login));
+  const loginImg = useAppearance((s) => catalogUrl(s.a.images?.login) ?? catalogUrl(s.a.images?.hero));
 
   const send = async () => {
     setBusy(true); setErr(null);

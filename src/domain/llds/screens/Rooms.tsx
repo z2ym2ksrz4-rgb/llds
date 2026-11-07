@@ -4,7 +4,10 @@ import { api, type Absence, type Booking, type Room, type Session } from "@/core
 import { useAuth } from "@/core/auth";
 import { Sheet, Toast } from "../components/Sheet";
 import { SessionSheet, SessionEditor } from "../components/SessionSheet";
-import { addDays, dayLabel, hm, mondayOf, sameDay, startOfDay, atTime, overlaps } from "../lib/time";
+import { addDays, dayLabel, DAY_LONG, hm, mondayOf, sameDay, startOfDay, atTime, overlaps } from "../lib/time";
+import { useAppearance } from "@/core/appearance";
+import { catalogUrl } from "../lib/catalog";
+import { art, teamAccent } from "../lib/art";
 
 const HOURS = Array.from({ length: 14 }, (_, i) => 9 + i); // 09–22
 
@@ -25,6 +28,13 @@ export function Rooms() {
   const [toast, setToast] = useState<string | null>(null);
   const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
   const week = mondayOf(day);
+  const [weekSessions, setWeekSessions] = useState<Session[]>([]);   // for the dots in the day picker
+  const bgImg = useAppearance((a) => catalogUrl(a.a.images?.hero)) ?? art("studio");
+  const myTeamIds = new Set(me.memberships.filter((m) => m.person_id === viewing.personId || m.person_id === me.person.id).map((m) => m.team_id));
+  const accentOf = (teamId: string | null) => { const tm = teamId ? me.teams.find((x) => x.id === teamId) : null; return tm ? teamAccent(tm) : {}; };
+  const [nowMin, setNowMin] = useState(() => new Date().getHours() * 60 + new Date().getMinutes());
+  useEffect(() => { const i = setInterval(() => setNowMin(new Date().getHours() * 60 + new Date().getMinutes()), 60_000); return () => clearInterval(i); }, []);
+  useEffect(() => { void api.listSessions(week.toISOString(), addDays(week, 7).toISOString()).then(setWeekSessions).catch(() => setWeekSessions([])); }, [week.getTime()]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const load = useCallback(async () => {
     const from = day.toISOString(), to = addDays(day, 1).toISOString();
@@ -41,14 +51,16 @@ export function Rooms() {
   useEffect(() => { const el = scroller.current; if (el) el.scrollTop = (15 - 9) * 48; }, [day.getTime()]); // default to the afternoon where the regular trainings are
   return (
     <section className="screen rooms">
+      <div className="rooms-bg" aria-hidden="true" style={{ backgroundImage: `url(${bgImg})` }} />
       <header className="topbar"><h1 className="display">{t("nav.rooms")}</h1>{isTrainer && <button className="ghost small" onClick={() => setOpen({ kind: "new", room_id: rooms[0]?.id ?? "", start: "16:00" })}>+ {t("session.training")}</button>}</header>
       <div className="days">
         {Array.from({ length: 7 }, (_, i) => addDays(week, i)).map((d) => (
-          <button key={d.toISOString()} className={"day" + (sameDay(d, day) ? " on" : "")} onClick={() => setDay(d)}><span>{dayLabel(d).split(" ")[0]}</span><b>{d.getDate()}</b></button>
+          <button key={d.toISOString()} className={"day" + (sameDay(d, day) ? " on" : "") + (sameDay(d, new Date()) ? " today" : "")} onClick={() => setDay(d)}><span>{dayLabel(d).split(" ")[0]}</span><b>{d.getDate()}</b><i className={weekSessions.some((x) => sameDay(new Date(x.starts_at), d) && x.team_id && myTeamIds.has(x.team_id)) ? "mine" : weekSessions.some((x) => sameDay(new Date(x.starts_at), d)) ? "any" : ""} /></button>
         ))}
       </div>
       <div className="row between small muted"><button className="linklike" onClick={() => setDay(addDays(day, -7))}>‹ {t("rooms.prevWeek")}</button><button className="linklike" onClick={() => setDay(startOfDay(new Date()))}>{t("rooms.today")}</button><button className="linklike" onClick={() => setDay(addDays(day, 7))}>{t("rooms.nextWeek")} ›</button></div>
 
+      <div className="dayhead"><h2 className="display">{DAY_LONG[(day.getDay() + 6) % 7]} {day.getDate()}. {day.toLocaleDateString("da-DK", { month: "long" })}</h2><span className="small muted">{t("rooms.countLine", { n: sessions.filter((x) => !x.cancelled).length, b: bookings.filter((x) => x.status !== "rejected").length })}</span></div>
       <div className="cal calhead" style={{ gridTemplateColumns: `44px repeat(${rooms.length}, 1fr)` }}>
         <div />{rooms.map((r) => <div key={r.id} className="h">{r.name}</div>)}
       </div>
@@ -57,9 +69,10 @@ export function Rooms() {
         <div className="hours">{HOURS.map((h) => <div key={h} className="t">{h}.00</div>)}</div>
         {rooms.map((r) => (
           <div key={r.id} className="col" style={{ height: HOURS.length * 48 }}>
+            {sameDay(day, new Date()) && nowMin >= 9 * 60 && nowMin <= 23 * 60 && <div className="nowline" style={{ top: (nowMin - 9 * 60) / 60 * 48 }} />}
             {HOURS.map((h) => <button key={h} className="free" style={{ top: (h - 9) * 48 }} aria-label={`${r.name} ${h}:00`} onClick={() => setOpen({ kind: "book", room_id: r.id, start: `${String(h).padStart(2, "0")}:00` })} />)}
             {sessions.filter((s) => s.room_id === r.id).map((s) => (
-              <button key={s.id} className={"ev" + (mine(s) ? " mine" : "") + (s.cancelled ? " off" : "")} style={{ top: slotTop(s.starts_at), height: slotH(s.starts_at, s.ends_at) }} onClick={() => setOpen({ kind: "session", s })}>
+              <button key={s.id} className={"ev" + (mine(s) ? " mine" : "") + (s.cancelled ? " off" : "")} style={{ top: slotTop(s.starts_at), height: slotH(s.starts_at, s.ends_at), ...accentOf(s.team_id) }} onClick={() => setOpen({ kind: "session", s })}>
                 <b>{s.title ?? s.team_name}</b><small>{hm(s.starts_at)}–{hm(s.ends_at)}{s.substitute_wanted && !s.substitute_id ? " · " + t("session.subWanted") : ""}</small>
               </button>
             ))}

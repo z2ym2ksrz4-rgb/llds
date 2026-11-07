@@ -143,7 +143,15 @@
     "todayInStudio": "I dag i studiet",
     "nextInStudio": "Næste træninger",
     "upcoming": "Kommende events",
-    "teamsCount": "{{n}} hold"
+    "teamsCount": "{{n}} hold",
+    "greet": {
+      "morning": "Godmorgen, {{name}}",
+      "day": "Hej {{name}}",
+      "evening": "Godaften, {{name}}"
+    },
+    "nextUp": "Næste",
+    "yourShelf": "Din trofæhylde",
+    "childsShelf": "{{name}}s trofæhylde"
   },
   "admin": {
     "users": "Brugere",
@@ -382,7 +390,8 @@
     "book": "Book sal",
     "sendForApproval": "Send til godkendelse",
     "booked": "{{room}} er booket",
-    "sentForApproval": "Sendt til godkendelse – du får besked"
+    "sentForApproval": "Sendt til godkendelse – du får besked",
+    "countLine": "{{n}} træninger · {{b}} bookinger"
   },
   "feed": {
     "title": "Opslag",
@@ -826,8 +835,7 @@
       "teampick": "Holdvælger",
       "week": "Din/barnets uge",
       "payments": "Åbne betalinger",
-      "badges": "Emblemer",
-      "milestones": "Milepæle"
+      "badges": "Trofæhylde (emblemer + milepæle)"
     }
   },
   "week": {
