@@ -21,7 +21,7 @@ export function TopRight() {
     <div className="row">
       <LangFlags />
       <Bell />
-      <button className="avatar" aria-label={t("nav.profile")} data-testid="avatar" onClick={() => setOpen(true)}>{me.person.first_name[0]}{me.person.last_name[0] ?? ""}</button>
+      <button className="avatar" aria-label={t("nav.profile")} data-testid="avatar" data-tour="avatar" onClick={() => setOpen(true)}>{me.person.first_name[0]}{me.person.last_name[0] ?? ""}</button>
       {open && (
         <Sheet onClose={() => setOpen(false)} eyebrow={me.person.email ?? ""} title={`${me.person.first_name} ${me.person.last_name}`}>
           {options.length > 1 && (

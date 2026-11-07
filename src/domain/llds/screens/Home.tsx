@@ -97,7 +97,7 @@ export function Home() {
       )}
 
       {isAdmin && studio.length > 0 && (
-        <div className="sec"><div className="row between"><h2>{studioToday ? t("home.todayInStudio") : t("home.nextInStudio")}</h2><button className="linklike small" onClick={() => setTab("rooms")}>{t("home.fullSchedule")}</button></div>
+        <div className="sec" data-tour="week"><div className="row between"><h2>{studioToday ? t("home.todayInStudio") : t("home.nextInStudio")}</h2><button className="linklike small" onClick={() => setTab("rooms")}>{t("home.fullSchedule")}</button></div>
           <div className="card list" data-testid="studio-today">
             {studio.map((s) => <button key={s.id} className={"item" + (s.cancelled ? " off" : "")} onClick={() => setOpen(s)}><span className="time">{studioToday ? hm(s.starts_at) : <>{dateLabel(s.starts_at)}<br />{hm(s.starts_at)}</>}</span><span className="grow">{s.title ?? s.team_name}<div className="tiny">{s.room_name}{s.trainer_name ? ` · ${s.substitute_name ?? s.trainer_name}` : ""}{s.cancelled ? " · " + t("session.cancelled") : ""}</div></span><span className="gold">›</span></button>)}
           </div>
@@ -110,7 +110,7 @@ export function Home() {
       )}
       {(!isAdmin || teamIds.size > 0) && <TeamPicker />}
       {teamIds.size > 0 && (
-        <div className="sec"><div className="row between"><h2>{hat ? t("home.childsWeek", { name: hat.first_name }) : t("home.yourWeek")}</h2><button className="linklike small" onClick={() => setTab("rooms")}>{t("home.fullSchedule")}</button></div>
+        <div className="sec" data-tour="week"><div className="row between"><h2>{hat ? t("home.childsWeek", { name: hat.first_name }) : t("home.yourWeek")}</h2><button className="linklike small" onClick={() => setTab("rooms")}>{t("home.fullSchedule")}</button></div>
           <div className="card list">
             {myWeek.map((s) => { const a = myAbs(s); const past = new Date(s.ends_at) < new Date(); return (
               <div key={s.id} className={"item" + (s.cancelled ? " off" : "")}>

@@ -21,7 +21,7 @@ export function TeamPicker() {
 
   return (
     <>
-      <button className="teampick" onClick={() => setOpen(true)} aria-haspopup="dialog">
+      <button className="teampick" data-tour="teampick" onClick={() => setOpen(true)} aria-haspopup="dialog">
         <span className="eyebrow">{viewing.isChild ? t("team.childsTeam", { name: hats.find((h) => h.id === viewing.personId)?.name }) : t("team.myTeam")}</span>
         <strong>{current?.name ?? t("team.none")} <span className="caret">▾</span></strong>
       </button>

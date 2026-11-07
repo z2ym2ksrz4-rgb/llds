@@ -18,7 +18,7 @@ export function Bell() {
   const openIt = async () => { setOpen(true); if (unread) { await api.markNotificationsRead(); setTimeout(() => void load(), 400); } };
   return (
     <>
-      <button className="bell" aria-label={t("notif.title")} data-testid="bell" onClick={() => void openIt()}><Icon name="bell" />{unread > 0 && <span className="badge" data-testid="badge">{unread}</span>}</button>
+      <button className="bell" aria-label={t("notif.title")} data-testid="bell" data-tour="bell" onClick={() => void openIt()}><Icon name="bell" />{unread > 0 && <span className="badge" data-testid="badge">{unread}</span>}</button>
       {open && (
         <Sheet onClose={() => setOpen(false)} eyebrow={t("notif.eyebrow")} title={t("notif.title")}>
           <div className="list">

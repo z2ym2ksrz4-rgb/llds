@@ -6,6 +6,7 @@ import { isRelease } from "@/core/release";
 import { Home, Login, Register, Pending, Rooms, TeamScreen, Admin, More, Social, Events } from "@/domain";
 import { Icon } from "@/domain/llds/components/Icons";
 import { Logo } from "@/domain/llds/components/Logo";
+import { Tour } from "@/domain/llds/components/Tour";
 import { TestMenu } from "./TestMenu";
 
 export default function App() {
@@ -35,9 +36,10 @@ export default function App() {
     <div className="app">
       {phase === "ready" && viewAs && <div className="viewbar" data-testid="viewbar"><span>{t("view.previewing", { role: t(`roles.${viewAs}`) })}</span><button onClick={() => setViewAs(null)}>{t("view.exit")}</button></div>}
       <main>{body}</main>
+      {phase === "ready" && <Tour />}
       {phase === "ready" && (
         <nav className="tabbar">
-          {tabs.map(([k, label, icon]) => <button key={k} className={tab === k ? "active" : ""} onClick={() => setTab(k)}><Icon name={icon} /><span>{label}</span></button>)}
+          {tabs.map(([k, label, icon]) => <button key={k} className={tab === k ? "active" : ""} data-tour={`tab-${k}`} onClick={() => setTab(k)}><Icon name={icon} /><span>{label}</span></button>)}
         </nav>
       )}
       {!isRelease && <TestMenu />}

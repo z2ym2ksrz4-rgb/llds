@@ -2,7 +2,7 @@
 import { chromium } from "playwright";
 const base = process.env.BASE ?? "http://localhost:4173/";
 const b = await chromium.launch({ executablePath: process.env.CHROME ?? "/opt/pw-browsers/chromium" });
-const p = await (await b.newContext({ viewport: { width: 390, height: 844 } })).newPage();
+const p = await (await b.newContext({ viewport: { width: 390, height: 844 } })).newPage(); await p.addInitScript(() => { try { if (!localStorage.getItem("llds_tour")) localStorage.setItem("llds_tour", JSON.stringify({ state: "done", at: Date.now() })); } catch {} });
 const errors = []; p.on("pageerror", e => errors.push(e.message)); p.on("console", m => { if (m.type() === "error" && !m.text().includes("Failed to load resource")) errors.push(m.text()); });
 const out = {};
 await p.goto(base, { waitUntil: "networkidle" }); await p.evaluate(() => localStorage.clear()); await p.reload({ waitUntil: "networkidle" });

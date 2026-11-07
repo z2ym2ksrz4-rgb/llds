@@ -676,5 +676,71 @@
     "pick": "Billede",
     "auto": "Automatisk",
     "hint": "{{n}} billeder i kataloget – læg nye i public/art/catalog."
+  },
+  "tour": {
+    "eyebrow": "Velkommen",
+    "title": "Hej {{name}} – skal vi vise dig rundt?",
+    "intro": "Det tager et minut. Vi peger på de vigtigste ting i appen – du kan altid finde rundvisningen igen under Indstillinger.",
+    "start": "Ja, vis mig rundt",
+    "later": "Senere",
+    "no": "Nej tak",
+    "skip": "Spring over",
+    "back": "Tilbage",
+    "next": "Næste",
+    "finish": "Færdig",
+    "stepOf": "Trin {{i}} af {{n}}",
+    "again": "Vis rundvisningen igen",
+    "steps": {
+      "hero": {
+        "label": "Næste event",
+        "title": "Det vigtigste øverst",
+        "body": "Hjem viser altid det næste event – tryk for detaljer, tilmelding og pakkeliste."
+      },
+      "team": {
+        "label": "Holdvælger",
+        "title": "Vælg hold og hvem du ser som",
+        "body": "Har du flere hold eller børn, skifter du her. Alt nedenunder følger valget."
+      },
+      "week": {
+        "label": "Ugens træninger",
+        "title": "Træninger og afbud",
+        "body": "Ugens træninger med sal og træner. Meld afbud med ét tryk – træneren får besked."
+      },
+      "bell": {
+        "label": "Notifikationer",
+        "title": "Besked, når noget sker",
+        "body": "Aflysninger, vikarer, beskeder fra Line, nye emblemer og tilmeldinger lander her."
+      },
+      "profile": {
+        "label": "Profil",
+        "title": "Din profil og menu",
+        "body": "Sprog, indstillinger, klippekort, Stjerneshoppen og log ud. Admins finder også Admin her."
+      },
+      "rooms": {
+        "label": "Sale",
+        "title": "Salkalenderen",
+        "body": "Se alle træninger i Store og Lille Sal, og book en sal til ekstra træning."
+      },
+      "teamtab": {
+        "label": "Mit hold",
+        "title": "Holdets eget rum",
+        "body": "Koreografi og musik, holdets billeder, dansere, trofæhylde, emblemer og holdets væg."
+      },
+      "social": {
+        "label": "Social",
+        "title": "Væggen",
+        "body": "Opslag fra holdet og hele skolen samt officielle beskeder fra Line – samlet ét sted."
+      },
+      "events": {
+        "label": "Events",
+        "title": "Stævner, shows og shop",
+        "body": "Kommende events med tilmelding, resultater og Stjerneshoppen."
+      },
+      "admin": {
+        "label": "Admin",
+        "title": "Alt admin i appen",
+        "body": "Brugere, hold, sæsonplan, bookinger, beskeder, events, shop og billedkatalog – Line rører aldrig en konsol."
+      }
+    }
   }
 }

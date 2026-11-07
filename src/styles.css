@@ -304,3 +304,15 @@ button.cta { box-shadow:0 10px 26px -12px rgba(201,162,74,.7); }
 .confetti i { position:absolute; top:-10px; width:8px; height:14px; border-radius:2px; background:var(--c, var(--gold2)); animation:fall var(--d, 1.6s) ease-in forwards; transform:rotate(var(--r, 0deg)); }
 @keyframes fall { 0% { transform:translateY(0) rotate(0); opacity:1; } 100% { transform:translateY(105vh) rotate(720deg); opacity:.2; } }
 @media (prefers-reduced-motion: reduce) { .hero.photo .bg, .logo-draw::after, .confetti i { animation:none; } }
+
+/* first-login tour */
+.tour-bg { position:fixed; inset:0; z-index:150; background:rgba(10,10,11,.72); backdrop-filter:blur(2px); display:flex; align-items:center; justify-content:center; padding:20px; }
+.tour-bg.transparent { background:none; backdrop-filter:none; display:block; pointer-events:none; }
+.tour-spot { position:fixed; border-radius:16px; box-shadow:0 0 0 9999px rgba(10,10,11,.74), 0 0 0 2px var(--gold2), 0 0 30px rgba(230,200,122,.55); transition:all .45s var(--ease, ease); pointer-events:none; }
+.tour-label { position:fixed; background:linear-gradient(135deg,var(--gold2),var(--gold)); color:#161206; font-size:.68rem; letter-spacing:.14em; text-transform:uppercase; font-weight:500; padding:4px 10px; border-radius:999px; transition:all .45s var(--ease, ease); }
+.tour-label::before { content:"✦ "; }
+.tour-card { position:relative; background:var(--bg2); border:1px solid rgba(201,162,74,.45); border-radius:18px; padding:16px 18px; display:flex; flex-direction:column; gap:10px; max-width:420px; width:100%; box-shadow:0 20px 60px -20px rgba(201,162,74,.35); pointer-events:auto; }
+.tour-card.center { text-align:left; }
+.tour-card.bottom, .tour-card.top { position:fixed; left:14px; right:14px; width:auto; margin:0 auto; }
+.tour-card h3 { font-family:var(--display); font-size:1.4rem; margin:0; }
+.tour-card .cta.small { padding:10px 14px; }

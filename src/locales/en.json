@@ -676,5 +676,71 @@
     "pick": "Image",
     "auto": "Automatic",
     "hint": "{{n}} images in the catalogue – add new ones in public/art/catalog."
+  },
+  "tour": {
+    "eyebrow": "Welcome",
+    "title": "Hi {{name}} – shall we show you around?",
+    "intro": "It takes a minute. We point out the most important things in the app – you can always find the tour again under Settings.",
+    "start": "Yes, show me",
+    "later": "Later",
+    "no": "No thanks",
+    "skip": "Skip",
+    "back": "Back",
+    "next": "Next",
+    "finish": "Done",
+    "stepOf": "Step {{i}} of {{n}}",
+    "again": "Show the tour again",
+    "steps": {
+      "hero": {
+        "label": "Next event",
+        "title": "The most important thing first",
+        "body": "Home always shows the next event – tap for details, sign-up and packing list."
+      },
+      "team": {
+        "label": "Team picker",
+        "title": "Pick team and who you view as",
+        "body": "With several teams or children you switch here. Everything below follows."
+      },
+      "week": {
+        "label": "This week",
+        "title": "Trainings and absences",
+        "body": "This week's trainings with hall and trainer. Report an absence in one tap – the trainer is notified."
+      },
+      "bell": {
+        "label": "Notifications",
+        "title": "Know when something happens",
+        "body": "Cancellations, substitutes, messages from Line, new emblems and sign-ups land here."
+      },
+      "profile": {
+        "label": "Profile",
+        "title": "Your profile and menu",
+        "body": "Language, settings, punch cards, the Star Shop and sign out. Admins find Admin here too."
+      },
+      "rooms": {
+        "label": "Rooms",
+        "title": "The hall calendar",
+        "body": "See all trainings in both halls and book a hall for extra practice."
+      },
+      "teamtab": {
+        "label": "My team",
+        "title": "The team's own space",
+        "body": "Choreography and music, team photos, dancers, trophy shelf, emblems and the team wall."
+      },
+      "social": {
+        "label": "Social",
+        "title": "The wall",
+        "body": "Posts from the team and the whole school plus official messages from Line – in one place."
+      },
+      "events": {
+        "label": "Events",
+        "title": "Competitions, shows and shop",
+        "body": "Upcoming events with sign-up, results and the Star Shop."
+      },
+      "admin": {
+        "label": "Admin",
+        "title": "All admin in the app",
+        "body": "Users, teams, season plan, bookings, messages, events, shop and image catalogue – no console needed."
+      }
+    }
   }
 }
