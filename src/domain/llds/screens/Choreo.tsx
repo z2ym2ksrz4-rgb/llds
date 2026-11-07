@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { api, type Formation, type Member, type Video } from "@/core/api";
+import { api, type Video } from "@/core/api";
 import { Sheet } from "../components/Sheet";
 import { ago } from "../lib/time";
 
@@ -13,7 +13,7 @@ export function Choreo({ teamId, staff, onBack, toast, mode = "choreo" }: { team
   const load = useCallback(async () => { const v = await api.listVideos(teamId); setVideos(v); setOpen((o) => (o ? v.find((x) => x.id === o.id) ?? null : null)); }, [teamId]);
   useEffect(() => { void load(); }, [load]);
   const shown = mode === "formations" ? videos.filter((v) => v.formations.length > 0 || staff) : videos;
-  if (open) return <VideoView video={open} teamId={teamId} staff={staff} initialTab={mode === "formations" ? "formations" : undefined} backLabel={mode === "formations" ? t("choreo.formations") : t("team.choreo")} onBack={() => { setOpen(null); void load(); }} onChanged={() => void load()} toast={toast} />;
+  if (open) return <VideoView video={open} staff={staff} backLabel={mode === "formations" ? t("choreo.formations") : t("team.choreo")} onBack={() => { setOpen(null); void load(); }} onChanged={() => void load()} toast={toast} />;
   return (
     <section className="screen">
       <button className="linklike" onClick={onBack}>‹ {t("team.myTeam")}</button>
@@ -43,15 +43,14 @@ function UploadSheet({ teamId, onClose, onDone, toast }: { teamId: string; onClo
   );
 }
 
-function VideoView({ video, teamId, staff, onBack, onChanged, toast, initialTab, backLabel }: { video: Video; teamId: string; staff: boolean; onBack: () => void; onChanged: () => void; toast: (m: string) => void; initialTab?: "video" | "formations"; backLabel?: string }) {
+function VideoView({ video, staff, onBack, onChanged, toast, backLabel }: { video: Video; staff: boolean; onBack: () => void; onChanged: () => void; toast: (m: string) => void; backLabel?: string }) {
   const { t } = useTranslation();
   const ref = useRef<HTMLVideoElement>(null);
   const [rate, setRate] = useState(1);
   const [mirror, setMirror] = useState(false);
   const [a, setA] = useState<number | null>(null);
   const [b, setB] = useState<number | null>(null);
-  const [tab, setTab] = useState<"video" | "formations">(initialTab ?? (video.url ? "video" : "formations"));
-  const [bpm, setBpm] = useState(120);
+    const [bpm, setBpm] = useState(120);
   useEffect(() => { if (ref.current) ref.current.playbackRate = rate; }, [rate]);
   const onTime = () => { const v = ref.current; if (v && a != null && b != null && b > a && (v.currentTime >= b || v.currentTime < a - 0.3)) { v.currentTime = a; if (v.paused) void v.play().catch(() => undefined); } };
   const eight = () => { const v = ref.current; if (!v) return; const s = Math.max(0, v.currentTime); const len = 8 * 60 / bpm; setA(s); setB(Math.min(v.duration || s + len, s + len)); v.currentTime = s; if (v.paused) void v.play().catch(() => undefined); };
@@ -61,11 +60,7 @@ function VideoView({ video, teamId, staff, onBack, onChanged, toast, initialTab,
     <section className="screen">
       <button className="linklike" onClick={onBack}>‹ {backLabel ?? t("team.choreo")}</button>
       <header className="topbar"><h1 className="display">{video.title}</h1>{staff && <button className="ghost small danger" onClick={async () => { await api.deleteVideo(video.id); toast(t("feed.deleted")); onBack(); }}>{t("common.delete")}</button>}</header>
-      <div className="chips" style={{ marginBottom: 10 }}>
-        <button className={"chip" + (tab === "video" ? " on" : "")} onClick={() => setTab("video")}>{t("choreo.video")}</button>
-        <button className={"chip" + (tab === "formations" ? " on" : "")} onClick={() => setTab("formations")}>{t("choreo.formations")}</button>
-      </div>
-      {tab === "video" && (video.url ? (
+      {(video.url ? (
         <>
           <video ref={ref} src={video.url} controls playsInline className={"choreo-video" + (mirror ? " mirror" : "")} onTimeUpdate={onTime} onLoadedMetadata={() => { if (ref.current) ref.current.playbackRate = rate; }} />
           <div className="field"><span>{t("choreo.tempo")}</span><div className="chips">{[0.5, 0.75, 1].map((r) => <button key={r} className={"chip" + (rate === r ? " on" : "")} onClick={() => setRate(r)}>{r === 1 ? t("choreo.fullTempo") : `${r * 100} %`}</button>)}<button className={"chip" + (mirror ? " on" : "")} onClick={() => setMirror(!mirror)}>{t("choreo.mirror")}</button></div></div>
@@ -78,51 +73,7 @@ function VideoView({ video, teamId, staff, onBack, onChanged, toast, initialTab,
         </>
       ) : <p className="muted">{t("choreo.noFile")}</p>)}
       <VideoNotes video={video} staff={staff} onChanged={onChanged} toast={toast} />
-      {tab === "formations" && <Formations video={video} teamId={teamId} staff={staff} onChanged={onChanged} toast={toast} />}
     </section>
-  );
-}
-
-function Formations({ video, teamId, staff, onChanged, toast }: { video: Video; teamId: string; staff: boolean; onChanged: () => void; toast: (m: string) => void }) {
-  const { t } = useTranslation();
-  const [fs, setFs] = useState<Formation[]>(video.formations);
-  const [i, setI] = useState(0);
-  const [edit, setEdit] = useState(false);
-  const [dancers, setDancers] = useState<string[]>([]);
-  const [sel, setSel] = useState<string | null>(null);
-  useEffect(() => { setFs(video.formations); setI((x) => Math.min(x, Math.max(0, video.formations.length - 1))); }, [video]);
-  useEffect(() => { if (!staff) return; void (async () => { const ms: Member[] = await api.listMembers(); setDancers(ms.filter((m) => m.memberships.some((x) => x.team_id === teamId && x.role === "dancer")).map((m) => (m.first_name[0] + (m.last_name[0] ?? "")).toUpperCase())); })(); }, [staff, teamId]);
-  const f = fs[i];
-  const place = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!edit || !sel || !f) return;
-    const r = e.currentTarget.getBoundingClientRect(); const x = Math.round(((e.clientX - r.left) / r.width) * 100) / 100, y = Math.round(((e.clientY - r.top) / r.height) * 100) / 100;
-    const next = fs.map((ff, j) => j !== i ? ff : { ...ff, positions: [...ff.positions.filter((p) => p.initials !== sel), { initials: sel, x, y }] }); setFs(next);
-  };
-  const save = async () => { await api.updateVideo(video.id, { formations: fs }); setEdit(false); toast(t("common.saved")); onChanged(); };
-  const used = new Set(f?.positions.map((p) => p.initials));
-  return (
-    <div className="stack">
-      {fs.length > 0 && <div className="chips">{fs.map((ff, j) => <button key={j} className={"chip" + (j === i ? " on" : "")} onClick={() => setI(j)}>{ff.label}</button>)}</div>}
-      {f ? (
-        <div className={"stage" + (edit ? " editing" : "")} onClick={place} data-testid="stage">
-          <span className="stage-front">{t("choreo.front")}</span>
-          {f.positions.map((p) => <span key={p.initials} className={"dot" + (sel === p.initials ? " sel" : "")} style={{ left: `${p.x * 100}%`, top: `${p.y * 100}%` }} onClick={(e) => { if (edit) { e.stopPropagation(); setSel(p.initials); } }}>{p.initials}</span>)}
-        </div>
-      ) : <p className="muted">{t("choreo.noFormations")}</p>}
-      {staff && !edit && <button className="ghost small" onClick={() => setEdit(true)}>{fs.length ? t("choreo.editFormations") : t("choreo.addFormation")}</button>}
-      {staff && edit && (
-        <div className="card" style={{ margin: 0 }}>
-          <div className="row"><input placeholder={t("choreo.formationName")} value={f?.label ?? ""} onChange={(e) => setFs(fs.map((ff, j) => j === i ? { ...ff, label: e.target.value } : ff))} disabled={!f} />
-            <button className="ghost small" onClick={() => { setFs([...fs, { label: `${t("choreo.formation")} ${fs.length + 1}`, positions: [] }]); setI(fs.length); }}>+ {t("choreo.formation")}</button>
-            {f && <button className="ghost small danger" onClick={() => { const n = fs.filter((_, j) => j !== i); setFs(n); setI(Math.max(0, i - 1)); }}>×</button>}</div>
-          <div className="eyebrow">{t("choreo.pickDancer")}</div>
-          <div className="chips">{dancers.map((d) => <button key={d} className={"chip small" + (sel === d ? " on" : used.has(d) ? " ok" : "")} onClick={() => setSel(d)}>{d}</button>)}
-            {sel && used.has(sel) && <button className="chip small warn" onClick={() => setFs(fs.map((ff, j) => j === i ? { ...ff, positions: ff.positions.filter((p) => p.initials !== sel) } : ff))}>{t("choreo.removeFromStage")}</button>}</div>
-          <p className="tiny">{t("choreo.editHint")}</p>
-          <div className="row"><button className="small" onClick={() => void save()}>{t("common.save")}</button><button className="ghost small" onClick={() => { setFs(video.formations); setEdit(false); }}>{t("common.cancel")}</button></div>
-        </div>
-      )}
-    </div>
   );
 }
 

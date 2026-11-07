@@ -16,6 +16,7 @@ import { ScrollList } from "../components/ScrollList";
 import { TopRight } from "../components/ProfileMenu";
 import { Folders } from "./Folders";
 import { Choreo } from "./Choreo";
+import { Formations } from "./Formations";
 import { Notes } from "./Notes";
 import { MILESTONE_IDEAS } from "../lib/milestones";
 import { artForCategory } from "../lib/art";
@@ -69,7 +70,7 @@ export function TeamScreen() {
   if (!team) return <section className="screen"><header className="topbar"><h1 className="display">{t("team.myTeam")}</h1><TopRight /></header><TeamPicker /><p className="muted">{t("team.noneYet")}</p></section>;
   if (page === "folders") return <><Folders teamId={team.id} staff={staff} onBack={() => { setPage("team"); void load(); }} toast={say} /><Toast msg={toast} /></>;
   if (page === "choreo") return <><Choreo teamId={team.id} staff={staff} onBack={() => { setPage("team"); void load(); }} toast={say} /><Toast msg={toast} /></>;
-  if (page === "formations") return <><Choreo mode="formations" teamId={team.id} staff={staff} onBack={() => { setPage("team"); void load(); }} toast={say} /><Toast msg={toast} /></>;
+  if (page === "formations") return <><Formations teamId={team.id} teamName={team.name} staff={staff} onBack={() => { setPage("team"); void load(); }} toast={say} /><Toast msg={toast} /></>;
   if (page === "notes") return <Notes teamId={team.id} staff={staff} onBack={() => setPage("team")} />;
 
   const role = roleOn(team.id);
@@ -117,7 +118,7 @@ export function TeamScreen() {
       <div className="grid2 tiles">
         <button className={"card tap" + (seesChoreo ? "" : " dim")} disabled={!seesChoreo} onClick={() => setPage("choreo")} data-testid="go-choreo"><div className="eyebrow">{t("team.choreo")}</div><div className="big">{seesChoreo ? t("team.videosN", { n: stats.videos }) : t("team.choreoLocked")}</div></button>
         <button className="card tap" onClick={() => setPage("folders")} data-testid="go-folders"><div className="eyebrow">{t("team.folders")}</div><div className="big">{t("team.mediaN", { n: stats.media })}</div></button>
-        <button className={"card tap" + (seesChoreo ? "" : " dim")} disabled={!seesChoreo} onClick={() => setPage("formations")} data-testid="go-formations"><div className="eyebrow">{t("choreo.formations")}</div><div className="big">{t("team.formationsN", { n: stats.formations })}</div></button>
+        <button className="card tap" onClick={() => setPage("formations")} data-testid="go-formations"><div className="eyebrow">{t("choreo.formations")}</div><div className="big">{t("team.formationsN", { n: stats.formations })}</div></button>
         <button className="card tap" onClick={() => setPage("dancers")} data-testid="go-dancers"><div className="eyebrow">{t("team.dancers")}</div><div className="big">{stats.dancers}{staff ? "" : ""}</div></button>
       </div>
       

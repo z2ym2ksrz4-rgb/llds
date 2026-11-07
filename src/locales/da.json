@@ -24,7 +24,9 @@
     "more": "Læs mere",
     "less": "Vis mindre",
     "deleted": "Slettet",
-    "newVersion": "✦ Ny version klar – tryk for at opdatere"
+    "newVersion": "✦ Ny version klar – tryk for at opdatere",
+    "create": "Opret",
+    "ok": "OK"
   },
   "lang": {
     "da": "Dansk",
@@ -887,5 +889,38 @@
       "assistant": "Hjælpetræner",
       "admin": "Admin"
     }
+  },
+  "form": {
+    "title": "Formationer",
+    "new": "Ny formation",
+    "intro": "Trænerens formationer: hvor hver danser står på forskellige tidspunkter i dansen. Tryk ▶ for at se skiftene.",
+    "introStaff": "Lav en formationsplan pr. dans: tilføj billeder (frames), træk danserne på plads og skriv tælling/tid. Gemmes automatisk.",
+    "framesN": "{{n}} billeder",
+    "empty": "Ingen formationer endnu.",
+    "name": "Navn på dansen",
+    "namePh": "fx DM-dansen 2027",
+    "frameN": "Billede {{n}}",
+    "frameOf": "Billede {{i}} af {{n}}",
+    "atPh": "Tælling / tid",
+    "back": "Bagscene",
+    "front": "Publikum",
+    "removeFromFrame": "Fjern fra billedet",
+    "noFramesStaff": "Tryk “Nyt billede” for at starte – danserne placeres automatisk, og du trækker dem på plads.",
+    "noFrames": "Træneren har ikke lavet billeder endnu.",
+    "addFrame": "Nyt billede",
+    "moveFrame": "Flyt",
+    "duplicate": "Kopiér",
+    "deleteFrame": "Slet billede",
+    "dancers": "Dansere",
+    "custom": "Anden markør",
+    "customLabel": "Tekst på markøren (fx “Rekvisit” eller “Solo”)",
+    "hint": "Tryk på en danser for at sætte hende på scenen, og træk prikken derhen hun skal stå. Prikkerne glider til næste billede, når man trykker ▶.",
+    "play": "Afspil",
+    "stop": "Stop",
+    "viewAudience": "Set fra publikum",
+    "viewDancer": "Set fra scenen",
+    "mirrorHint": "Spejlvend – som danserne ser det",
+    "deleteSet": "Slet hele formationen",
+    "deleteSetSure": "Slet “{{title}}” med alle billeder?"
   }
 }

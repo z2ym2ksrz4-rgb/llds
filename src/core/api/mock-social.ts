@@ -1,4 +1,4 @@
-import type { Audience, Channel, Comment, Folder, Formation, MediaItem, MediaRef, Membership, Message, MessageStatus, Note, Person, Post, Report, Team, TeamStaff, Thread, ThreadMessage, Video } from "./types";
+import type { Audience, Channel, Comment, Folder, Formation, FormationSet, Frame, TeamDancer, MediaItem, MediaRef, Membership, Message, MessageStatus, Note, Person, Post, Report, Team, TeamStaff, Thread, ThreadMessage, Video } from "./types";
 import { downscaleImage, fileToDataUrl } from "./image";
 
 /** Phase-3 half of the mock. Binary media lives in memory only (data/object URLs), so it is gone after a reload. */
@@ -7,6 +7,7 @@ export type SocialState = {
   posts: Post[]; comments: Comment[]; reports: Report[]; messages: Message[]; receipts: { message_id: string; person_id: string; acted_at: string }[];
   folders: Folder[]; media: MediaItem[]; videos: Video[]; notes: Note[];
   threads?: Thread[]; threadMsgs?: ThreadMessage[]; threadReads?: { thread_id: string; person_id: string; read_at: string }[];
+  formationSets?: FormationSet[];
 };
 const id = () => Math.random().toString(36).slice(2, 10);
 const now = () => new Date().toISOString();
@@ -56,6 +57,11 @@ export function socialOps(get: () => { X: SocialState; notify: (pid: string, kin
     for (const pid of t.participants) if (pid !== me.id) g.notify(pid, "message", `${name(me)}: ${t.subject}`, body.slice(0, 120), { thread_id: threadId }); };
 
   return {
+    async listFormationSets(teamId: string): Promise<FormationSet[]> { return (get().X.formationSets ?? []).filter((f) => f.team_id === teamId).sort((a, b) => b.updated_at.localeCompare(a.updated_at)); },
+    async createFormationSet(teamId: string, title: string): Promise<FormationSet> { const g = get(); const f: FormationSet = { id: "fs-" + id(), team_id: teamId, title, created_by: g.me()!.id, frames: [], created_at: now(), updated_at: now() }; (g.X.formationSets ??= []).push(f); g.save(); g.emit(); return f; },
+    async saveFormationSet(fid: string, patch: { title?: string; frames?: Frame[] }) { const g = get(); const f = (g.X.formationSets ?? []).find((x) => x.id === fid); if (f) Object.assign(f, patch, { updated_at: now() }); g.save(); g.emit(); },
+    async deleteFormationSet(fid: string) { const g = get(); g.X.formationSets = (g.X.formationSets ?? []).filter((x) => x.id !== fid); g.save(); g.emit(); },
+    async teamDancers(teamId: string): Promise<TeamDancer[]> { const g = get(); return g.memberships.filter((m) => m.team_id === teamId && m.role === "dancer").map((m) => g.persons.find((p) => p.id === m.person_id)).filter((p): p is Person => !!p && p.status === "approved").map((p) => ({ person_id: p.id, name: name(p), initials: (p.first_name[0] + (p.last_name[0] ?? "")).toUpperCase() })); },
     async teamStaff(teamId: string): Promise<TeamStaff[]> {
       const g = get(); const out: TeamStaff[] = [];
       for (const m of g.memberships.filter((m) => m.team_id === teamId && m.role !== "dancer")) { const p = g.persons.find((x) => x.id === m.person_id); if (p && p.status === "approved") out.push({ person_id: p.id, name: name(p), role: m.role as "trainer" | "assistant", is_admin: p.is_admin }); }
@@ -156,7 +162,7 @@ export function socialOps(get: () => { X: SocialState; notify: (pid: string, kin
     async listResults(teamId?: string) { const g = get(); return (g.X.results ?? []).filter((r) => !teamId || r.team_id === teamId).map((r) => ({ ...r, team_name: g.teams.find((t) => t.id === r.team_id)?.name ?? null })).sort((a, b) => b.held_on.localeCompare(a.held_on)); },
     async addResult(i: { team_id: string | null; event_title: string; placed: string; held_on: string; visibility: "private" | "public" }) { const g = get(); (g.X.results ??= []).push({ id: "res-" + id(), ...i }); g.save(); g.emit(); },
     async deleteResult(rid: string) { const g = get(); g.X.results = (g.X.results ?? []).filter((r) => r.id !== rid); g.save(); g.emit(); },
-    async teamStats(teamId: string) { const g = get(); const vids = g.X.videos.filter((v) => v.team_id === teamId); const folders = g.X.folders.filter((f) => f.team_id === teamId).map((f) => f.id); return { videos: vids.length, formations: vids.reduce((n, v) => n + v.formations.length, 0), media: g.X.media.filter((m) => folders.includes(m.folder_id)).length, dancers: g.memberships.filter((m) => m.team_id === teamId && m.role === "dancer").length }; },
+    async teamStats(teamId: string) { const g = get(); const vids = g.X.videos.filter((v) => v.team_id === teamId); const folders = g.X.folders.filter((f) => f.team_id === teamId).map((f) => f.id); return { videos: vids.length, formations: (g.X.formationSets ?? []).filter((f) => f.team_id === teamId).length, media: g.X.media.filter((m) => folders.includes(m.folder_id)).length, dancers: g.memberships.filter((m) => m.team_id === teamId && m.role === "dancer").length }; },
     async importTeamImage(teamId: string, folderName: string, file: Blob, fileName: string, asCover: boolean) {
       const g = get(); const me = g.me()!; let f = g.X.folders.find((x) => x.team_id === teamId && x.name === folderName);
       if (!f) { f = { id: "f-" + id(), team_id: teamId, name: folderName, staff_only: false, media_count: 0, cover_path: null, created_at: now() }; g.X.folders.push(f); }

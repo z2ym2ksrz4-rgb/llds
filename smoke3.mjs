@@ -60,11 +60,7 @@ await p.click("nav.tabbar >> text=/^(Mit hold|Hold)$/"); await p.waitForSelector
 await p.click("[data-testid=go-choreo]"); await p.waitForSelector("[data-testid=video]"); await p.click("[data-testid=video]");
 // notes on the video (trainer writes)
 await p.waitForSelector("[data-testid=video-notes]"); await p.click("[data-testid=video-notes] .linklike"); await p.fill("[data-testid=video-notes-input]", "Tæl 5-6-7-8 før løftet – Freja starter forrest."); await p.click("[data-testid=video-notes] .cta"); await p.waitForSelector(".toast"); await p.waitForTimeout(300); out.videoNotes = await p.textContent("[data-testid=video-notes] p");
-// formations tile is its own page, opening the video on the formations tab
-await p.click("text=‹ Koreografi"); await p.click("text=‹ Mit hold"); await p.waitForSelector("[data-testid=go-formations]"); await p.click("[data-testid=go-formations]"); await p.waitForSelector("[data-testid=video]"); out.formationsTitle = await p.textContent("h1.display"); await p.click("[data-testid=video]"); await p.waitForSelector("[data-testid=stage]"); out.formationsTabFirst = true; await p.click("text=‹ Formationer"); await p.click("text=‹ Mit hold"); await p.click("[data-testid=go-choreo]"); await p.waitForSelector("[data-testid=video]"); await p.click("[data-testid=video]");
-await p.waitForSelector("[data-testid=stage]"); out.formationDots = await p.$$eval("[data-testid=stage] .dot", e => e.length);
-await p.click("text=Redigér formationer"); await p.click(".chips .chip:has-text('AN')"); await p.click("[data-testid=stage]", { position: { x: 60, y: 60 } }); await p.click("text=Gem"); await p.waitForSelector(".toast"); await shot(5);
-out.dotMoved = await p.$eval("[data-testid=stage] .dot:has-text('AN')", e => e.style.left);
+
 await p.click("text=‹ Koreografi"); await logout();
 
 // 3. trainer (Maja): trainers channel visible, post there

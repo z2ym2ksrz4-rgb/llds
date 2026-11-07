@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Audience, Channel, Comment, Folder, Formation, MediaItem, MediaRef, Message, MessageStatus, Note, Post, Report, TeamStaff, Thread, ThreadMessage, Video } from "./types";
+import type { Audience, Channel, Comment, Folder, Formation, FormationSet, Frame, TeamDancer, MediaItem, MediaRef, Message, MessageStatus, Note, Post, Report, TeamStaff, Thread, ThreadMessage, Video } from "./types";
 import { downscaleImage } from "./image";
 
 type Fail = (e: { message: string } | null) => void;
@@ -137,9 +137,14 @@ export function supabaseSocial(sb: SupabaseClient, fail: Fail, schoolId: () => P
     },
     async addResult(i: { team_id: string | null; event_title: string; placed: string; held_on: string; visibility: "private" | "public" }) { const { error } = await sb.from("result").insert({ ...i, school_id: await schoolId() }); fail(error); },
     async deleteResult(id: string) { const { error } = await sb.from("result").delete().eq("id", id); fail(error); },
+    async listFormationSets(teamId: string) { const { data, error } = await sb.from("formation_set").select("*").eq("team_id", teamId).order("updated_at", { ascending: false }); fail(error); return (data ?? []) as FormationSet[]; },
+    async createFormationSet(teamId: string, title: string) { const { data, error } = await sb.from("formation_set").insert({ team_id: teamId, title, created_by: await myPersonId(), frames: [] }).select("*").single(); fail(error); return data as FormationSet; },
+    async saveFormationSet(id: string, patch: { title?: string; frames?: Frame[] }) { const { error } = await sb.from("formation_set").update({ ...patch, updated_at: new Date().toISOString() }).eq("id", id); fail(error); },
+    async deleteFormationSet(id: string) { const { error } = await sb.from("formation_set").delete().eq("id", id); fail(error); },
+    async teamDancers(teamId: string) { const { data, error } = await sb.rpc("team_dancers", { p_team: teamId }); fail(error); return (data ?? []) as TeamDancer[]; },
     async teamStats(teamId: string) {
-      const [v, f, m] = await Promise.all([sb.from("video").select("formations").eq("team_id", teamId), sb.from("folder_view").select("media_count").eq("team_id", teamId), sb.from("membership").select("person_id").eq("team_id", teamId).eq("role", "dancer")]);
-      return { videos: (v.data ?? []).length, formations: (v.data ?? []).reduce((n, x) => n + ((x.formations as unknown[]) ?? []).length, 0), media: (f.data ?? []).reduce((n, x) => n + Number(x.media_count ?? 0), 0), dancers: (m.data ?? []).length };
+      const [v, f, m, fs] = await Promise.all([sb.from("video").select("formations").eq("team_id", teamId), sb.from("folder_view").select("media_count").eq("team_id", teamId), sb.from("membership").select("person_id").eq("team_id", teamId).eq("role", "dancer"), sb.from("formation_set").select("id").eq("team_id", teamId)]);
+      return { videos: (v.data ?? []).length, formations: (fs.data ?? []).length, media: (f.data ?? []).reduce((n, x) => n + Number(x.media_count ?? 0), 0), dancers: (m.data ?? []).length };
     },
     async importTeamImage(teamId: string, folderName: string, file: Blob, fileName: string, asCover: boolean) {
       const sid = await schoolId(); const pid = await myPersonId();
