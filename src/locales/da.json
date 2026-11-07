@@ -27,7 +27,8 @@
     "newVersion": "✦ Ny version klar – tryk for at opdatere",
     "create": "Opret",
     "ok": "OK",
-    "add": "Tilføj"
+    "add": "Tilføj",
+    "error": "Fejl"
   },
   "lang": {
     "da": "Dansk",
@@ -162,7 +163,7 @@
     "childsShelf": "{{name}}s trofæhylde"
   },
   "admin": {
-    "users": "Brugere",
+    "users": "Nye brugere",
     "usersIntro": "Nye profiler venter på din godkendelse. Sæt hver person på hold med en rolle, og tryk Godkend.",
     "noPending": "Ingen afventer godkendelse.",
     "pending": "Afventer",
@@ -174,7 +175,7 @@
     "approve": "Godkend",
     "reject": "Afvis",
     "approved": "{{name}} er godkendt og har fået besked.",
-    "usersSub": "Godkend nye profiler",
+    "usersSub": "Godkend tilmeldinger og invitér",
     "members": "Medlemmer",
     "membersSub": "Alle godkendte – hold, roller, børneprofiler",
     "teams": "Hold",
@@ -334,7 +335,13 @@
     "needsAge": "Kræver alder {{min}}+ – ret fødselsdatoen, hvis den er forkert",
     "needsAgeUnknown": "Fødselsdato mangler",
     "loginPending": "Logger ind med {{email}} – har ikke været inde endnu",
-    "loginNoEmail": "Ingen e-mail – kan ikke logge ind selv"
+    "loginNoEmail": "Ingen e-mail – kan ikke logge ind selv",
+    "teamsHead": "Hold",
+    "teamsHint": "Tryk på rollen ud for holdet. Forælder = barnet danser på holdet.",
+    "otherStyle": "Andet",
+    "whichChild": "Hvilket barn?",
+    "addChildFirst": "Tilføj et barn under Børn først",
+    "notSelf": "Du kan ikke ændre din egen admin-status"
   },
   "settings": {
     "language": "Sprog",

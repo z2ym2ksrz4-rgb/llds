@@ -27,7 +27,8 @@
     "newVersion": "✦ New version ready – tap to update",
     "create": "Create",
     "ok": "OK",
-    "add": "Add"
+    "add": "Add",
+    "error": "Error"
   },
   "lang": {
     "da": "Dansk",
@@ -162,7 +163,7 @@
     "childsShelf": "{{name}}'s trophy shelf"
   },
   "admin": {
-    "users": "Users",
+    "users": "New users",
     "usersIntro": "New profiles await your approval. Put each person on teams with a role, then press Approve.",
     "noPending": "Nobody is waiting for approval.",
     "pending": "Pending",
@@ -174,7 +175,7 @@
     "approve": "Approve",
     "reject": "Reject",
     "approved": "{{name}} is approved and has been notified.",
-    "usersSub": "Approve new profiles",
+    "usersSub": "Approve sign-ups and invite",
     "members": "Members",
     "membersSub": "Everyone approved – teams, roles, child profiles",
     "teams": "Teams",
@@ -334,7 +335,13 @@
     "needsAge": "Requires age {{min}}+ – fix the birth date if it is wrong",
     "needsAgeUnknown": "Birth date missing",
     "loginPending": "Signs in with {{email}} – has not logged in yet",
-    "loginNoEmail": "No e-mail – cannot sign in"
+    "loginNoEmail": "No e-mail – cannot sign in",
+    "teamsHead": "Teams",
+    "teamsHint": "Tap the role next to the team. Parent = the child dances on the team.",
+    "otherStyle": "Other",
+    "whichChild": "Which child?",
+    "addChildFirst": "Add a child under Children first",
+    "notSelf": "You cannot change your own admin status"
   },
   "settings": {
     "language": "Language",

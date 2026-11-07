@@ -6,32 +6,39 @@ import { Sheet } from "../components/Sheet";
 
 type Props = { member: Member; all: Member[]; teams: Team[]; onClose: () => void; onChanged: () => void; onOpen: (m: Member) => void; toast: (m: string) => void };
 
-const Check = ({ on, children, sub, sub2, onChange, testId, disabled }: { on: boolean; children: ReactNode; sub?: string; sub2?: string; onChange: () => void; testId?: string; disabled?: boolean }) => (
+const Check = ({ on, children, sub, onChange, testId, disabled }: { on: boolean; children: ReactNode; sub?: string; onChange: () => void; testId?: string; disabled?: boolean }) => (
   <button type="button" className={"checkrow" + (on ? " on" : "") + (disabled ? " off" : "")} role="checkbox" aria-checked={on} aria-disabled={disabled} disabled={disabled} onClick={onChange} data-testid={testId}>
     <span className="box" aria-hidden>{on ? "✓" : ""}</span>
-    <span className="grow"><span className="lbl">{children}</span>{(sub2 ?? sub) && <span className="tiny">{sub2 ?? sub}</span>}</span>
+    <span className="grow"><span className="lbl">{children}</span>{sub && <span className="tiny">{sub}</span>}</span>
   </button>
 );
 
-/** Admin → Medlemmer → one person. Roles are explicit check boxes (dancer / parent / trainer / admin); each role opens its own
- *  section (teams as dancer, teams as trainer or assistant, linked children). A summary at the bottom lists exactly what the
- *  person can see in the app, so Line never has to guess. */
+const ageOf = (p: { birth_date?: string | null; birth_year?: number | null }) => p.birth_date ? Math.floor((Date.now() - new Date(p.birth_date).getTime()) / 31557600000) : p.birth_year ? new Date().getFullYear() - p.birth_year : null;
+
+/** Admin → Medlemmer → one person.
+ *  Top: what the person can see in the app (one ✓ per team, with the reason). Then "who is this?" as four check rows
+ *  (dancer / parent / trainer / admin – any combination; eligibility by age). Then ONE team list, grouped by style and
+ *  alphabetical, where each checked role adds its own chip on every team row: Danser · Forælder (via a child) · Træner · Hjælpetræner.
+ *  Then the children (link existing / create new). Everything is saved with Gem. */
 export function MemberSheet({ member: p, all, teams, onClose, onChanged, onOpen, toast }: Props) {
   const { t } = useTranslation();
   const me = useAuth((s) => s.me)!;
-  // Eligibility follows age (and child login), never whether the person has logged in yet – seeded trainers have no login until first sign-in.
-  const age = p.birth_date ? Math.floor((Date.now() - new Date(p.birth_date).getTime()) / 31557600000) : p.birth_year ? new Date().getFullYear() - p.birth_year : null;
-  const canStaff = !p.supervised_by && (age === null || age >= 15);         // trainer / assistant from 15
-  const canParent = !p.supervised_by && (age === null || age >= 18);        // parent / admin from 18
-  const canAdmin = canParent;
-  const why = (ok: boolean, min: number) => (ok ? undefined : age === null ? t("admin.needsAgeUnknown") : t("admin.needsAge", { min }));
+  const age = ageOf(p);
+  const canStaff = !p.supervised_by && (age === null || age >= 15);
+  const canParent = !p.supervised_by && (age === null || age >= 18);
+  const isSelf = p.id === me.person.id;
+  const canAdmin = canParent && !isSelf;
+  const why = (ok: boolean, min: number) => (ok ? undefined : isSelf && min === 18 && canParent ? t("admin.notSelf") : age === null ? t("admin.needsAgeUnknown") : t("admin.needsAge", { min }));
 
   const [dancer, setDancer] = useState(p.memberships.some((m) => m.role === "dancer"));
   const [parent, setParent] = useState(p.children.length > 0);
   const [staff, setStaff] = useState(p.memberships.some((m) => m.role !== "dancer"));
-  const [dancerTeams, setDancerTeams] = useState<string[]>(p.memberships.filter((m) => m.role === "dancer").map((m) => m.team_id));
-  const [staffTeams, setStaffTeams] = useState<{ team_id: string; role: Role }[]>(p.memberships.filter((m) => m.role !== "dancer").map((m) => ({ team_id: m.team_id, role: m.role })));
+  const [admin, setAdmin] = useState(p.is_admin);
+  const [ms, setMs] = useState<{ team_id: string; role: Role }[]>(p.memberships.map((m) => ({ team_id: m.team_id, role: m.role })));
   const [kids, setKids] = useState<string[]>(p.children.map((c) => c.id));
+  // children's dancer teams (draft) – edited through the "Forælder" chip on a team row
+  const [kidTeams, setKidTeams] = useState<Record<string, string[]>>(() => Object.fromEntries(p.children.map((c) => [c.id, (all.find((x) => x.id === c.id)?.memberships ?? []).filter((m) => m.role === "dancer").map((m) => m.team_id)])));
+  const [pickKidFor, setPickKidFor] = useState<string | null>(null);
   const [kidQ, setKidQ] = useState("");
   const [newKid, setNewKid] = useState<{ first_name: string; birth_date: string; team_ids: string[] } | null>(null);
   const [busy, setBusy] = useState(false);
@@ -40,73 +47,107 @@ export function MemberSheet({ member: p, all, teams, onClose, onChanged, onOpen,
   const teamName = (id: string) => teams.find((x) => x.id === id)?.name ?? "?";
   const byId = (id: string) => all.find((x) => x.id === id);
   const toggleIn = (list: string[], id: string) => (list.includes(id) ? list.filter((x) => x !== id) : [...list, id]);
-  const setStaffRole = (team_id: string, role: Role | null) => setStaffTeams((cur) => { const rest = cur.filter((m) => m.team_id !== team_id); return role ? [...rest, { team_id, role }] : rest; });
+  const has = (team_id: string, role: Role) => ms.some((m) => m.team_id === team_id && m.role === role);
+  const toggleRole = (team_id: string, role: Role) => setMs((cur) => (cur.some((m) => m.team_id === team_id && m.role === role) ? cur.filter((m) => !(m.team_id === team_id && m.role === role)) : [...cur, { team_id, role }]));
+  const kidsOn = (team_id: string) => kids.filter((k) => (kidTeams[k] ?? byId(k)?.memberships.filter((m) => m.role === "dancer").map((m) => m.team_id) ?? []).includes(team_id));
+  const toggleKidTeam = (kid: string, team_id: string) => setKidTeams((cur) => ({ ...cur, [kid]: toggleIn(cur[kid] ?? byId(kid)?.memberships.filter((m) => m.role === "dancer").map((m) => m.team_id) ?? [], team_id) }));
+  const onParentChip = (team_id: string) => {
+    if (!kids.length) { toast(t("admin.addChildFirst")); document.getElementById("kids-sec")?.scrollIntoView({ behavior: "smooth", block: "center" }); return; }
+    if (kids.length === 1) { toggleKidTeam(kids[0], team_id); return; }
+    setPickKidFor((cur) => (cur === team_id ? null : team_id));
+  };
 
-  // candidates for "add existing child": approved persons without their own adult login, not already linked, not the person
+  // teams grouped by style, alphabetical
+  const groups = useMemo(() => {
+    const g = new Map<string, Team[]>();
+    for (const tm of [...teams].sort((a, b) => a.name.localeCompare(b.name, "da"))) { const k = tm.style || t("admin.otherStyle"); g.set(k, [...(g.get(k) ?? []), tm]); }
+    return [...g.entries()].sort((a, b) => a[0].localeCompare(b[0], "da"));
+  }, [teams, t]);
+
   const candidates = useMemo(() => {
     const q = kidQ.trim().toLowerCase(); if (q.length < 2) return [];
     return all.filter((x) => x.id !== p.id && !kids.includes(x.id) && (!x.user_id || x.supervised_by) && `${x.first_name} ${x.last_name}`.toLowerCase().includes(q)).slice(0, 6);
   }, [kidQ, all, kids, p.id]);
 
-  // what the person will be able to see after save
   const access = useMemo(() => {
     const rows: { team: string; via: string }[] = [];
-    if (dancer) for (const id of dancerTeams) rows.push({ team: teamName(id), via: t("roles.dancer") });
-    if (staff) for (const m of staffTeams) rows.push({ team: teamName(m.team_id), via: t(`roles.${m.role}`) });
-    if (parent) for (const kid of kids) { const c = byId(kid); for (const m of c?.memberships ?? []) if (m.role === "dancer") rows.push({ team: teamName(m.team_id), via: t("admin.viaChild", { name: c!.first_name }) }); }
-    return rows;
+    for (const m of ms) if ((m.role === "dancer" && dancer) || (m.role !== "dancer" && staff)) rows.push({ team: teamName(m.team_id), via: t(`roles.${m.role}`) });
+    if (parent) for (const kid of kids) { const c = byId(kid); for (const tid of kidTeams[kid] ?? c?.memberships.filter((m) => m.role === "dancer").map((m) => m.team_id) ?? []) rows.push({ team: teamName(tid), via: t("admin.viaChild", { name: c?.first_name ?? "" }) }); }
+    return rows.sort((a, b) => a.team.localeCompare(b.team, "da"));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dancer, dancerTeams, staff, staffTeams, parent, kids, all, teams]);
+  }, [ms, dancer, staff, parent, kids, kidTeams, all, teams]);
 
   const save = async () => {
     setBusy(true);
     try {
-      const ms: { team_id: string; role: Role }[] = [...(dancer ? dancerTeams.map((team_id) => ({ team_id, role: "dancer" as Role })) : []), ...(staff ? staffTeams.filter((m) => !dancer || !dancerTeams.includes(m.team_id)) : [])];
-      await api.setMemberships(p.id, ms);
-      if (canParent) await api.setGuardians(p.id, parent ? kids : []);
+      await api.setMemberships(p.id, ms.filter((m) => (m.role === "dancer" ? dancer : staff)));
+      if (canParent) {
+        await api.setGuardians(p.id, parent ? kids : []);
+        if (parent) for (const kid of kids) { const c = byId(kid); if (!c || !kidTeams[kid]) continue; const keep = c.memberships.filter((m) => m.role !== "dancer").map((m) => ({ team_id: m.team_id, role: m.role })); await api.setMemberships(kid, [...keep, ...kidTeams[kid].map((team_id) => ({ team_id, role: "dancer" as Role }))]); }
+      }
+      if (canAdmin && admin !== p.is_admin) await api.setAdmin(p.id, admin);
       toast(t("common.saved")); onChanged(); onClose();
-    } finally { setBusy(false); }
+    } catch (x) { toast(t("common.error") + ": " + String((x as Error).message ?? x)); }
+    finally { setBusy(false); }
   };
   const createKid = async () => {
     if (!newKid || !newKid.first_name.trim()) return;
     setBusy(true);
-    try { const cid = await api.createChild({ parent_id: p.id, first_name: newKid.first_name, last_name: p.last_name, birth_date: newKid.birth_date || null, team_ids: newKid.team_ids }); setKids((k) => [...k, cid]); setNewKid(null); onChanged(); toast(t("admin.childCreated", { name: newKid.first_name })); }
+    try { const cid = await api.createChild({ parent_id: p.id, first_name: newKid.first_name, last_name: p.last_name, birth_date: newKid.birth_date || null, team_ids: newKid.team_ids }); setKids((k) => [...k, cid]); setKidTeams((k) => ({ ...k, [cid]: newKid.team_ids })); setNewKid(null); onChanged(); toast(t("admin.childCreated", { name: newKid.first_name })); }
     finally { setBusy(false); }
   };
 
   const login = p.supervised_by ? t("admin.loginChild") : p.user_id ? t("admin.loginOwn", { email: p.email ?? "" }) : p.email ? t("admin.loginPending", { email: p.email }) : p.parents.length ? t("admin.loginNone") : t("admin.loginNoEmail");
   const year = p.birth_date ? new Date(p.birth_date).getFullYear() : p.birth_year;
+  const anyRole = dancer || staff || parent;
 
   return (
     <Sheet onClose={onClose} eyebrow={t("admin.member")} title={`${p.first_name} ${p.last_name}`}>
       <div className="tiny">{[year ? t("admin.born", { year }) : null, p.phone, login].filter(Boolean).join(" · ")}</div>
       {p.parents.length > 0 && <div className="tiny" style={{ marginTop: 4 }}>{t("admin.parents")}: {p.parents.map((g) => <button key={g.id} className="linklike" onClick={() => { const m = byId(g.id); if (m) onOpen(m); }}>{g.first_name} {g.last_name}</button>).reduce<ReactNode[]>((acc, el, i) => (i ? [...acc, ", ", el] : [el]), [])}</div>}
 
-      {/* 1. Roles */}
+      {/* 1. Access summary – first, so the consequence of every tick is visible */}
+      <div className="field"><span>{t("admin.accessHead")}</span>
+        <div className="card access" data-testid="access">
+          {access.length ? access.map((r, i) => <div key={i} className="accessrow"><span className="box on" aria-hidden>✓</span><span className="grow">{r.team}</span><span className="tiny">{r.via}</span></div>) : <p className="tiny muted" style={{ margin: 0 }}>{t("admin.accessNone")}</p>}
+          <div className="tiny" style={{ marginTop: 8 }}>{login}{admin ? ` · ${t("admin.accessAdmin")}` : ""}</div>
+        </div>
+      </div>
+
+      {/* 2. Roles – any combination */}
       <div className="field"><span>{t("admin.rolesHead")}</span>
         <div className="checklist">
           <Check on={dancer} onChange={() => setDancer((v) => !v)} sub={t("admin.roleDancerSub")} testId="role-dancer">{t("roles.dancer")}</Check>
           <Check on={parent} disabled={!canParent} onChange={() => setParent((v) => !v)} sub={why(canParent, 18) ?? t("admin.roleParentSub")} testId="role-parent">{t("roles.parent")}</Check>
           <Check on={staff} disabled={!canStaff} onChange={() => setStaff((v) => !v)} sub={why(canStaff, 15) ?? t("admin.roleStaffSub")} testId="role-staff">{t("admin.roleStaff")}</Check>
-          {p.id !== me.person.id && <Check on={p.is_admin} disabled={!canAdmin} sub2={why(canAdmin, 18)} onChange={async () => { await api.setAdmin(p.id, !p.is_admin); toast(!p.is_admin ? t("admin.adminGiven", { name: p.first_name }) : t("admin.adminRemoved", { name: p.first_name })); onChanged(); }} sub={t("admin.isAdminHint")} testId="admin-toggle">{t("admin.isAdmin")}</Check>}
+          <Check on={admin} disabled={!canAdmin} onChange={() => setAdmin((v) => !v)} sub={why(canAdmin, 18) ?? t("admin.isAdminHint")} testId="admin-toggle">{t("admin.isAdmin")}</Check>
         </div>
       </div>
 
-      {/* 2. Dancer on teams */}
-      {dancer && <div className="field"><span>{t("admin.dancerOn")}</span>
-        <div className="checklist cols" data-testid="dancer-teams">{teams.map((tm) => <Check key={tm.id} on={dancerTeams.includes(tm.id)} onChange={() => setDancerTeams((l) => toggleIn(l, tm.id))}>{tm.name}<span className="tiny"> · {tm.level}</span></Check>)}</div>
-      </div>}
-
-      {/* 3. Trainer / assistant on teams */}
-      {staff && canStaff && <div className="field"><span>{t("admin.staffOn")}</span>
-        <div className="teamgrid" data-testid="staff-teams">{teams.map((tm) => { const r = staffTeams.find((m) => m.team_id === tm.id)?.role ?? null; return (
-          <div key={tm.id} className={"teamrow" + (r ? " on" : "")}><span className="grow">{r ? "✓ " : ""}{tm.name}</span><div className="chips tight">{(["trainer", "assistant"] as Role[]).map((role) => <button key={role} type="button" className={"chip small" + (r === role ? " on" : "")} onClick={() => setStaffRole(tm.id, r === role ? null : role)}>{t(`roles.${role}`)}</button>)}</div></div>); })}</div>
+      {/* 3. One team list – chips per checked role */}
+      {anyRole && <div className="field"><span>{t("admin.teamsHead")}</span>
+        <p className="tiny muted" style={{ margin: "0 0 6px" }}>{t("admin.teamsHint")}</p>
+        <div className="teamlist" data-testid="teamlist">
+          {groups.map(([style, list]) => <div key={style} className="tgroup"><div className="eyebrow">{style}</div>
+            {list.map((tm) => { const kOn = parent ? kidsOn(tm.id) : []; const on = (dancer && has(tm.id, "dancer")) || (staff && (has(tm.id, "trainer") || has(tm.id, "assistant"))) || kOn.length > 0; return (
+              <div key={tm.id} className={"trow" + (on ? " on" : "")} data-team={tm.name}>
+                <div className="trow-main"><span className="grow"><span className="tname">{on ? "✓ " : ""}{tm.name}</span><span className="tiny"> · {tm.level}</span></span>
+                  <div className="chips tight">
+                    {dancer && <button type="button" className={"chip small" + (has(tm.id, "dancer") ? " on" : "")} onClick={() => toggleRole(tm.id, "dancer")}>{t("roles.dancer")}</button>}
+                    {parent && canParent && <button type="button" className={"chip small" + (kOn.length ? " on" : "")} onClick={() => onParentChip(tm.id)} data-testid="chip-parent">{t("roles.parent")}{kOn.length ? ` (${kOn.map((k) => byId(k)?.first_name).join(", ")})` : ""}</button>}
+                    {staff && canStaff && <button type="button" className={"chip small" + (has(tm.id, "trainer") ? " on" : "")} onClick={() => toggleRole(tm.id, "trainer")}>{t("roles.trainer")}</button>}
+                    {staff && canStaff && <button type="button" className={"chip small" + (has(tm.id, "assistant") ? " on" : "")} onClick={() => toggleRole(tm.id, "assistant")}>{t("roles.assistant")}</button>}
+                  </div></div>
+                {pickKidFor === tm.id && kids.length > 1 && <div className="trow-kids"><span className="tiny">{t("admin.whichChild")}</span>{kids.map((k) => <button key={k} type="button" className={"chip small" + (kOn.includes(k) ? " on" : "")} onClick={() => toggleKidTeam(k, tm.id)}>{byId(k)?.first_name}</button>)}</div>}
+              </div>); })}
+          </div>)}
+        </div>
       </div>}
 
       {/* 4. Children */}
-      {parent && canParent && <div className="field"><span>{t("admin.childrenHead")}</span>
+      {parent && canParent && <div className="field" id="kids-sec"><span>{t("admin.childrenHead")}</span>
         <div className="checklist" data-testid="kids">
-          {kids.map((id) => { const c = byId(id); if (!c) return null; const tms = c.memberships.filter((m) => m.role === "dancer").map((m) => teamName(m.team_id)); return (
+          {kids.map((id) => { const c = byId(id); if (!c) return null; const tms = (kidTeams[id] ?? c.memberships.filter((m) => m.role === "dancer").map((m) => m.team_id)).map(teamName); return (
             <div key={id} className="checkrow on static"><span className="box" aria-hidden>✓</span><span className="grow"><span className="lbl">{c.first_name} {c.last_name}</span><span className="tiny">{[c.birth_year ? String(c.birth_year) : null, tms.length ? tms.join(" · ") : t("admin.noTeams")].filter(Boolean).join(" · ")}</span></span>
               <button type="button" className="chip small" onClick={() => onOpen(c)}>{t("admin.editChild")}</button><button type="button" className="chip small danger" aria-label={t("admin.unlink")} onClick={() => setKids((k) => k.filter((x) => x !== id))}>×</button></div>); })}
           {!kids.length && <p className="tiny muted" style={{ margin: "4px 0" }}>{t("admin.noChildrenYet")}</p>}
@@ -123,14 +164,6 @@ export function MemberSheet({ member: p, all, teams, onClose, onChanged, onOpen,
           <div className="row"><button type="button" className="cta grow" disabled={busy || !newKid.first_name.trim()} onClick={() => void createKid()}>{t("admin.createChild")}</button><button type="button" className="ghost" onClick={() => setNewKid(null)}>{t("common.cancel")}</button></div>
         </div>}
       </div>}
-
-      {/* 5. Access summary */}
-      <div className="field"><span>{t("admin.accessHead")}</span>
-        <div className="card access" data-testid="access">
-          {access.length ? access.map((r, i) => <div key={i} className="accessrow"><span className="box on" aria-hidden>✓</span><span className="grow">{r.team}</span><span className="tiny">{r.via}</span></div>) : <p className="tiny muted" style={{ margin: 0 }}>{t("admin.accessNone")}</p>}
-          <div className="tiny" style={{ marginTop: 8 }}>{login}{p.is_admin ? ` · ${t("admin.accessAdmin")}` : ""}</div>
-        </div>
-      </div>
 
       <div className="row"><button className="cta grow" disabled={busy} onClick={() => void save()} data-testid="member-save">{t("common.save")}</button>
         <button className="ghost danger" onClick={async () => { if (!confirmOff) { setConfirmOff(true); setTimeout(() => setConfirmOff(false), 4000); return; } await api.setPersonStatus(p.id, "inactive"); toast(t("admin.deactivated")); onChanged(); onClose(); }}>{confirmOff ? t("admin.deactivateConfirm") : t("admin.deactivate")}</button></div>
