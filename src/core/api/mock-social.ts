@@ -1,10 +1,10 @@
-import type { Audience, Channel, Comment, Folder, Formation, FormationSet, Frame, Marker, TeamDancer, MediaItem, MediaRef, Membership, Message, MessageStatus, Note, Person, Post, Report, Team, TeamStaff, Thread, ThreadMessage, Video } from "./types";
+import type { MessageComment, Audience, Channel, Comment, Folder, Formation, FormationSet, Frame, Marker, TeamDancer, MediaItem, MediaRef, Membership, Message, MessageStatus, Note, Person, Post, Report, Team, TeamStaff, Thread, ThreadMessage, Video } from "./types";
 import { downscaleImage, fileToDataUrl } from "./image";
 
 /** Phase-3 half of the mock. Binary media lives in memory only (data/object URLs), so it is gone after a reload. */
 export type SocialState = {
   results?: { id: string; team_id: string | null; event_title: string; placed: string; held_on: string; visibility: "private" | "public" }[];
-  posts: Post[]; comments: Comment[]; reports: Report[]; messages: Message[]; receipts: { message_id: string; person_id: string; acted_at: string }[];
+  posts: Post[]; comments: Comment[]; reports: Report[]; messages: Message[]; receipts: { message_id: string; person_id: string; acted_at: string }[]; msgComments?: MessageComment[];
   folders: Folder[]; media: MediaItem[]; videos: Video[]; notes: Note[];
   threads?: Thread[]; threadMsgs?: ThreadMessage[]; threadReads?: { thread_id: string; person_id: string; read_at: string }[];
   formationSets?: FormationSet[];
@@ -121,6 +121,9 @@ export function socialOps(get: () => { X: SocialState; notify: (pid: string, kin
       g.save(); g.emit();
     },
     async ackMessage(mid: string) { const g = get(); const me = g.me()!; if (!g.X.receipts.some((r) => r.message_id === mid && r.person_id === me.id)) g.X.receipts.push({ message_id: mid, person_id: me.id, acted_at: now() }); g.save(); g.emit(); },
+    async listMessageComments(mid: string): Promise<MessageComment[]> { return (get().X.msgComments ?? []).filter((c) => c.message_id === mid); },
+    async addMessageComment(mid: string, body: string) { const g = get(); const me = g.me()!; (g.X.msgComments ??= []).push({ id: "mc-" + id(), message_id: mid, author_id: me.id, author_name: name(me), body, created_at: now() }); g.save(); g.emit(); },
+    async deleteMessageComment(cid: string) { const g = get(); g.X.msgComments = (g.X.msgComments ?? []).filter((c) => c.id !== cid); g.save(); g.emit(); },
     async messageStatus(mid: string): Promise<MessageStatus[]> {
       const g = get(); const m = g.X.messages.find((x) => x.id === mid); if (!m) return [];
       const teamSet = new Set(m.audience.teams ?? []);

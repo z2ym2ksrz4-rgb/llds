@@ -136,7 +136,8 @@
     "noConversationsStaff": "No conversations on this team yet.",
     "noPhone": "no phone number",
     "call": "Call",
-    "sms": "Text"
+    "sms": "Text",
+    "officialOnHome": "{{n}} message(s) from the school await your reply"
   },
   "home": {
     "hi": "Hi {{name}}",
@@ -593,7 +594,10 @@
     "nobodyMissing": "Everyone has responded 🎉",
     "nobodyYet": "Nobody yet.",
     "noneNew": "No new messages",
-    "history": "History ({{n}})"
+    "history": "History ({{n}})",
+    "comments": "Comments ({{n}})",
+    "commentPh": "Write a comment or a question …",
+    "commentSend": "Send"
   },
   "folders": {
     "new": "New folder",
@@ -847,7 +851,8 @@
   },
   "social": {
     "feed": "Feed",
-    "all": "All"
+    "all": "All",
+    "intro": "The team's own space – everyone on the team can post and comment. Trainer messages are under My team, school messages on Home."
   },
   "view": {
     "as": "View app as",

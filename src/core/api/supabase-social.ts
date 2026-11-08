@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Audience, Channel, Comment, Folder, Formation, FormationSet, Frame, Marker, TeamDancer, MediaItem, MediaRef, Message, MessageStatus, Note, Post, Report, TeamStaff, Thread, ThreadMessage, Video } from "./types";
+import type { MessageComment, Audience, Channel, Comment, Folder, Formation, FormationSet, Frame, Marker, TeamDancer, MediaItem, MediaRef, Message, MessageStatus, Note, Post, Report, TeamStaff, Thread, ThreadMessage, Video } from "./types";
 import { downscaleImage } from "./image";
 
 type Fail = (e: { message: string } | null) => void;
@@ -66,6 +66,9 @@ export function supabaseSocial(sb: SupabaseClient, fail: Fail, schoolId: () => P
       const { error } = await sb.from("message").insert({ school_id: await schoolId(), author_id: await myPersonId(), ...i }); fail(error);
     },
     async ackMessage(id: string) { const { error } = await sb.from("message_receipt").upsert({ message_id: id, person_id: await myPersonId() }, { onConflict: "message_id,person_id" }); fail(error); },
+    async listMessageComments(messageId: string): Promise<MessageComment[]> { const { data, error } = await sb.from("message_comment_view").select("*").eq("message_id", messageId).order("created_at"); fail(error); return (data ?? []) as MessageComment[]; },
+    async addMessageComment(messageId: string, body: string) { const { error } = await sb.from("message_comment").insert({ message_id: messageId, author_id: await myPersonId(), body }); fail(error); },
+    async deleteMessageComment(id: string) { const { error } = await sb.from("message_comment").delete().eq("id", id); fail(error); },
     async messageStatus(id: string): Promise<MessageStatus[]> { const { data, error } = await sb.rpc("message_status", { p_message: id }); fail(error); return (data ?? []) as MessageStatus[]; },
 
     async teamStaff(teamId: string) { const { data, error } = await sb.rpc("team_staff", { p_team: teamId }); fail(error); return (data ?? []) as TeamStaff[]; },

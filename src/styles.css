@@ -571,3 +571,6 @@ button.cta { box-shadow:0 10px 26px -12px rgba(201,162,74,.7); }
 
 /* staff: tap-to-call / tap-to-text per contact */
 .contacts{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:4px}.contact{display:inline-flex;align-items:center;gap:6px}.cbtn{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:rgba(201,162,74,.12);border:1px solid rgba(201,162,74,.35);text-decoration:none;font-size:.85rem;line-height:1}.cbtn:active{background:rgba(201,162,74,.3)}
+
+/* comments under a trainer message */
+.comments{margin-top:4px;border-top:1px solid rgba(255,255,255,.08);padding-top:10px}.comments .comment{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)}.comments .comment:last-of-type{border-bottom:0}

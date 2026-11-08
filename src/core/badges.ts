@@ -9,8 +9,8 @@ import type { Tab } from "./nav";
  *  Admin: real to-do counts (pending users, bookings to approve, open orders …) – they only go away when the task is done. */
 export const TAB_KINDS: Record<Exclude<Tab, "home" | "more" | "admin">, string[]> = {
   rooms: ["booking", "session", "substitute"],
-  team: ["post", "badge", "milestone"],
-  social: ["message"],
+  team: ["message", "badge", "milestone"],   // trainer messages, comments on them, conversations
+  social: ["post"],                           // the teams' own feed
   events: ["event"],
   shop: ["order", "punch", "payment"],
 };

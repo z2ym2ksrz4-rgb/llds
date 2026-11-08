@@ -136,7 +136,8 @@
     "noConversationsStaff": "Ingen samtaler på holdet endnu.",
     "noPhone": "intet telefonnummer",
     "call": "Ring til",
-    "sms": "Sms til"
+    "sms": "Sms til",
+    "officialOnHome": "{{n}} besked(er) fra skolen venter på dit svar"
   },
   "home": {
     "hi": "Hej {{name}}",
@@ -593,7 +594,10 @@
     "nobodyMissing": "Alle har reageret 🎉",
     "nobodyYet": "Ingen endnu.",
     "noneNew": "Ingen nye beskeder",
-    "history": "Historik ({{n}})"
+    "history": "Historik ({{n}})",
+    "comments": "Kommentarer ({{n}})",
+    "commentPh": "Skriv en kommentar eller et spørgsmål …",
+    "commentSend": "Send"
   },
   "folders": {
     "new": "Ny mappe",
@@ -847,7 +851,8 @@
   },
   "social": {
     "feed": "Feed",
-    "all": "Alle"
+    "all": "Alle",
+    "intro": "Holdets eget rum – alle på holdet kan slå op og kommentere. Beskeder fra træneren finder du under Mit hold, skolens beskeder på Hjem."
   },
   "view": {
     "as": "Vis appen som",

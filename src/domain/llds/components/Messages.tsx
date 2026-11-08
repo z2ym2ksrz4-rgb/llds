@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { api, type Audience, type Message, type MessageStatus, type Team } from "@/core/api";
+import { api, type Audience, type Message, type MessageComment, type MessageStatus, type Team } from "@/core/api";
 import { useAuth } from "@/core/auth";
 import { Sheet } from "./Sheet";
 import { ScrollList } from "./ScrollList";
@@ -11,7 +11,7 @@ export function MessageBanner({ toast }: { toast: (m: string) => void }) {
   const { t } = useTranslation();
   const [list, setList] = useState<Message[]>([]);
   const [open, setOpen] = useState<Message | null>(null);
-  const load = useCallback(async () => setList(await api.listMessages()), []);
+  const load = useCallback(async () => setList((await api.listMessages()).filter((m) => m.audience.all)), []);   // official = school-wide; team messages live on the team page
   useEffect(() => { void load(); }, [load]);
   const due = list.filter((m) => !m.acted_at);
   const [history, setHistory] = useState(false);
@@ -41,6 +41,14 @@ export function MessageSheet({ message, onClose, toast }: { message: Message; on
   const isStaff = useAuth((s) => s.isStaff)();
   const [status, setStatus] = useState<MessageStatus[] | null>(null);
   const [acted, setActed] = useState(message.acted_at);
+  // comments: only on a trainer's team message (not on official school-wide ones)
+  const teamMsg = !message.audience.all && !!message.audience.teams?.length;
+  const me = useAuth((s) => s.me);
+  const [comments, setComments] = useState<MessageComment[]>([]);
+  const [cBody, setCBody] = useState(""); const [cBusy, setCBusy] = useState(false);
+  const loadComments = useCallback(async () => { if (teamMsg) setComments(await api.listMessageComments(message.id).catch(() => [])); }, [message.id, teamMsg]);
+  useEffect(() => { void loadComments(); }, [loadComments]);
+  const sendComment = async () => { if (!cBody.trim()) return; setCBusy(true); try { await api.addMessageComment(message.id, cBody.trim()); setCBody(""); await loadComments(); } finally { setCBusy(false); } };
   const ack = async () => { await api.ackMessage(message.id); setActed(new Date().toISOString()); toast(t(`msg.acked.${message.needs}`)); };
   // "read" messages are marked read the moment they are opened – no button; only "accept" asks for a tap
   useEffect(() => { if (message.needs === "read" && !message.acted_at) void api.ackMessage(message.id).then(() => setActed(new Date().toISOString())).catch(() => { /* ignore */ }); }, [message.id]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -51,6 +59,13 @@ export function MessageSheet({ message, onClose, toast }: { message: Message; on
       <p style={{ whiteSpace: "pre-wrap", margin: 0 }}>{message.body}</p>
       {acted ? <span className="chip ok">{t(`msg.done.${message.needs}`)} · {ago(acted)}</span>
         : message.needs === "accept" ? <button className="cta" id="msg-ack" onClick={() => void ack()}>{t(`msg.ackBtn.${message.needs}`)}</button> : null}
+      {teamMsg && (
+        <div className="comments" data-testid="msg-comments">
+          <div className="eyebrow">{t("msg.comments", { n: comments.length })}</div>
+          {comments.map((c) => <div key={c.id} className="comment"><span className="avatar small">{c.author_name[0]}</span><div className="grow"><div className="small"><b>{c.author_name}</b> <span className="muted">· {ago(c.created_at)}</span></div><div>{c.body}</div></div>{(isStaff || c.author_id === me?.person.id) && <button className="ghost small" aria-label={t("common.delete")} onClick={async () => { await api.deleteMessageComment(c.id); void loadComments(); }}>×</button>}</div>)}
+          <div className="replyrow"><textarea rows={1} value={cBody} placeholder={t("msg.commentPh")} onChange={(e) => setCBody(e.target.value)} data-testid="msg-comment-input" /><button className="cta small" disabled={cBusy || !cBody.trim()} onClick={() => void sendComment()} data-testid="msg-comment-send">{t("msg.commentSend")}</button></div>
+        </div>
+      )}
       {isStaff && (status ? (
         <div className="card" style={{ margin: 0 }}>
           <div className="eyebrow">{t("msg.status", { done, total: status.length })}</div>

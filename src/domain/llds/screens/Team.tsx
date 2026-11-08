@@ -132,7 +132,7 @@ export function TeamScreen() {
         <div className="row between"><h2>{t("team.messages")}</h2>
           <div className="row" style={{ gap: 6 }}>{staff && <button className="small" data-testid="write-team" onClick={() => setCompose(true)}>{t("team.writeToTeam")}</button>}<button className="ghost small" data-testid="write-trainer" onClick={() => setWrite(true)}>{staff ? t("threads.newConversation") : t("threads.writeTo")}</button></div></div>
         <MsgGroup label={t("team.fromTrainer", { team: team.name })} list={teamMsgs} Row={Row} empty={t("team.noTeamMessages")} cls="team" />
-        {allMsgs.length > 0 && <MsgGroup label={t("team.toEveryone")} list={allMsgs} Row={Row} empty="" cls="all" />}
+        {allMsgs.some((m) => !m.acted_at) && <button type="button" className="msg-none" onClick={() => setTab("home")} data-testid="official-hint"><span className="dot" aria-hidden /><span className="grow">{t("team.officialOnHome", { n: allMsgs.filter((m) => !m.acted_at).length })}</span><span className="tiny">{t("nav.home")} ›</span></button>}
         <ThreadGroup label={staff ? t("team.conversationsStaff") : t("team.conversationsMine")} threads={threads} onOpen={(th) => setOpenThread(th)} empty={staff ? t("team.noConversationsStaff") : t("team.noConversationsMine")} />
       </div>); })()}
       {openMsg && <MessageSheet message={openMsg} onClose={() => { setOpenMsg(null); void load(); }} toast={say} />}

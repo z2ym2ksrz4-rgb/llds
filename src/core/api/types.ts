@@ -226,6 +226,7 @@ export type Report = {
   excerpt: string; author_name: string; team_id: string | null; hidden: boolean; resolved_at: string | null; created_at: string;
 };
 export type Audience = { all?: boolean; teams?: string[] };
+export type MessageComment = { id: string; message_id: string; author_id: string; author_name: string; body: string; created_at: string };
 export type Message = { id: string; author_name: string; title: string; body: string; audience: Audience; needs: "read" | "accept"; created_at: string; acted_at: string | null };
 export type MessageStatus = { person_id: string; name: string; acted_at: string | null };
 /* direct conversations ("Skriv til træneren") */
@@ -262,6 +263,10 @@ export interface Api {
   sendMessage(input: { title: string; body: string; audience: Audience; needs: "read" | "accept" }): Promise<void>;
   ackMessage(id: string): Promise<void>;
   messageStatus(id: string): Promise<MessageStatus[]>;
+  /* comments under a trainer's team message */
+  listMessageComments(messageId: string): Promise<MessageComment[]>;
+  addMessageComment(messageId: string, body: string): Promise<void>;
+  deleteMessageComment(id: string): Promise<void>;
   /* conversations */
   teamStaff(teamId: string): Promise<TeamStaff[]>;
   listThreads(): Promise<Thread[]>;

@@ -55,7 +55,7 @@ function Composer({ teamId, channel, isStaff, isAdmin, onPosted }: { teamId: str
   const supervised = !!me.person.supervised_by;
   const post = async () => {
     setBusy(true); setErr(null);
-    try { await api.createPost({ team_id: teamId, channel, body: body.trim(), files, official: isStaff && official, visibility: isAdmin && pub ? "public" : "private" }); setBody(""); setFiles([]); onPosted(); }
+    try { await api.createPost({ team_id: teamId, channel, body: body.trim(), files, official: isAdmin && official, visibility: isAdmin && pub ? "public" : "private" }); setBody(""); setFiles([]); onPosted(); }
     catch (e) { setErr((e as Error).message); } finally { setBusy(false); }
   };
   return (
@@ -68,7 +68,7 @@ function Composer({ teamId, channel, isStaff, isAdmin, onPosted }: { teamId: str
           {!supervised && <><button className="ghost small" onClick={() => fileRef.current?.click()}>📷 {t("feed.addPhoto")}</button>
             {isStaff && <button className="ghost small" onClick={() => setPickImg(!pickImg)} data-testid="pick-catalog">✦ {t("catalog.title")}</button>}
             <input ref={fileRef} type="file" accept="image/*,video/*" multiple hidden onChange={(e) => { setFiles([...files, ...Array.from(e.target.files ?? [])]); e.target.value = ""; }} /></>}
-          {isStaff && channel !== "trainers" && <label className="check small"><input type="checkbox" checked={official} onChange={(e) => setOfficial(e.target.checked)} />{t("feed.official")}</label>}
+          {isAdmin && channel !== "trainers" && <label className="check small"><input type="checkbox" checked={official} onChange={(e) => setOfficial(e.target.checked)} />{t("feed.official")}</label>}
           {isAdmin && channel === "school" && <label className="check small"><input type="checkbox" checked={pub} onChange={(e) => setPub(e.target.checked)} />{t("feed.public")}</label>}
         </div>
         <button className="small" id="post-send" disabled={busy || (!body.trim() && !files.length)} onClick={() => void post()}>{t("feed.post")}</button>

@@ -14,13 +14,13 @@ await p.click("[data-testid=write-trainer]"); await p.waitForSelector("[data-tes
 const admin = await p.$("[data-testid=to-admin]"); if (admin) await admin.click();
 await p.fill("[data-testid=thread-body]", "Hej – kan Freja komme 10 min for sent på mandag?"); await p.click("[data-testid=thread-send]"); await p.waitForSelector(".toast");
 await logout(); await login("admin@demo"); // Line is The AXIS' trainer and the admin
-await p.click("nav.tabbar >> text=Social"); await p.click("[data-testid=tab-threads]"); await p.waitForSelector("[data-testid=thread]"); out.trainerSees = (await p.textContent("[data-testid=thread]")).slice(0, 80);
-await p.click("[data-testid=thread]"); await p.waitForSelector("[data-testid=bubbles] .bubble"); await p.fill("[data-testid=thread-reply]", "Helt fint 👍"); await p.click("[data-testid=thread-reply-send]"); await p.waitForTimeout(400);
+await p.click("nav.tabbar >> text=/^(Mit hold|Hold)$/"); await p.waitForSelector("[data-testid=msggroup-mine]"); await p.waitForSelector("[data-testid=team-thread]"); out.trainerSees = (await p.textContent("[data-testid=team-thread]")).slice(0, 80);
+await p.click("[data-testid=team-thread]"); await p.waitForSelector("[data-testid=bubbles] .bubble"); await p.fill("[data-testid=thread-reply]", "Helt fint 👍"); await p.click("[data-testid=thread-reply-send]"); await p.waitForTimeout(400);
 out.bubbles = await p.$$eval("[data-testid=bubbles] .bubble", (e) => e.length); await p.mouse.click(195, 100); await p.waitForTimeout(200);
 // trainer writes to the team from the team page
 await p.click("nav.tabbar >> text=/^(Mit hold|Hold)$/"); await p.waitForSelector("[data-testid=write-team]"); await p.click("[data-testid=write-team]"); await p.waitForSelector(".sheet"); out.teamComposer = !!(await p.$(".sheet textarea")); await p.mouse.click(195, 100); await p.waitForTimeout(200);
 // parent sees the reply as unread in Samtaler
-await logout(); await login("parent@demo"); await p.click("nav.tabbar >> text=Social"); await p.click("[data-testid=tab-threads]"); await p.waitForSelector("[data-testid=thread]"); out.parentUnread = !!(await p.$("[data-testid=thread].unread"));
+await logout(); await login("parent@demo"); await p.click("nav.tabbar >> text=/^(Mit hold|Hold)$/"); await p.waitForSelector("[data-testid=msggroup-mine]"); await p.waitForSelector("[data-testid=team-thread]"); out.parentUnread = !!(await p.$("[data-testid=team-thread].due"));
 // settings: delete account – confirm appears, cancel
 await p.click("nav.tabbar >> text=Hjem"); await p.click("[data-testid=avatar]"); await p.click("[data-testid=menu-more]"); await p.click("[data-testid=more-settings]"); await p.click("[data-testid=delete-account]"); await p.waitForSelector("[data-testid=delete-confirm]");
 out.deleteConfirm = await p.textContent("[data-testid=delete-confirm] strong"); await p.click("[data-testid=delete-confirm] >> text=Annuller"); out.confirmGone = !(await p.$("[data-testid=delete-confirm]"));
