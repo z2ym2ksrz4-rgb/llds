@@ -15,9 +15,18 @@ out.parentOn = await p.getAttribute("[data-testid=role-parent]", "aria-checked")
 out.accessFirst = await p.evaluate(() => { const f = document.querySelector("[data-testid=access]"); const r = document.querySelector("[data-testid=role-parent]"); return !!(f && r && (f.compareDocumentPosition(r) & Node.DOCUMENT_POSITION_FOLLOWING)); });
 out.kidsBefore = await p.$$eval("[data-testid=kids] .checkrow", e => e.length);
 // create a new child on Apexion
-await p.click("text=Nyt barn"); await p.fill("[data-testid=new-kid] input:not([type=date])", "Noa"); await p.fill("[data-testid=new-kid] input[type=date]", "2016-05-01");
-await p.locator("[data-testid=new-kid] .checkrow", { hasText: "Apexion" }).click();
-await p.click("[data-testid=new-kid] button.cta"); await p.waitForSelector("text=Noa er oprettet");
+// pick existing: list opens at once, filter by name, cancel
+await p.click("[data-testid=kid-pick-open]"); await p.waitForSelector("[data-testid=kid-pick] .item");
+out.pickListOpen = await p.$$eval("[data-testid=kid-pick] .item", e => e.length) > 3;
+await p.fill("#kid-search", "Tilde"); await p.waitForTimeout(150); out.pickFiltered = await p.$$eval("[data-testid=kid-pick] .item", e => e.map(x => x.textContent)).then(a => a.length === 1 && a[0].includes("Tilde"));
+await p.click("[data-testid=kid-pick] .ghost");
+// draft a new child, remove it again, draft once more – created only on Gem
+await p.click("[data-testid=kid-new-open]"); await p.fill("[data-testid=new-kid] input:not([type=date])", "Noa"); await p.fill("[data-testid=new-kid] input[type=date]", "2016-05-01");
+await p.locator("[data-testid=new-kid] .chip", { hasText: "Apexion" }).click(); await p.click("[data-testid=kid-add]");
+out.draftAdded = await p.$$eval("[data-testid=kid-draft]", e => e.length) === 1;
+await p.click("[data-testid=kid-draft] .danger"); out.draftRemoved = await p.$$eval("[data-testid=kid-draft]", e => e.length) === 0;
+await p.click("[data-testid=kid-new-open]"); await p.fill("[data-testid=new-kid] input:not([type=date])", "Noa"); await p.fill("[data-testid=new-kid] input[type=date]", "2016-05-01");
+await p.locator("[data-testid=new-kid] .chip", { hasText: "Apexion" }).click(); await p.click("[data-testid=kid-add]");
 out.kidsAfter = await p.$$eval("[data-testid=kids] .checkrow", e => e.length);
 out.accessHasNoa = (await p.locator("[data-testid=access]").innerText()).includes("forælder til Noa");
 // dancer + trainer + admin at the same time, all from the one team list

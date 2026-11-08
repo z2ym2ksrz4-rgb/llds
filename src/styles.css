@@ -490,6 +490,11 @@ button.cta { box-shadow:0 10px 26px -12px rgba(201,162,74,.7); }
 
 /* Admin → Medlemmer: explicit check rows so roles and access are unambiguous */
 .checklist{display:flex;flex-direction:column;gap:6px}.checklist.cols{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+div.checklist{padding-left:0;color:inherit}
+.kidrow .acts{display:flex;gap:6px;flex:none}.kidrow .chip.small{padding:4px 9px}
+.kidactions{display:flex;gap:8px;margin-top:8px}.kidactions .chip{flex:1;justify-content:center;text-align:center;white-space:nowrap;padding:9px 10px}
+.kidpick .list .item .tiny{margin-top:2px}.kidpick input{width:100%;box-sizing:border-box}
+.newkid .grid2 label{display:block;font-size:.85rem;color:var(--muted)}.newkid .grid2 input{width:100%;box-sizing:border-box;margin-top:4px}.newkid .chips.wrap{flex-wrap:wrap}.newkid .head{display:flex;align-items:center;justify-content:space-between}.newkid .head .eyebrow{margin:0}
 .checkrow{display:flex;align-items:center;gap:10px;text-align:left;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:var(--fg);font:inherit;cursor:pointer;min-height:44px}
 .checkrow.on{border-color:rgba(201,162,74,.55);background:rgba(201,162,74,.08)}.checkrow.static{cursor:default}
 .checkrow .box{flex:none;width:22px;height:22px;border-radius:7px;border:1.5px solid rgba(255,255,255,.3);display:grid;place-items:center;font-size:14px;font-weight:700;color:#0a0a0b}
