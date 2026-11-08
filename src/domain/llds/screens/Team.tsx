@@ -90,9 +90,9 @@ export function TeamScreen() {
       <button className="linklike" onClick={() => setPage("team")}>‹ {team.name}</button>
       <header className="topbar"><h1 className="display">{t("team.dancers")} · {stats.dancers}</h1></header>
       <div className="card list">
-        {trainers.map((p) => <div key={p.id} className="item"><span className="avatar">{p.first_name[0]}</span><span className="grow">{p.first_name} {p.last_name}<div className="tiny">{t(`roles.${p.memberships.find((m) => m.team_id === team.id)?.role ?? "trainer"}`)}</div></span></div>)}
+        {trainers.map((p) => <div key={p.id} className="item"><span className="avatar">{p.first_name[0]}</span><span className="grow">{p.first_name} {p.last_name}<div className="tiny">{t(`roles.${p.memberships.find((m) => m.team_id === team.id)?.role ?? "trainer"}`)}</div><Contacts person={p} /></span></div>)}
         {dancers.map((p) => <div key={p.id} className="item"><span className="avatar">{p.first_name[0]}</span><span className="grow">{p.first_name} {p.last_name}{p.birth_year ? <span className="tiny"> · {p.birth_year}</span> : ""}
-          <div className="tiny">{p.parents.map((g) => `${g.first_name} ${g.phone ?? ""}`).join(" · ") || p.phone || ""}{p.photo_consent === false ? " · " + t("team.noPhotoConsent") : ""}</div><EmblemRow badges={badges.filter((b) => b.person_id === p.id)} size="sm" /></span>{p.supervised_by && <span className="chip small">{t("team.childAccount")}</span>}<button className="ghost small" aria-label={t("badges.give")} data-testid="give-badge" onClick={() => setGiveTo(p)}>🎖</button><button className="ghost small" aria-label={t("milestones.give")} data-testid="give-milestone" onClick={() => { setAward(p); setAwardTitle(""); }}>🏅</button></div>)}
+          <Contacts person={p} />{p.photo_consent === false && <div className="tiny">{t("team.noPhotoConsent")}</div>}<EmblemRow badges={badges.filter((b) => b.person_id === p.id)} size="sm" /></span>{p.supervised_by && <span className="chip small">{t("team.childAccount")}</span>}<button className="ghost small" aria-label={t("badges.give")} data-testid="give-badge" onClick={() => setGiveTo(p)}>🎖</button><button className="ghost small" aria-label={t("milestones.give")} data-testid="give-milestone" onClick={() => { setAward(p); setAwardTitle(""); }}>🏅</button></div>)}
         {!staff && <p className="muted">{t("team.rosterStaffOnly")}</p>}
       </div>
       {giveTo && <GiveEmblemSheet personId={giveTo.id} personName={giveTo.first_name} teamId={team.id} onClose={() => setGiveTo(null)} onGiven={(b) => { setGiveTo(null); confetti(); say(t("badges.given", { name: giveTo.first_name, badge: `${b.emoji} ${b.name}` })); void load(); }} />}
@@ -217,5 +217,18 @@ function ThreadGroup({ label, threads, onOpen, empty }: { label: string; threads
       ) : <p className="muted small" style={{ margin: 0 }}>{empty}</p>)}
       {history && done.length > 0 && <ScrollList className="m0">{done.map((th) => <Row key={th.id} th={th} />)}</ScrollList>}
     </div>
+  );
+}
+
+/** Staff view of a person: who to call – the dancer's own number (adults) and the parents' – as tap-to-call / tap-to-text icons. */
+function Contacts({ person: p }: { person: Member }) {
+  const { t } = useTranslation();
+  const rows: { name: string; phone: string }[] = [];
+  if (p.phone && !p.parents.length) rows.push({ name: p.first_name, phone: p.phone });
+  for (const g of p.parents) if (g.phone) rows.push({ name: g.first_name, phone: g.phone });
+  if (!rows.length) return <div className="tiny muted">{p.parents.length ? p.parents.map((g) => g.first_name).join(" · ") + " · " + t("team.noPhone") : t("team.noPhone")}</div>;
+  const tel = (n: string) => n.replace(/[^\d+]/g, "");
+  return (
+    <div className="contacts">{rows.map((r) => <span key={r.name + r.phone} className="contact"><span className="tiny">{r.name}</span><a className="cbtn" href={`tel:${tel(r.phone)}`} aria-label={`${t("team.call")} ${r.name}`} onClick={(e) => e.stopPropagation()}>☎</a><a className="cbtn" href={`sms:${tel(r.phone)}`} aria-label={`${t("team.sms")} ${r.name}`} onClick={(e) => e.stopPropagation()}>💬</a></span>)}</div>
   );
 }

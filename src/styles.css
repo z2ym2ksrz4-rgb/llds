@@ -568,3 +568,6 @@ button.cta { box-shadow:0 10px 26px -12px rgba(201,162,74,.7); }
 
 /* thread reply: text field takes the width, button stays a button */
 .replyrow{display:flex;gap:8px;align-items:flex-end;margin-top:8px}.replyrow textarea{flex:1 1 auto;min-width:0;width:auto;resize:none}.replyrow .cta{flex:0 0 auto;width:auto;min-width:0;padding:10px 18px;margin:0}
+
+/* staff: tap-to-call / tap-to-text per contact */
+.contacts{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:4px}.contact{display:inline-flex;align-items:center;gap:6px}.cbtn{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:rgba(201,162,74,.12);border:1px solid rgba(201,162,74,.35);text-decoration:none;font-size:.85rem;line-height:1}.cbtn:active{background:rgba(201,162,74,.3)}

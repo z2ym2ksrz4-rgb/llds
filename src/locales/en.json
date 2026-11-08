@@ -133,7 +133,10 @@
     "conversationsMine": "To me – conversations with the trainer",
     "conversationsStaff": "Conversations with dancers and parents",
     "noConversationsMine": "No conversations yet – use “Write to the trainer”.",
-    "noConversationsStaff": "No conversations on this team yet."
+    "noConversationsStaff": "No conversations on this team yet.",
+    "noPhone": "no phone number",
+    "call": "Call",
+    "sms": "Text"
   },
   "home": {
     "hi": "Hi {{name}}",

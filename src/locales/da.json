@@ -133,7 +133,10 @@
     "conversationsMine": "Til mig – samtaler med træneren",
     "conversationsStaff": "Samtaler med dansere og forældre",
     "noConversationsMine": "Ingen samtaler endnu – brug “Skriv til træneren”.",
-    "noConversationsStaff": "Ingen samtaler på holdet endnu."
+    "noConversationsStaff": "Ingen samtaler på holdet endnu.",
+    "noPhone": "intet telefonnummer",
+    "call": "Ring til",
+    "sms": "Sms til"
   },
   "home": {
     "hi": "Hej {{name}}",
