@@ -169,8 +169,9 @@
     "yourShelf": "Your trophy shelf",
     "childsShelf": "{{name}}'s trophy shelf",
     "adminTodo": "For you",
-    "openOrders": "open orders in the shop",
-    "cardsWaiting": "punch cards awaiting activation"
+    "openOrders": "open orders",
+    "cardsWaiting": "punch cards to activate",
+    "overview": "Overview"
   },
   "admin": {
     "users": "New users",
@@ -582,7 +583,9 @@
       "accept": "Have accepted"
     },
     "nobodyMissing": "Everyone has responded 🎉",
-    "nobodyYet": "Nobody yet."
+    "nobodyYet": "Nobody yet.",
+    "noneNew": "No new messages",
+    "history": "History ({{n}})"
   },
   "folders": {
     "new": "New folder",

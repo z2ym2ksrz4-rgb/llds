@@ -14,14 +14,22 @@ export function MessageBanner({ toast }: { toast: (m: string) => void }) {
   const load = useCallback(async () => setList(await api.listMessages()), []);
   useEffect(() => { void load(); }, [load]);
   const due = list.filter((m) => !m.acted_at);
-  // latest first, the ones that still need me on top – the box shows 3 rows like every other box on Home
-  const shown = [...due, ...list.filter((m) => m.acted_at)];
+  const [history, setHistory] = useState(false);
+  const done = list.filter((m) => m.acted_at);
   return (
     <>
-      {list.length > 0 && (
-        <div className="sec" data-testid="msg-banner"><h2>{due.length ? t("msg.needsYou", { n: due.length }) : t("msg.title")}</h2>
-          <ScrollList testId="msg-list">{shown.map((m) => <button key={m.id} className={"item" + (m.acted_at ? "" : " due")} onClick={() => setOpen(m)}><span className="grow">{m.title}<div className="tiny">{m.author_name} · {ago(m.created_at)} · {m.acted_at ? t(`msg.done.${m.needs}`) : t(`msg.needs.${m.needs}`)}</div></span><span className="gold">{m.acted_at ? "" : "●"} ›</span></button>)}</ScrollList>
+      {due.length > 0 && (
+        <div className="sec" data-testid="msg-banner"><h2>{t("msg.needsYou", { n: due.length })}</h2>
+          <ScrollList testId="msg-list">{due.map((m) => <button key={m.id} className="item due" onClick={() => setOpen(m)}><span className="grow">{m.title}<div className="tiny">{m.author_name} · {ago(m.created_at)} · {t(`msg.needs.${m.needs}`)}</div></span><span className="gold">● ›</span></button>)}</ScrollList>
         </div>
+      )}
+      {due.length === 0 && (
+        <button type="button" className={"msg-none" + (history ? " open" : "")} data-testid="msg-none" onClick={() => setHistory((h) => !h)} aria-expanded={history}>
+          <span className="dot" aria-hidden /><span className="grow">{t("msg.noneNew")}</span>{done.length > 0 && <span className="tiny">{t("msg.history", { n: done.length })} <i className="caret">{history ? "⌃" : "⌄"}</i></span>}
+        </button>
+      )}
+      {history && done.length > 0 && (
+        <ScrollList testId="msg-history">{done.map((m) => <button key={m.id} className="item" onClick={() => setOpen(m)}><span className="grow">{m.title}<div className="tiny">{m.author_name} · {ago(m.created_at)} · {t(`msg.done.${m.needs}`)}</div></span><span className="gold">›</span></button>)}</ScrollList>
       )}
       {open && <MessageSheet message={open} onClose={() => { setOpen(null); void load(); }} toast={toast} />}
     </>

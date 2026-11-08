@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/core/auth";
 import type { Team } from "@/core/api";
@@ -25,6 +26,7 @@ export function TeamPicker() {
   const current = teamOf(teamId ?? "");
   const pickTeam = (g: typeof groups[number], id: string) => { if (g.personId !== viewing.personId) setViewing({ personId: g.personId, isChild: g.isChild }); setTeam(id); };
   const total = groups.reduce((n, g) => n + g.teams.length, 0);
+  const [open, setOpen] = useState(false);
 
   if (!total) {
     const kid = viewing.isChild ? me.children.find((c) => c.id === viewing.personId) : null;
@@ -32,14 +34,18 @@ export function TeamPicker() {
     return <div className="teampick static" data-tour="teampick"><span className="eyebrow">{t("team.myTeam")}</span><strong>{t("team.none")}</strong>
       <p className="tiny muted" style={{ margin: "4px 0 0" }}>{kid ? (staffOn.length ? t("team.childNoDancerTeams", { name: kid.first_name, teams: staffOn.join(", ") }) : t("team.childNoTeams", { name: kid.first_name })) : t("team.noneYet")}</p></div>;
   }
+  const roleLabel = (() => { const g = groups.find((x) => x.personId === viewing.personId && x.teams.some((t) => t.id === teamId)); return g?.label ?? ""; })();
   return (
-    <div className="teampick static" data-tour="teampick" data-testid="teampick">
-      <span className="eyebrow">{viewing.isChild ? t("team.childsTeam", { name: me.children.find((c) => c.id === viewing.personId)?.first_name }) : t("team.myTeam")}</span>
-      <strong>{current?.name ?? t("team.none")}</strong>
-      {total > 1 && <div className="teamgroups">
+    <div className={"teampick compact" + (open ? " open" : "")} data-tour="teampick" data-testid="teampick">
+      <button type="button" className="teampick-head" onClick={() => total > 1 && setOpen((o) => !o)} aria-expanded={open} disabled={total <= 1}>
+        <span className="grow"><span className="eyebrow">{viewing.isChild ? t("team.childsTeam", { name: me.children.find((c) => c.id === viewing.personId)?.first_name }) : t("team.myTeam")}{roleLabel ? <span className="rl"> · {roleLabel}</span> : null}</span>
+          <strong>{current?.name ?? t("team.none")}</strong></span>
+        {total > 1 && <span className="caret">{open ? "⌃" : "⌄"}</span>}
+      </button>
+      {open && total > 1 && <div className="teamgroups">
         {groups.map((g) => (
           <div key={g.key} className="tg"><span className="tiny lbl">{g.label}</span>
-            <div className="chips tight scrollx">{g.teams.map((x) => <button key={x.id} type="button" className={"chip small" + (x.id === teamId && g.personId === viewing.personId ? " on" : "")} onClick={() => pickTeam(g, x.id)}>{x.name}</button>)}</div>
+            <div className="chips tight wrap">{g.teams.map((x) => <button key={x.id} type="button" className={"chip small" + (x.id === teamId && g.personId === viewing.personId ? " on" : "")} onClick={() => { pickTeam(g, x.id); setOpen(false); }}>{x.name}</button>)}</div>
           </div>
         ))}
       </div>}

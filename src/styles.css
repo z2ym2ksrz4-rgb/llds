@@ -540,3 +540,20 @@ button.cta { box-shadow:0 10px 26px -12px rgba(201,162,74,.7); }
 /* team switcher: groups by role, chips scroll sideways when many */
 .teampick.static{cursor:default}.teamgroups{display:flex;flex-direction:column;gap:8px;margin-top:8px}.tg .lbl{display:block;margin-bottom:4px;color:var(--muted)}
 .chips.scrollx{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;-webkit-overflow-scrolling:touch}.chips.scrollx::-webkit-scrollbar{display:none}.chips.scrollx .chip{flex:none;white-space:nowrap}
+
+/* Home: no new messages – one quiet line with a disclosure for the history */
+.msg-none{width:100%;display:flex;align-items:center;gap:10px;padding:10px 4px;background:none;border:0;border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06);color:var(--muted);font:inherit;text-align:left;margin:4px 0 10px}
+.msg-none .dot{width:7px;height:7px;border-radius:50%;background:rgba(201,162,74,.5)}.msg-none .caret{font-style:normal;color:var(--gold2);margin-left:2px}.msg-none.open{margin-bottom:6px}
+
+/* compact team switcher: one line, folds out */
+.teampick.compact{padding:0;overflow:hidden}.teampick-head{width:100%;display:flex;align-items:center;gap:10px;padding:10px 14px;background:none;border:0;color:inherit;font:inherit;text-align:left;cursor:pointer}.teampick-head:disabled{cursor:default}
+.teampick-head .eyebrow{margin:0 0 1px}.teampick-head .rl{text-transform:none;letter-spacing:0;color:var(--muted)}.teampick-head strong{font-size:1.25rem;line-height:1.15}
+.teampick-head .caret{color:var(--gold2);font-size:1rem;line-height:1;padding-top:4px}
+.teampick.compact .teamgroups{padding:2px 14px 12px;margin-top:0;border-top:1px solid rgba(255,255,255,.06)}.teampick.compact .tg{padding-top:8px}.chips.wrap{flex-wrap:wrap}
+
+/* Home (admin): one overview card – six tiles, lit when there is something to do */
+.tiles6{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;padding:0;overflow:hidden;background:rgba(255,255,255,.06)}
+.tile6{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:12px 12px 10px;background:var(--card);border:0;color:var(--muted);font:inherit;text-align:left;min-height:84px;cursor:pointer}
+.tile6 b{font-family:var(--display);font-weight:500;font-size:1.7rem;line-height:1;color:var(--fg)}.tile6 span{font-size:.72rem;line-height:1.2}
+.tile6.hot b{background:linear-gradient(90deg,var(--gold2),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}.tile6.hot span{color:var(--fg)}
+.teampick-head>.grow{display:flex;flex-direction:column;align-items:flex-start;gap:1px;min-width:0}.teampick-head .eyebrow{display:block}

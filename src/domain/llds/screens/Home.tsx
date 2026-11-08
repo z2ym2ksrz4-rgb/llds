@@ -78,7 +78,9 @@ export function Home() {
   const nameOf = (pid: string) => (pid === me.person.id ? null : me.children.find((c) => c.id === pid)?.first_name ?? null);
   const week: WeekItem[] = [];
   for (const s of sessions) {
-    const mineStaff = !viewing.isChild && (s.trainer_id === me.person.id || s.substitute_id === me.person.id || s.assistant_id === me.person.id);
+    // I run this training if I am set on it – or I am trainer/assistant on the team (the session's trainer field is only an override)
+    const staffOnTeam = !!s.team_id && me.memberships.some((m) => m.person_id === me.person.id && m.team_id === s.team_id && m.role !== "dancer");
+    const mineStaff = !viewing.isChild && (s.trainer_id === me.person.id || s.substitute_id === me.person.id || s.assistant_id === me.person.id || staffOnTeam);
     if (mineStaff) week.push({ key: "st" + s.id, at: s.starts_at, end: s.ends_at, kind: "staff", title: s.title ?? s.team_name ?? "", sub: `${s.room_name ?? ""}${s.substitute_id === me.person.id ? " · " + t("session.sub") : ""}`, off: s.cancelled, session: s });
     for (const pid of familyIds) if (s.team_id && familyTeams(pid).has(s.team_id) && !(mineStaff && pid === me.person.id)) { const a = absences.find((x) => x.session_id === s.id && x.person_id === pid); week.push({ key: "tr" + s.id + pid, at: s.starts_at, end: s.ends_at, kind: "training", title: s.team_name ?? "", sub: `${s.room_name ?? ""} · ${s.substitute_name ?? s.trainer_name ?? ""}${a ? " · " + t("session.absenceSentChip") : ""}`, who: nameOf(pid) ?? undefined, off: s.cancelled, session: s }); }
   }
@@ -125,18 +127,17 @@ export function Home() {
       </div>
     </>),
     stats: () => (<>
-      {isAdmin && (
-        <button className="statline" data-testid="statline" onClick={() => setTab("rooms")}>
-          <span className="eyebrow">{t("home.today")}</span>
-          <span><b>{sessions.filter((s) => new Date(s.starts_at).toDateString() === today && !s.cancelled).length}</b> {t("home.trainingsToday")}</span><i /><span><b>{todayAbs.length}</b> {t("home.absencesToday")}</span><i /><span><b>{bookings.filter((b) => b.status === "pending").length}</b> {t("home.bookingsPending")}</span><i /><span><b>{subWanted.length}</b> {t("home.subsWanted")}</span>
-        </button>
-      )}
-      {isAdmin && (
-        <div className="statline adminline" data-testid="adminline">
-          <span className="eyebrow">{t("home.adminTodo")}</span>
-          <button type="button" onClick={() => openAdmin("shop")}><b>{adminOpen.orders}</b> {t("home.openOrders")}</button><i /><button type="button" onClick={() => openAdmin("punch")}><b>{adminOpen.cards}</b> {t("home.cardsWaiting")}</button>
-        </div>
-      )}
+      {isAdmin && (() => { const tiles: { n: number; label: string; go: () => void; testId?: string }[] = [
+          { n: sessions.filter((s) => new Date(s.starts_at).toDateString() === today && !s.cancelled).length, label: t("home.trainingsToday"), go: () => setTab("rooms") },
+          { n: todayAbs.length, label: t("home.absencesToday"), go: () => setTab("rooms") },
+          { n: bookings.filter((b) => b.status === "pending").length, label: t("home.bookingsPending"), go: () => openAdmin("bookings") },
+          { n: subWanted.length, label: t("home.subsWanted"), go: () => openAdmin("season") },
+          { n: adminOpen.orders, label: t("home.openOrders"), go: () => openAdmin("shop"), testId: "tile-orders" },
+          { n: adminOpen.cards, label: t("home.cardsWaiting"), go: () => openAdmin("punch"), testId: "tile-cards" },
+        ]; return (
+        <div className="sec" data-testid="statline"><h2>{t("home.overview")}</h2>
+          <div className="card tiles6" data-testid="adminline">{tiles.map((x, i) => <button key={i} type="button" className={"tile6" + (x.n ? " hot" : "")} onClick={x.go} data-testid={x.testId}><b>{x.n}</b><span>{x.label}</span></button>)}</div>
+        </div>); })()}
     </>),
     messages: () => (<>
       <MessageBanner toast={say} />

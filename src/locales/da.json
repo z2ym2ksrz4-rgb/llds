@@ -169,8 +169,9 @@
     "yourShelf": "Din trofæhylde",
     "childsShelf": "{{name}}s trofæhylde",
     "adminTodo": "Til dig",
-    "openOrders": "åbne ordrer i Stjerneshoppen",
-    "cardsWaiting": "klippekort venter på aktivering"
+    "openOrders": "åbne ordrer",
+    "cardsWaiting": "klippekort til aktivering",
+    "overview": "Overblik"
   },
   "admin": {
     "users": "Nye brugere",
@@ -582,7 +583,9 @@
       "accept": "Har accepteret"
     },
     "nobodyMissing": "Alle har reageret 🎉",
-    "nobodyYet": "Ingen endnu."
+    "nobodyYet": "Ingen endnu.",
+    "noneNew": "Ingen nye beskeder",
+    "history": "Historik ({{n}})"
   },
   "folders": {
     "new": "Ny mappe",
