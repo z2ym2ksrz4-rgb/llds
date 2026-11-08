@@ -16,9 +16,9 @@ await p.fill("[data-testid=thread-body]", "Hej – kan Freja komme 10 min for se
 await logout(); await login("admin@demo"); // Line is The AXIS' trainer and the admin
 await p.click("nav.tabbar >> text=/^(Mit hold|Hold)$/"); await p.waitForSelector("[data-testid=msggroup-mine]"); await p.waitForSelector("[data-testid=team-thread]"); out.trainerSees = (await p.textContent("[data-testid=team-thread]")).slice(0, 80);
 await p.click("[data-testid=team-thread]"); await p.waitForSelector("[data-testid=bubbles] .bubble"); await p.fill("[data-testid=thread-reply]", "Helt fint 👍"); await p.click("[data-testid=thread-reply-send]"); await p.waitForTimeout(400);
-out.bubbles = await p.$$eval("[data-testid=bubbles] .bubble", (e) => e.length); await p.mouse.click(195, 100); await p.waitForTimeout(200);
+out.bubbles = await p.$$eval("[data-testid=bubbles] .bubble", (e) => e.length); await p.click("[data-testid=sheet-close]"); await p.waitForTimeout(200);
 // trainer writes to the team from the team page
-await p.click("nav.tabbar >> text=/^(Mit hold|Hold)$/"); await p.waitForSelector("[data-testid=write-team]"); await p.click("[data-testid=write-team]"); await p.waitForSelector(".sheet"); out.teamComposer = !!(await p.$(".sheet textarea")); await p.mouse.click(195, 100); await p.waitForTimeout(200);
+await p.click("nav.tabbar >> text=/^(Mit hold|Hold)$/"); await p.waitForSelector("[data-testid=write-team]"); await p.click("[data-testid=write-team]"); await p.waitForSelector(".sheet"); out.teamComposer = !!(await p.$(".sheet textarea")); await p.click("[data-testid=sheet-close]"); await p.waitForTimeout(200);
 // parent sees the reply as unread in Samtaler
 await logout(); await login("parent@demo"); await p.click("nav.tabbar >> text=/^(Mit hold|Hold)$/"); await p.waitForSelector("[data-testid=msggroup-mine]"); await p.waitForSelector("[data-testid=team-thread]"); out.parentUnread = !!(await p.$("[data-testid=team-thread].due"));
 // settings: delete account – confirm appears, cancel

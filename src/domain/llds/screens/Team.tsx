@@ -81,7 +81,8 @@ export function TeamScreen() {
   const dancers = members.filter((p) => p.memberships.some((m) => m.team_id === team.id && m.role === "dancer"));
   const trainers = members.filter((p) => p.memberships.some((m) => m.team_id === team.id && m.role !== "dancer"));
   const child = viewing.isChild ? me.children.find((c) => c.id === viewing.personId) : null;
-  const seesChoreo = staff || role !== "parent" || team.parents_see_video || ((ageOf(child) ?? 99) < 13);
+  // choreography + formations belong to the dancers; a parent only sees them when the child has no own login (too young) or the team allows it
+  const seesChoreo = staff || role !== "parent" || team.parents_see_video || !child?.user_id || ((ageOf(child) ?? 99) < 13);
   const next = sessions[0];
   const trainerName = next?.trainer_name ?? trainers[0]?.first_name ?? null;
 
@@ -122,7 +123,7 @@ export function TeamScreen() {
       <div className="grid2 tiles">
         <button className={"card tap" + (seesChoreo ? "" : " dim")} disabled={!seesChoreo} onClick={() => setPage("choreo")} data-testid="go-choreo"><div className="eyebrow">{t("team.choreo")}</div><div className="big">{seesChoreo ? t("team.videosN", { n: stats.videos }) : t("team.choreoLocked")}</div></button>
         <button className="card tap" onClick={() => setPage("folders")} data-testid="go-folders"><div className="eyebrow">{t("team.folders")}</div><div className="big">{t("team.mediaN", { n: stats.media })}</div></button>
-        <button className="card tap" onClick={() => setPage("formations")} data-testid="go-formations"><div className="eyebrow">{t("choreo.formations")}</div><div className="big">{t("team.formationsN", { n: stats.formations })}</div></button>
+        <button className={"card tap" + (seesChoreo ? "" : " dim")} disabled={!seesChoreo} onClick={() => setPage("formations")} data-testid="go-formations"><div className="eyebrow">{t("choreo.formations")}</div><div className="big">{seesChoreo ? t("team.formationsN", { n: stats.formations }) : t("team.choreoLocked")}</div></button>
         <button className="card tap" onClick={() => setPage("dancers")} data-testid="go-dancers"><div className="eyebrow">{t("team.dancers")}</div><div className="big">{stats.dancers}{staff ? "" : ""}</div></button>
       </div>
       

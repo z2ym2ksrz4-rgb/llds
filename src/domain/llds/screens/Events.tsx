@@ -76,7 +76,7 @@ function EventsList({ admin }: { admin?: boolean }) {
         <button key={e.id} className="hero tap photo evcard" data-testid="event" onClick={() => setOpen(e)} style={{ backgroundImage: `url(${catalogUrl(e.image_key) ?? artFor(e.id)})` }}>
           <div><div className="eyebrow">{dateLabel(e.starts_at)} · {t(`events.kind.${e.kind}`)}</div><h2 className="display">{e.title}</h2>
             <div className="row between"><span className="small muted">{e.place ?? ""}{e.team_names?.length ? ` · ${e.team_names.join(", ")}` : ` · ${t("events.allTeams")}`}</span>
-              {e.mySignups && e.mySignups > 0 ? <span className="chip ok small">{t("events.on")}</span> : relevant && (e.signup_deadline || e.price_dkk) ? <span className="chip gold small">{t("events.openSignup")}</span> : null}</div></div>
+              {e.mySignups && e.mySignups > 0 ? (e.myUnpaid ? <span className="chip warn small" data-testid="ev-awaiting">{t("events.awaitingPayment")}</span> : <span className="chip ok small">{t("events.on")}</span>) : relevant && (e.signup_deadline || e.price_dkk) ? <span className="chip gold small">{t("events.openSignup")}</span> : null}</div></div>
         </button>); })}
       {!events.length && <p className="muted">{t("events.empty")}</p>}
       <button className="linklike small" onClick={() => setPast(!past)}>{past ? t("events.hidePast") : t("events.showPast")}</button>
@@ -98,7 +98,7 @@ export function EventSheet({ event, staff, onClose, onEdit, onChanged, toast }: 
   const hats = [me.person, ...me.children].filter((p) => !event.team_ids.length || me.memberships.some((m) => m.person_id === p.id && event.team_ids.includes(m.team_id)));
   const deadlinePassed = !!event.signup_deadline && event.signup_deadline < isoDate(new Date());
   const mine = (pid: string) => signups.find((s) => s.person_id === pid);
-  const toggle = async (pid: string) => { const on = !mine(pid); await api.signUp_(event.id, pid, on); toast(on ? t("events.signedUp") : t("events.withdrawn")); await load(); onChanged(); if (on && event.price_dkk) setPay(pid); };
+  const toggle = async (pid: string) => { const on = !mine(pid); await api.signUp_(event.id, pid, on); toast(on ? (event.price_dkk ? t("events.signedUpPay") : t("events.signedUp")) : t("events.withdrawn")); await load(); onChanged(); if (on && event.price_dkk) setPay(pid); };
   const paid = signups.filter((s) => s.paid).length;
   return (
     <Sheet onClose={onClose} photo={catalogUrl(event.image_key) ?? artFor(event.id)} eyebrow={`${t(`events.kind.${event.kind}`)} · ${dateLabel(event.starts_at)}`} title={event.title}>
@@ -115,7 +115,7 @@ export function EventSheet({ event, staff, onClose, onEdit, onChanged, toast }: 
       {hats.length > 0 && (
         <div className="card" style={{ margin: 0 }}><div className="eyebrow">{t("events.signup")}</div>
           {hats.map((p) => { const s = mine(p.id); return (
-            <div key={p.id} className="row between"><span>{p.first_name}{s ? <span className={"chip small " + (s.paid || !event.price_dkk ? "ok" : "warn")} style={{ marginLeft: 8 }}>{s.paid || !event.price_dkk ? t("events.on") : t("events.unpaid")}</span> : null}</span>
+            <div key={p.id} className="row between"><span>{p.first_name}{s ? <span className={"chip small " + (s.paid || !event.price_dkk ? "ok" : "warn")} style={{ marginLeft: 8 }}>{s.paid || !event.price_dkk ? t("events.on") : t("events.awaitingPayment")}</span> : null}</span>
               <div className="row">{s && event.price_dkk && !s.paid && <button className="small" onClick={() => setPay(p.id)}>{t("events.payBtn")}</button>}
                 <button className={s ? "ghost small" : "small"} data-testid="signup" disabled={deadlinePassed && !s} onClick={() => void toggle(p.id)}>{s ? t("events.withdraw") : t("events.signUp")}</button></div></div>); })}
           {deadlinePassed && <p className="tiny">{t("events.deadlinePassed")}</p>}

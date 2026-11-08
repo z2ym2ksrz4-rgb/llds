@@ -118,27 +118,34 @@ function BookSheet({ day, rooms, room_id, start, sessions, bookings, isStaff, is
   const { t } = useTranslation();
   const me = useAuth((s) => s.me)!; const viewing = useAuth((s) => s.viewing)!; const viewAs = useAuth((s) => s.viewAs);
   const who = viewing.isChild ? me.children.find((c) => c.id === viewing.personId)?.first_name : me.person.first_name;
-  const [f, setF] = useState({ room_id, start, dur: 60, title: `Solo – ${who}` });
+  const [f, setF] = useState({ room_id, start, dur: 45, title: `Solo – ${who}` });
   const [err, setErr] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
   const save = async () => {
+    setErr(null);
+    if (!f.title.trim()) { setErr(t("rooms.purposeRequired")); return; }
     const s = atTime(day, f.start); const e = new Date(s.getTime() + f.dur * 6e4);
     const sI = s.toISOString(), eI = e.toISOString();
     if (sessions.some((x) => x.room_id === f.room_id && !x.cancelled && overlaps(sI, eI, x.starts_at, x.ends_at)) || bookings.some((x) => x.room_id === f.room_id && x.status !== "rejected" && overlaps(sI, eI, x.starts_at, x.ends_at))) { setErr(t("rooms.taken")); return; }
-    const b = await api.createBooking({ room_id: f.room_id, title: f.title || t("rooms.booking"), starts_at: sI, ends_at: eI, person_id: viewing.personId, force_pending: !!viewAs && !me.person.is_admin && !me.memberships.some((m) => m.person_id === me.person.id && m.role !== "dancer") });
-    toast(b.status === "approved" ? t("rooms.booked", { room: b.room_name }) : t("rooms.sentForApproval")); onSaved();
+    setBusy(true);
+    try {
+      const b = await api.createBooking({ room_id: f.room_id, title: f.title.trim(), starts_at: sI, ends_at: eI, person_id: viewing.personId, force_pending: !!viewAs && !me.person.is_admin && !me.memberships.some((m) => m.person_id === me.person.id && m.role !== "dancer") });
+      toast(b.status === "approved" ? t("rooms.booked", { room: b.room_name }) : t("rooms.sentForApproval")); onSaved();
+    } catch (x) { setErr(t("common.error") + ": " + String((x as Error).message ?? x)); }
+    finally { setBusy(false); }
   };
   return (
     <Sheet onClose={onClose} eyebrow={t("rooms.bookRoom")} title={t("rooms.newBooking")}>
       {isTrainer && <button className="ghost" onClick={onTraining}>{t("rooms.createTrainingInstead")}</button>}
       <div className="field"><span>{t("session.room")}</span><div className="chips">{rooms.map((r) => <button key={r.id} className={"chip" + (f.room_id === r.id ? " on" : "")} onClick={() => setF({ ...f, room_id: r.id })}>{r.name}</button>)}</div></div>
       <div className="grid2">
-        <label className="field"><span>{t("session.start")}</span><input id="bk-start" type="time" value={f.start} onChange={(e) => setF({ ...f, start: e.target.value })} /></label>
-        <div className="field"><span>{t("rooms.duration")}</span><div className="chips">{[30, 60, 90, 120].map((d) => <button key={d} className={"chip" + (f.dur === d ? " on" : "")} onClick={() => setF({ ...f, dur: d })}>{d} min</button>)}</div></div>
+        <label className="field"><span>{t("session.start")}</span><input id="bk-start" type="time" step={900} value={f.start} onChange={(e) => setF({ ...f, start: e.target.value })} /></label>
+        <div className="field"><span>{t("rooms.duration")}</span><div className="chips">{[45, 90, 135, 180].map((d) => <button key={d} className={"chip" + (f.dur === d ? " on" : "")} onClick={() => setF({ ...f, dur: d })}>{d} min</button>)}</div></div>
       </div>
-      <label className="field"><span>{t("rooms.purpose")}</span><input id="bk-title" value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} /></label>
+      <label className="field"><span>{t("rooms.purpose")}</span><input id="bk-title" required value={f.title} placeholder={t("rooms.purposePh")} onChange={(e) => setF({ ...f, title: e.target.value })} /></label>
       <p className="tiny">{isStaff ? t("rooms.staffBooks") : t("rooms.needsApproval")}</p>
       {err && <p className="error" role="alert">{err}</p>}
-      <button className="cta" onClick={() => void save()}>{isStaff ? t("rooms.book") : t("rooms.sendForApproval")}</button>
+      <button className="cta" disabled={busy || !f.title.trim()} onClick={() => void save()}>{isStaff ? t("rooms.book") : t("rooms.sendForApproval")}</button>
     </Sheet>
   );
 }

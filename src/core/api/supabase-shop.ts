@@ -12,10 +12,10 @@ export function supabaseShop(sb: SupabaseClient, fail: Fail, schoolId: () => Pro
       let q = sb.from("event_view").select("*").order("starts_at");
       if (!includePast) q = q.gte("starts_at", new Date(Date.now() - 864e5).toISOString());
       const { data, error } = await q; fail(error);
-      const { data: mine } = await sb.from("event_signup").select("event_id,person_id"); // RLS: my people (+ staff: all)
+      const { data: mine } = await sb.from("event_signup").select("event_id,person_id,paid"); // RLS: my people (+ staff: all)
       const pid = await myPersonId(); const { data: kids } = await sb.from("guardian").select("child_id").eq("parent_id", pid);
       const people = new Set([pid, ...(kids ?? []).map((k) => k.child_id as string)]);
-      return (data ?? []).map((e: Record<string, unknown>) => ({ ...(e as Event), signups: Number(e.signups ?? 0), plan: (e.plan ?? []) as Event["plan"], pack_list: (e.pack_list ?? []) as string[], team_ids: (e.team_ids ?? []) as string[], mySignups: (mine ?? []).filter((s) => s.event_id === e.id && people.has(s.person_id as string)).length }));
+      return (data ?? []).map((e: Record<string, unknown>) => ({ ...(e as Event), signups: Number(e.signups ?? 0), plan: (e.plan ?? []) as Event["plan"], pack_list: (e.pack_list ?? []) as string[], team_ids: (e.team_ids ?? []) as string[], mySignups: (mine ?? []).filter((s) => s.event_id === e.id && people.has(s.person_id as string)).length, myUnpaid: e.price_dkk ? (mine ?? []).filter((s) => s.event_id === e.id && people.has(s.person_id as string) && !s.paid).length : 0 }));
     },
     async saveEvent(i: EventInput, id?: string) {
       const row = { ...i, school_id: await schoolId() };

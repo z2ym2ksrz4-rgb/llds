@@ -303,9 +303,9 @@ export type Event = {
   image_key?: string | null;        // catalogue image (public/art/catalog) chosen by the admin; null = automatic
   id: string; title: string; kind: EventKind; starts_at: string; ends_at: string | null; place: string | null; meet_time: string | null;
   team_ids: string[]; team_names: string[] | null; plan: { time: string; text: string }[]; pack_list: string[]; info: string | null;
-  signup_deadline: string | null; price_dkk: number | null; visibility: "private" | "public"; signups: number; created_at: string; mySignups?: number;
+  signup_deadline: string | null; price_dkk: number | null; visibility: "private" | "public"; signups: number; created_at: string; mySignups?: number; myUnpaid?: number;   // my/children's sign-ups still awaiting payment
 };
-export type EventInput = Omit<Event, "id" | "signups" | "team_names" | "created_at" | "mySignups">;
+export type EventInput = Omit<Event, "id" | "signups" | "team_names" | "created_at" | "mySignups" | "myUnpaid">;
 export type EventSignup = { event_id: string; person_id: string; person_name: string; team_name: string | null; paid: boolean; created_at: string };
 
 export type Product = { id: string; name: string; price_dkk: number; sizes: string[]; stock: number | null; image_path: string | null; image_url?: string | null; visibility: "private" | "public"; active: boolean; created_at?: string };

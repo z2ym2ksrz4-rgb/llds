@@ -28,7 +28,8 @@
     "create": "Opret",
     "ok": "OK",
     "add": "Tilføj",
-    "error": "Fejl"
+    "error": "Fejl",
+    "close": "Luk"
   },
   "lang": {
     "da": "Dansk",
@@ -523,7 +524,9 @@
     "sendForApproval": "Send til godkendelse",
     "booked": "{{room}} er booket",
     "sentForApproval": "Sendt til godkendelse – du får besked",
-    "countLine": "{{n}} træninger · {{b}} bookinger"
+    "countLine": "{{n}} træninger · {{b}} bookinger",
+    "purposeRequired": "Skriv et formål med bookingen.",
+    "purposePh": "Fx Solo – Liva, duo-træning, prøve"
   },
   "feed": {
     "title": "Opslag",
@@ -716,7 +719,7 @@
     "paid": "Betalt",
     "markPaid": "Markér betalt",
     "payTitle": "Egenbetaling",
-    "paidClaimed": "Tak – Line markerer betalingen, når den er modtaget.",
+    "paidClaimed": "Tak – tilmeldingen står som 'Afventer betaling', til Line har bekræftet den.",
     "signedUp": "Tilmeldt!",
     "withdrawn": "Afmeldt",
     "name": "Titel",
@@ -739,7 +742,9 @@
     "placed": "Placering",
     "publicResult": "Vis på website",
     "map": "Kort",
-    "free": "Gratis"
+    "free": "Gratis",
+    "awaitingPayment": "Afventer betaling",
+    "signedUpPay": "Tilmeldingen er registreret – den gælder, når Line har bekræftet betalingen."
   },
   "shop": {
     "title": "Shop",

@@ -28,7 +28,8 @@
     "create": "Create",
     "ok": "OK",
     "add": "Add",
-    "error": "Error"
+    "error": "Error",
+    "close": "Close"
   },
   "lang": {
     "da": "Dansk",
@@ -523,7 +524,9 @@
     "sendForApproval": "Send for approval",
     "booked": "{{room}} is booked",
     "sentForApproval": "Sent for approval – you'll be notified",
-    "countLine": "{{n}} trainings · {{b}} bookings"
+    "countLine": "{{n}} trainings · {{b}} bookings",
+    "purposeRequired": "Please state the purpose of the booking.",
+    "purposePh": "E.g. Solo – Liva, duo practice, rehearsal"
   },
   "feed": {
     "title": "Posts",
@@ -716,7 +719,7 @@
     "paid": "Paid",
     "markPaid": "Mark paid",
     "payTitle": "Participation fee",
-    "paidClaimed": "Thanks – Line marks the payment when received.",
+    "paidClaimed": "Thanks – the sign-up shows 'Awaiting payment' until Line confirms it.",
     "signedUp": "Signed up!",
     "withdrawn": "Withdrawn",
     "name": "Title",
@@ -739,7 +742,9 @@
     "placed": "Placing",
     "publicResult": "Show on website",
     "map": "Map",
-    "free": "Free"
+    "free": "Free",
+    "awaitingPayment": "Awaiting payment",
+    "signedUpPay": "Sign-up registered – it counts once Line has confirmed the payment."
   },
   "shop": {
     "title": "Shop",

@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { api } from "@/core/api";
 import { useAuth } from "@/core/auth";
 import { registerPush } from "@/core/push";
-import { askBrowserPermission } from "../lib/notify";
+import { askBrowserPermission, notifyKindsFor } from "../lib/notify";
 
 /** First-login question: notifications on? Shown once the tour is finished/declined (or at once when the tour was already done). "Ikke nu" asks again next login. */
 const KEY = "llds_notif_asked";
@@ -23,7 +23,7 @@ export function NotifyPrompt() {
     addEventListener("llds:tour-done", start); return () => removeEventListener("llds:tour-done", start);
   }, [phase, me?.person.id, me?.person.notify_prefs?.asked, viewAs]); // eslint-disable-line react-hooks/exhaustive-deps
   if (!show || !me) return null;
-  const kinds = NOTIFY_KINDS_FOR(me.person.is_admin);
+  const kinds = notifyKindsFor(me);
   const finish = async (on: boolean, chosen?: Record<string, boolean>) => {
     setShow(false); setPick(null);
     try { localStorage.setItem(KEY + ":" + me.person.id, "1"); } catch { /* ignore */ }
@@ -66,7 +66,7 @@ export function NotifySettings() {
       <div className="card list">
         <label className="item switch"><span className="grow"><strong>{t("notifPrefs.master")}</strong><div className="tiny">{t("notifPrefs.masterSub")}</div></span>
           <input type="checkbox" role="switch" checked={on} disabled={busy} data-testid="notif-master" onChange={(e) => void set({ ...p, on: e.target.checked })} /></label>
-        {on && NOTIFY_KINDS_FOR(me.person.is_admin).map((k) => (
+        {on && notifyKindsFor(me).map((k) => (
           <label className="item switch" key={k.key}><span className="avatar small">{k.emoji}</span><span className="grow">{t(`notifPrefs.kinds.${k.key}`)}</span>
             <input type="checkbox" role="switch" checked={p.kinds?.[k.key] ?? true} disabled={busy} data-testid={`notif-kind-${k.key}`} onChange={(e) => void set({ ...p, kinds: { ...(p.kinds ?? {}), [k.key]: e.target.checked } })} /></label>
         ))}
@@ -74,5 +74,3 @@ export function NotifySettings() {
     </div>
   );
 }
-import { NOTIFY_KINDS } from "../lib/notify";
-const NOTIFY_KINDS_FOR = (admin: boolean) => NOTIFY_KINDS.filter((k) => admin || !k.admin);
