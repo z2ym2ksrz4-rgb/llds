@@ -180,6 +180,7 @@ export const mockApi: Api = {
     S.persons.push({ id: pid, school_id: SCHOOL, user_id: null, first_name: i.first_name, last_name: i.last_name, email: i.email, phone: i.phone || null, birth_year: null, birth_date: null, status: "approved", is_admin: false, photo_consent: null, wished_roles: [i.is_parent ? "parent" : "dancer"], wished_teams: null, supervised_by: null, created_at: now() });
     for (const m of i.memberships) S.memberships.push({ person_id: pid, team_id: m.team_id, role: m.role });
     for (const c of i.children) {
+      if (c.id) { S.guardians.push({ parent_id: pid, child_id: c.id }); continue; }
       const cid = "p-" + id();
       S.persons.push({ id: cid, school_id: SCHOOL, user_id: null, first_name: c.first_name, last_name: i.last_name, email: null, phone: null, birth_year: c.birth_date ? Number(c.birth_date.slice(0, 4)) : null, birth_date: c.birth_date || null, status: "approved", is_admin: false, photo_consent: null, wished_roles: ["dancer"], wished_teams: null, supervised_by: null, created_at: now() });
       S.guardians.push({ parent_id: pid, child_id: cid });

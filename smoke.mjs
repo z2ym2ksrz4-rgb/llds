@@ -43,9 +43,12 @@ const inv = p.locator("[data-testid=invite]");
 await inv.locator("button.chip").first().click();
 await inv.locator("form .grid2").first().locator("input").nth(0).fill("Inga"); await inv.locator("form .grid2").first().locator("input").nth(1).fill("Inviteret");
 await inv.locator("input[type=email]").fill("inga@demo");
-const kidRow = inv.locator(".kidrow").first();
-await kidRow.locator("input").first().fill("Ida");
-await kidRow.locator("select").selectOption({ label: (await kidRow.locator("select option", { hasText: "Apexion" }).first().textContent()) ?? "Apexion" });
+// link an existing dancer, draft a new child, remove the new one again, add another
+await inv.locator("[data-testid=invite-pick-open]").click(); await inv.locator("[data-testid=invite-pick] .item", { hasText: "Tilde" }).click();
+await inv.locator("[data-testid=invite-new-open]").click(); await inv.locator("[data-testid=invite-newkid] .ghost").click();
+out.inviteKidRemoved = (await inv.locator("[data-testid=invite-newkid]").count()) === 0;
+await inv.locator("[data-testid=invite-new-open]").click(); await inv.locator("[data-testid=invite-newkid] input:not([type=date])").fill("Ida");
+await inv.locator("[data-testid=invite-newkid] .chip", { hasText: "Apexion" }).click();
 await inv.locator("button[type=submit]").click();
 await p.waitForSelector("text=Inga er oprettet");
 out.invited = true;

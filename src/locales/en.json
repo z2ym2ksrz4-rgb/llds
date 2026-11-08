@@ -373,7 +373,8 @@
     "noMatch": "No match",
     "addChild": "Add child",
     "optional": "optional",
-    "draftHint": "The child is created when you press Save. Changed your mind? Tap × on the row."
+    "draftHint": "The child is created when you press Save. Changed your mind? Tap × on the row.",
+    "inviteChildrenHint": "Pick existing dancers (e.g. a child already created) or create new ones. The parent gets access to the children's teams."
   },
   "settings": {
     "language": "Language",

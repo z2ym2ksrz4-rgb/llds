@@ -373,7 +373,8 @@
     "noMatch": "Ingen match",
     "addChild": "Tilføj barn",
     "optional": "valgfrit",
-    "draftHint": "Barnet oprettes først, når du trykker Gem. Fortrudt? Tryk × på rækken."
+    "draftHint": "Barnet oprettes først, når du trykker Gem. Fortrudt? Tryk × på rækken.",
+    "inviteChildrenHint": "Vælg eksisterende dansere (fx et barn der allerede er oprettet) eller opret nye. Forælderen får adgang til børnenes hold."
   },
   "settings": {
     "language": "Sprog",

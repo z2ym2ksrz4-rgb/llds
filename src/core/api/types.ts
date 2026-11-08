@@ -118,7 +118,7 @@ export interface Api {
   resendInvite(personId: string): Promise<void>;
 }
 
-export type InviteInput = { first_name: string; last_name: string; email: string; phone: string; is_parent: boolean; memberships: { team_id: string; role: Role }[]; children: { first_name: string; birth_date: string; memberships: { team_id: string; role: Role }[] }[]; message?: string | null };
+export type InviteInput = { first_name: string; last_name: string; email: string; phone: string; is_parent: boolean; memberships: { team_id: string; role: Role }[]; children: { id?: string; first_name: string; birth_date: string; memberships: { team_id: string; role: Role }[] }[]; message?: string | null };
 
 /* ---------------- phase 2: schedule, rooms, bookings, absence, attendance ---------------- */
 export type Room = { id: string; name: string; sort: number };
