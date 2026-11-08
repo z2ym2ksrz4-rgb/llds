@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type ReactElement } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type Message, type Absence, type Event, type Member, type PersonBadge, type Result, type Session } from "@/core/api";
 import { resolveImage } from "../lib/catalog";
@@ -123,6 +123,16 @@ export function TeamScreen() {
       </div>
       
 
+      {(() => { const teamMsgs = msgs.filter((m) => m.audience.teams?.includes(team.id)); const allMsgs = msgs.filter((m) => m.audience.all); const Row = ({ m }: { m: Message }) => <button className="item" onClick={() => setOpenMsg(m)} data-testid="team-msg"><span className="grow">{m.title}<div className="tiny">{m.author_name} · {ago(m.created_at)}</div></span>{m.acted_at ? <span className="chip ok small">{t(`msg.done.${m.needs}`)}</span> : <span className="chip warn small">{t(`msg.needs.${m.needs}`)}</span>}</button>; return (
+      <div className="sec teammsgs" data-testid="team-messages">
+        <div className="row between"><h2>{t("team.messages")}</h2>
+          <div className="row" style={{ gap: 6 }}>{staff && <button className="small" data-testid="write-team" onClick={() => setCompose(true)}>{t("team.writeToTeam")}</button>}<button className="ghost small" data-testid="write-trainer" onClick={() => setWrite(true)}>{staff ? t("threads.newConversation") : t("threads.writeTo")}</button></div></div>
+        <MsgGroup label={t("team.fromTrainer", { team: team.name })} list={teamMsgs} Row={Row} empty={t("team.noTeamMessages")} cls="team" />
+        {allMsgs.length > 0 && <MsgGroup label={t("team.toEveryone")} list={allMsgs} Row={Row} empty="" cls="all" />}
+      </div>); })()}
+      {openMsg && <MessageSheet message={openMsg} onClose={() => { setOpenMsg(null); void load(); }} toast={say} />}
+      {write && <ThreadComposer teamId={team.id} teamName={team.name} onClose={() => setWrite(false)} toast={say} />}
+
       {(team.description || team.price || team.day_time) && (
         <div className="sec"><h2>{t("team.about")}</h2><div className="card" data-testid="team-about">
           {aboutImg && <div className="mood" data-testid="team-about-img" style={{ backgroundImage: `url(${aboutImg})` }} />}
@@ -148,17 +158,6 @@ export function TeamScreen() {
       </ScrollList></div>
       {openBadge && <EmblemSheet b={openBadge} onClose={() => setOpenBadge(null)} onRemove={staff ? async () => { await api.removeBadge(openBadge.id); setOpenBadge(null); void load(); } : undefined} />}
 
-      {(() => { const teamMsgs = msgs.filter((m) => m.audience.teams?.includes(team.id)); const allMsgs = msgs.filter((m) => m.audience.all); const Row = ({ m }: { m: Message }) => <button className="item" onClick={() => setOpenMsg(m)} data-testid="team-msg"><span className="grow">{m.title}<div className="tiny">{m.author_name} · {ago(m.created_at)}</div></span>{m.acted_at ? <span className="chip ok small">{t(`msg.done.${m.needs}`)}</span> : <span className="chip warn small">{t(`msg.needs.${m.needs}`)}</span>}</button>; return (
-      <div className="sec teammsgs" data-testid="team-messages">
-        <div className="row between"><h2>{t("team.messages")}</h2>
-          <div className="row" style={{ gap: 6 }}>{staff && <button className="small" data-testid="write-team" onClick={() => setCompose(true)}>{t("team.writeToTeam")}</button>}<button className="ghost small" data-testid="write-trainer" onClick={() => setWrite(true)}>{staff ? t("threads.newConversation") : t("threads.writeTo")}</button></div></div>
-        <div className="group team"><div className="eyebrow">{t("team.fromTrainer", { team: team.name })}</div>
-          <ScrollList className="m0">{teamMsgs.map((m) => <Row key={m.id} m={m} />)}{!teamMsgs.length && <p className="muted small" style={{ margin: 0 }}>{t("team.noTeamMessages")}</p>}</ScrollList></div>
-        {allMsgs.length > 0 && <div className="group all"><div className="eyebrow">{t("team.toEveryone")}</div>
-          <ScrollList className="m0">{allMsgs.map((m) => <Row key={m.id} m={m} />)}</ScrollList></div>}
-      </div>); })()}
-      {openMsg && <MessageSheet message={openMsg} onClose={() => { setOpenMsg(null); void load(); }} toast={say} />}
-      {write && <ThreadComposer teamId={team.id} teamName={team.name} onClose={() => setWrite(false)} toast={say} />}
 
       <div className="sec"><h2>{t("team.upcoming")}</h2>
         <ScrollList>
@@ -178,4 +177,20 @@ function About({ text }: { text: string }) {
   const [open, setOpen] = useState(false); const { t } = useTranslation();
   const short = text.length > 260 && !open ? text.slice(0, 260).replace(/\s+\S*$/, "") + "…" : text;
   return <div><p className="small muted" style={{ whiteSpace: "pre-line", margin: 0 }}>{short}</p>{text.length > 260 && <button className="linklike small" onClick={() => setOpen(!open)}>{open ? t("common.less") : t("common.more")}</button>}</div>;
+}
+
+/** One message group on the team page: unread messages pop up; otherwise a quiet "no new" line that folds the history out. */
+function MsgGroup({ label, list, Row, empty, cls }: { label: string; list: Message[]; Row: (p: { m: Message }) => ReactElement; empty: string; cls: string }) {
+  const { t } = useTranslation();
+  const [history, setHistory] = useState(false);
+  const due = list.filter((m) => !m.acted_at), done = list.filter((m) => m.acted_at);
+  return (
+    <div className={"group " + cls} data-testid={`msggroup-${cls}`}><div className="eyebrow">{label}</div>
+      {due.length > 0 && <ScrollList className="m0">{due.map((m) => <Row key={m.id} m={m} />)}</ScrollList>}
+      {due.length === 0 && (list.length > 0 ? (
+        <button type="button" className={"msg-none" + (history ? " open" : "")} onClick={() => setHistory((h) => !h)} aria-expanded={history}><span className="dot" aria-hidden /><span className="grow">{t("msg.noneNew")}</span><span className="tiny">{t("msg.history", { n: done.length })} <i className="caret">{history ? "⌃" : "⌄"}</i></span></button>
+      ) : empty ? <p className="muted small" style={{ margin: 0 }}>{empty}</p> : null)}
+      {history && done.length > 0 && <ScrollList className="m0">{done.map((m) => <Row key={m.id} m={m} />)}</ScrollList>}
+    </div>
+  );
 }
