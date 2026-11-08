@@ -78,6 +78,7 @@ export function supabaseSchedule(sb: SupabaseClient, fail: Fail, schoolId: () =>
       const { data, error } = await sb.from("team").insert({ school_id: await schoolId(), ...i, parents_see_video: i.parents_see_video ?? (i.category === "mini" || i.category === "kids") }).select("*").single(); fail(error); return data as Team;
     },
     async updateTeam(id: string, patch: TeamInput) { const { error } = await sb.from("team").update(patch).eq("id", id); fail(error); },
+    async setTeamGallery(teamId: string, refs: string[]) { const { error } = await sb.rpc("set_team_gallery", { p_team: teamId, p_refs: refs }); fail(error); },
     async listMembers(): Promise<Member[]> {
       const { data: persons, error } = await sb.from("person").select("*").neq("status", "rejected").order("first_name"); fail(error);
       const { data: ms } = await sb.from("membership").select("person_id,team_id,role");

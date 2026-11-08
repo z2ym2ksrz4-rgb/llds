@@ -55,6 +55,7 @@ export type Team = {
   admission?: "open" | "tryout" | "audition";   // how dancers get on the team (badge on website + app)
   admission_note?: string | null;
   photos?: string[];            // Line's own photos of the team (website URLs); a second one is shown under "Om holdet"
+  gallery?: string[];           // pictures for the Home carousel, chosen by admin/trainer (catalog keys, art/ paths or URLs); empty = random pick
   alt_url?: string | null;      // the raw cover_url when a real cover_path photo overrides it – shown as a mood image on the team page
   price?: string | null;
   years?: string | null;
@@ -192,6 +193,8 @@ export interface Api {
   /* teams & members (admin/staff) */
   createTeam(input: TeamInput & { name: string }): Promise<Team>;
   updateTeam(id: string, patch: TeamInput): Promise<void>;
+  /** Admin or the team's trainer/assistant: pictures for the Home carousel. */
+  setTeamGallery(teamId: string, refs: string[]): Promise<void>;
   listMembers(): Promise<Member[]>;
   setMemberships(personId: string, memberships: { team_id: string; role: Role }[]): Promise<void>;
   /** Admin: replace the set of children linked to a parent (guardian rows). */

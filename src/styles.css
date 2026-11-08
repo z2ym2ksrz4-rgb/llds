@@ -557,3 +557,11 @@ button.cta { box-shadow:0 10px 26px -12px rgba(201,162,74,.7); }
 .tile6 b{font-family:var(--display);font-weight:500;font-size:1.7rem;line-height:1;color:var(--fg)}.tile6 span{font-size:.72rem;line-height:1.2}
 .tile6.hot b{background:linear-gradient(90deg,var(--gold2),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}.tile6.hot span{color:var(--fg)}
 .teampick-head>.grow{display:flex;flex-direction:column;align-items:flex-start;gap:1px;min-width:0}.teampick-head .eyebrow{display:block}
+
+/* Home: team picture carousel */
+.tcar{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:2px 16px 4px;margin:0 -16px;-webkit-overflow-scrolling:touch}.tcar::-webkit-scrollbar{display:none}
+.tcar-slide{flex:none;width:78%;max-width:420px;aspect-ratio:4/3;border-radius:20px;overflow:hidden;background:#000 center/cover;border:1px solid rgba(201,162,74,.3);scroll-snap-align:start;position:relative;padding:0;cursor:pointer;isolation:isolate;box-shadow:0 18px 40px -26px rgba(201,162,74,.6)}
+.tcar-slide::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,12,0) 45%,rgba(10,10,12,.85));z-index:-1}
+.tcar-cap{position:absolute;left:14px;right:14px;bottom:12px;text-align:left;color:#fff;display:flex;flex-direction:column;gap:2px}.tcar-cap .eyebrow{margin:0;font-size:.62rem}.tcar-cap b{font-family:var(--display);font-weight:500;font-size:1.35rem;line-height:1.05}
+.tcar-dots{display:flex;justify-content:center;gap:5px;margin-top:8px}.tcar-dots i{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.25);transition:all .3s}.tcar-dots i.on{width:16px;border-radius:3px;background:var(--gold2)}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}

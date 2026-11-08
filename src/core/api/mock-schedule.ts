@@ -128,6 +128,7 @@ export function scheduleOps(get: () => { S: SchedState; persons: Person[]; membe
       g.teams.push(t); g.save(); g.emit(); return t;
     },
     async updateTeam(tid: string, patch: TeamInput) { const g = get(); const t = g.teams.find((x) => x.id === tid); if (t) Object.assign(t, patch); g.save(); g.emit(); },
+    async setTeamGallery(tid: string, refs: string[]) { const g = get(); const t = g.teams.find((x) => x.id === tid); if (t) t.gallery = refs; g.save(); g.emit(); },
     async listMembers(): Promise<Member[]> {
       const g = get();
       return g.persons.filter((p) => p.status !== "rejected").map((p) => ({ ...p, memberships: g.memberships.filter((m) => m.person_id === p.id),

@@ -129,7 +129,11 @@
     "groupAssistant": "Hjælpetræner på",
     "groupDancer": "Danser på",
     "groupParent": "Forælder til {{name}}",
-    "groupAll": "Alle hold (admin)"
+    "groupAll": "Alle hold (admin)",
+    "conversationsMine": "Til mig – samtaler med træneren",
+    "conversationsStaff": "Samtaler med dansere og forældre",
+    "noConversationsMine": "Ingen samtaler endnu – brug “Skriv til træneren”.",
+    "noConversationsStaff": "Ingen samtaler på holdet endnu."
   },
   "home": {
     "hi": "Hej {{name}}",
@@ -171,7 +175,8 @@
     "adminTodo": "Til dig",
     "openOrders": "åbne ordrer",
     "cardsWaiting": "klippekort til aktivering",
-    "overview": "Overblik"
+    "overview": "Overblik",
+    "carousel": "Holdbilleder"
   },
   "admin": {
     "users": "Nye brugere",
@@ -1021,7 +1026,8 @@
       "teampick": "Holdvælger",
       "week": "Din/barnets uge",
       "payments": "Åbne betalinger",
-      "badges": "Trofæhylde (emblemer + milepæle)"
+      "badges": "Trofæhylde (emblemer + milepæle)",
+      "gallery": "Holdbilleder (karrusel)"
     },
     "gallery": "Billedkarrusel på websitet",
     "gallerySub": "Vælg billeder til karrusellen på forsiden af websitet – i den rækkefølge du trykker ({{n}} valgt). Tom = Lines holdfotos vises automatisk.",
@@ -1097,5 +1103,16 @@
     "stageRight": "Scene højre",
     "houseLeft": "Venstre",
     "houseRight": "Højre"
+  },
+  "gallery": {
+    "title": "Billeder til karrusellen",
+    "sub": "{{n}} valgt – rækkefølgen er den, du trykker i. Vises på forsiden hos alle på holdet.",
+    "line": "Lines fotos",
+    "folders": "Holdets mapper",
+    "catalog": "Katalog",
+    "clear": "Ryd",
+    "emptyHint": "Vælger du ingen, vælger appen selv tilfældigt blandt holdets billeder.",
+    "edit": "Billeder til forsiden",
+    "saved": "Karrusellen er opdateret"
   }
 }

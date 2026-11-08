@@ -7,6 +7,7 @@ import { TeamPicker } from "../components/TeamPicker";
 import { SessionSheet } from "../components/SessionSheet";
 import { Toast } from "../components/Sheet";
 import { MessageBanner } from "../components/Messages";
+import { TeamCarousel } from "../components/TeamCarousel";
 import { TopRight } from "../components/ProfileMenu";
 import { artFor } from "../lib/art";
 import { catalogUrl } from "../lib/catalog";
@@ -114,6 +115,7 @@ export function Home() {
         </div>
       </div>
     </>),
+    gallery: () => <TeamCarousel />,
     stats: () => (<>
       {isAdmin && (() => { const tiles: { n: number; label: string; go: () => void; testId?: string }[] = [
           { n: sessions.filter((s) => new Date(s.starts_at).toDateString() === today && !s.cancelled).length, label: t("home.trainingsToday"), go: () => setTab("rooms") },

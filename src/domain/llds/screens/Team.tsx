@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, type ReactElement } from "react";
 import { useTranslation } from "react-i18next";
-import { api, type Message, type Absence, type Event, type Member, type PersonBadge, type Result, type Session } from "@/core/api";
+import { api, type Thread, type Message, type Absence, type Event, type Member, type PersonBadge, type Result, type Session } from "@/core/api";
 import { resolveImage } from "../lib/catalog";
 import { aboutImage, teamAccent } from "../lib/art";
 import { confetti } from "../lib/confetti";
@@ -11,8 +11,9 @@ import { TeamPicker } from "../components/TeamPicker";
 import { SessionSheet } from "../components/SessionSheet";
 import { Sheet, Toast } from "../components/Sheet";
 import { MessageComposer, MessageSheet } from "../components/Messages";
-import { ThreadComposer } from "../components/Threads";
+import { ThreadComposer, ThreadSheet } from "../components/Threads";
 import { ScrollList } from "../components/ScrollList";
+import { GalleryPicker } from "../components/TeamCarousel";
 import { TopRight } from "../components/ProfileMenu";
 import { Folders } from "./Folders";
 import { Choreo } from "./Choreo";
@@ -43,6 +44,7 @@ export function TeamScreen() {
   const [open, setOpen] = useState<Session | null>(null);
   const [compose, setCompose] = useState(false);
   const [write, setWrite] = useState(false);
+  const [threads, setThreads] = useState<Thread[]>([]); const [openThread, setOpenThread] = useState<Thread | null>(null);
   const [msgs, setMsgs] = useState<Message[]>([]);
   const [openMsg, setOpenMsg] = useState<Message | null>(null);
   const [award, setAward] = useState<Member | null>(null);
@@ -50,6 +52,7 @@ export function TeamScreen() {
   const [badges, setBadges] = useState<PersonBadge[]>([]);
   const [giveTo, setGiveTo] = useState<Member | null>(null);
   const [openBadge, setOpenBadge] = useState<PersonBadge | null>(null);
+  const [galleryOpen, setGalleryOpen] = useState(false); const refreshMe = useAuth((x) => x.refresh);
   const [awardTitle, setAwardTitle] = useState("");
   const [toast, setToast] = useState<string | null>(null);
   const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
@@ -62,6 +65,7 @@ export function TeamScreen() {
     setSessions(mine); setEvents(ev.filter((e) => !e.team_ids.length || e.team_ids.includes(teamId))); setResults(rs); setStats(st); setBadges(bd);
     setAbsences(await api.listAbsences(mine.map((x) => x.id)));
     void api.listMessages().then(setMsgs).catch(() => setMsgs([]));
+    void api.listThreads().then((th) => setThreads(th.filter((x) => x.team_id === teamId))).catch(() => setThreads([]));
     if (staff) setMembers((await api.listMembers()).filter((p) => p.memberships.some((m) => m.team_id === teamId)));
   }, [teamId, staff]);
   useEffect(() => { void load(); }, [load]);
@@ -129,9 +133,11 @@ export function TeamScreen() {
           <div className="row" style={{ gap: 6 }}>{staff && <button className="small" data-testid="write-team" onClick={() => setCompose(true)}>{t("team.writeToTeam")}</button>}<button className="ghost small" data-testid="write-trainer" onClick={() => setWrite(true)}>{staff ? t("threads.newConversation") : t("threads.writeTo")}</button></div></div>
         <MsgGroup label={t("team.fromTrainer", { team: team.name })} list={teamMsgs} Row={Row} empty={t("team.noTeamMessages")} cls="team" />
         {allMsgs.length > 0 && <MsgGroup label={t("team.toEveryone")} list={allMsgs} Row={Row} empty="" cls="all" />}
+        <ThreadGroup label={staff ? t("team.conversationsStaff") : t("team.conversationsMine")} threads={threads} onOpen={(th) => setOpenThread(th)} empty={staff ? t("team.noConversationsStaff") : t("team.noConversationsMine")} />
       </div>); })()}
       {openMsg && <MessageSheet message={openMsg} onClose={() => { setOpenMsg(null); void load(); }} toast={say} />}
-      {write && <ThreadComposer teamId={team.id} teamName={team.name} onClose={() => setWrite(false)} toast={say} />}
+      {write && <ThreadComposer teamId={team.id} teamName={team.name} onClose={() => setWrite(false)} onSent={() => void load()} toast={say} />}
+      {openThread && <ThreadSheet thread={openThread} onClose={() => { setOpenThread(null); void load(); }} toast={say} />}
 
       {(team.description || team.price || team.day_time) && (
         <div className="sec"><h2>{t("team.about")}</h2><div className="card" data-testid="team-about">
@@ -152,6 +158,8 @@ export function TeamScreen() {
         {!results.length && <p className="muted small" style={{ margin: 0 }}>{events.find((e) => e.kind === "competition") ? t("team.noTrophiesYet", { event: events.find((e) => e.kind === "competition")!.title, date: dateLabel(events.find((e) => e.kind === "competition")!.starts_at) }) : t("team.noTrophies")}</p>}
       </ScrollList></div>
 
+      {staff && <div className="row" style={{ justifyContent: "flex-end", marginTop: -6 }}><button className="linklike small" data-testid="open-gallery" onClick={() => setGalleryOpen(true)}>{t("gallery.edit")}</button></div>}
+      {galleryOpen && <GalleryPicker team={team} onClose={() => setGalleryOpen(false)} onSaved={() => { setGalleryOpen(false); say(t("gallery.saved")); void refreshMe(); }} />}
       <div className="sec"><div className="row between"><h2>{t("badges.title")}</h2>{staff && <button className="linklike small" onClick={() => setPage("dancers")}>{t("badges.give")}</button>}</div><ScrollList testId="team-badges">
         {[...badges].sort((x, y) => y.created_at.localeCompare(x.created_at)).map((b) => <button key={b.id} className="item" onClick={() => setOpenBadge(b)}><span className="emblem sm"><span className="e">{b.emoji}</span></span><span className="grow">{b.person_name}<div className="tiny">{b.name}{b.note ? ` · “${b.note}”` : ""} · {ago(b.created_at)}</div></span></button>)}
         {!badges.length && <p className="muted small" style={{ margin: 0 }}>{t("badges.emptyTeam")}</p>}
@@ -191,6 +199,23 @@ function MsgGroup({ label, list, Row, empty, cls }: { label: string; list: Messa
         <button type="button" className={"msg-none" + (history ? " open" : "")} onClick={() => setHistory((h) => !h)} aria-expanded={history}><span className="dot" aria-hidden /><span className="grow">{t("msg.noneNew")}</span><span className="tiny">{t("msg.history", { n: done.length })} <i className="caret">{history ? "⌃" : "⌄"}</i></span></button>
       ) : empty ? <p className="muted small" style={{ margin: 0 }}>{empty}</p> : null)}
       {history && done.length > 0 && <ScrollList className="m0">{done.map((m) => <Row key={m.id} m={m} />)}</ScrollList>}
+    </div>
+  );
+}
+
+/** Conversations on this team (me ↔ trainer/admin, either way round): unread ones pop up, the rest fold out. */
+function ThreadGroup({ label, threads, onOpen, empty }: { label: string; threads: Thread[]; onOpen: (t: Thread) => void; empty: string }) {
+  const { t } = useTranslation();
+  const [history, setHistory] = useState(false);
+  const due = threads.filter((x) => x.unread), done = threads.filter((x) => !x.unread);
+  const Row = ({ th }: { th: Thread }) => <button className={"item" + (th.unread ? " due" : "")} onClick={() => onOpen(th)} data-testid="team-thread"><span className="grow">{th.subject}<div className="tiny">{th.last_sender_name ?? th.created_by_name} · {ago(th.last_at)}{th.last_body ? ` · ${th.last_body.slice(0, 60)}` : ""}</div></span><span className="gold">{th.unread ? "● " : ""}›</span></button>;
+  return (
+    <div className="group mine" data-testid="msggroup-mine"><div className="eyebrow">{label}</div>
+      {due.length > 0 && <ScrollList className="m0">{due.map((th) => <Row key={th.id} th={th} />)}</ScrollList>}
+      {due.length === 0 && (threads.length ? (
+        <button type="button" className={"msg-none" + (history ? " open" : "")} onClick={() => setHistory((h) => !h)} aria-expanded={history}><span className="dot" aria-hidden /><span className="grow">{t("msg.noneNew")}</span><span className="tiny">{t("msg.history", { n: done.length })} <i className="caret">{history ? "⌃" : "⌄"}</i></span></button>
+      ) : <p className="muted small" style={{ margin: 0 }}>{empty}</p>)}
+      {history && done.length > 0 && <ScrollList className="m0">{done.map((th) => <Row key={th.id} th={th} />)}</ScrollList>}
     </div>
   );
 }

@@ -129,7 +129,11 @@
     "groupAssistant": "Assistant on",
     "groupDancer": "Dancer on",
     "groupParent": "Parent of {{name}}",
-    "groupAll": "All teams (admin)"
+    "groupAll": "All teams (admin)",
+    "conversationsMine": "To me – conversations with the trainer",
+    "conversationsStaff": "Conversations with dancers and parents",
+    "noConversationsMine": "No conversations yet – use “Write to the trainer”.",
+    "noConversationsStaff": "No conversations on this team yet."
   },
   "home": {
     "hi": "Hi {{name}}",
@@ -171,7 +175,8 @@
     "adminTodo": "For you",
     "openOrders": "open orders",
     "cardsWaiting": "punch cards to activate",
-    "overview": "Overview"
+    "overview": "Overview",
+    "carousel": "Team pictures"
   },
   "admin": {
     "users": "New users",
@@ -1021,7 +1026,8 @@
       "teampick": "Team picker",
       "week": "Your/child's week",
       "payments": "Open payments",
-      "badges": "Trophy shelf (badges + milestones)"
+      "badges": "Trophy shelf (badges + milestones)",
+      "gallery": "Team pictures (carousel)"
     },
     "gallery": "Photo carousel on the website",
     "gallerySub": "Pick images for the carousel on the website front page – in the order you tap ({{n}} selected). Empty = Line's team photos are shown automatically.",
@@ -1097,5 +1103,16 @@
     "stageRight": "Stage right",
     "houseLeft": "Left",
     "houseRight": "Right"
+  },
+  "gallery": {
+    "title": "Pictures for the carousel",
+    "sub": "{{n}} chosen – in the order you tap. Shown on Home for everyone on the team.",
+    "line": "Line's photos",
+    "folders": "Team folders",
+    "catalog": "Catalog",
+    "clear": "Clear",
+    "emptyHint": "Choose none and the app picks randomly from the team's pictures.",
+    "edit": "Pictures for Home",
+    "saved": "Carousel updated"
   }
 }
