@@ -709,7 +709,7 @@
     "pack": "Pakkeliste",
     "signup": "Tilmelding",
     "on": "Tilmeldt",
-    "unpaid": "Mangler betaling",
+    "unpaid": "Tilmeldt – mangler betaling",
     "payBtn": "Betal",
     "withdraw": "Afmeld",
     "signUp": "Tilmeld",
@@ -719,7 +719,7 @@
     "paid": "Betalt",
     "markPaid": "Markér betalt",
     "payTitle": "Egenbetaling",
-    "paidClaimed": "Tak – tilmeldingen står som 'Afventer betaling', til Line har bekræftet den.",
+    "paidClaimed": "Tak! Tilmeldingen står som 'Betalt – afventer Lines godkendelse', til hun har set beløbet.",
     "signedUp": "Tilmeldt!",
     "withdrawn": "Afmeldt",
     "name": "Titel",
@@ -744,7 +744,9 @@
     "map": "Kort",
     "free": "Gratis",
     "awaitingPayment": "Afventer betaling",
-    "signedUpPay": "Tilmeldingen er registreret – den gælder, når Line har bekræftet betalingen."
+    "signedUpPay": "Tilmeldingen er registreret – betal med MobilePay, så bekræfter Line den.",
+    "claimed": "Betalt – afventer Lines godkendelse",
+    "claimedShort": "Siger betalt – bekræft"
   },
   "shop": {
     "title": "Shop",

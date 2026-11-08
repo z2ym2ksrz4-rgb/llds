@@ -138,7 +138,7 @@ label.check input { width:20px; height:20px; accent-color:var(--gold); }
 .card.tap { cursor:pointer; } .card.dim { opacity:.6; }
 .check { width:22px; height:22px; border-radius:6px; border:1px solid var(--line); display:grid; place-items:center; flex:none; color:var(--brand-ink); font-size:.8rem; }
 .check.on { background:var(--gold); border-color:var(--gold); }
-.chip.ok { border-color:#3b5a40; color:var(--ok); } .chip.gold { color:var(--gold2); border-color:var(--gold3); }
+.chip.ok { border-color:#3b5a40; color:var(--ok); } .chip.pend { border-color:rgba(201,162,74,.5); color:var(--gold2); background:rgba(201,162,74,.1); } .chip.gold { color:var(--gold2); border-color:var(--gold3); }
 .toggle { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 0; border-bottom:1px solid var(--line); font-size:.95rem; }
 .toggle input { width:20px; height:20px; accent-color:var(--gold); }
 .week { display:grid; grid-template-columns:repeat(auto-fit, minmax(90px, 1fr)); gap:6px; }

@@ -47,7 +47,7 @@ export function shopOps(get: () => { Y: ShopState; persons: Person[]; membership
     async listEvents(includePast = false): Promise<Event[]> {
       const g = get(); const cut = new Date(Date.now() - 864e5).toISOString();
       const mine = myPeople();
-      return g.Y.events.filter((e) => includePast || e.starts_at >= cut).map((e) => ({ ...e, mySignups: g.Y.signups.filter((s) => s.event_id === e.id && mine.includes(s.person_id)).length, myUnpaid: e.price_dkk ? g.Y.signups.filter((s) => s.event_id === e.id && mine.includes(s.person_id) && !s.paid).length : 0, signups: g.Y.signups.filter((s) => s.event_id === e.id).length, team_names: e.team_ids.length ? e.team_ids.map((t) => g.teams.find((x) => x.id === t)?.name ?? "?") : null })).sort((a, b) => a.starts_at.localeCompare(b.starts_at));
+      return g.Y.events.filter((e) => includePast || e.starts_at >= cut).map((e) => ({ ...e, mySignups: g.Y.signups.filter((s) => s.event_id === e.id && mine.includes(s.person_id)).length, myUnpaid: e.price_dkk ? g.Y.signups.filter((s) => s.event_id === e.id && mine.includes(s.person_id) && !s.paid && !s.claimed_paid_at).length : 0, myClaimed: e.price_dkk ? g.Y.signups.filter((s) => s.event_id === e.id && mine.includes(s.person_id) && !s.paid && !!s.claimed_paid_at).length : 0, signups: g.Y.signups.filter((s) => s.event_id === e.id).length, team_names: e.team_ids.length ? e.team_ids.map((t) => g.teams.find((x) => x.id === t)?.name ?? "?") : null })).sort((a, b) => a.starts_at.localeCompare(b.starts_at));
     },
     async saveEvent(i: EventInput, eid?: string) {
       const g = get();
@@ -62,6 +62,7 @@ export function shopOps(get: () => { Y: ShopState; persons: Person[]; membership
       if (on) { const e = g.Y.events.find((x) => x.id === eventId); const tn = g.memberships.filter((m) => m.person_id === personId && e?.team_ids.includes(m.team_id)).map((m) => g.teams.find((t) => t.id === m.team_id)?.name)[0] ?? null; g.Y.signups.push({ event_id: eventId, person_id: personId, person_name: name(personId), team_name: tn, paid: false, created_at: now() }); for (const a of admins()) g.notify(a.id, "signup", `Tilmelding til ${e?.title ?? ""} ✅`, name(personId), { event_id: eventId }); }
       g.save(); g.emit();
     },
+    async claimSignupPaid(eventId: string, personId: string) { const g = get(); const s = g.Y.signups.find((x) => x.event_id === eventId && x.person_id === personId); if (s) s.claimed_paid_at = new Date().toISOString(); g.save(); g.emit(); },
     async setSignupPaid(eventId: string, personId: string, paid: boolean) { const g = get(); const s = g.Y.signups.find((x) => x.event_id === eventId && x.person_id === personId); if (s) s.paid = paid; g.save(); g.emit(); },
 
     async listProducts(all = false): Promise<Product[]> { return get().Y.products.filter((p) => all || p.active).map((p) => ({ ...p, image_url: p.image_path ? (p.image_path.startsWith("http") ? p.image_path : imgs.get(p.image_path) ?? null) : null })); },

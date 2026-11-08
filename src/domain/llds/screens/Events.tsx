@@ -76,7 +76,7 @@ function EventsList({ admin }: { admin?: boolean }) {
         <button key={e.id} className="hero tap photo evcard" data-testid="event" onClick={() => setOpen(e)} style={{ backgroundImage: `url(${catalogUrl(e.image_key) ?? artFor(e.id)})` }}>
           <div><div className="eyebrow">{dateLabel(e.starts_at)} · {t(`events.kind.${e.kind}`)}</div><h2 className="display">{e.title}</h2>
             <div className="row between"><span className="small muted">{e.place ?? ""}{e.team_names?.length ? ` · ${e.team_names.join(", ")}` : ` · ${t("events.allTeams")}`}</span>
-              {e.mySignups && e.mySignups > 0 ? (e.myUnpaid ? <span className="chip warn small" data-testid="ev-awaiting">{t("events.awaitingPayment")}</span> : <span className="chip ok small">{t("events.on")}</span>) : relevant && (e.signup_deadline || e.price_dkk) ? <span className="chip gold small">{t("events.openSignup")}</span> : null}</div></div>
+              {e.mySignups && e.mySignups > 0 ? (e.myUnpaid ? <span className="chip warn small" data-testid="ev-awaiting">{t("events.unpaid")}</span> : e.myClaimed ? <span className="chip small pend" data-testid="ev-claimed">{t("events.claimed")}</span> : <span className="chip ok small">{t("events.on")}</span>) : relevant && (e.signup_deadline || e.price_dkk) ? <span className="chip gold small">{t("events.openSignup")}</span> : null}</div></div>
         </button>); })}
       {!events.length && <p className="muted">{t("events.empty")}</p>}
       <button className="linklike small" onClick={() => setPast(!past)}>{past ? t("events.hidePast") : t("events.showPast")}</button>
@@ -115,18 +115,18 @@ export function EventSheet({ event, staff, onClose, onEdit, onChanged, toast }: 
       {hats.length > 0 && (
         <div className="card" style={{ margin: 0 }}><div className="eyebrow">{t("events.signup")}</div>
           {hats.map((p) => { const s = mine(p.id); return (
-            <div key={p.id} className="row between"><span>{p.first_name}{s ? <span className={"chip small " + (s.paid || !event.price_dkk ? "ok" : "warn")} style={{ marginLeft: 8 }}>{s.paid || !event.price_dkk ? t("events.on") : t("events.awaitingPayment")}</span> : null}</span>
-              <div className="row">{s && event.price_dkk && !s.paid && <button className="small" onClick={() => setPay(p.id)}>{t("events.payBtn")}</button>}
+            <div key={p.id} className="row between"><span>{p.first_name}{s ? <span className={"chip small " + (s.paid || !event.price_dkk ? "ok" : s.claimed_paid_at ? "pend" : "warn")} style={{ marginLeft: 8 }}>{s.paid || !event.price_dkk ? t("events.on") : s.claimed_paid_at ? t("events.claimed") : t("events.unpaid")}</span> : null}</span>
+              <div className="row">{s && event.price_dkk && !s.paid && !s.claimed_paid_at && <button className="small" onClick={() => setPay(p.id)}>{t("events.payBtn")}</button>}
                 <button className={s ? "ghost small" : "small"} data-testid="signup" disabled={deadlinePassed && !s} onClick={() => void toggle(p.id)}>{s ? t("events.withdraw") : t("events.signUp")}</button></div></div>); })}
           {deadlinePassed && <p className="tiny">{t("events.deadlinePassed")}</p>}
         </div>
       )}
       {staff && (
         <div className="card" style={{ margin: 0 }}><div className="row between"><span className="eyebrow">{t("events.signups", { n: signups.length })}{event.price_dkk ? ` · ${t("events.paidN", { n: paid })}` : ""}</span>{onEdit && <button className="linklike small" onClick={onEdit}>{t("common.edit")}</button>}</div>
-          <div className="list">{signups.map((s) => <div key={s.person_id} className="item" style={{ padding: "6px 0" }}><span className="grow">{s.person_name}<span className="tiny"> · {s.team_name ?? ""}</span></span>{event.price_dkk ? <button className={"chip small" + (s.paid ? " ok" : " warn")} onClick={async () => { await api.setSignupPaid(event.id, s.person_id, !s.paid); void load(); }}>{s.paid ? t("events.paid") : t("events.markPaid")}</button> : null}</div>)}</div>
+          <div className="list">{signups.map((s) => <div key={s.person_id} className="item" style={{ padding: "6px 0" }}><span className="grow">{s.person_name}<span className="tiny"> · {s.team_name ?? ""}</span></span>{event.price_dkk ? <button className={"chip small" + (s.paid ? " ok" : s.claimed_paid_at ? " pend" : " warn")} onClick={async () => { await api.setSignupPaid(event.id, s.person_id, !s.paid); void load(); }}>{s.paid ? t("events.paid") : s.claimed_paid_at ? t("events.claimedShort") : t("events.markPaid")}</button> : null}</div>)}</div>
         </div>
       )}
-      {pay && event.price_dkk && <PaySheet amount={event.price_dkk} reference={`${event.title.slice(0, 20)} ${hats.find((h) => h.id === pay)?.first_name ?? ""}`} title={t("events.payTitle")} onClose={() => setPay(null)} onPaid={async () => { setPay(null); toast(t("events.paidClaimed")); }} />}
+      {pay && event.price_dkk && <PaySheet amount={event.price_dkk} reference={`${event.title.slice(0, 20)} ${hats.find((h) => h.id === pay)?.first_name ?? ""}`} title={t("events.payTitle")} onClose={() => setPay(null)} onPaid={async () => { const pid = pay; setPay(null); try { await api.claimSignupPaid(event.id, pid); } catch { /* ignore */ } toast(t("events.paidClaimed")); await load(); onChanged(); }} />}
     </Sheet>
   );
 }

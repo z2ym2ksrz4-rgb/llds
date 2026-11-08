@@ -709,7 +709,7 @@
     "pack": "Pack list",
     "signup": "Sign-up",
     "on": "Signed up",
-    "unpaid": "Payment missing",
+    "unpaid": "Signed up – payment missing",
     "payBtn": "Pay",
     "withdraw": "Withdraw",
     "signUp": "Sign up",
@@ -719,7 +719,7 @@
     "paid": "Paid",
     "markPaid": "Mark paid",
     "payTitle": "Participation fee",
-    "paidClaimed": "Thanks – the sign-up shows 'Awaiting payment' until Line confirms it.",
+    "paidClaimed": "Thanks! The sign-up shows 'Paid – awaiting Line's confirmation' until she has seen the amount.",
     "signedUp": "Signed up!",
     "withdrawn": "Withdrawn",
     "name": "Title",
@@ -744,7 +744,9 @@
     "map": "Map",
     "free": "Free",
     "awaitingPayment": "Awaiting payment",
-    "signedUpPay": "Sign-up registered – it counts once Line has confirmed the payment."
+    "signedUpPay": "Sign-up registered – pay with MobilePay and Line will confirm it.",
+    "claimed": "Paid – awaiting Line's confirmation",
+    "claimedShort": "Says paid – confirm"
   },
   "shop": {
     "title": "Shop",
