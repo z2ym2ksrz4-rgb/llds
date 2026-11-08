@@ -174,6 +174,7 @@ export const mockApi: Api = {
     save(); emit();
   },
   async reject(personId) { const p = S.persons.find((x) => x.id === personId); if (p) p.status = "rejected"; save(); emit(); },
+  async lastMailStatus() { return "sent"; },
   async invitePerson(i) {
     if (S.persons.some((p) => p.email?.toLowerCase() === i.email.toLowerCase())) throw new Error("email exists");
     const pid = "p-" + id();

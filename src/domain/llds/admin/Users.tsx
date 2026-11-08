@@ -44,7 +44,7 @@ export function AdminUsers() {
       <header className="topbar"><h1 className="display">{t("admin.users")}</h1></header>
       <p className="muted">{t("admin.usersIntro")}</p>
       {msg && <p className="ok" role="status">{msg}</p>}
-      <InviteCard teams={teams} onDone={(name) => { setMsg(t("admin.invited", { name })); void refresh(); }} />
+      <InviteCard teams={teams} onDone={(name, mail) => { setMsg(mail === "sent" || mail === "queued" ? t("admin.invited", { name }) : t("admin.invitedNoMail", { name })); void refresh(); }} />
       {!pending.length && <div className="card"><p className="muted">{t("admin.noPending")}</p></div>}
       {pending.map((p) => { const ws = web.filter((w) => w.contact_id === p.id || w.dancer_id === p.id || p.children.some((c) => c.id === w.dancer_id)); return (
         <article className="card stack" key={p.id} data-testid="pending">
@@ -92,7 +92,7 @@ export function AdminUsers() {
 type ChildDraft = { first_name: string; birth_date: string; team_id: string };
 
 /** Admin → Brugere → "Inviter til appen": create an adult (parent or dancer/trainer) with optional children, all approved, welcome mail with the app link. */
-function InviteCard({ teams, onDone }: { teams: Team[]; onDone: (name: string) => void }) {
+function InviteCard({ teams, onDone }: { teams: Team[]; onDone: (name: string, mail: string | null) => void }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [f, setF] = useState({ first_name: "", last_name: "", email: "", phone: "", is_parent: true, message: "" });
@@ -123,7 +123,7 @@ function InviteCard({ teams, onDone }: { teams: Team[]; onDone: (name: string) =
     if (!adult.length && !children.some((c) => c.memberships.length)) { setErr(t("admin.inviteNeedTeam")); return; }
     const input: InviteInput = { first_name: f.first_name.trim(), last_name: f.last_name.trim(), email: f.email.trim(), phone: f.phone.trim(), is_parent: f.is_parent, memberships: adult, children, message: f.message.trim() || null };
     setBusy(true);
-    try { await api.invitePerson(input); onDone(input.first_name); setOpen(false); setF({ first_name: "", last_name: "", email: "", phone: "", is_parent: true, message: "" }); setAdult([]); setKids([]); setLinked([]); }
+    try { const pid = await api.invitePerson(input); const mail = await api.lastMailStatus(pid).catch(() => null); onDone(input.first_name, mail); setOpen(false); setF({ first_name: "", last_name: "", email: "", phone: "", is_parent: true, message: "" }); setAdult([]); setKids([]); setLinked([]); }
     catch (x) { const m = String((x as Error).message || ""); setErr(m.includes("exists") ? t("admin.inviteExists") : m); }
     finally { setBusy(false); }
   };

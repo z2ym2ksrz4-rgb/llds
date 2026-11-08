@@ -119,5 +119,6 @@ export function supabaseApi(url: string, anonKey: string): Api {
       fail(error); return data as string;
     },
     async resendInvite(personId) { const { error } = await sb.rpc("resend_invite", { p_id: personId }); fail(error); },
+    async lastMailStatus(personId) { const { data } = await sb.from("mail_log").select("status").contains("ref", { person_id: personId }).order("created_at", { ascending: false }).limit(1).maybeSingle(); return (data?.status as string | undefined) ?? null; },
   };
 }

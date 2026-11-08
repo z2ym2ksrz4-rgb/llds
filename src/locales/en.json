@@ -374,7 +374,11 @@
     "addChild": "Add child",
     "optional": "optional",
     "draftHint": "The child is created when you press Save. Changed your mind? Tap × on the row.",
-    "inviteChildrenHint": "Pick existing dancers (e.g. a child already created) or create new ones. The parent gets access to the children's teams."
+    "inviteChildrenHint": "Pick existing dancers (e.g. a child already created) or create new ones. The parent gets access to the children's teams.",
+    "invitedNoMail": "{{name}} was created – but the mail was NOT sent (mail key missing in Supabase Vault). Resend the invitation once the key is in place.",
+    "resendInvite": "Resend invitation",
+    "inviteResent": "Invitation sent again.",
+    "inviteResentNoMail": "Not sent – mail key missing in Supabase Vault."
   },
   "settings": {
     "language": "Language",

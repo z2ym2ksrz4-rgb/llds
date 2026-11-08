@@ -374,7 +374,11 @@
     "addChild": "Tilføj barn",
     "optional": "valgfrit",
     "draftHint": "Barnet oprettes først, når du trykker Gem. Fortrudt? Tryk × på rækken.",
-    "inviteChildrenHint": "Vælg eksisterende dansere (fx et barn der allerede er oprettet) eller opret nye. Forælderen får adgang til børnenes hold."
+    "inviteChildrenHint": "Vælg eksisterende dansere (fx et barn der allerede er oprettet) eller opret nye. Forælderen får adgang til børnenes hold.",
+    "invitedNoMail": "{{name}} er oprettet – men mailen blev IKKE sendt (mail-nøglen mangler i Supabase Vault). Send invitationen igen, når nøglen er på plads.",
+    "resendInvite": "Send invitation igen",
+    "inviteResent": "Invitationen er sendt igen.",
+    "inviteResentNoMail": "Ikke sendt – mail-nøglen mangler i Supabase Vault."
   },
   "settings": {
     "language": "Sprog",

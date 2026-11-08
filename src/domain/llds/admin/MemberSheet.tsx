@@ -108,6 +108,7 @@ export function MemberSheet({ member: p, all, teams, onClose, onChanged, onOpen,
   return (
     <Sheet onClose={onClose} eyebrow={t("admin.member")} title={`${p.first_name} ${p.last_name}`}>
       <div className="tiny">{[year ? t("admin.born", { year }) : null, p.phone, login].filter(Boolean).join(" · ")}</div>
+      {!p.user_id && p.email && !p.supervised_by && <button type="button" className="chip small" style={{ marginTop: 6 }} disabled={busy} data-testid="resend-invite" onClick={async () => { setBusy(true); try { await api.resendInvite(p.id); const st = await api.lastMailStatus(p.id).catch(() => null); toast(st === "sent" || st === "queued" ? t("admin.inviteResent") : t("admin.inviteResentNoMail")); } catch (x) { toast(t("common.error") + ": " + String((x as Error).message ?? x)); } finally { setBusy(false); } }}>{t("admin.resendInvite")}</button>}
       {p.parents.length > 0 && <div className="tiny" style={{ marginTop: 4 }}>{t("admin.parents")}: {p.parents.map((g) => <button key={g.id} className="linklike" onClick={() => { const m = byId(g.id); if (m) onOpen(m); }}>{g.first_name} {g.last_name}</button>).reduce<ReactNode[]>((acc, el, i) => (i ? [...acc, ", ", el] : [el]), [])}</div>}
 
       {/* 1. Access summary – first, so the consequence of every tick is visible */}
