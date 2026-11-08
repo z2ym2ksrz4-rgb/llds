@@ -9,35 +9,44 @@ import { askBrowserPermission } from "../lib/notify";
 const KEY = "llds_notif_asked";
 export function NotifyPrompt() {
   const { t } = useTranslation();
-  const me = useAuth((s) => s.me); const phase = useAuth((s) => s.phase); const refresh = useAuth((s) => s.refresh);
+  const me = useAuth((s) => s.me); const phase = useAuth((s) => s.phase); const refresh = useAuth((s) => s.refresh); const viewAs = useAuth((s) => s.viewAs);
   const [show, setShow] = useState(false);
+  const [pick, setPick] = useState<Record<string, boolean> | null>(null);   // step 2: which kinds
   useEffect(() => {
-    if (phase !== "ready" || !me || me.person.notify_prefs?.asked) return;
-    let asked = false; try { const a = JSON.parse(localStorage.getItem(KEY) ?? "null") as { at: number } | null; asked = !!a && Date.now() - a.at < 6 * 3600e3; } catch { /* ignore */ }
-    if (asked) return; // "Ikke nu" – ask again next sitting
+    // once per person: never in a "Vis appen som" preview, never again once answered (server flag or this device)
+    if (phase !== "ready" || !me || viewAs || me.person.notify_prefs?.asked) return;
+    let asked = false; try { asked = !!localStorage.getItem(KEY + ":" + me.person.id) || !!localStorage.getItem(KEY); } catch { /* ignore */ }
+    if (asked) return;
     let tour: { state?: string } | null = null; try { tour = JSON.parse(localStorage.getItem("llds_tour") ?? "null"); } catch { /* ignore */ }
     const start = () => setShow(true);
     if (tour?.state) { const tm = setTimeout(start, 1200); return () => clearTimeout(tm); }
     addEventListener("llds:tour-done", start); return () => removeEventListener("llds:tour-done", start);
-  }, [phase, me?.person.id, me?.person.notify_prefs?.asked]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [phase, me?.person.id, me?.person.notify_prefs?.asked, viewAs]); // eslint-disable-line react-hooks/exhaustive-deps
   if (!show || !me) return null;
-  const answer = async (on: boolean, remember: boolean) => {
-    setShow(false);
-    if (!remember) { try { localStorage.setItem(KEY, JSON.stringify({ at: Date.now() })); } catch { /* ignore */ } } // "Ikke nu": ask again next sitting on this device
-    if (remember) { await api.updateNotifyPrefs({ ...(me.person.notify_prefs ?? {}), on, asked: true }); await refresh(); }
+  const kinds = NOTIFY_KINDS_FOR(me.person.is_admin);
+  const finish = async (on: boolean, chosen?: Record<string, boolean>) => {
+    setShow(false); setPick(null);
+    try { localStorage.setItem(KEY + ":" + me.person.id, "1"); } catch { /* ignore */ }
+    await api.updateNotifyPrefs({ ...(me.person.notify_prefs ?? {}), on, kinds: chosen ?? me.person.notify_prefs?.kinds ?? {}, asked: true }); await refresh();
     if (on) { await askBrowserPermission(); void registerPush(); }
   };
   return (
     <div className="tour-bg" role="dialog" aria-modal="true" data-testid="notif-prompt">
       <div className="tour-card center">
         <div className="eyebrow">{t("notifPrefs.eyebrow")}</div>
-        <h2 className="display">{t("notifPrefs.promptTitle")}</h2>
-        <p className="muted">{t("notifPrefs.promptBody")}</p>
-        <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
-          <button className="cta" onClick={() => void answer(true, true)} data-testid="notif-on">{t("notifPrefs.turnOn")}</button>
-          <button className="ghost" onClick={() => void answer(false, false)} data-testid="notif-later">{t("notifPrefs.notNow")}</button>
-          <button className="ghost" onClick={() => void answer(false, true)} data-testid="notif-off">{t("notifPrefs.noThanks")}</button>
-        </div>
+        {!pick ? (<>
+          <h2 className="display">{t("notifPrefs.promptTitle")}</h2>
+          <p className="muted">{t("notifPrefs.promptBody")}</p>
+          <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
+            <button className="cta" onClick={() => setPick(Object.fromEntries(kinds.map((k) => [k.key, true])))} data-testid="notif-on">{t("notifPrefs.turnOn")}</button>
+            <button className="ghost" onClick={() => void finish(false)} data-testid="notif-off">{t("notifPrefs.noThanks")}</button>
+          </div>
+        </>) : (<>
+          <h2 className="display">{t("notifPrefs.pickTitle")}</h2>
+          <p className="muted">{t("notifPrefs.pickBody")}</p>
+          <div className="checklist" data-testid="notif-kinds">{kinds.map((k) => <button key={k.key} type="button" className={"checkrow" + (pick[k.key] ? " on" : "")} role="checkbox" aria-checked={!!pick[k.key]} onClick={() => setPick({ ...pick, [k.key]: !pick[k.key] })}><span className="box" aria-hidden>{pick[k.key] ? "✓" : ""}</span><span className="grow"><span className="lbl">{k.emoji} {t(`notifPrefs.kinds.${k.key}`)}</span></span></button>)}</div>
+          <button className="cta" onClick={() => void finish(true, pick)} data-testid="notif-save">{t("notifPrefs.save")}</button>
+        </>)}
         <p className="tiny muted" style={{ margin: 0 }}>{t("notifPrefs.changeLater")}</p>
       </div>
     </div>

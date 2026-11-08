@@ -8,7 +8,7 @@ await p.goto(base, { waitUntil: "networkidle" }); await p.evaluate(() => localSt
 const login = async (email) => { await p.fill("#email", email); await p.click("form button.cta"); await p.fill("#code", "000000"); await p.click("form button.cta"); await p.waitForSelector("nav.tabbar"); };
 await login("admin@demo");
 // 1) prompt appears (tour done) and "Slå til" stores prefs
-await p.waitForSelector("[data-testid=notif-prompt]", { timeout: 5000 }); await p.click("[data-testid=notif-on]"); await p.waitForTimeout(300);
+await p.waitForSelector("[data-testid=notif-prompt]", { timeout: 5000 }); await p.click("[data-testid=notif-on]"); await p.waitForSelector("[data-testid=notif-kinds]"); out.kindsOffered = await p.$$eval("[data-testid=notif-kinds] .checkrow", e => e.length); await p.click("[data-testid=notif-kinds] .checkrow >> nth=1"); await p.click("[data-testid=notif-save]"); await p.waitForTimeout(300);
 out.promptGone = !(await p.$("[data-testid=notif-prompt]"));
 // 2) settings: switch off "order" kind
 await p.click("[data-testid=avatar]"); await p.click("[data-testid=menu-more]"); await p.click("[data-testid=more-settings]"); await p.waitForSelector("[data-testid=notif-settings]");
@@ -17,7 +17,7 @@ await p.click("[data-testid=notif-kind-order]"); await p.waitForTimeout(300); ou
 out.prefs = await p.evaluate(() => JSON.parse(localStorage.getItem("llds_mock")).persons.find((x) => x.id === "p-line").notify_prefs);
 // 3) parent buys a punch card + signs up for an event -> admin gets punch + signup notifications, but no order (we'll place an order too and check it is filtered)
 await p.click("text=Log ud"); await p.waitForSelector("#email"); await login("parent@demo");
-await p.waitForSelector("[data-testid=notif-prompt]", { timeout: 5000 }); await p.click("[data-testid=notif-later]"); await p.waitForTimeout(200);
+await p.waitForSelector("[data-testid=notif-prompt]", { timeout: 5000 }); await p.click("[data-testid=notif-off]"); await p.waitForTimeout(200);
 await p.click("[data-testid=shop]"); await p.waitForSelector("[data-testid=shop-screen]"); const hasPunch = await p.$("[data-testid=buy-card]");
 if (hasPunch) { await p.waitForSelector("[data-testid=buy-card]"); await p.click("[data-testid=buy-card] >> nth=0"); await p.waitForTimeout(500); await p.mouse.click(195, 140); await p.waitForTimeout(200); }
 out.hasPunch = !!hasPunch;

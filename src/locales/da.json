@@ -980,7 +980,10 @@
       "booking": "Salbookinger",
       "signup": "Nye tilmeldinger (admin)",
       "payment": "Sæsonbetalinger"
-    }
+    },
+    "pickTitle": "Hvad vil du have besked om?",
+    "pickBody": "Alt er slået til – fravælg det, du ikke vil forstyrres med.",
+    "save": "Gem"
   },
   "customize": {
     "title": "Tilpas appen",

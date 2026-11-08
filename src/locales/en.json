@@ -980,7 +980,10 @@
       "booking": "Room bookings",
       "signup": "New sign-ups (admin)",
       "payment": "Season payments"
-    }
+    },
+    "pickTitle": "What do you want to hear about?",
+    "pickBody": "Everything is on – untick what you don't want to be disturbed by.",
+    "save": "Save"
   },
   "customize": {
     "title": "Customise the app",
