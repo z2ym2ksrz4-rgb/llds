@@ -52,6 +52,11 @@ team_ages["solo-duo"] = {"born", "junior", "voksen"}
 LOGO = f'<img class="mark" src="{BASE}/brand/logo-white.png" alt="LL Dance Studio">'
 NAV = [("Holdplan", "/saeson-26-27/", "Alle hold, dag for dag"), ("Medlemsskab", "/medlemsskab/", "Priser, rater og prøvetimer"), ("Stjerneshoppen", "/merchandise/", "Tøj og merchandise"), ("Backstage", "/backstage/", "Trænerne bag studiet"), ("Kontakt", "/kontakt/", "Find os i Ulstrup"), ("Appen", "/hent/", "Hent eller åbn appen")]
 ICON_ARROW = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>'
+import unicodedata as _ud
+def slugify(x):
+    x = x.lower().replace("æ", "ae").replace("ø", "oe").replace("å", "aa"); x = _ud.normalize("NFKD", x).encode("ascii", "ignore").decode()
+    return re.sub(r"[^a-z0-9]+", "-", x).strip("-")
+ICON_BACK = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>'
 
 CSS = r"""
 :root{--bg:#0a0a0b;--bg2:#111113;--card:#161618;--line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.16);--fg:#f4f1ea;--muted:#a8a49c;--fg3:#6f6c66;--gold:#c9a24a;--gold2:#e6c87a;--gold3:#8c6c25;--gold-soft:rgba(201,162,74,.12);--display:"Cormorant Garamond",Georgia,serif;--body:"Outfit",system-ui,-apple-system,"Segoe UI",sans-serif;--r:22px;--ease:cubic-bezier(.2,.7,.2,1)}
@@ -74,6 +79,7 @@ h2{font-size:clamp(2rem,4.6vw,3.4rem);margin:0 0 20px}h3{font-size:1.5rem}
 header.top{position:fixed;top:0;left:0;right:0;z-index:50;padding:16px 0;transition:background .5s,backdrop-filter .5s,padding .5s}
 header.top.solid{background:rgba(10,10,11,.72);backdrop-filter:blur(16px) saturate(140%);-webkit-backdrop-filter:blur(16px) saturate(140%);padding:10px 0;border-bottom:1px solid var(--line)}
 header.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.top .back{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;border:1px solid var(--line2);color:var(--fg);background:rgba(10,10,11,.5);margin-right:10px;flex:none;transition:background .25s}.top .back:hover{background:var(--gold-soft);color:var(--gold2)}
 .logo{display:flex;align-items:center;gap:10px;color:var(--fg)}.logo .mark{height:54px;width:auto;transition:transform .5s var(--ease)}.logo:hover .mark{transform:rotate(-6deg)}
 .pill{display:flex;gap:2px;padding:4px;border:1px solid var(--line);border-radius:999px;background:rgba(10,10,11,.5);backdrop-filter:blur(12px)}
 .pill a{color:var(--muted);padding:9px 16px;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;border-radius:999px;transition:all .3s}.pill a:hover{color:var(--fg)}.pill a.on{color:#161206;background:linear-gradient(135deg,var(--gold2),var(--gold))}
@@ -188,6 +194,16 @@ section{padding:clamp(64px,9vw,120px) 0;position:relative}section.tight{padding-
 .bar{position:sticky;top:64px;z-index:20;background:rgba(10,10,11,.8);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:999px;padding:6px;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;margin:0 0 28px}.bar::-webkit-scrollbar{display:none}
 .bar button{flex:1 0 auto;background:none;border:0;color:var(--muted);border-radius:999px;padding:11px 20px;font-family:inherit;font-size:.9rem;cursor:pointer;transition:all .3s;white-space:nowrap}.bar button.on{color:#161206;background:linear-gradient(135deg,var(--gold2),var(--gold))}
 .day{display:none}.day.on{display:grid;grid-template-columns:1fr 1fr;gap:28px}@media(max-width:760px){.day.on{grid-template-columns:1fr}}
+.legend{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:0 0 14px}.legend .lg{font-size:.78rem;color:var(--muted);display:inline-flex;align-items:center;gap:6px}.legend .lg:before{content:"";width:12px;height:12px;border-radius:4px;background:rgba(201,162,74,.22);border:1px solid var(--gold3)}.legend .lg.l1:before{background:rgba(255,255,255,.06);border-color:var(--line2)}
+.weekcal{display:grid;grid-template-columns:52px repeat(4,minmax(150px,1fr));gap:0 8px;overflow-x:auto;scrollbar-width:thin;padding-bottom:10px;-webkit-overflow-scrolling:touch}
+.weekcal .dh{position:sticky;top:64px;z-index:5;background:var(--bg);font-family:var(--display);font-size:1.25rem;padding:8px 4px 10px;border-bottom:1px solid var(--line);margin-bottom:8px}
+.weekcal .axis{position:sticky;left:0;z-index:6;background:var(--bg)}.weekcal .axis .dh{border-color:transparent}
+.weekcal .lanes{position:relative}.weekcal .hr{position:absolute;left:0;right:0;border-top:1px dashed rgba(255,255,255,.07)}.weekcal .col .hr span{display:none}.weekcal .axis .hr span{position:absolute;top:-9px;left:0;font-size:.7rem;color:var(--fg3);background:var(--bg);padding-right:6px}
+.weekcal .blk{position:absolute;left:0;right:0;display:flex;flex-direction:column;justify-content:center;gap:1px;padding:6px 9px;border-radius:12px;overflow:hidden;text-decoration:none;color:var(--fg);font-size:.78rem;line-height:1.15;background:rgba(201,162,74,.16);border:1px solid rgba(201,162,74,.5);transition:transform .25s var(--ease),background .25s}
+.weekcal .blk.l1{background:rgba(255,255,255,.05);border-color:var(--line2)}.weekcal a.blk:hover{transform:scale(1.02);background:rgba(201,162,74,.28);z-index:3}
+.weekcal .blk b{font-family:var(--display);font-weight:500;font-size:.98rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.05}.weekcal .blk .tm{color:var(--gold2);font-size:.7rem;letter-spacing:.04em}.weekcal .blk .rm{color:var(--fg3);font-size:.68rem}
+.weekcal .blk.na{opacity:.75;cursor:default}.weekcal .blk.half.s0{right:51%}.weekcal .blk.half.s1{left:51%}.weekcal .blk.half b{font-size:.86rem}.weekcal .blk.half{padding:5px 7px}
+@media(max-width:760px){.weekcal{grid-template-columns:44px repeat(4,200px)}.weekcal .dh{font-size:1.05rem;top:56px}}
 .room h3{font-size:.74rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-family:var(--body);font-weight:500;margin:0 0 14px;display:flex;align-items:center;gap:10px}.room h3:after{content:"";flex:1;height:1px;background:var(--line)}
 .cls{display:flex;gap:16px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:10px;margin-bottom:10px;color:var(--fg);transition:border-color .3s,transform .5s var(--ease)}
 .cls .img{width:92px;height:92px;border-radius:12px;background:center/cover;flex:none;position:relative;overflow:hidden}.cls .img:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent,rgba(10,10,11,.4))}
@@ -205,7 +221,7 @@ article{max-width:72ch}article h2{font-size:1.9rem;margin:38px 0 10px}article p,
 /* shop / membership / staff / contact */
 .prods{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}.prod{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:6px;min-height:150px;position:relative;overflow:hidden}.prod.img{padding:0}.prod .pimg{aspect-ratio:4/5;background:center/cover;transition:transform 1s var(--ease)}.prod:hover .pimg{transform:scale(1.04)}.prod .pin{padding:14px 16px 16px;display:flex;flex-direction:column;gap:4px;flex:1}.prod.img:before{display:none}.prod:before{content:attr(data-i);position:absolute;right:-6px;top:-18px;font-family:var(--display);font-size:5rem;color:rgba(201,162,74,.08);font-style:italic}.prod h4{font-size:1.2rem}.prod .price{color:var(--gold2);font-family:var(--display);font-size:1.6rem;margin-top:auto}
 .acc{border-top:1px solid var(--line)}.acc details{border-bottom:1px solid var(--line)}.acc summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:22px 0;font-family:var(--display);font-size:1.6rem}.acc summary::-webkit-details-marker{display:none}.acc summary:after{content:"+";color:var(--gold);font-family:var(--body);font-size:1.4rem;transition:transform .4s}.acc details[open] summary:after{transform:rotate(45deg)}.acc .b{padding:0 0 22px;color:var(--muted);max-width:70ch;white-space:pre-line}
-.staff{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}.staff .card{padding:0;overflow:hidden}.staff img{width:100%;aspect-ratio:1536/647;object-fit:cover;display:block}.staff .in{padding:16px 18px 20px}
+.staff{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}.staff .card{padding:0;overflow:hidden;scroll-margin-top:90px}.staff .card:target{border-color:var(--gold);box-shadow:0 0 0 2px rgba(201,162,74,.3)}.staff img{width:100%;aspect-ratio:1536/647;object-fit:cover;display:block}.staff .in{padding:16px 18px 20px}
 .contact{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}.map{border-radius:28px;overflow:hidden;border:1px solid var(--line);aspect-ratio:16/7;margin-top:28px;filter:grayscale(1) invert(.92) contrast(.9)}.map iframe{width:100%;height:100%;border:0;display:block}
 footer{padding:70px 0 40px;border-top:1px solid var(--line);margin-top:40px}footer .cols3{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:30px}@media(max-width:760px){footer .cols3{grid-template-columns:1fr}}
 footer h4{font-family:var(--body);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:12px}footer a{color:var(--muted);display:block;padding:4px 0}footer a:hover{color:var(--fg)}footer .legal{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:var(--fg3);font-size:.8rem;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
@@ -311,7 +327,7 @@ def page(title, body, desc, active="", hero=None, hero_title=None, hero_sub=None
 <title>{E(title)}</title><meta name="description" content="{E(desc)}"><meta name="theme-color" content="#0a0a0b"><meta property="og:title" content="{E(title)}"><meta property="og:description" content="{E(desc)}">{f'<meta property="og:image" content="{hero}">' if hero else ""}
 <link rel="icon" href="{BASE}/favicon.png" type="image/png"><link rel="apple-touch-icon" href="{BASE}/icons/apple-touch-icon.png"><link rel="stylesheet" href="{BASE}/style.css?v={BUILD}">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Outfit:wght@300;400;500&display=swap"></head><body>
-<header class="top"><div class="wrap"><a class="logo" href="{BASE}/">{LOGO}</a><nav class="pill">{pill}</nav><div class="hr"><div class="langs"><a href="__DA__" class="flag on" title="Dansk" aria-label="Dansk">🇩🇰</a><a href="__EN__" class="flag" title="English" aria-label="English">🇬🇧</a></div><a class="btn sm hbtn" href="{BASE}/app/">Åbn appen</a><button class="burger" aria-label="Menu"><i></i>Menu</button></div></div></header>
+<header class="top"><div class="wrap">{'' if active in ("", "/") else f'<a class="back" href="{BASE}/" aria-label="Tilbage" onclick="if(history.length>1&&document.referrer.indexOf(location.host)>-1){{history.back();return false}}">{ICON_BACK}</a>'}<a class="logo" href="{BASE}/">{LOGO}</a><nav class="pill">{pill}</nav><div class="hr"><div class="langs"><a href="__DA__" class="flag on" title="Dansk" aria-label="Dansk">🇩🇰</a><a href="__EN__" class="flag" title="English" aria-label="English">🇬🇧</a></div><a class="btn sm hbtn" href="{BASE}/app/">Åbn appen</a><button class="burger" aria-label="Menu"><i></i>Menu</button></div></div></header>
 <div class="menu"><div class="l"><a class="big" href="{BASE}/" style="transition-delay:40ms"><small>00</small>Forside<span>LL Dance Studio</span></a>{big}<div class="foot"><a class="btn" href="{BASE}/app/">Åbn appen {ICON_ARROW}</a><a class="btn ghost" href="tel:{C["phone"].replace(" ", "")}">{E(C["phone"])}</a></div></div><div class="r" style="background-image:url({ART(6)})"><div><div class="eyebrow">Ulstrup</div><h3>Dans med hjertet.<br><em>Vind med holdet.</em></h3></div></div></div>
 {heroh}{body}
 <footer><div class="wrap"><div class="cols3"><div><img src="{BASE}/brand/logo-white.png" alt="LL Dance Studio" style="width:180px;margin-bottom:14px"><p class="muted small">{E(C["address"])}<br><a href="tel:{C["phone"].replace(" ", "")}" style="display:inline">{E(C["phone"])}</a> · {E(C["hours"])}<br><a href="mailto:{C["email"]}" style="display:inline">{C["email"]}</a></p></div>
@@ -409,7 +425,7 @@ home = f"""
 <section class="tight"><div class="wrap"><div class="head rv"><div><div class="eyebrow">Kalender</div><h2>Events, shows <em>&amp; workshops</em></h2></div><a class="btn ghost" href="{BASE}/app/">Tilmeld i appen {ICON_ARROW}</a></div><div class="grid rv" id="events"><p class="empty">Henter…</p></div></div></section>
 <section class="tight"><div class="wrap"><div class="eyebrow">Fra studiet</div><h2>Nyt</h2><div id="news"></div></div></section>
 <section class="tight"><div class="wrap"><div class="head rv"><div><div class="eyebrow">Backstage</div><h2>Trænerne bag <em>holdene</em></h2></div><a class="btn ghost" href="{BASE}/backstage/">Alle trænere {ICON_ARROW}</a></div>
-<div class="scroller rv">{"".join(f'<a class="tr" href="{BASE}/backstage/"><img src="{s["image"]}" alt="{E(s["name"])}" loading="lazy"><div class="in"><h4>{E(s["name"])}</h4><div class="tiny">{E(s["role"])}</div></div></a>' for s in P["staff"][:8])}</div></div></section>
+<div class="scroller rv">{"".join(f'<a class="tr" href="{BASE}/backstage/#{slugify(s["name"])}"><img src="{s["image"]}" alt="{E(s["name"])}" loading="lazy"><div class="in"><h4>{E(s["name"])}</h4><div class="tiny">{E(s["role"])}</div></div></a>' for s in P["staff"])}</div></div></section>
 <section class="tight"><div class="wrap"><div class="app rv"><div class="txt"><div class="eyebrow">LL Dance Studio-appen</div><h2>Alt det praktiske – <em>i lommen</em></h2><p class="muted">Dansere, forældre og trænere har hvert deres rum. Tilmelding, afbud, koreografi-videoer, holdets billeder, beskeder fra Line, events og Stjerneshoppen – ét sted.</p>
 <ul class="feat"><li>Ugens træninger og afbud med ét tryk</li><li>Koreografi og musik til øvning hjemme</li><li>Holdets billeder og videoer – kun for holdet</li><li>Beskeder, aflysninger og vikarer</li><li>Tilmelding og betaling til events</li><li>Klippekort og Stjerneshoppen</li></ul>
 <div class="btns"><a class="btn" href="{BASE}/app/">Åbn appen {ICON_ARROW}</a><a class="btn ghost" href="{BASE}/support/">Sådan kommer du i gang</a></div></div><div class="pic" style="background-image:url({ART(5)})"></div></div></div></section>
@@ -426,18 +442,37 @@ def cls(c):
     sub = f'{E(c["age"])} · {E(c["level"])}' + (' · <span class="chip gold" style="margin:0;padding:1px 8px">Lukket hold</span>' if c.get("closed") else "")
     body = f'<div class="img" style="background-image:url({img})"></div><div><div class="t">{E(c["time"])}</div><h4>{E(c["name"])}</h4><div class="tiny">{sub}{("<br>" + E(c["note"])) if c.get("note") else ""}</div></div>'
     return f'<a class="cls" href="{BASE}/{c["slug"]}/" data-ages="{ages}">{body}<span class="go">{ICON_ARROW}</span></a>' if c.get("slug") else f'<div class="cls na" data-ages="{ages}">{body}</div>'
-dayblocks = ""
-for i, d in enumerate(SCHED["days"]):
-    rooms = "".join(f'<div class="room"><h3>{r}</h3>{"".join(cls(c) for c in SCHED["classes"] if c["day"] == i and c["room"] == r)}</div>' for r in SCHED["rooms"])
-    dayblocks += f'<div class="day{" on" if i == 0 else ""}" data-day="{i}">{rooms}</div>'
+# --- week calendar: days as columns, rooms as lanes inside each day, blocks positioned by time (public: official teams only)
+def _mins(t):
+    h, m = t.strip().replace(".", ":").split(":"); return int(h) * 60 + int(m)
+def _span(tm):
+    a, b = [x.strip() for x in tm.replace("-", "–").split("–")[:2]]; return _mins(a), _mins(b)
+_all = [c for c in SCHED["classes"] if "–" in c["time"] or "-" in c["time"]]
+T0 = min(_span(c["time"])[0] for c in _all) // 60 * 60; T1 = (max(_span(c["time"])[1] for c in _all) + 59) // 60 * 60
+PX = 1.8  # px per minute
+def _block(c):
+    a, b = _span(c["time"]); top = (a - T0) * PX; h = max(34, (b - a) * PX - 4)
+    lane = SCHED["rooms"].index(c["room"]) if c["room"] in SCHED["rooms"] else 0
+    # another room at the same time on the same day → share the column (left/right), otherwise full width
+    clash = any(o is not c and o["day"] == c["day"] and o["room"] != c["room"] and o in _all and _span(o["time"])[0] < b and _span(o["time"])[1] > a for o in SCHED["classes"])
+    if clash: lane_cls = f"l{lane} half s{lane}"
+    else: lane_cls = f"l{lane}"
+    inner = f'<span class="tm">{E(c["time"])}</span><b>{E(c["name"])}</b><span class="rm">{E(c["room"])}</span>'
+    st = f'style="top:{top:.0f}px;height:{h:.0f}px"'
+    return (f'<a class="blk {lane_cls}" href="{BASE}/{c["slug"]}/" {st} title="{E(c["name"])}">{inner}</a>' if c.get("slug") else f'<div class="blk {lane_cls} na" {st} title="{E(c["name"])}">{inner}</div>')
+hours = "".join(f'<div class="hr" style="top:{(h*60-T0)*PX:.0f}px"><span>{h:02d}</span></div>' for h in range(T0 // 60, T1 // 60 + 1))
+cols = "".join(f'<div class="col"><div class="dh">{d}</div><div class="lanes" style="height:{(T1-T0)*PX:.0f}px">{hours}{"".join(_block(c) for c in SCHED["classes"] if c["day"] == i and c in _all)}</div></div>' for i, d in enumerate(SCHED["days"]))
+legend = "".join(f'<span class="lg l{i}">{E(r)}</span>' for i, r in enumerate(SCHED["rooms"]))
 monthly = "".join(cls({**m, "time": "Én gang om måneden"}) for m in SCHED["monthly"])
 holdplan = f"""
-<section class="tight plan" style="margin-top:-20px"><div class="wrap"><div class="chips" style="margin-top:0">{age_chips}</div><div class="bar">{days}</div>{dayblocks}
+<section class="tight plan" style="margin-top:-20px"><div class="wrap">
+<div class="legend">{legend}<span class="tiny muted">Tryk på et hold for beskrivelse, pris og tilmelding</span></div>
+<div class="weekcal"><div class="axis"><div class="dh">&nbsp;</div><div class="lanes" style="height:{(T1-T0)*PX:.0f}px">{"".join(f'<div class="hr" style="top:{(h*60-T0)*PX:.0f}px"><span>{h:02d}:00</span></div>' for h in range(T0 // 60, T1 // 60 + 1))}</div></div>{cols}</div>
 <div style="margin-top:36px" class="room"><h3>Månedligt</h3>{monthly}</div>
 <div id="live-note" style="margin-top:36px"></div>
 <div class="card" style="margin-top:36px;display:flex;gap:16px;align-items:center;flex-wrap:wrap"><div style="flex:1;min-width:240px"><h3>Ferie, kalender og aflysninger</h3><p class="muted small" style="margin:4px 0 0">Alle holds kalendere, ferier, ekstra træninger og dagens aflysninger ligger i appen – med push-besked når noget ændrer sig.</p></div><a class="btn" href="{BASE}/app/">Åbn appen {ICON_ARROW}</a></div></div></section>
 """
-write("saeson-26-27/index.html", page("Holdplan – Sæson 26/27 – LL Dance Studio", holdplan, "Ugeplan for alle hold i sæson 26/27: dag, tid, sal, alder og niveau – filtrér på alder.", "/saeson-26-27/", hero=team_img("sky-stars", 1) or H["hero"], hero_title="Sæson <em>26/27</em>", hero_sub="Holdplan", hero_lead="Træning mandag–torsdag i Store Sal og Lille Sal på Vinkelvej 17. Filtrér på alder, og tryk på et hold for beskrivelse, pris og tilmelding."))
+write("saeson-26-27/index.html", page("Holdplan – Sæson 26/27 – LL Dance Studio", holdplan, "Ugekalender for alle hold i sæson 26/27 – dag, tid og sal. Tryk på et hold for beskrivelse, pris og tilmelding.", "/saeson-26-27/", hero=team_img("sky-stars", 1) or H["hero"], hero_title="Sæson <em>26/27</em>", hero_sub="Holdplan", hero_lead="Træning mandag–torsdag i Store Sal og Lille Sal på Vinkelvej 17. Her ser du, hvornår de enkelte hold ligger – tryk på et hold for beskrivelse, pris og tilmelding."))
 
 # ---------------- team pages
 FACT_LABELS = [("day_time", "Dag og tid"), ("style", "Stilart"), ("level", "Niveau"), ("years", "Årgang"), ("trainer", "Træner"), ("assistant", "Hjælpetræner"), ("location", "Sted"), ("season", "Sæson"), ("audition", "Optagelse")]
@@ -472,7 +507,7 @@ shop = f"""<section class="tight"><div class="wrap"><div class="head rv"><p clas
 write("merchandise/index.html", page("Stjerneshoppen – LL Dance Studio", shop, "Merchandise fra LL Dance Studio: tøj, tasker, drikkedunke – bestil i appen.", "/merchandise/", hero=S["image"], hero_title="Stjerne<em>shoppen</em>", hero_sub="Merchandise"))
 
 # ---------------- backstage
-staff = "".join(f'<div class="card rv"><img src="{s["image"]}" alt="{E(s["name"])}" loading="lazy"><div class="in"><h3>{E(s["name"])}</h3><div class="tiny" style="color:var(--gold)">{E(s["role"])}</div>{("<div class=tiny style=margin-top:4px>" + E(s["teaches"]) + "</div>") if s.get("teaches") else ""}<p class="small muted" style="margin:10px 0 0">{E(s["bio"])}</p></div></div>' for s in P["staff"])
+staff = "".join(f'<div class="card rv" id="{slugify(s["name"])}"><img src="{s["image"]}" alt="{E(s["name"])}" loading="lazy"><div class="in"><h3>{E(s["name"])}</h3><div class="tiny" style="color:var(--gold)">{E(s["role"])}</div>{("<div class=tiny style=margin-top:4px>" + E(s["teaches"]) + "</div>") if s.get("teaches") else ""}<p class="small muted" style="margin:10px 0 0">{E(s["bio"])}</p></div></div>' for s in P["staff"])
 back = f"""<section class="tight"><div class="wrap"><div class="staff">{staff}</div>
 <div class="app rv" style="margin-top:40px"><div class="txt"><div class="eyebrow">For dansere, forældre og trænere</div><h2>Backstage er <em>appen</em></h2><p class="muted">Træninger, afbud, koreografi, holdets mapper, beskeder og tilmeldinger – alt det, der før lå spredt, ligger nu ét sted.</p><a class="btn" href="{BASE}/hent/">Hent appen {ICON_ARROW}</a></div><div class="pic" style="background-image:url({ART(4)})"></div></div></div></section>"""
 write("backstage/index.html", page("Backstage – LL Dance Studio", back, "Trænerne bag LL Dance Studio – og indgangen til appen for dansere, forældre og trænere.", "/backstage/", hero=P["staff"][0]["image"], hero_title="Mød <em>trænerne</em>", hero_sub="Backstage", hero_lead="Holdet bag LL Dance Studio – dansere og undervisere med erfaring fra konkurrencer, shows og mange års undervisning."))
