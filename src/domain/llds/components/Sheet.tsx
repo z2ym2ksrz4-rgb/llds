@@ -60,23 +60,27 @@ export function Sheet({ onClose, children, title, eyebrow, photo }: { onClose: (
   if (dy) style.transform = `translateY(${dy}px)`;
   if (drag.current?.mode) style.transition = "none";
   const head = photo ? (
-    <div className="hero photo kb sheet-hero" data-testid="sheet-hero"><span className="bg warm" style={{ backgroundImage: `url(${photo})` }} />
-      <div className="handle" />
-      <div>{eyebrow && <div className="eyebrow">{eyebrow}</div>}{title && <h2 className="display">{title}</h2>}</div>
-    </div>
+    <div className="sheet-grab photo-grab" onPointerDown={(e) => start(e, false)} onPointerMove={move} onPointerUp={end} onPointerCancel={end}><div className="handle" /></div>
   ) : (
-    <div className="sheet-head">
-      <div className="handle" />
-      {eyebrow && <div className="eyebrow">{eyebrow}</div>}
-      {title && <h2 className="display" style={{ margin: 0 }}>{title}</h2>}
+    <div className="sheet-grab" onPointerDown={(e) => start(e, false)} onPointerMove={move} onPointerUp={end} onPointerCancel={end}>
+      <div className="sheet-head">
+        <div className="handle" />
+        {eyebrow && <div className="eyebrow">{eyebrow}</div>}
+        {title && <h2 className="display" style={{ margin: 0 }}>{title}</h2>}
+      </div>
     </div>
   );
+  const hero = photo ? (
+    <div className="hero photo kb sheet-hero" data-testid="sheet-hero"><span className="bg warm" style={{ backgroundImage: `url(${photo})` }} />
+      <div>{eyebrow && <div className="eyebrow">{eyebrow}</div>}{title && <h2 className="display">{title}</h2>}</div>
+    </div>
+  ) : null;
   return createPortal(
     <div className={"sheet-bg" + (closing ? " closing" : "")} onClick={() => { if (Date.now() - dragged.current > 300) close(); }} data-testid="sheet-bg">
       <div ref={sheetRef} className={"sheet" + (photo ? " withphoto" : "") + (h !== null ? " sized" : "")} style={style} role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
         <button type="button" className="sheet-close" aria-label={t("common.close")} data-testid="sheet-close" onClick={close}>×</button>
-        <div className="sheet-grab" onPointerDown={(e) => start(e, false)} onPointerMove={move} onPointerUp={end} onPointerCancel={end}>{head}</div>
-        <div ref={bodyRef} className="sheet-body" onPointerDown={(e) => start(e, true)} onPointerMove={move} onPointerUp={end} onPointerCancel={end}>{children}</div>
+        {head}
+        <div ref={bodyRef} className={"sheet-body" + (photo ? " withhero" : "")} onPointerDown={(e) => start(e, true)} onPointerMove={move} onPointerUp={end} onPointerCancel={end}>{hero}{children}</div>
       </div>
     </div>,
     document.body,

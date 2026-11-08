@@ -49,7 +49,7 @@ await p.click("text=Bed om vikar"); await p.waitForSelector(".toast"); out.sub =
 await p.click(".days .day >> nth=1"); await p.waitForTimeout(200);
 await p.click(".cal .ev:has-text('Styrketræning Junior & Voksen')"); await p.waitForSelector(".sheet"); await p.waitForTimeout(300);
 out.noAttendanceBtn = !(await p.$(".sheet button:has-text('Fremmøde')")); // presence is assumed unless absent – no tick needed on non-punch teams
-await p.mouse.click(195, 140); await p.waitForTimeout(300);
+await p.click("[data-testid=sheet-close]"); await p.waitForTimeout(400);
 await shot(4); await logout();
 
 // 4. Sofie (trainer) sees substitute wanted on Home and takes it

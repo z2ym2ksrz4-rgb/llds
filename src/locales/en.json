@@ -822,7 +822,7 @@
     "adminTitle": "Payments",
     "adminSub": "Season payments, website sign-ups, send payment requests with a discount",
     "request": "Send payment request",
-    "open": "Open",
+    "open": "Open MobilePay",
     "all": "All",
     "noneAdmin": "No payments here.",
     "adminHint": "“Mark paid” puts the dancer on the team, approves the profile and sends a receipt by e-mail.",
@@ -852,7 +852,13 @@
     "requested": "Sign-up sent",
     "ratesText": "Line gets back to you about payment.",
     "feeHint": "Instalments: {{fee}} kr. per instalment – only one fee per instalment, however many teams.",
-    "markRate": "Mark instalment {{k}} paid"
+    "markRate": "Mark instalment {{k}} paid",
+    "eyebrow": "MobilePay",
+    "to": "to",
+    "reference": "Write in the comment",
+    "hint": "On the phone: tap the button. On a computer: scan the QR code with MobilePay. Then tap “I have paid”.",
+    "claim": "I have paid",
+    "openFilter": "Open"
   },
   "milestones": {
     "title": "Milestones",

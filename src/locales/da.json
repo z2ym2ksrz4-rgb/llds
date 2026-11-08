@@ -822,7 +822,7 @@
     "adminTitle": "Betalinger",
     "adminSub": "Sæsonbetalinger, web-tilmeldinger, send betalingsanmodning med rabat",
     "request": "Send betalingsanmodning",
-    "open": "Åbne",
+    "open": "Åbn MobilePay",
     "all": "Alle",
     "noneAdmin": "Ingen betalinger her.",
     "adminHint": "“Markér betalt” sætter danseren på holdet, godkender profilen og sender en kvittering på e-mail.",
@@ -852,7 +852,13 @@
     "requested": "Tilmelding sendt",
     "ratesText": "Line vender tilbage om betalingen.",
     "feeHint": "Ratebetaling: {{fee}} kr. pr. rate – kun ét gebyr pr. rate, uanset hvor mange hold.",
-    "markRate": "Markér rate {{k}} betalt"
+    "markRate": "Markér rate {{k}} betalt",
+    "eyebrow": "MobilePay",
+    "to": "til",
+    "reference": "Skriv i kommentar",
+    "hint": "På telefonen: tryk knappen. På computer: scan QR-koden med MobilePay. Tryk derefter “Jeg har betalt”.",
+    "claim": "Jeg har betalt",
+    "openFilter": "Åbne"
   },
   "milestones": {
     "title": "Milepæle",

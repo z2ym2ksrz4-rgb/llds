@@ -110,7 +110,7 @@ export function PaymentsAdmin() {
   return (
     <section className="screen">
       <header className="topbar"><h1 className="display">{t("pay.adminTitle")}</h1><button className="small" onClick={() => setCompose(true)} data-testid="pay-new">+ {t("pay.request")}</button></header>
-      <div className="row between"><div className="subtabs" style={{ margin: 0 }}><button className={filter === "open" ? "on" : ""} onClick={() => setFilter("open")}>{t("pay.open")}</button><button className={filter === "all" ? "on" : ""} onClick={() => setFilter("all")}>{t("pay.all")}</button></div><span className="tiny">{shown.length} · {kr(sum)}</span></div>
+      <div className="row between"><div className="subtabs" style={{ margin: 0 }}><button className={filter === "open" ? "on" : ""} onClick={() => setFilter("open")}>{t("pay.openFilter")}</button><button className={filter === "all" ? "on" : ""} onClick={() => setFilter("all")}>{t("pay.all")}</button></div><span className="tiny">{shown.length} · {kr(sum)}</span></div>
       <div className="card list" data-testid="admin-payments">
         {shown.map((p) => (
           <div key={p.id} className="item" data-testid="admin-payment">

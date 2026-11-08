@@ -115,7 +115,7 @@ export function EventSheet({ event, staff, onClose, onEdit, onChanged, toast }: 
       {hats.length > 0 && (
         <div className="card" style={{ margin: 0 }}><div className="eyebrow">{t("events.signup")}</div>
           {hats.map((p) => { const s = mine(p.id); return (
-            <div key={p.id} className="row between"><span>{p.first_name}{s ? <span className={"chip small " + (s.paid || !event.price_dkk ? "ok" : s.claimed_paid_at ? "pend" : "warn")} style={{ marginLeft: 8 }}>{s.paid || !event.price_dkk ? t("events.on") : s.claimed_paid_at ? t("events.claimed") : t("events.unpaid")}</span> : null}</span>
+            <div key={p.id} className="signrow"><span className="who"><span>{p.first_name}</span>{s ? <span className={"chip small " + (s.paid || !event.price_dkk ? "ok" : s.claimed_paid_at ? "pend" : "warn")}>{s.paid || !event.price_dkk ? t("events.on") : s.claimed_paid_at ? t("events.claimed") : t("events.unpaid")}</span> : null}</span>
               <div className="row">{s && event.price_dkk && !s.paid && !s.claimed_paid_at && <button className="small" onClick={() => setPay(p.id)}>{t("events.payBtn")}</button>}
                 <button className={s ? "ghost small" : "small"} data-testid="signup" disabled={deadlinePassed && !s} onClick={() => void toggle(p.id)}>{s ? t("events.withdraw") : t("events.signUp")}</button></div></div>); })}
           {deadlinePassed && <p className="tiny">{t("events.deadlinePassed")}</p>}

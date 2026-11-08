@@ -13,7 +13,7 @@ const pick = async (name) => { await p.click("[data-testid=avatar]"); await p.wa
 out.tabsAdmin = await tabs();
 await p.click("[data-testid=avatar]"); await p.waitForSelector("[data-testid=view-as] .persona");
 out.personas = await p.$$eval("[data-testid=view-as] .persona b", (e) => e.map((x) => x.textContent.split(" ·")[0]));
-await p.mouse.click(195, 20); await p.waitForSelector(".sheet-bg", { state: "detached" });
+await p.click("[data-testid=sheet-close]"); await p.waitForSelector(".sheet-bg", { state: "detached" });
 // trainer
 await pick("Rasmus"); out.viewbar = await p.textContent("[data-testid=viewbar]"); out.tabsTrainer = await tabs();
 await p.click("nav.tabbar >> text=/^(Mit hold|Hold)$/"); await p.waitForSelector(".teampick"); out.trainerTeam = await p.textContent(".teampick strong");
