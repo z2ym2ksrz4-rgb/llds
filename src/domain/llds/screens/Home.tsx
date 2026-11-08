@@ -52,6 +52,7 @@ export function Home() {
   }, [isAdmin]);
   useEffect(() => { void load(); }, [load, viewing.personId]);
 
+  const teamId = useAuth((s) => s.teamId);
   const teamIds = new Set(me.memberships.filter((m) => m.person_id === viewing.personId).map((m) => m.team_id));
   const today = new Date().toDateString();
   const staffToday = sessions.filter((s) => (s.trainer_id === me.person.id || s.substitute_id === me.person.id) && new Date(s.starts_at).toDateString() === today);
@@ -60,7 +61,6 @@ export function Home() {
   const todayAbs = absences.filter((a) => sessions.some((s) => s.id === a.session_id && new Date(s.starts_at).toDateString() === today));
   const myTeamIds = new Set(me.memberships.map((m) => m.team_id));
   const hero = events.find((e) => !e.team_ids.length || e.team_ids.some((id) => myTeamIds.has(id))) ?? events[0];
-  const daysTo = hero ? Math.max(0, Math.round((new Date(hero.starts_at).getTime() - Date.now()) / 864e5)) : 0;
   const openPay = [...orders.filter((o) => o.status === "awaiting_payment").map((o) => ({ id: o.id, label: `${t("shop.title")} #${o.number}`, sub: o.claimed_paid_at ? t("shop.status.claimed") : t("shop.status.awaiting_payment"), amount: o.total_dkk })),
     ...cards.filter((c) => c.status === "awaiting_payment").map((c) => ({ id: c.id, label: c.type_name, sub: c.claimed_paid_at ? t("punch.status.claimed") : t("punch.status.awaiting_payment"), amount: c.price_dkk }))];
   const myMilestones = milestones.filter((m) => m.person_id === viewing.personId);
@@ -96,7 +96,6 @@ export function Home() {
   const heroImg = resolveImage(ownPhoto) ?? catalogUrl(hero?.image_key) ?? catalogUrl(appearance.images?.hero) ?? artFor(viewing.personId, ["group", "trails", "studio"]);
   const hour = new Date().getHours(); const tone = hour < 10 ? "morning" : hour < 17 ? "day" : "evening";
   const greeting = t(`home.greet.${tone}`, { name: me.person.first_name }); // always the logged-in person – the child's name goes on the sections below
-  const nextUp = week[0];
   const heroRef = useRef<HTMLDivElement>(null);
   useEffect(() => { // parallax: image moves slower than the page, text fades
     let raf = 0; const on = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { const el = heroRef.current; if (!el) return; const y = window.scrollY; el.style.setProperty("--py", `${y * 0.35}px`); el.style.setProperty("--fade", String(Math.max(0, 1 - y / 320))); }); };
@@ -112,18 +111,7 @@ export function Home() {
         <div className="homehero-text">
           <div className="eyebrow">{dateLine}</div>
           <h1 className="display">{greeting}</h1>
-          {nextUp ? (
-            <button className="nextup" data-testid="nextup" onClick={() => (nextUp.session ? setOpen(nextUp.session) : nextUp.event ? setOpenEvent(nextUp.event) : setTab("rooms"))}>
-              <span className="eyebrow">{t("home.nextUp")} · {new Date(nextUp.at).toDateString() === today ? t("home.today") : dateLabel(nextUp.at)} {hm(nextUp.at)}</span>
-              <strong>{nextUp.title}</strong><span className="small muted">{nextUp.sub}</span>
-            </button>
-          ) : hero ? (
-            <button className="nextup" data-testid="nextup" onClick={() => setOpenEvent(hero)}><span className="eyebrow">{t("home.nextUp")} · {daysTo === 0 ? t("home.today") : t("home.inDays", { n: daysTo })}</span><strong>{hero.title}</strong><span className="small muted">{dateLabel(hero.starts_at)}{hero.place ? ` · ${hero.place}` : ""}</span></button>
-          ) : null}
         </div>
-      </div>
-      <div className="weekstrip" aria-hidden="true">
-        {strip.map((d) => { const key = d.toDateString(); const n = week.filter((w) => new Date(w.at).toDateString() === key).length; return <span key={key} className={"d" + (key === today ? " today" : "") + (n ? " has" : "")}><small>{DAY_SHORT[(d.getDay() + 6) % 7]}</small><b>{d.getDate()}</b><i /></span>; })}
       </div>
     </>),
     stats: () => (<>
@@ -175,6 +163,10 @@ export function Home() {
     </>),
     teampick: () => (<>
       {(!isAdmin || teamIds.size > 0) && <TeamPicker />}
+      {/* week strip: the dots follow the team chosen above – its trainings and events */}
+      <div className="weekstrip" aria-hidden="true" data-testid="weekstrip">
+        {strip.map((d) => { const key = d.toDateString(); const n = sessions.filter((x) => x.team_id === teamId && !x.cancelled && new Date(x.starts_at).toDateString() === key).length + events.filter((e) => new Date(e.starts_at).toDateString() === key && (!e.team_ids.length || (teamId ? e.team_ids.includes(teamId) : false))).length; return <span key={key} className={"d" + (key === today ? " today" : "") + (n ? " has" : "")}><small>{DAY_SHORT[(d.getDay() + 6) % 7]}</small><b>{d.getDate()}</b><i /></span>; })}
+      </div>
     </>),
     week: () => (<>
       {(week.length > 0 || teamIds.size > 0) && (
