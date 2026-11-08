@@ -1,5 +1,6 @@
 import { shiftOccurrence } from "./schedule-util";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { downscaleImage } from "./image";
 import type { Absence, Booking, Member, Membership, Person, PersonStatus, Role, Room, RosterEntry, Session, SessionInput, Team, TeamInput } from "./types";
 
 type Fail = (e: { message: string } | null) => void;
@@ -84,6 +85,8 @@ export function supabaseSchedule(sb: SupabaseClient, fail: Fail, schoolId: () =>
       const { data: ms } = await sb.from("membership").select("person_id,team_id,role");
       const { data: gs } = await sb.from("guardian").select("parent_id,child_id");
       const P = (persons ?? []) as Person[]; const M = (ms ?? []) as Membership[]; const G = gs ?? [];
+      const paths = P.filter((p) => p.photo_path).map((p) => p.photo_path as string);
+      if (paths.length) { const { data: signed } = await sb.storage.from("media").createSignedUrls(paths, 3600); for (const p of P) { const hit = signed?.find((x) => x.path === p.photo_path); if (hit?.signedUrl) p.photo_url = hit.signedUrl; } }
       return P.map((p) => ({ ...p, memberships: M.filter((m) => m.person_id === p.id), children: P.filter((c) => G.some((g) => g.parent_id === p.id && g.child_id === c.id)), parents: P.filter((c) => G.some((g) => g.child_id === p.id && g.parent_id === c.id)) }));
     },
     async setMemberships(pid: string, ms: { team_id: string; role: Role }[]) {
@@ -102,7 +105,13 @@ export function supabaseSchedule(sb: SupabaseClient, fail: Fail, schoolId: () =>
       if (i.team_ids.length) { const { error: e3 } = await sb.from("membership").insert(i.team_ids.map((team_id) => ({ person_id: cid, team_id, role: "dancer" }))); fail(e3); }
       return cid;
     },
-    async updatePerson(pid: string, patch: { first_name?: string; last_name?: string; birth_date?: string | null; phone?: string | null }) {
+    async uploadAvatar(pid: string, file: File) {
+      const path = `${await schoolId()}/avatars/${pid}/${crypto.randomUUID()}.jpg`;
+      const { error } = await sb.storage.from("media").upload(path, await downscaleImage(file, 512, 0.85), { contentType: "image/jpeg" }); fail(error);
+      const { error: e2 } = await sb.from("person").update({ photo_path: path }).eq("id", pid); fail(e2);
+      return path;
+    },
+    async updatePerson(pid: string, patch: { first_name?: string; last_name?: string; birth_date?: string | null; phone?: string | null; bio?: string | null; photo_path?: string | null }) {
       const row: Record<string, unknown> = { ...patch }; if ("birth_date" in patch) row.birth_year = patch.birth_date ? Number(patch.birth_date.slice(0, 4)) : null;
       const { error } = await sb.from("person").update(row).eq("id", pid); fail(error);
     },

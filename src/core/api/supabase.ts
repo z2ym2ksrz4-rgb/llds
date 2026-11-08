@@ -18,6 +18,8 @@ export function supabaseApi(url: string, anonKey: string): Api {
       const childIds = (g ?? []).map((r) => r.child_id as string);
       const children = childIds.length ? ((await sb.from("person").select("*").in("id", childIds)).data ?? []) as Person[] : [];
       const ids = [person.id, ...childIds];
+      const avatars = [person, ...children].filter((p) => p.photo_path).map((p) => p.photo_path as string);
+      if (avatars.length) { const { data: signed } = await sb.storage.from("media").createSignedUrls(avatars, 3600); for (const p of [person, ...children]) { const hit = signed?.find((x) => x.path === p.photo_path); if (hit?.signedUrl) p.photo_url = hit.signedUrl; } }
       const memberships = ((await sb.from("membership").select("person_id,team_id,role").in("person_id", ids)).data ?? []) as Membership[];
       const teams = person.status === "approved" ? (((await sb.from("team").select("*").eq("archived", false).order("sort")).data ?? []) as Team[]) : [];
       const covers = teams.filter((t) => t.cover_path).map((t) => t.cover_path as string);

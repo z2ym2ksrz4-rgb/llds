@@ -9,6 +9,7 @@ import { useAuth } from "@/core/auth";
 import { useNav } from "@/core/nav";
 import { TeamPicker } from "../components/TeamPicker";
 import { SessionSheet } from "../components/SessionSheet";
+import { Avatar } from "../components/Profile";
 import { Sheet, Toast } from "../components/Sheet";
 import { MessageComposer, MessageSheet } from "../components/Messages";
 import { ThreadComposer, ThreadSheet } from "../components/Threads";
@@ -91,9 +92,9 @@ export function TeamScreen() {
       <button className="linklike" onClick={() => setPage("team")}>‹ {team.name}</button>
       <header className="topbar"><h1 className="display">{t("team.dancers")} · {stats.dancers}</h1></header>
       <div className="card list">
-        {trainers.map((p) => <div key={p.id} className="item"><span className="avatar">{p.first_name[0]}</span><span className="grow">{p.first_name} {p.last_name}<div className="tiny">{t(`roles.${p.memberships.find((m) => m.team_id === team.id)?.role ?? "trainer"}`)}</div><Contacts person={p} /></span></div>)}
-        {dancers.map((p) => <div key={p.id} className="item"><span className="avatar">{p.first_name[0]}</span><span className="grow">{p.first_name} {p.last_name}{p.birth_year ? <span className="tiny"> · {p.birth_year}</span> : ""}
-          <Contacts person={p} />{p.photo_consent === false && <div className="tiny">{t("team.noPhotoConsent")}</div>}<EmblemRow badges={badges.filter((b) => b.person_id === p.id)} size="sm" /></span>{p.supervised_by && <span className="chip small">{t("team.childAccount")}</span>}<button className="ghost small" aria-label={t("badges.give")} data-testid="give-badge" onClick={() => setGiveTo(p)}>🎖</button><button className="ghost small" aria-label={t("milestones.give")} data-testid="give-milestone" onClick={() => { setAward(p); setAwardTitle(""); }}>🏅</button></div>)}
+        {trainers.map((p) => <div key={p.id} className="item"><Avatar person={p} /><span className="grow">{p.first_name} {p.last_name}<div className="tiny">{t(`roles.${p.memberships.find((m) => m.team_id === team.id)?.role ?? "trainer"}`)}</div>{p.bio && <div className="tiny bio">{p.bio}</div>}<Contacts person={p} /></span></div>)}
+        {dancers.map((p) => <div key={p.id} className="item"><Avatar person={p} /><span className="grow">{p.first_name} {p.last_name}{p.birth_year ? <span className="tiny"> · {p.birth_year}</span> : ""}
+          {p.bio && <div className="tiny bio">{p.bio}</div>}<Contacts person={p} />{p.photo_consent === false && <div className="tiny">{t("team.noPhotoConsent")}</div>}<EmblemRow badges={badges.filter((b) => b.person_id === p.id)} size="sm" /></span>{p.supervised_by && <span className="chip small">{t("team.childAccount")}</span>}<button className="ghost small" aria-label={t("badges.give")} data-testid="give-badge" onClick={() => setGiveTo(p)}>🎖</button><button className="ghost small" aria-label={t("milestones.give")} data-testid="give-milestone" onClick={() => { setAward(p); setAwardTitle(""); }}>🏅</button></div>)}
         {!staff && <p className="muted">{t("team.rosterStaffOnly")}</p>}
       </div>
       {giveTo && <GiveEmblemSheet personId={giveTo.id} personName={giveTo.first_name} teamId={team.id} onClose={() => setGiveTo(null)} onGiven={(b) => { setGiveTo(null); confetti(); say(t("badges.given", { name: giveTo.first_name, badge: `${b.emoji} ${b.name}` })); void load(); }} />}

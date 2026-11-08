@@ -6,10 +6,8 @@ import { useNav } from "@/core/nav";
 import { SettingsScreen } from "@/app/SettingsScreen";
 import { JoinTeam, MyPayments } from "./Payments";
 import { Toast } from "../components/Sheet";
-import { Shop } from "./Shop";
-import { PunchCards } from "./PunchCards";
 
-type Page = "menu" | "shop" | "punch" | "milestones" | "settings" | "payments";
+type Page = "menu" | "milestones" | "settings" | "payments";
 
 /** "Mere": events, shop, punch cards, milestones, settings. */
 export function More() {
@@ -17,8 +15,6 @@ export function More() {
   const [page, setPage] = useState<Page>("menu");
   const [join, setJoin] = useState(false); const [toast, setToast] = useState<string | null>(null); const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
   const setTab = useNav((s) => s.setTab);
-  if (page === "shop") return <Shop onBack={() => setPage("menu")} />;
-  if (page === "punch") return <PunchCards onBack={() => setPage("menu")} />;
   if (page === "milestones") return <Milestones onBack={() => setPage("menu")} />;
   if (page === "settings") return <div><button className="linklike" onClick={() => setPage("menu")}>‹ {t("nav.more")}</button><SettingsScreen /></div>;
   if (page === "payments") return <MyPayments onBack={() => setPage("menu")} />;

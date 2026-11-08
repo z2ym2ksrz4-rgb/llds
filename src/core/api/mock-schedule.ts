@@ -143,7 +143,8 @@ export function scheduleOps(get: () => { S: SchedState; persons: Person[]; membe
       for (const team_id of i.team_ids) g.memberships.push({ person_id: cid, team_id, role: "dancer" });
       g.save(); g.emit(); return cid;
     },
-    async updatePerson(pid: string, patch: { first_name?: string; last_name?: string; birth_date?: string | null; phone?: string | null }) { const g = get(); const p = g.persons.find((x) => x.id === pid); if (p) { Object.assign(p, patch); if ("birth_date" in patch) p.birth_year = patch.birth_date ? Number(patch.birth_date.slice(0, 4)) : null; } g.save(); g.emit(); },
+    async uploadAvatar(pid: string, file: File) { const g = get(); const p = g.persons.find((x) => x.id === pid); const url = URL.createObjectURL(file); if (p) { p.photo_path = "mock/" + pid; p.photo_url = url; } g.save(); g.emit(); return "mock/" + pid; },
+    async updatePerson(pid: string, patch: { first_name?: string; last_name?: string; birth_date?: string | null; phone?: string | null; bio?: string | null; photo_path?: string | null }) { const g = get(); const p = g.persons.find((x) => x.id === pid); if (p) { Object.assign(p, patch); if ("birth_date" in patch) p.birth_year = patch.birth_date ? Number(patch.birth_date.slice(0, 4)) : null; } g.save(); g.emit(); },
     async setPersonStatus(pid: string, status: PersonStatus) { const g = get(); const p = g.persons.find((x) => x.id === pid); if (p) p.status = status; g.save(); g.emit(); },
     async setAdmin(pid: string, isAdmin: boolean) { const g = get(); const p = g.persons.find((x) => x.id === pid); if (p) p.is_admin = isAdmin; g.save(); g.emit(); },
     async staffList() { const g = get(); return g.persons.filter((p) => p.status === "approved" && (p.is_admin || g.memberships.some((m) => m.person_id === p.id && m.role !== "dancer"))); },

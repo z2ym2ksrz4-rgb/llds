@@ -770,7 +770,11 @@
     "addToCart": "Læg i kurv",
     "added": "Lagt i kurven",
     "payTitle": "Ordre #{{n}}",
-    "claimed": "Tak – Line tjekker MobilePay og markerer ordren betalt."
+    "claimed": "Tak – Line tjekker MobilePay og markerer ordren betalt.",
+    "history": "Historik",
+    "buyingAs": "Du handler som {{name}} – skift person øverst på Hjem, hvis det skal være et barn.",
+    "cartEmpty": "Kurven er tom.",
+    "noHistory": "Ingen køb endnu."
   },
   "punch": {
     "title": "Klippekort",
@@ -792,7 +796,13 @@
     "hint": "Kortet aktiveres af Line, når betalingen er modtaget – så er du automatisk på holdet.",
     "claimed": "Tak – Line aktiverer kortet, når betalingen er modtaget.",
     "forTeams": "Klippekort gælder kun på:",
-    "notForOthers": "Andre hold betaler sæsonpris og skal ikke bruge klip."
+    "notForOthers": "Andre hold betaler sæsonpris og skal ikke bruge klip.",
+    "haveLeft": "Du har {{n}} klip tilbage",
+    "afterThis": "{{n}} tilbage efter denne time",
+    "buyNew": "Køb nyt klippekort",
+    "pendingCard": "Dit klippekort venter på aktivering",
+    "noCard": "Intet aktivt klippekort",
+    "noCardSub": "Holdet kører på klippekort – køb et i shoppen, så aktiverer Line det, når betalingen er set."
   },
   "pay": {
     "title": "Sæsonbetalinger",
@@ -1147,5 +1157,24 @@
     "emptyHint": "Vælger du ingen, vælger appen selv tilfældigt blandt holdets billeder.",
     "edit": "Billeder til forsiden",
     "saved": "Karrusellen er opdateret"
+  },
+  "profile": {
+    "title": "Min profil",
+    "sub": "Billede og en kort tekst om dig – valgfrit. Vises for holdkammerater og trænere i appen.",
+    "childNote": "Barnets profil – du styrer billede og tekst, indtil barnet får eget login.",
+    "addPhoto": "Tilføj billede",
+    "changePhoto": "Skift billede",
+    "removePhoto": "Fjern",
+    "photoSaved": "Billedet er gemt.",
+    "photoRemoved": "Billedet er fjernet.",
+    "bio": "Om mig",
+    "bioPh": "Fx: Danser showdance på The AXIS, elsker konkurrencer og kage ☕",
+    "bioWho": "vises på holdets danserliste",
+    "bioSaved": "Teksten er gemt."
+  },
+  "wallet": {
+    "title": "Klippekort og køb",
+    "noCards": "Ingen klippekort endnu.",
+    "toShop": "Gå til shoppen"
   }
 }

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type Member, type Absence, type Person, type Session, type SessionInput, type Team, type Room } from "@/core/api";
 import { useAuth } from "@/core/auth";
+import { PunchStatus } from "../screens/PunchCards";
 import { Sheet } from "./Sheet";
 import { dateLabel, hm, hhmm, SEASON_END, isoDate } from "../lib/time";
 import { shiftOccurrence } from "@/core/api/schedule-util";
@@ -63,6 +64,7 @@ export function SessionSheet({ session, absences, onClose, onChanged, toast }: {
       ))}
 
       {/* absence */}
+      {dancerHere && punchTeam && !session.cancelled && !past && mode === "view" && <PunchStatus personId={viewing.personId} />}
       {dancerHere && !session.cancelled && !past && mode === "view" && (myAbsence
         ? <div className="row between"><span className="chip warn">{t("session.absenceSentChip")}{myAbsence.reason ? ` · ${t(`absence.${myAbsence.reason}`)}` : ""}</span><button className="linklike" onClick={() => void withdraw()}>{t("session.withdraw")}</button></div>
         : <button className="ghost" onClick={() => setMode("absence")}>{hatName ? t("session.reportAbsenceFor", { name: hatName }) : t("session.reportAbsence")}</button>)}

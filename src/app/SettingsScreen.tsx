@@ -1,6 +1,8 @@
 import { ageOf } from "@/domain/llds/lib/time";
 import { resetTour } from "@/domain/llds/components/Tour";
 import { NotifySettings } from "@/domain/llds/components/NotifyPrompt";
+import { ProfileSection } from "@/domain/llds/components/Profile";
+import { MyWallet } from "@/domain/llds/screens/PunchCards";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSettings } from "@/core/settings";
@@ -24,6 +26,8 @@ export function SettingsScreen() {
     <section className="screen">
       <header className="topbar"><h1 className="display">{t("nav.settings")}</h1></header>
       {me && <div className="card"><strong>{me.person.first_name} {me.person.last_name}</strong><div className="tiny">{me.person.email} · {me.person.phone}</div></div>}
+      <ProfileSection />
+      <MyWallet />
 
       {me && me.children.length > 0 && (
         <div className="sec"><h2>{t("settings.children")}</h2>

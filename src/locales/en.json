@@ -770,7 +770,11 @@
     "addToCart": "Add to cart",
     "added": "Added to cart",
     "payTitle": "Order #{{n}}",
-    "claimed": "Thanks – Line checks MobilePay and marks the order paid."
+    "claimed": "Thanks – Line checks MobilePay and marks the order paid.",
+    "history": "History",
+    "buyingAs": "You are shopping as {{name}} – switch person at the top of Home if it should be a child.",
+    "cartEmpty": "Your basket is empty.",
+    "noHistory": "No purchases yet."
   },
   "punch": {
     "title": "Punch cards",
@@ -792,7 +796,13 @@
     "hint": "Line activates the card once payment is received – then you are on the team automatically.",
     "claimed": "Thanks – Line activates the card once payment is received.",
     "forTeams": "Punch cards are only for:",
-    "notForOthers": "Other teams pay a season fee and do not use punches."
+    "notForOthers": "Other teams pay a season fee and do not use punches.",
+    "haveLeft": "You have {{n}} punches left",
+    "afterThis": "{{n}} left after this class",
+    "buyNew": "Buy a new punch card",
+    "pendingCard": "Your punch card awaits activation",
+    "noCard": "No active punch card",
+    "noCardSub": "This team runs on punch cards – buy one in the shop and Line activates it once the payment is seen."
   },
   "pay": {
     "title": "Season payments",
@@ -1147,5 +1157,24 @@
     "emptyHint": "Choose none and the app picks randomly from the team's pictures.",
     "edit": "Pictures for Home",
     "saved": "Carousel updated"
+  },
+  "profile": {
+    "title": "My profile",
+    "sub": "Picture and a short text about you – optional. Shown to team mates and trainers in the app.",
+    "childNote": "The child's profile – you manage picture and text until the child gets its own login.",
+    "addPhoto": "Add picture",
+    "changePhoto": "Change picture",
+    "removePhoto": "Remove",
+    "photoSaved": "Picture saved.",
+    "photoRemoved": "Picture removed.",
+    "bio": "About me",
+    "bioPh": "E.g.: Dances showdance on The AXIS, loves competitions and cake ☕",
+    "bioWho": "shown on the team's dancer list",
+    "bioSaved": "Text saved."
+  },
+  "wallet": {
+    "title": "Punch cards and purchases",
+    "noCards": "No punch cards yet.",
+    "toShop": "Go to the shop"
   }
 }
