@@ -16,10 +16,11 @@ export function TopRight() {
   const signOut = useAuth((s) => s.signOut);
   const viewAs = useAuth((s) => s.viewAs);
   const setViewAs = useAuth((s) => s.setViewAs);
-  const options = useAuth((s) => s.viewOptions)();
+  const personas = useAuth((s) => s.personas); const loadPersonas = useAuth((s) => s.loadPersonas);
   const realAdmin = useAuth((s) => !!s.realMe?.person.is_admin);
   const setTab = useNav((s) => s.setTab);
   const [open, setOpen] = useState(false);
+  useEffect(() => { if (open && realAdmin) void loadPersonas(); }, [open, realAdmin, loadPersonas]);
   return (
     <div className="row">
       <LangFlags />
@@ -28,9 +29,16 @@ export function TopRight() {
       <button className="avatar" aria-label={t("nav.profile")} data-testid="avatar" data-tour="avatar" onClick={() => setOpen(true)}>{me.person.first_name[0]}{me.person.last_name[0] ?? ""}</button>
       {open && (
         <Sheet onClose={() => setOpen(false)} eyebrow={me.person.email ?? ""} title={`${me.person.first_name} ${me.person.last_name}`}>
-          {options.length > 1 && (
+          {realAdmin && (
             <div className="field"><span>{t("view.as")}</span>
-              <div className="chips" data-testid="view-as">{options.map((r) => <button key={r} className={"chip" + ((viewAs ?? (realAdmin ? "admin" : null)) === r || (!viewAs && !realAdmin && r === options[0]) ? " on" : "")} onClick={() => { setViewAs(r); setOpen(false); }}>{t(`roles.${r}`)}</button>)}</div>
+              <div className="personas" data-testid="view-as">
+                <button className={"persona" + (!viewAs ? " on" : "")} onClick={() => { void setViewAs(null); setOpen(false); }}><b>{t("view.yourself")}</b><span className="tiny">{t("roles.admin")}</span></button>
+                {personas.map((p) => <button key={p.id} className={"persona" + (viewAs === p.id ? " on" : "")} onClick={() => { void setViewAs(p.id); setOpen(false); }}>
+                  <b>{p.first_name}{p.age !== null ? <span className="tiny"> · {p.age} {t("view.years")}</span> : null}</b>
+                  <span className="tiny">{p.roles.map((r) => t(`roles.${r}`)).join(" + ")}{p.children.length ? ` · ${t("view.childOf", { names: p.children.join(", ") })}` : ""}</span>
+                </button>)}
+                {!personas.length && <p className="tiny muted">{t("view.noPersonas")}</p>}
+              </div>
               <div className="tiny">{t("view.hint")}</div>
             </div>
           )}

@@ -92,7 +92,9 @@ export interface Api {
   signOut(): Promise<void>;
   onAuthChange(cb: () => void): () => void;
   /** me */
-  getMe(): Promise<Me | null>; // null = signed in but no person yet
+  getMe(): Promise<Me | null>;
+  /** Admin: the profile exactly as another person sees it ("Vis appen som" with real test personas). */
+  getMeFor(personId: string): Promise<Me>; // null = signed in but no person yet
   updateNotifyPrefs(prefs: NotifyPrefs): Promise<void>;
   deleteMyAccount(): Promise<void>;
   /* sign-ups made on the website (no app): season payment via MobilePay, Line confirms */

@@ -6,7 +6,7 @@ const p = await b.newPage({ viewport: { width: 390, height: 844 } }); await p.ad
 p.on("pageerror", (e) => out.errors.push(e.message));
 await p.goto(base, { waitUntil: "networkidle" }); await p.evaluate(() => localStorage.clear()); await p.reload({ waitUntil: "networkidle" });
 await p.fill("#email", "admin@demo"); await p.click("form button.cta"); await p.fill("#code", "000000"); await p.click("form button.cta"); await p.waitForSelector("nav.tabbar");
-await p.click("nav.tabbar >> text=/^(Mit hold|Hold)$/"); await p.waitForSelector("[data-testid=team-hero]"); await p.click(".teampick"); await p.click(".sheet .item:has-text('The AXIS')"); await p.waitForTimeout(300);
+await p.click("nav.tabbar >> text=/^(Mit hold|Hold)$/"); await p.waitForSelector("[data-testid=team-hero]"); await p.click(".teampick .chip:has-text('The AXIS')"); await p.waitForTimeout(300);
 out.heroBefore = (await p.getAttribute("[data-testid=team-hero] .bg", "style")).slice(0, 60);
 await p.click("[data-testid=go-folders]"); await p.waitForSelector("[data-testid=folder]"); await p.click("[data-testid=folder] >> nth=0"); await p.waitForSelector("#media-files", { state: "attached" });
 const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFUlEQVR4nGP8z8DwnwEKGGEMEAAATQUDAX7Y1fwAAAAASUVORK5CYII=", "base64");

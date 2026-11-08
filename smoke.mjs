@@ -56,10 +56,9 @@ await p.click("nav.tabbar >> text=Hjem"); await p.click("[data-testid=avatar]");
 await p.fill("#email", "ny@demo"); await p.click("form button.cta"); await p.fill("#code", "111111"); await p.click("form button.cta");
 try { await p.waitForSelector(".teampick", { timeout: 8000 }); } catch (e) { await shot("fail"); console.log("MAIN:", await p.evaluate(() => document.querySelector("main")?.innerText.slice(0, 400)), "STATE:", await p.evaluate(() => { const s = JSON.parse(localStorage.getItem("llds_mock") || "{}"); return JSON.stringify({ email: s.email, persons: (s.persons || []).map(x => [x.first_name, x.email, x.status]) }); })); throw e; }
 out.firstTeam = await p.textContent(".teampick strong");
-await p.click(".teampick"); await p.waitForSelector(".sheet");
-out.hats = await p.$$eval(".sheet .chips .chip", els => els.map(e => e.textContent));
-await p.click(".sheet .chip:has-text('Mille')"); await p.waitForTimeout(100);
-out.childTeams = await p.$$eval(".sheet .list .item", els => els.map(e => e.textContent));
+out.hats = await p.$$eval(".teampick .tg .lbl", els => els.map(e => e.textContent));
+await p.click(".teampick .tg:has-text('Mille') .chip >> nth=0"); await p.waitForTimeout(100);
+out.childTeams = await p.$$eval(".teampick .tg:has-text('Mille') .chip", els => els.map(e => e.textContent));
 await shot(4);
 // 4. desktop width renders (tab bar on top)
 await p.setViewportSize({ width: 1280, height: 800 }); await p.waitForTimeout(200); await shot(5);

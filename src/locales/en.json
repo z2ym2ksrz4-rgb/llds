@@ -124,7 +124,12 @@
     "toEveryone": "To everyone – from the school",
     "noTeamMessages": "No messages to the team yet.",
     "childNoDancerTeams": "{{name}} is not a dancer on any team yet – as a parent you only follow teams where {{name}} dances. ({{name}} trains {{teams}}.)",
-    "childNoTeams": "Line has not put {{name}} on a team yet."
+    "childNoTeams": "Line has not put {{name}} on a team yet.",
+    "groupTrainer": "Trainer on",
+    "groupAssistant": "Assistant on",
+    "groupDancer": "Dancer on",
+    "groupParent": "Parent of {{name}}",
+    "groupAll": "All teams (admin)"
   },
   "home": {
     "hi": "Hi {{name}}",
@@ -835,12 +840,16 @@
   },
   "view": {
     "as": "View app as",
-    "hint": "Preview the app through another role – server permissions are unchanged.",
-    "previewing": "Viewing the app as {{role}}",
+    "hint": "Test personas are real profiles (surname Testperson), so you see the app exactly as they do. What you do in the preview is saved for real.",
+    "previewing": "You are viewing the app as {{role}}",
     "exit": "Exit",
     "blockedEyebrow": "No access",
     "blocked": "Dancers on this team ({{years}}) are under {{age}} and have no login of their own. Parents see the team, trainings and photos.",
-    "asParent": "View as parent"
+    "asParent": "View as parent",
+    "yourself": "Yourself",
+    "years": "yrs",
+    "childOf": "parent of {{names}}",
+    "noPersonas": "No test personas – run migration 0036."
   },
   "badges": {
     "title": "Emblems",

@@ -7,7 +7,7 @@ p.on("pageerror", (e) => out.errors.push(e.message));
 const login = async (email) => { await p.goto(base, { waitUntil: "networkidle" }); await p.fill("#email", email); await p.click("form button.cta"); await p.fill("#code", "000000"); await p.click("form button.cta"); await p.waitForSelector("nav.tabbar"); };
 await login("admin@demo");
 await p.click("nav.tabbar >> text=/^(Mit hold|Hold)$/"); await p.waitForSelector("[data-testid=team-hero]");
-await p.click(".teampick"); await p.click(".sheet .item:has-text('The AXIS')"); await p.waitForTimeout(300);
+await p.click(".teampick .chip:has-text('The AXIS')"); await p.waitForTimeout(300);
 out.trophiesShown = !!(await p.$("[data-testid=trophies]"));
 out.badgesEmpty = (await p.textContent("[data-testid=team-badges]")).slice(0, 40);
 await p.click("[data-testid=go-dancers]"); await p.waitForSelector("[data-testid=give-badge]");

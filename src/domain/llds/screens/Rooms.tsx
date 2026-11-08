@@ -124,7 +124,7 @@ function BookSheet({ day, rooms, room_id, start, sessions, bookings, isStaff, is
     const s = atTime(day, f.start); const e = new Date(s.getTime() + f.dur * 6e4);
     const sI = s.toISOString(), eI = e.toISOString();
     if (sessions.some((x) => x.room_id === f.room_id && !x.cancelled && overlaps(sI, eI, x.starts_at, x.ends_at)) || bookings.some((x) => x.room_id === f.room_id && x.status !== "rejected" && overlaps(sI, eI, x.starts_at, x.ends_at))) { setErr(t("rooms.taken")); return; }
-    const b = await api.createBooking({ room_id: f.room_id, title: f.title || t("rooms.booking"), starts_at: sI, ends_at: eI, person_id: viewing.personId, force_pending: !!viewAs && !["admin", "trainer", "assistant"].includes(viewAs) });
+    const b = await api.createBooking({ room_id: f.room_id, title: f.title || t("rooms.booking"), starts_at: sI, ends_at: eI, person_id: viewing.personId, force_pending: !!viewAs && !me.person.is_admin && !me.memberships.some((m) => m.person_id === me.person.id && m.role !== "dancer") });
     toast(b.status === "approved" ? t("rooms.booked", { room: b.room_name }) : t("rooms.sentForApproval")); onSaved();
   };
   return (

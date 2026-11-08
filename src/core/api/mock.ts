@@ -50,23 +50,38 @@ function load(): State {
   const freja: Person = { ...line, id: "p-freja", user_id: null, first_name: "Freja", last_name: "Therkildsen", email: null, is_admin: false, birth_year: 2013, wished_roles: ["dancer"] };
   const pendingParent: Person = { ...line, id: "p-karin", user_id: "u-karin", first_name: "Karin", last_name: "Nielsen", email: "karin@demo", status: "pending", is_admin: false, wished_roles: ["parent"], wished_teams: "The AXIS (Alma)" };
   const pendingChild: Person = { ...freja, id: "p-alma", first_name: "Alma", last_name: "Nielsen", birth_year: 2012, status: "pending" };
+  // test personas for "Vis appen som" – mirror of supabase/migrations/0036_test_persons.sql
+  const yr = new Date().getFullYear();
+  const tp = (id: string, first: string, birth: number, extra: Partial<Person> = {}): Person => ({ ...line, id, user_id: null, email: null, phone: null, first_name: first, last_name: "Testperson", birth_year: birth, birth_date: `${birth}-05-15`, is_admin: false, supervised_by: null, wished_roles: [], source: "admin", ...extra });
+  const tPia = tp("t-pia", "Pia", 1984), tTilde = tp("t-tilde", "Tilde", yr - 15), tMilo = tp("t-milo", "Milo", yr - 11, { supervised_by: "t-pia" }), tIda = tp("t-ida", "Ida", yr - 8), tRasmus = tp("t-rasmus", "Rasmus", 1996), tHelle = tp("t-helle", "Helle", yr - 16), tJonas = tp("t-jonas", "Jonas", 2004), tSanne = tp("t-sanne", "Sanne", 1988), tNoor = tp("t-noor", "Noor", yr - 10), tCamilla = tp("t-camilla", "Camilla", 1981, { is_admin: true });
+  const testPersons = [tTilde, tMilo, tPia, tIda, tRasmus, tHelle, tJonas, tSanne, tNoor, tCamilla];
   return {
     email: null,
-    persons: [line, maja, sofie, st, freja, pendingParent, pendingChild],
+    persons: [line, maja, sofie, st, freja, pendingParent, pendingChild, ...testPersons],
     teams: TEAMS,
     S: seedSchedule(TEAMS, [line, maja, sofie]),
     X: seedSocial(TEAMS, [line, maja, sofie, st, freja]),
     Y: seedShop(TEAMS),
-    guardians: [{ parent_id: "p-st", child_id: "p-freja" }, { parent_id: "p-karin", child_id: "p-alma" }],
+    guardians: [{ parent_id: "p-st", child_id: "p-freja" }, { parent_id: "p-karin", child_id: "p-alma" }, { parent_id: "t-pia", child_id: "t-milo" }, { parent_id: "t-pia", child_id: "t-ida" }, { parent_id: "t-sanne", child_id: "t-noor" }, { parent_id: "t-camilla", child_id: "t-milo" }],
     memberships: [
       { person_id: "p-freja", team_id: "team-0", role: "dancer" }, { person_id: "p-freja", team_id: "team-14", role: "dancer" },
       { person_id: "p-maja", team_id: "team-12", role: "trainer" }, { person_id: "p-maja", team_id: "team-15", role: "trainer" }, { person_id: "p-maja", team_id: "team-14", role: "dancer" },
       { person_id: "p-sofie", team_id: "team-8", role: "trainer" }, { person_id: "p-sofie", team_id: "team-11", role: "trainer" }, { person_id: "p-line", team_id: "team-0", role: "trainer" }, { person_id: "p-line", team_id: "team-1", role: "trainer" },
       { person_id: "p-alma", team_id: "team-0", role: "dancer" }, { person_id: "p-karin", team_id: "team-0", role: "dancer" },
+      { person_id: "t-tilde", team_id: "team-0", role: "dancer" }, { person_id: "t-milo", team_id: "team-4", role: "dancer" }, { person_id: "t-ida", team_id: "team-11", role: "dancer" },
+      { person_id: "t-rasmus", team_id: "team-12", role: "trainer" }, { person_id: "t-rasmus", team_id: "team-5", role: "trainer" }, { person_id: "t-helle", team_id: "team-11", role: "assistant" },
+      { person_id: "t-jonas", team_id: "team-1", role: "dancer" }, { person_id: "t-jonas", team_id: "team-5", role: "trainer" }, { person_id: "t-sanne", team_id: "team-14", role: "dancer" }, { person_id: "t-noor", team_id: "team-4", role: "dancer" }, { person_id: "t-camilla", team_id: "team-0", role: "trainer" },
     ],
   };
 }
 let S = load();
+const buildMe = (person: Person): Me => {
+  const childIds = S.guardians.filter((g) => g.parent_id === person.id).map((g) => g.child_id);
+  const children = S.persons.filter((p) => childIds.includes(p.id));
+  const ids = [person.id, ...childIds];
+  const memberships = S.memberships.filter((m) => ids.includes(m.person_id));
+  return { person, children, memberships, teams: person.status === "approved" ? S.teams : [] };
+};
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch { /* ignore */ } };
 const listeners = new Set<() => void>();
 const emit = () => listeners.forEach((l) => l());
@@ -97,11 +112,11 @@ export const mockApi: Api = {
     if (!S.email) return null;
     const person = meRow();
     if (!person) return null;
-    const childIds = S.guardians.filter((g) => g.parent_id === person.id).map((g) => g.child_id);
-    const children = S.persons.filter((p) => childIds.includes(p.id));
-    const ids = [person.id, ...childIds];
-    const memberships = S.memberships.filter((m) => ids.includes(m.person_id));
-    return { person, children, memberships, teams: person.status === "approved" ? S.teams : [] };
+    return buildMe(person);
+  },
+  async getMeFor(personId: string): Promise<Me> {
+    const person = S.persons.find((p) => p.id === personId); if (!person) throw new Error("not found");
+    return buildMe(person);
   },
   async signUp(i: SignUpInput) {
     if (!S.email) throw new Error("not signed in");

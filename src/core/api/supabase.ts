@@ -1,6 +1,6 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import appConfig from "../../../app.config.json";
-import type { Api, Appearance, WebSignup, Membership, PendingPerson, Person, Role, Team } from "./types";
+import type { Api, Appearance, WebSignup, Me, Membership, PendingPerson, Person, Role, Team } from "./types";
 import { supabaseSchedule } from "./supabase-schedule";
 import { supabaseSocial } from "./supabase-social";
 import { supabaseShop } from "./supabase-shop";
@@ -13,6 +13,17 @@ export function supabaseApi(url: string, anonKey: string): Api {
   const myPersonId = async () => { const { data } = await sb.rpc("my_person_id"); return (data as string | null) ?? null; };
   const schoolId = async () => { const { data } = await sb.rpc("my_school_id"); return data as string; };
 
+  const buildMe = async (person: Person): Promise<Me> => {
+      const { data: g } = await sb.from("guardian").select("child_id").eq("parent_id", person.id);
+      const childIds = (g ?? []).map((r) => r.child_id as string);
+      const children = childIds.length ? ((await sb.from("person").select("*").in("id", childIds)).data ?? []) as Person[] : [];
+      const ids = [person.id, ...childIds];
+      const memberships = ((await sb.from("membership").select("person_id,team_id,role").in("person_id", ids)).data ?? []) as Membership[];
+      const teams = person.status === "approved" ? (((await sb.from("team").select("*").eq("archived", false).order("sort")).data ?? []) as Team[]) : [];
+      const covers = teams.filter((t) => t.cover_path).map((t) => t.cover_path as string);
+      if (covers.length) { const { data: signed } = await sb.storage.from("media").createSignedUrls(covers, 3600); for (const t of teams) { const hit = signed?.find((x) => x.path === t.cover_path); if (hit?.signedUrl) { t.alt_url = t.cover_url; t.cover_url = hit.signedUrl; } } }
+      return { person, children, memberships, teams };
+  };
   return {
     ...supabaseSchedule(sb, fail, schoolId, myPersonId),
     ...supabaseSocial(sb, fail, schoolId, myPersonId, schoolSlug),
@@ -44,16 +55,13 @@ export function supabaseApi(url: string, anonKey: string): Api {
         if (claimed) ({ data: person } = await sb.from("person").select("*").eq("id", claimed).maybeSingle());
       }
       if (!person) return null;
-      const { data: g } = await sb.from("guardian").select("child_id").eq("parent_id", person.id);
-      const childIds = (g ?? []).map((r) => r.child_id as string);
-      const children = childIds.length ? ((await sb.from("person").select("*").in("id", childIds)).data ?? []) as Person[] : [];
-      const ids = [person.id, ...childIds];
-      const memberships = ((await sb.from("membership").select("person_id,team_id,role").in("person_id", ids)).data ?? []) as Membership[];
-      const teams = person.status === "approved" ? (((await sb.from("team").select("*").eq("archived", false).order("sort")).data ?? []) as Team[]) : [];
-      const covers = teams.filter((t) => t.cover_path).map((t) => t.cover_path as string);
-      if (covers.length) { const { data: signed } = await sb.storage.from("media").createSignedUrls(covers, 3600); for (const t of teams) { const hit = signed?.find((x) => x.path === t.cover_path); if (hit?.signedUrl) { t.alt_url = t.cover_url; t.cover_url = hit.signedUrl; } } }
-      return { person: person as Person, children, memberships, teams };
+      return buildMe(person as Person);
     },
+    async getMeFor(personId: string): Promise<Me> {
+      const { data: person, error } = await sb.from("person").select("*").eq("id", personId).single(); fail(error);
+      return buildMe(person as Person);
+    },
+
 
     async updateNotifyPrefs(prefs) {
       const pid = await myPersonId(); if (!pid) return;

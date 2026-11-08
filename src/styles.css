@@ -532,3 +532,11 @@ button.cta { box-shadow:0 10px 26px -12px rgba(201,162,74,.7); }
 
 /* unread counters on the tab bar */
 .tabbar button{position:relative}.tabbar .tabbadge{position:absolute;top:4px;left:calc(50% + 6px);min-width:17px;height:17px;padding:0 5px;border-radius:999px;background:#d9534f;color:#fff;font:600 .66rem/17px Outfit,system-ui,sans-serif;font-style:normal;text-align:center;box-shadow:0 0 0 2px #0a0a0b}
+
+/* "Vis appen som" – persona cards */
+.personas{display:grid;grid-template-columns:1fr 1fr;gap:8px}.persona{text-align:left;padding:10px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:var(--fg);font:inherit;display:flex;flex-direction:column;gap:2px;min-height:58px}
+.persona.on{border-color:rgba(201,162,74,.6);background:rgba(201,162,74,.1)}.persona b{font-weight:500}.persona .tiny{line-height:1.25}
+
+/* team switcher: groups by role, chips scroll sideways when many */
+.teampick.static{cursor:default}.teamgroups{display:flex;flex-direction:column;gap:8px;margin-top:8px}.tg .lbl{display:block;margin-bottom:4px;color:var(--muted)}
+.chips.scrollx{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;-webkit-overflow-scrolling:touch}.chips.scrollx::-webkit-scrollbar{display:none}.chips.scrollx .chip{flex:none;white-space:nowrap}
