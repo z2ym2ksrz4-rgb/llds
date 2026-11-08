@@ -67,7 +67,7 @@ export function ThreadSheet({ thread, onClose, toast }: { thread: Thread; onClos
       <div className="bubbles" data-testid="bubbles">
         {msgs.map((m) => <div key={m.id} className={"bubble" + (m.sender_id === me.person.id ? " me" : "")}><div className="tiny">{m.sender_name} · {dateLabel(m.created_at)} {hm(m.created_at)}</div><div style={{ whiteSpace: "pre-wrap" }}>{m.body}</div></div>)}
       </div>
-      <div className="row"><textarea rows={2} className="grow" value={body} placeholder={t("threads.replyPlaceholder")} onChange={(e) => setBody(e.target.value)} data-testid="thread-reply" /><button className="cta small" disabled={busy || !body.trim()} onClick={() => void reply()} data-testid="thread-reply-send">{t("threads.reply")}</button></div>
+      <div className="replyrow"><textarea rows={2} value={body} placeholder={t("threads.replyPlaceholder")} onChange={(e) => setBody(e.target.value)} data-testid="thread-reply" /><button className="cta small" disabled={busy || !body.trim()} onClick={() => void reply()} data-testid="thread-reply-send">{t("threads.reply")}</button></div>
     </Sheet>
   );
 }
