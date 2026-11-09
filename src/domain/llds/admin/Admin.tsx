@@ -54,7 +54,7 @@ export function Admin() {
     ["import", t("admin.importPhotos"), t("admin.importSub"), 0],
   ];
   return (
-    <section className="screen">
+    <section className="screen adminhome">
       <header className="topbar"><h1 className="display">{t("nav.admin")}</h1></header>
       <div className="card list">
         {items.map(([k, label, sub, n]) => <button key={k} className="item" onClick={() => setPage(k)}><span className="grow">{label}<div className="tiny">{sub}</div></span>{n > 0 && <span className="chip warn small">{n}</span>}<span className="gold">›</span></button>)}

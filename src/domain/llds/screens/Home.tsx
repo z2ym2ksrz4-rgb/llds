@@ -45,7 +45,7 @@ export function Home() {
   const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
 
   const load = useCallback(async () => {
-    const from = startOfDay(new Date()), to = addDays(from, 7);
+    const from = startOfDay(new Date()), to = addDays(from, 14);   // 14 days so "vikar søges" shows in time; the week view itself cuts at 7
     const [s, b, ev, ms, o, c] = await Promise.all([api.listSessions(from.toISOString(), to.toISOString()), api.listBookings(from.toISOString(), addDays(from, isAdmin ? 30 : 7).toISOString()).catch(() => [] as Booking[]), api.listEvents(), api.listMilestones(), api.listOrders(), api.listPunchCards()]);
     void api.settleAttendance().catch(() => 0).then(() => api.listPersonBadges()).then(setBadges).catch(() => setBadges([]));
     setSessions(s); setBookings(b); setEvents(ev); setMilestones(ms); setOrders(o); setCards(c);
@@ -79,6 +79,7 @@ export function Home() {
   const nameOf = (pid: string) => (pid === me.person.id ? null : me.children.find((c) => c.id === pid)?.first_name ?? null);
   const week: WeekItem[] = [];
   for (const s of sessions) {
+    if (new Date(s.starts_at) >= weekEnd) continue;
     // I run this training if I am set on it – or I am trainer/assistant on the team (the session's trainer field is only an override)
     const staffOnTeam = !!s.team_id && me.memberships.some((m) => m.person_id === me.person.id && m.team_id === s.team_id && m.role !== "dancer");
     const mineStaff = !viewing.isChild && (s.trainer_id === me.person.id || s.substitute_id === me.person.id || s.assistant_id === me.person.id || staffOnTeam);

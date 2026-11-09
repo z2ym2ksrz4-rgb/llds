@@ -595,3 +595,40 @@ div.checklist{padding-left:0;color:inherit}
 .shophead { align-items:center; } .iconbtn .ico { stroke:currentColor; fill:none; stroke-width:1.4; stroke-linecap:round; stroke-linejoin:round; } .iconbtn { position:relative; width:40px; height:40px; border-radius:50%; background:var(--card2); border:1px solid var(--line); color:var(--gold2); display:grid; place-items:center; padding:0; } .iconbtn .tabbadge { position:absolute; top:-4px; right:-4px; }
 .product.punchprod .cover.punchcover { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; background:linear-gradient(135deg, rgba(201,162,74,.28), rgba(201,162,74,.08)); } .punchcover .display { font-size:2.4rem; color:var(--gold2); line-height:1; }
 .punchstatus.warn { border-color:rgba(224,138,138,.4); } .item .bio { margin-top:2px; font-style:italic; color:var(--muted); }
+
+/* ---------------------------------------------------------------- responsive: tablet (640–1099) and desktop (≥1100) */
+/* tablet: same single column, but the hero stops eating the screen and grids get a second column */
+@media (min-width:640px) {
+  .homehero { min-height:min(46dvh, 460px); margin-left:0; margin-right:0; border-radius:22px; overflow:hidden; border:1px solid var(--line); }
+  .homehero-top { padding-right:18px; } .homehero-text { padding:0 22px 16px; } .homehero-text h1.display { font-size:clamp(2.2rem, 5vw, 3rem); }
+  .tiles6 { grid-template-columns:repeat(6,1fr); }
+  .shop-grid { grid-template-columns:repeat(auto-fill, minmax(190px,1fr)); gap:14px; }
+  .checklist.cols { grid-template-columns:repeat(3,1fr); }
+  .galpick { grid-template-columns:repeat(5,1fr); }
+  .tcar-slide { flex-basis:46%; }
+}
+/* desktop: fixed left navigation, content centred, Home in two columns */
+@media (min-width:1100px) {
+  .app { display:grid; grid-template-columns:232px minmax(0,1fr); flex-direction:row; }
+  .tabbar { position:sticky; top:0; height:100dvh; order:-1; flex-direction:column; justify-content:flex-start; align-items:stretch; gap:4px; padding:22px 14px; border-right:1px solid var(--line); border-bottom:0; background:var(--bg2); }
+  .tabbar::before { content:"LL Dance Studio"; position:static; height:auto; background:none; display:block; font-family:var(--display); font-size:1.25rem; color:var(--gold2); padding:4px 12px 18px; letter-spacing:.02em; }
+  .tabbar button { flex-direction:row; justify-content:flex-start; width:100%; gap:12px; font-size:.78rem; letter-spacing:.08em; padding:11px 14px; border-radius:12px; }
+  .tabbar button.active { background:var(--gold-soft); color:var(--gold2); }
+  .tabbar button .ico { width:20px; height:20px; }
+  .tabbar .tabbadge { position:static; margin-left:auto; }
+  .tabbar button.active::after, .tabbar .dot { display:none; }
+  main { max-width:1180px; padding:28px 40px 60px; }
+  .screen.home { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); column-gap:28px; align-items:start; }
+  .screen.home > .homehero, .screen.home > .teampick, .screen.home > .weekstrip, .screen.home > .toast, .screen.home > .sheet-bg { grid-column:1 / -1; }
+  .screen.home > .homehero { min-height:380px; }
+  .screen.home > .sec, .screen.home > .card { margin-top:0; }
+  .sheet-bg { padding-left:232px; }
+  .toast { left:calc(232px + 16px); }
+  .shop-grid { grid-template-columns:repeat(4,1fr); }
+  .teamlist { columns:2; column-gap:24px; } .teamlist .tgroup { break-inside:avoid; }
+  .cal { font-size:.85rem; }
+  .screen.rooms .calwrap { max-width:none; }
+  .screen.adminhome > .card.list { display:grid; grid-template-columns:1fr 1fr; gap:0 24px; } .screen.adminhome > .card.list .item { break-inside:avoid; }
+}
+/* very wide: keep text lines readable */
+@media (min-width:1500px) { main { max-width:1280px; } }
