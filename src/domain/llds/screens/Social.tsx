@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { api, type Post } from "@/core/api";
 import { useAuth } from "@/core/auth";
 import { Feed, PostList } from "../components/Feed";
+import { TabNews } from "../components/TabNews";
 import { TopRight } from "../components/ProfileMenu";
 
 /** Social = the teams' own community: everyone on a team (dancers, trainers, parents) posts to their own team and comments.
@@ -20,6 +21,7 @@ export function Social() {
   return (
     <section className="screen">
       <header className="topbar"><h1 className="display">{t("nav.social")}</h1><TopRight /></header>
+      <TabNews tab="social" />
       <p className="tiny muted" style={{ margin: "0 0 6px" }}>{t("social.intro")}</p>
       <div className="chips" style={{ margin: "6px 0 10px" }}>
         <button className={"chip" + (filter === "all" ? " on" : "")} onClick={() => setFilter("all")}>{t("social.all")}</button>

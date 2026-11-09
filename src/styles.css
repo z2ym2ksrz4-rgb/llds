@@ -632,3 +632,5 @@ div.checklist{padding-left:0;color:inherit}
 }
 /* very wide: keep text lines readable */
 @media (min-width:1500px) { main { max-width:1280px; } }
+.tabnews { border-color:rgba(201,162,74,.35); margin-bottom:10px; } .tabnews .item:disabled { opacity:1; cursor:default; } .tabnews .dot.gold { width:8px; height:8px; border-radius:50%; background:var(--gold2); flex:none; }
+.item .tiny.todo { color:var(--warn); }

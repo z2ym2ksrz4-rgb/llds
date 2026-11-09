@@ -5,6 +5,8 @@ import { EventSheet } from "./Events";
 import { catalogUrl as catUrl } from "../lib/catalog";
 import { artFor } from "../lib/art";
 import { useAuth } from "@/core/auth";
+import { useNav } from "@/core/nav";
+import { TabNews } from "../components/TabNews";
 import { Sheet, Toast } from "../components/Sheet";
 import { SessionSheet, SessionEditor } from "../components/SessionSheet";
 import { addDays, dayLabel, DAY_LONG, hm, mondayOf, sameDay, startOfDay, atTime, overlaps } from "../lib/time";
@@ -32,6 +34,11 @@ export function Rooms() {
   const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
   const week = mondayOf(day);
   const [weekSessions, setWeekSessions] = useState<Session[]>([]);   // for the dots in the day picker
+  const takeRef = useNav((s) => s.takeRef); const pendingRef = useNav((s) => s.pendingRef);
+  useEffect(() => { // opened from a notification: jump to the training's day and open it
+    const sid = takeRef("session_id"); if (!sid) return;
+    void api.getSession(sid).then((sess) => { if (sess) { setDay(startOfDay(new Date(sess.starts_at))); setOpen({ kind: "session", s: sess }); } });
+  }, [pendingRef]); // eslint-disable-line react-hooks/exhaustive-deps
   const [events, setEvents] = useState<Event[]>([]);                   // events live in the calendar automatically – created, moved or deleted in Admin → Events
   const [openEvent, setOpenEvent] = useState<Event | null>(null);
   useEffect(() => { void api.listEvents(true).then(setEvents).catch(() => setEvents([])); }, [day.getTime()]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -59,6 +66,7 @@ export function Rooms() {
   return (
     <section className="screen rooms">
       <div className="rooms-bg" aria-hidden="true" style={{ backgroundImage: `url(${bgImg})` }} />
+      <TabNews tab="rooms" />
       <header className="topbar"><h1 className="display">{t("nav.rooms")}</h1>{isTrainer && <button className="ghost small" onClick={() => setOpen({ kind: "new", room_id: rooms[0]?.id ?? "", start: "16:00" })}>+ {t("session.training")}</button>}</header>
       <div className="days">
         {Array.from({ length: 7 }, (_, i) => addDays(week, i)).map((d) => (

@@ -2,8 +2,10 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type Event, type EventInput, type EventSignup, type Result } from "@/core/api";
 import { useAuth } from "@/core/auth";
+import { useNav } from "@/core/nav";
 import { ImagePicker } from "../components/ImagePicker";
 import { catalogUrl } from "../lib/catalog";
+import { TabNews } from "../components/TabNews";
 import { Sheet, Toast } from "../components/Sheet";
 import { PaySheet } from "../components/Pay";
 import { dateLabel, hm, isoDate } from "../lib/time";
@@ -19,6 +21,7 @@ export function Events({ admin }: { admin?: boolean }) {
   return (
     <section className="screen">
       <header className="topbar"><h1 className="display">{t("events.title")}</h1>{!admin && <TopRight />}</header>
+      {!admin && <TabNews tab="events" />}
       <div className="subtabs"><button className={tab === "upcoming" ? "on" : ""} onClick={() => setTab("upcoming")}>{t("events.upcoming")}</button><button className={tab === "results" ? "on" : ""} onClick={() => setTab("results")}>{t("events.results")}</button></div>
       {tab === "upcoming" && <EventsList admin={admin} />}
       {tab === "results" && <Results />}
@@ -68,6 +71,11 @@ function EventsList({ admin }: { admin?: boolean }) {
   const [toast, setToast] = useState<string | null>(null); const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
   const load = useCallback(async () => { const e = await api.listEvents(past); setEvents(e); setOpen((o) => (o ? e.find((x) => x.id === o.id) ?? null : null)); }, [past]);
   useEffect(() => { void load(); }, [load]);
+  const takeRef = useNav((s) => s.takeRef); const pendingRef = useNav((s) => s.pendingRef);
+  useEffect(() => { // opened from a notification
+    const eid = takeRef("event_id"); if (!eid) return;
+    void api.listEvents(true).then((all) => { const e = all.find((x) => x.id === eid); if (e) { if (new Date(e.starts_at) < new Date()) setPast(true); setOpen(e); } });
+  }, [pendingRef]); // eslint-disable-line react-hooks/exhaustive-deps
   const mine = new Set(me.memberships.map((m) => m.team_id));
   return (
     <div className="stack" style={{ marginTop: 10 }}>

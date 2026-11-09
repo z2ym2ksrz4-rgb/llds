@@ -6,6 +6,7 @@ import { useNav } from "@/core/nav";
 import { PaySheet } from "../components/Pay";
 import { Sheet, Toast } from "../components/Sheet";
 import { Icon } from "../components/Icons";
+import { TabNews } from "../components/TabNews";
 import { useCart } from "../lib/cart";
 import { OrderRow, PunchCardView } from "./PunchCards";
 
@@ -59,6 +60,7 @@ export function ShopScreen() {
         </div>
       </header>
       <p className="tiny muted" style={{ marginTop: -6 }}>{t("shop.buyingAs", { name: who })}</p>
+      <TabNews tab="shop" />
       <div className="shop-grid">
         {products.map((p) => <button key={p.id} className="product" onClick={() => setPick(p)} data-testid="product"><div className="cover">{p.image_url ? <img src={p.image_url} alt="" /> : <span className="display">{p.name[0]}</span>}</div><div className="small"><strong>{p.name}</strong><div className="tiny">{p.price_dkk} kr.{p.stock != null && p.stock <= 0 ? ` · ${t("shop.soldOut")}` : ""}</div></div></button>)}
         {types.map((ty) => <button key={ty.id} className="product punchprod" onClick={() => setPickCard(ty)} data-testid="buy-card"><div className="cover punchcover"><span className="display">{ty.punches}</span><span className="tiny">{t("punch.punches")}</span></div><div className="small"><strong>{ty.name}</strong><div className="tiny">{ty.price_dkk} kr. · {t("punch.valid", { days: ty.valid_days })}</div></div></button>)}

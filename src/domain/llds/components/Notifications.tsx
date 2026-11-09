@@ -4,6 +4,8 @@ import { useBadges } from "@/core/badges";
 import { api, type Notification } from "@/core/api";
 import { Sheet } from "./Sheet";
 import { Icon } from "./Icons";
+import { targetOf } from "./TabNews";
+import { useNav } from "@/core/nav";
 import { ago } from "../lib/time";
 import { browserNotify } from "../lib/notify";
 
@@ -14,6 +16,7 @@ export function Bell() {
   const { t } = useTranslation();
   const [list, setList] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
+  const openRef = useNav((s) => s.openRef);
   const load = useCallback(async () => {
     const next = await api.listNotifications();
     setList((prev) => { if (prev.length) for (const n of next.filter((x) => !x.read_at && !prev.some((p) => p.id === x.id))) browserNotify(n.title, n.body); return next; });
@@ -27,7 +30,7 @@ export function Bell() {
       {open && (
         <Sheet onClose={() => setOpen(false)} eyebrow={t("notif.eyebrow")} title={t("notif.title")}>
           <div className="list">
-            {list.map((n) => <div key={n.id} className={"item" + (n.read_at ? "" : " unread")} data-testid="notif"><span className="avatar small">{ICON[n.kind] ?? "•"}</span><span className="grow"><div>{n.title}</div>{n.body && <div className="tiny">{n.body}</div>}</span><span className="tiny">{ago(n.created_at)}</span></div>)}
+            {list.map((n) => { const tg = targetOf(n); return <button key={n.id} type="button" className={"item" + (n.read_at ? "" : " unread")} data-testid="notif" disabled={!tg} onClick={() => { if (tg) { setOpen(false); openRef(tg.tab, tg.ref); } }}><span className="avatar small">{ICON[n.kind] ?? "•"}</span><span className="grow"><div>{n.title}</div>{n.body && <div className="tiny">{n.body}</div>}</span><span className="tiny">{ago(n.created_at)}</span>{tg && <span className="gold">›</span>}</button>; })}
             {!list.length && <p className="muted">{t("notif.empty")}</p>}
           </div>
         </Sheet>

@@ -179,6 +179,7 @@ export interface Api {
   /* rooms & schedule */
   listRooms(): Promise<Room[]>;
   listSessions(fromIso: string, toIso: string): Promise<Session[]>;
+  getSession(id: string): Promise<Session | null>;
   createSession(input: SessionInput): Promise<void>;
   updateSession(id: string, patch: Partial<SessionInput> & { lesson_plan?: string | null; cancelled?: boolean; cancel_note?: string | null; substitute_wanted?: boolean; substitute_id?: string | null; lesson_plan_read_at?: string | null }, scope?: "one" | "future", opts?: { skipIds?: string[] }): Promise<void>;
   deleteSession(id: string, scope?: "one" | "future"): Promise<void>;

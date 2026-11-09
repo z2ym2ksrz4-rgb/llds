@@ -1176,5 +1176,26 @@
     "title": "Punch cards and purchases",
     "noCards": "No punch cards yet.",
     "toShop": "Go to the shop"
+  },
+  "news": {
+    "title": "New since last time",
+    "unread": "Unread",
+    "showAll": "Show all {{n}}"
+  },
+  "todo": {
+    "pending_one": "{{count}} new user awaits your approval",
+    "pending_other": "{{count}} new users await your approval",
+    "subs_one": "{{count}} training needs a substitute",
+    "subs_other": "{{count}} trainings need a substitute",
+    "bookings_one": "{{count}} booking awaits approval",
+    "bookings_other": "{{count}} bookings await approval",
+    "reports_one": "{{count}} report to handle",
+    "reports_other": "{{count}} reports to handle",
+    "orders_one": "{{count}} open order (pay/hand out)",
+    "orders_other": "{{count}} open orders (pay/hand out)",
+    "cards_one": "{{count}} punch card awaits activation",
+    "cards_other": "{{count}} punch cards await activation",
+    "payments_one": "{{count}} payment claimed – confirm in MobilePay",
+    "payments_other": "{{count}} payments claimed – confirm in MobilePay"
   }
 }

@@ -1176,5 +1176,26 @@
     "title": "Klippekort og køb",
     "noCards": "Ingen klippekort endnu.",
     "toShop": "Gå til shoppen"
+  },
+  "news": {
+    "title": "Nyt siden sidst",
+    "unread": "Ulæst",
+    "showAll": "Vis alle {{n}}"
+  },
+  "todo": {
+    "pending_one": "{{count}} ny bruger venter på din godkendelse",
+    "pending_other": "{{count}} nye brugere venter på din godkendelse",
+    "subs_one": "{{count}} træning mangler vikar",
+    "subs_other": "{{count}} træninger mangler vikar",
+    "bookings_one": "{{count}} booking venter på godkendelse",
+    "bookings_other": "{{count}} bookinger venter på godkendelse",
+    "reports_one": "{{count}} anmeldelse at behandle",
+    "reports_other": "{{count}} anmeldelser at behandle",
+    "orders_one": "{{count}} åben ordre (betal/udlevér)",
+    "orders_other": "{{count}} åbne ordrer (betal/udlevér)",
+    "cards_one": "{{count}} klippekort venter på aktivering",
+    "cards_other": "{{count}} klippekort venter på aktivering",
+    "payments_one": "{{count}} betaling meldt – bekræft i MobilePay",
+    "payments_other": "{{count}} betalinger meldt – bekræft i MobilePay"
   }
 }

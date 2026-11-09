@@ -15,6 +15,7 @@ export function supabaseSchedule(sb: SupabaseClient, fail: Fail, schoolId: () =>
   });
   return {
     async listRooms(): Promise<Room[]> { const { data, error } = await sb.from("room").select("id,name,sort").order("sort"); fail(error); return (data ?? []) as Room[]; },
+    async getSession(id: string): Promise<Session | null> { const { data } = await sb.from("session_view").select("*").eq("id", id).maybeSingle(); return data ? mapSession(data) : null; },
     async listSessions(from: string, to: string): Promise<Session[]> {
       const { data, error } = await sb.from("session_view").select("*").gte("starts_at", from).lt("starts_at", to).order("starts_at"); fail(error);
       return (data ?? []).map(mapSession);

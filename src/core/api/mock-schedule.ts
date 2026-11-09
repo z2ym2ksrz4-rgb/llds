@@ -49,6 +49,7 @@ export function scheduleOps(get: () => { S: SchedState; persons: Person[]; membe
   const names = (pid: string | null) => { const p = get().persons.find((x) => x.id === pid); return p ? `${p.first_name} ${p.last_name}` : null; };
   return {
     async listRooms() { return get().S.rooms; },
+    async getSession(id: string) { return get().S.sessions.find((s) => s.id === id) ?? null; },
     async listSessions(from: string, to: string) { return get().S.sessions.filter((s) => s.starts_at >= from && s.starts_at < to).sort((a, b) => a.starts_at.localeCompare(b.starts_at)); },
     async createSession(i: SessionInput) {
       const g = get(); const team = g.teams.find((t) => t.id === i.team_id); const room = g.S.rooms.find((r) => r.id === i.room_id);

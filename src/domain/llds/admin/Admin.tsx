@@ -44,12 +44,12 @@ export function Admin() {
   if (page === "customize") return <Back onBack={() => setPage("menu")}><Customize /></Back>;
   if (page === "payments") return <Back onBack={() => setPage("menu")}><PaymentsAdmin /></Back>;
   const items: [Page, string, string, number][] = [
-    ["users", t("admin.users"), t("admin.usersSub"), counts.pending], ["members", t("admin.members"), t("admin.membersSub"), 0], ["teams", t("admin.teams"), t("admin.teamsSub"), 0],
-    ["season", t("admin.season"), t("admin.seasonSub"), counts.subs], ["bookings", t("admin.bookings"), t("admin.bookingsSub"), counts.bookings],
-    ["messages", t("admin.messages"), t("admin.messagesSub"), 0], ["reports", t("admin.reports"), t("admin.reportsSub"), counts.reports],
-    ["events", t("events.title"), t("admin.eventsSub"), 0], ["shop", t("admin.shop"), t("admin.shopSub"), counts.orders], ["punch", t("punch.title"), t("admin.punchSub"), counts.cards],
+    ["users", t("admin.users"), counts.pending ? t("todo.pending", { count: counts.pending }) : t("admin.usersSub"), counts.pending], ["members", t("admin.members"), t("admin.membersSub"), 0], ["teams", t("admin.teams"), t("admin.teamsSub"), 0],
+    ["season", t("admin.season"), counts.subs ? t("todo.subs", { count: counts.subs }) : t("admin.seasonSub"), counts.subs], ["bookings", t("admin.bookings"), counts.bookings ? t("todo.bookings", { count: counts.bookings }) : t("admin.bookingsSub"), counts.bookings],
+    ["messages", t("admin.messages"), t("admin.messagesSub"), 0], ["reports", t("admin.reports"), counts.reports ? t("todo.reports", { count: counts.reports }) : t("admin.reportsSub"), counts.reports],
+    ["events", t("events.title"), t("admin.eventsSub"), 0], ["shop", t("admin.shop"), counts.orders ? t("todo.orders", { count: counts.orders }) : t("admin.shopSub"), counts.orders], ["punch", t("punch.title"), counts.cards ? t("todo.cards", { count: counts.cards }) : t("admin.punchSub"), counts.cards],
     ["catalog", t("catalog.adminTitle"), t("catalog.adminSub"), 0],
-    ["payments", t("pay.adminTitle"), t("pay.adminSub"), counts.payments],
+    ["payments", t("pay.adminTitle"), counts.payments ? t("todo.payments", { count: counts.payments }) : t("pay.adminSub"), counts.payments],
     ["customize", t("customize.title"), t("customize.sub"), 0],
     ["import", t("admin.importPhotos"), t("admin.importSub"), 0],
   ];
@@ -57,7 +57,7 @@ export function Admin() {
     <section className="screen adminhome">
       <header className="topbar"><h1 className="display">{t("nav.admin")}</h1></header>
       <div className="card list">
-        {items.map(([k, label, sub, n]) => <button key={k} className="item" onClick={() => setPage(k)}><span className="grow">{label}<div className="tiny">{sub}</div></span>{n > 0 && <span className="chip warn small">{n}</span>}<span className="gold">›</span></button>)}
+        {items.map(([k, label, sub, n]) => <button key={k} className="item" onClick={() => setPage(k)}><span className="grow">{label}<div className={"tiny" + (n > 0 ? " todo" : "")}>{sub}</div></span>{n > 0 && <span className="chip warn small">{n}</span>}<span className="gold">›</span></button>)}
       </div>
       <p className="tiny">{t("admin.phase4note")}</p>
     </section>

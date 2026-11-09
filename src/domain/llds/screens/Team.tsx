@@ -9,6 +9,7 @@ import { useAuth } from "@/core/auth";
 import { useNav } from "@/core/nav";
 import { TeamPicker } from "../components/TeamPicker";
 import { SessionSheet } from "../components/SessionSheet";
+import { TabNews } from "../components/TabNews";
 import { Avatar } from "../components/Profile";
 import { Sheet, Toast } from "../components/Sheet";
 import { MessageComposer, MessageSheet } from "../components/Messages";
@@ -114,6 +115,7 @@ export function TeamScreen() {
   return (
     <section className="screen" style={teamAccent(team)}>
       <header className="topbar"><h1 className="display">{team.name}</h1><TopRight /></header>
+      <TabNews tab="team" />
       <TeamPicker />
       <div className="hero photo kb" data-testid="team-hero" data-tour="team-hero"><span className="bg warm" style={{ backgroundImage: `url(${heroUrl})` }} />
         <div><div className="eyebrow">{team.style} · {t(`category.${team.category}`)} · {team.level}</div><h2 className="display">{team.name}</h2>
