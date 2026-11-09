@@ -20,6 +20,8 @@ export function SessionSheet({ session, absences, onClose, onChanged, toast }: {
   const staffOf = me.person.is_admin || (session.team_id != null && me.memberships.some((m) => m.person_id === me.person.id && m.team_id === session.team_id && m.role !== "dancer"));
   const trainerOf = me.person.is_admin || (session.team_id != null && me.memberships.some((m) => m.person_id === me.person.id && m.team_id === session.team_id && m.role === "trainer"));
   const isSub = session.substitute_id === me.person.id;
+  // only the training's own trainer (or admin) moves / cancels / asks for a substitute; other staff may only take the substitute slot
+  const owns = me.person.is_admin || session.trainer_id === me.person.id || (!session.trainer_id && trainerOf);
   const punchTeam = !!session.team_id && !!me.teams.find((x) => x.id === session.team_id)?.punch_card_open;
   const canAttend = (staffOf || isSub) && punchTeam;   // presence is assumed unless absent (settle_attendance); only punch-card teams need the trainer's tick (a punch is paid)
   const isStaffAnywhere = me.person.is_admin || me.memberships.some((m) => m.person_id === me.person.id && m.role !== "dancer");
@@ -56,7 +58,7 @@ export function SessionSheet({ session, absences, onClose, onChanged, toast }: {
         <LessonPlan session={session} onClose={() => setMode("view")} onSaved={() => { onChanged(); setMode("view"); }} />
       ) : (
         <div className="card" style={{ margin: 0 }}>
-          <div className="row between"><span className="eyebrow">{t("session.plan")}</span>{trainerOf && <button className="linklike" onClick={() => setMode("plan")}>{session.lesson_plan ? t("common.edit") : t("session.writePlan")}</button>}</div>
+          <div className="row between"><span className="eyebrow">{t("session.plan")}</span>{(owns || isSub) && <button className="linklike" onClick={() => setMode("plan")}>{session.lesson_plan ? t("common.edit") : t("session.writePlan")}</button>}</div>
           {session.lesson_plan ? <p className="small" style={{ whiteSpace: "pre-wrap", margin: 0 }}>{session.lesson_plan}</p> : <p className="tiny" style={{ margin: 0 }}>{t("session.noPlan")}</p>}
           {isSub && session.lesson_plan && !session.lesson_plan_read_at && <button className="ghost small" onClick={() => void markRead()}>{t("session.markRead")}</button>}
           {session.lesson_plan_read_at && <span className="tiny">{t("session.planRead")}</span>}
@@ -79,7 +81,7 @@ export function SessionSheet({ session, absences, onClose, onChanged, toast }: {
 
       {/* staff actions */}
       {mode === "view" && canAttend && !session.cancelled && <button className="ghost" onClick={() => setMode("attendance")}>{t("session.attendance")}</button>}
-      {mode === "view" && trainerOf && !session.cancelled && !past && (
+      {mode === "view" && owns && !session.cancelled && !past && (
         <div className="row">
           <button className="ghost grow" onClick={() => setMode("edit")}>{t("common.edit")}</button>
           {!session.substitute_id && !session.substitute_wanted && <button className="ghost grow" onClick={() => void wantSub()}>{t("session.askSub")}</button>}

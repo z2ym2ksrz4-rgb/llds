@@ -135,8 +135,8 @@ export function Home() {
     </>),
     subs: () => (<>
       {subWanted.length > 0 && isStaff && (
-        <div className="card" style={{ borderColor: "var(--gold3)" }}>
-          <div className="eyebrow">{t("home.subsWanted")}</div>
+        <div className="card list" style={{ borderColor: "var(--gold3)" }} data-testid="subs-wanted">
+          <div className="eyebrow" style={{ padding: "4px 0 2px" }}>{t("home.subsWanted")}</div>
           {subWanted.map((s) => <button key={s.id} className="item" onClick={() => setOpen(s)}><span className="time">{dateLabel(s.starts_at)} {hm(s.starts_at)}</span><span className="grow">{s.team_name}</span><span className="gold">›</span></button>)}
         </div>
       )}
