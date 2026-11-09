@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useBadges } from "@/core/badges";
+import { useAuth } from "@/core/auth";
 import { api, type Notification } from "@/core/api";
 import { Sheet } from "./Sheet";
 import { Icon } from "./Icons";
@@ -18,7 +19,8 @@ export function Bell() {
   const [open, setOpen] = useState(false);
   const openRef = useNav((s) => s.openRef);
   const load = useCallback(async () => {
-    const next = await api.listNotifications();
+    const me = useAuth.getState().me; const people = me ? [me.person.id, ...me.children.map((c) => c.id)] : undefined;
+    const next = await api.listNotifications(people);
     setList((prev) => { if (prev.length) for (const n of next.filter((x) => !x.read_at && !prev.some((p) => p.id === x.id))) browserNotify(n.title, n.body); return next; });
   }, []);
   useEffect(() => { void load(); const i = setInterval(() => void load(), 60_000); return () => clearInterval(i); }, [load]);

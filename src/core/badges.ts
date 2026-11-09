@@ -31,7 +31,8 @@ export const useBadges = create<Badges>((set, get) => ({
   async refresh() {
     const me = useAuth.getState().me; if (!me) { set({ tabs: {}, admin: EMPTY, adminTotal: 0, unread: [] }); return; }
     const isAdmin = me.person.is_admin;
-    const [notifs, threads] = await Promise.all([api.listNotifications().catch(() => [] as Notification[]), api.listThreads().catch(() => [])]);
+    const people = [me.person.id, ...me.children.map((c) => c.id)];
+    const [notifs, threads] = await Promise.all([api.listNotifications(people).catch(() => [] as Notification[]), api.listThreads().catch(() => [])]);
     const unread = notifs.filter((n) => !n.read_at);
     const tabs: Partial<Record<Tab, number>> = {};
     for (const [tab, kinds] of Object.entries(TAB_KINDS) as [Tab, string[]][]) { const n = unread.filter((x) => kinds.includes(x.kind)).length; if (n) tabs[tab] = n; }

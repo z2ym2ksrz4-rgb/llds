@@ -150,7 +150,7 @@ export function shopOps(get: () => { Y: ShopState; persons: Person[]; membership
     },
     async deleteMilestone(mid: string) { const g = get(); g.Y.milestones = g.Y.milestones.filter((m) => m.id !== mid); g.save(); g.emit(); },
 
-    async listNotifications(): Promise<Notification[]> { const mine = myPeople(); return get().Y.notifications.filter((n) => mine.includes(n.person_id)).sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, 60); },
+    async listNotifications(forPeople?: string[]): Promise<Notification[]> { const mine = forPeople?.length ? forPeople : myPeople(); return get().Y.notifications.filter((n) => mine.includes(n.person_id)).sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, 60); },
     async savePushToken() { /* no-op in mock */ },
     async markNotificationsRead(ids?: string[]) { const g = get(); const mine = myPeople(); for (const n of g.Y.notifications) if (mine.includes(n.person_id) && !n.read_at && (!ids || ids.includes(n.id))) n.read_at = now(); g.save(); g.emit(); },
   };

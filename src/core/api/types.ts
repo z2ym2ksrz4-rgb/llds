@@ -352,7 +352,8 @@ export interface Api {
   giveMilestone(personId: string, title: string, teamId: string | null): Promise<void>;
   deleteMilestone(id: string): Promise<void>;
   /* notifications */
-  listNotifications(): Promise<Notification[]>;
+  /** my notifications; `forPeople` narrows to these person ids (used by "Vis appen som" so a persona only sees its own) */
+  listNotifications(forPeople?: string[]): Promise<Notification[]>;
   markNotificationsRead(ids?: string[]): Promise<void>;
   savePushToken(token: string, platform: "ios" | "android" | "web"): Promise<void>;
 }

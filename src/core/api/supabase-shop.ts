@@ -110,7 +110,7 @@ export function supabaseShop(sb: SupabaseClient, fail: Fail, schoolId: () => Pro
     },
     async removeBadge(id: string) { const { error } = await sb.from("person_badge").delete().eq("id", id); fail(error); },
 
-    async listNotifications(): Promise<Notification[]> { const { data, error } = await sb.from("notification").select("*").order("created_at", { ascending: false }).limit(60); fail(error); return (data ?? []) as Notification[]; },
+    async listNotifications(forPeople?: string[]): Promise<Notification[]> { let q = sb.from("notification").select("*").order("created_at", { ascending: false }).limit(60); if (forPeople?.length) q = q.in("person_id", forPeople); const { data, error } = await q; fail(error); return (data ?? []) as Notification[]; },
     async markNotificationsRead(ids?: string[]) {
       let q = sb.from("notification").update({ read_at: new Date().toISOString() }).is("read_at", null); if (ids) q = q.in("id", ids);
       const { error } = await q; fail(error);

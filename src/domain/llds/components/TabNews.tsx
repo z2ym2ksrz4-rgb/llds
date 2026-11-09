@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { api, type Notification } from "@/core/api";
 import { TAB_KINDS } from "@/core/badges";
 import { useNav, type Tab } from "@/core/nav";
+import { useAuth } from "@/core/auth";
 import { ago } from "../lib/time";
 
 const ICON: Record<string, string> = { message: "✉️", booking: "🏠", substitute: "🙋", session: "⚠️", event: "📅", milestone: "🏅", badge: "🔥", order: "🛍", punch: "🎟", payment: "💳", post: "💬", signup: "📝" };
@@ -33,7 +34,8 @@ export function TabNews({ tab }: { tab: Tab }) {
     let on = true;
     const kinds = (TAB_KINDS as Record<string, string[]>)[tab] ?? [];
     const since = Date.now() - DAYS * 864e5;
-    api.listNotifications().then((all) => { if (on) setList(all.filter((n) => kinds.includes(n.kind) && new Date(n.created_at).getTime() > since)); }).catch(() => { /* ignore */ });
+    const me = useAuth.getState().me; const people = me ? [me.person.id, ...me.children.map((c) => c.id)] : undefined;
+    api.listNotifications(people).then((all) => { if (on) setList(all.filter((n) => kinds.includes(n.kind) && new Date(n.created_at).getTime() > since)); }).catch(() => { /* ignore */ });
     return () => { on = false; };
   }, [tab]);
   if (!list.length) return null;
