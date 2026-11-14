@@ -86,6 +86,7 @@ export function supabaseApi(url: string, anonKey: string): Api {
         p_school_slug: schoolSlug, p_first: i.firstName, p_last: i.lastName, p_phone: i.phone, p_birth_year: i.birthYear, p_birth_date: i.birthDate,
         p_roles: i.roles, p_wished_teams: i.wishedTeams,
         p_children: i.children.map((c) => ({ first_name: c.firstName, birth_year: c.birthYear, birth_date: c.birthDate || null })),
+        p_parent_email: i.parentEmail || null,
       });
       fail(error);
     },
@@ -120,6 +121,7 @@ export function supabaseApi(url: string, anonKey: string): Api {
       const { data, error } = await sb.rpc("invite_person", { p_first: i.first_name, p_last: i.last_name, p_email: i.email, p_phone: i.phone, p_is_parent: i.is_parent, p_memberships: i.memberships, p_children: i.children, p_message: i.message ?? null });
       fail(error); return data as string;
     },
+    async confirmChild(childId) { const { error } = await sb.rpc("confirm_child", { p_child: childId }); fail(error); },
     async resendInvite(personId) { const { error } = await sb.rpc("resend_invite", { p_id: personId }); fail(error); },
     async inviteExisting(personId, email) { const { error } = await sb.rpc("invite_existing", { p_id: personId, p_email: email }); fail(error); },
     async lastMailStatus(personId) { const { data } = await sb.from("mail_log").select("status").contains("ref", { person_id: personId }).order("created_at", { ascending: false }).limit(1).maybeSingle(); return (data?.status as string | undefined) ?? null; },

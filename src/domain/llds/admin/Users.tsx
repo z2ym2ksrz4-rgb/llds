@@ -33,7 +33,8 @@ export function AdminUsers() {
       await api.approve(p.id, draft[p.id] ?? [], !!admin[p.id]);
       for (const c of p.children) await api.approve(c.id, draft[c.id] ?? []);
       setMsg(t("admin.approved", { name: p.first_name })); await load(); void refresh();
-    } finally { setBusy(null); }
+    } catch (x) { const m = String((x as Error).message ?? x); setMsg(m.includes("needs parent") ? t("admin.approveNeedsParent", { name: p.first_name }) : m.includes("too young") ? t("admin.approveTooYoung", { name: p.first_name }) : m.includes("parent needs child") ? t("admin.approveParentNeedsChild", { name: p.first_name }) : t("common.error") + ": " + m); }
+    finally { setBusy(null); }
   };
   const reject = async (p: PendingPerson) => { setBusy(p.id); try { await api.reject(p.id); await load(); } finally { setBusy(null); } };
 

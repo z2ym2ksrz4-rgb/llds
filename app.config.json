@@ -12,8 +12,8 @@
     "url": "https://pbpaojgrjtolxwbdymad.supabase.co",
     "anonKey": "sb_publishable_SrD0r4I2I3O0J4pMAoPlYg_JwO969KZ"
   },
-  "minAccountAge": 13,
-  "supervisedFromAge": 10,
+  "minAccountAge": 15,
+  "supervisedFromAge": 13,
   "mobilepay": {
     "number": "46664",
     "name": "LL Dance Studio"

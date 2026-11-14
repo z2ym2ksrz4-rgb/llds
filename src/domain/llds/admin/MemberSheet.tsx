@@ -86,6 +86,7 @@ export function MemberSheet({ member: p, all, teams, onClose, onChanged, onOpen,
   }, [ms, dancer, staff, parent, kids, kidTeams, drafts, all, teams]);
 
   const save = async () => {
+    if (parent && canParent && kids.length === 0 && drafts.length === 0) { toast(t("admin.parentNeedsChild")); return; }
     setBusy(true);
     try {
       if (detChanged) await api.updatePerson(p.id, { first_name: det.first_name.trim(), last_name: det.last_name.trim(), birth_date: det.birth_date || null, phone: det.phone.trim() || null, ...(p.user_id ? {} : { email: det.email.trim().toLowerCase() || null }) });

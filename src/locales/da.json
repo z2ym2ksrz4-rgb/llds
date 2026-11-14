@@ -67,16 +67,18 @@
     "phone": "Telefon",
     "email": "E-mail",
     "birthYear": "Fødselsår",
-    "tooYoung": "Dansere under 13 opretter ikke sig selv: en forælder opretter sig og tilføjer barnet. Børn fra 10 år kan bagefter få en børneprofil, som forælderen styrer.",
+    "tooYoung": "Dansere under 13 opretter ikke sig selv – en forælder opretter sig og tilføjer barnet. Forælderen bruger appen på barnets vegne.",
     "children": "Mine børn på danseskolen",
     "childName": "Barnets fornavn",
     "addChild": "Tilføj barn",
-    "childHint": "Under 10 år: ingen login – du ser og svarer på barnets vegne. 10–12 år: du kan give barnet en børneprofil, du styrer. 13+: egen konto.",
+    "childHint": "Under 13: ingen login – du ser og svarer på barnets vegne. 13–14: barnet kan få et login, du godkender og styrer. 15+: barnet kan have appen selv.",
     "wishedTeams": "Hold (hjælp til Line)",
     "wishedTeamsPh": "Fx The AXIS, Hip Hop Mini…",
     "terms": "Ved at oprette dig accepterer du",
     "submit": "Send til godkendelse",
-    "birthDate": "Fødselsdato"
+    "birthDate": "Fødselsdato",
+    "parentEmail": "Forælders e-mail",
+    "parentEmailHint": "Er du {{from}}–{{to}} år, skal en forælder godkende, at du bruger appen. Har forælderen allerede appen, får hun besked med det samme – ellers kontakter Line jer."
   },
   "pending": {
     "title": "Tak, {{name}}",
@@ -404,7 +406,11 @@
       "admin": "Oprettet af admin"
     },
     "styleOn": "{{n}} af {{total}} hold valgt",
-    "styleTeams": "{{n}} hold"
+    "styleTeams": "{{n}} hold",
+    "approveNeedsParent": "{{name}} er 13–14 år og mangler en forælder, der har godkendt. Kobl forælderen på (Medlemmer) eller bed forælderen godkende under Indstillinger → Børn.",
+    "approveTooYoung": "{{name}} er under 13 og kan ikke have eget login – afvis og lad forælderen oprette sig.",
+    "approveParentNeedsChild": "{{name}} er kun forælder og har ingen børn koblet på – kobl et barn på først.",
+    "parentNeedsChild": "En forælder skal have mindst ét barn koblet på – vælg eller opret et barn først."
   },
   "settings": {
     "language": "Sprog",
@@ -421,14 +427,18 @@
     "grant": "Giv adgang",
     "childLoginGranted": "{{name}} kan nu logge ind – koden sendes til barnets e-mail",
     "childConsent": "Ved at give adgang samtykker du som forælder til, at dit barn bruger appen. Du kan lukke profilen når som helst.",
-    "childTooYoung": "Børneprofil kan gives fra {{age}} år.",
-    "childOwnAccount": "Fra 13 år opretter danseren sin egen profil.",
+    "childTooYoung": "Under {{age}} år: intet eget login – du ser og svarer på barnets vegne.",
+    "childOwnAccount": "Kan oprette sig selv i appen – eller du kan oprette login her.",
     "dangerTitle": "Konto",
     "deleteAccount": "Slet min konto",
     "deleteSure": "Er du sikker på, at du vil slette din konto?",
     "deleteExplain": "Din profil, dine børns profiler uden eget login, opslag, billeder og tilmeldinger slettes permanent. Det kan ikke fortrydes.",
     "deleteYes": "Ja, slet min konto",
-    "deleteLastAdmin": "Du er skolens eneste admin – gør en anden til admin først."
+    "deleteLastAdmin": "Du er skolens eneste admin – gør en anden til admin først.",
+    "childConfirmOffer": "{{name}} har oprettet sig selv i appen og skal godkendes af dig, før Line kan lukke ind.",
+    "confirmChild": "Godkend at barnet må bruge appen",
+    "childConfirmed": "{{name}} er godkendt – Line kan nu lukke ind.",
+    "childHasLogin": "Har eget login."
   },
   "category": {
     "mini": "Mini børn",

@@ -17,19 +17,23 @@ export function Register() {
   const [f, setF] = useState<SignUpInput>({ firstName: "", lastName: "", phone: "", birthYear: null, birthDate: null, roles: [], wishedTeams: "", children: [] });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  const minAge = appConfig.minAccountAge;
+  const minAge = appConfig.supervisedFromAge;          // 13: youngest own login
+  const ownAge = appConfig.minAccountAge;              // 15: own login without a parent
 
   const toggleRole = (r: R) => setF((x) => ({ ...x, roles: x.roles.includes(r) ? x.roles.filter((y) => y !== r) : [...x.roles, r] }));
   const isParent = f.roles.includes("parent");
   const isDancer = f.roles.includes("dancer");
-  const tooYoung = isDancer && f.birthDate != null && (ageOf({ birth_date: f.birthDate, birth_year: null }) ?? 99) < minAge;
-  const valid = f.firstName.trim() && f.lastName.trim() && f.phone.trim() && f.roles.length > 0 && !tooYoung
+  const myAge = f.birthDate ? ageOf({ birth_date: f.birthDate, birth_year: null }) : null;
+  const tooYoung = isDancer && f.birthDate != null && (myAge ?? 99) < minAge;
+  const needsParent = isDancer && !isParent && myAge != null && myAge >= minAge && myAge < ownAge;
+  const [parentEmail, setParentEmail] = useState("");
+  const valid = f.firstName.trim() && f.lastName.trim() && f.phone.trim() && f.roles.length > 0 && !tooYoung && (!needsParent || parentEmail.includes("@"))
     && (!isParent || f.children.every((c) => c.firstName.trim() && c.birthDate.length === 10))
     && (!isDancer || !!f.birthDate);
 
   const submit = async () => {
     setBusy(true); setErr(null);
-    try { await api.signUp({ ...f, children: isParent ? f.children : [] }); await refresh(); } catch (e) { setErr((e as Error).message); } finally { setBusy(false); }
+    try { await api.signUp({ ...f, children: isParent ? f.children : [], parentEmail: needsParent ? parentEmail.trim() : null }); await refresh(); } catch (e) { setErr((e as Error).message); } finally { setBusy(false); }
   };
 
   return (
@@ -53,6 +57,12 @@ export function Register() {
           <label className="field"><span>{t("register.birthDate")}</span>
             <input id="birthDate" type="date" min="1940-01-01" max={new Date().toISOString().slice(0, 10)} value={f.birthDate ?? ""} onChange={(e) => setF({ ...f, birthDate: e.target.value || null, birthYear: e.target.value ? Number(e.target.value.slice(0, 4)) : null })} />
             {tooYoung && <small className="error">{t("register.tooYoung", { age: minAge })}</small>}
+          </label>
+        )}
+        {needsParent && (
+          <label className="field"><span>{t("register.parentEmail")}</span>
+            <input id="parentEmail" type="email" inputMode="email" required value={parentEmail} onChange={(e) => setParentEmail(e.target.value)} />
+            <small className="muted">{t("register.parentEmailHint", { from: minAge, to: ownAge - 1 })}</small>
           </label>
         )}
         {isParent && (

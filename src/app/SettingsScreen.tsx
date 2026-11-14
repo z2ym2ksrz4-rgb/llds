@@ -31,10 +31,13 @@ export function SettingsScreen() {
 
       {me && me.children.length > 0 && (
         <div className="sec"><h2>{t("settings.children")}</h2>
-          {me.children.map((c) => { const age = ageOf(c); const eligible = age != null && age >= appConfig.supervisedFromAge && age < appConfig.minAccountAge; return (
+          {me.children.map((c) => { const age = ageOf(c); const eligible = age != null && age >= appConfig.supervisedFromAge && age < 18 && !c.user_id; const unconfirmed = !!c.user_id && !c.supervised_by && age != null && age < appConfig.minAccountAge; return (
             <div className="card" key={c.id}>
               <div className="row between"><strong>{c.first_name}</strong><span className="tiny">{c.birth_year ?? ""}{age != null ? ` · ${age} ${t("settings.years")}` : ""}</span></div>
-              {c.supervised_by ? (
+              {unconfirmed ? (
+                <><p className="small muted">{t("settings.childConfirmOffer", { name: c.first_name })}</p>
+                  <button className="small" data-testid="confirm-child" onClick={async () => { try { await api.confirmChild(c.id); await refresh(); setMsg(t("settings.childConfirmed", { name: c.first_name })); } catch (e) { setMsg((e as Error).message); } }}>{t("settings.confirmChild")}</button></>
+              ) : c.supervised_by ? (
                 <><div className="small"><span className="chip ok small">{t("settings.childLoginOn")}</span> {c.email}</div><p className="tiny">{t("settings.childLoginExplain")}</p>
                   <button className="ghost small" onClick={async () => { await api.revokeChildLogin(c.id); await refresh(); setMsg(t("settings.childLoginRevoked", { name: c.first_name })); }}>{t("settings.revokeChildLogin")}</button></>
               ) : eligible ? (
@@ -42,7 +45,7 @@ export function SettingsScreen() {
                   <div className="row"><input placeholder={t("settings.childEmail")} type="email" value={childEmail[c.id] ?? ""} onChange={(e) => setChildEmail({ ...childEmail, [c.id]: e.target.value })} />
                     <button className="small" disabled={!(childEmail[c.id] ?? "").includes("@")} onClick={async () => { try { await api.grantChildLogin(c.id, childEmail[c.id]); await refresh(); setMsg(t("settings.childLoginGranted", { name: c.first_name })); } catch (e) { setMsg((e as Error).message); } }}>{t("settings.grant")}</button></div>
                   <p className="tiny">{t("settings.childConsent")}</p></>
-              ) : <p className="tiny">{age != null && age < appConfig.supervisedFromAge ? t("settings.childTooYoung", { age: appConfig.supervisedFromAge }) : t("settings.childOwnAccount")}</p>}
+              ) : <p className="tiny">{c.user_id ? t("settings.childHasLogin") : age != null && age < appConfig.supervisedFromAge ? t("settings.childTooYoung", { age: appConfig.supervisedFromAge }) : t("settings.childOwnAccount")}</p>}
             </div>); })}
           {msg && <p className="ok small" role="status">{msg}</p>}
         </div>

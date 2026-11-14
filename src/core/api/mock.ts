@@ -53,7 +53,7 @@ function load(): State {
   // test personas for "Vis appen som" – mirror of supabase/migrations/0036_test_persons.sql
   const yr = new Date().getFullYear();
   const tp = (id: string, first: string, birth: number, extra: Partial<Person> = {}): Person => ({ ...line, id, user_id: null, email: null, phone: null, first_name: first, last_name: "Testperson", birth_year: birth, birth_date: `${birth}-05-15`, is_admin: false, supervised_by: null, wished_roles: [], source: "admin", ...extra });
-  const tPia = tp("t-pia", "Pia", 1984), tTilde = tp("t-tilde", "Tilde", yr - 15), tMilo = tp("t-milo", "Milo", yr - 11, { supervised_by: "t-pia" }), tIda = tp("t-ida", "Ida", yr - 8), tRasmus = tp("t-rasmus", "Rasmus", 1996), tHelle = tp("t-helle", "Helle", yr - 16), tJonas = tp("t-jonas", "Jonas", 2004), tSanne = tp("t-sanne", "Sanne", 1988), tNoor = tp("t-noor", "Noor", yr - 10), tCamilla = tp("t-camilla", "Camilla", 1981, { is_admin: true });
+  const tPia = tp("t-pia", "Pia", 1984), tTilde = tp("t-tilde", "Tilde", yr - 15), tMilo = tp("t-milo", "Milo", yr - 13, { supervised_by: "t-pia" }), tIda = tp("t-ida", "Ida", yr - 8), tRasmus = tp("t-rasmus", "Rasmus", 1996), tHelle = tp("t-helle", "Helle", yr - 16), tJonas = tp("t-jonas", "Jonas", 2004), tSanne = tp("t-sanne", "Sanne", 1988), tNoor = tp("t-noor", "Noor", yr - 10), tCamilla = tp("t-camilla", "Camilla", 1981, { is_admin: true });
   const testPersons = [tTilde, tMilo, tPia, tIda, tRasmus, tHelle, tJonas, tSanne, tNoor, tCamilla];
   return {
     email: null,
@@ -190,6 +190,7 @@ export const mockApi: Api = {
     save(); emit(); return pid;
   },
   async resendInvite() { /* mail only */ },
+  async confirmChild(childId: string) { const p = S.persons.find((x) => x.id === childId); const me = meRow(); if (p && me) p.supervised_by = me.id; save(); emit(); },
   async inviteExisting(personId: string, email: string) { const p = S.persons.find((x) => x.id === personId); if (!p) throw new Error("not found"); if (S.persons.some((x) => x.id !== personId && x.email?.toLowerCase() === email.toLowerCase())) throw new Error("email exists"); const age = p.birth_year ? new Date().getFullYear() - p.birth_year : null; const par = S.guardians.find((g) => g.child_id === personId)?.parent_id; if (age != null && age < 18 && !par) throw new Error("needs parent"); p.email = email.toLowerCase(); if (age != null && age < 18) p.supervised_by = par ?? null; p.status = "approved"; save(); emit(); },
 };
 

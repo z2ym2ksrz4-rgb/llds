@@ -83,6 +83,7 @@ export type SignUpInput = {
   roles: ("parent" | "dancer" | "trainer" | "assistant")[];
   wishedTeams: string;
   children: { firstName: string; birthYear: number; birthDate: string }[];
+  parentEmail?: string | null;   // 13–14-year-old dancers: the parent who must confirm
 };
 
 export type PendingPerson = Person & { children: Person[] };
@@ -119,6 +120,8 @@ export interface Api {
   /** Admin invites a person (optionally a parent with children); everyone is created approved and the adult gets a welcome mail with the app link. */
   invitePerson(input: InviteInput): Promise<string>;
   resendInvite(personId: string): Promise<void>;
+  /** parent confirms a 13–14-year-old's own registration (guardian.confirmed + supervised_by) */
+  confirmChild(childId: string): Promise<void>;
   /** admin: give an existing person (imported dancer, child, trainer) an e-mail and send the invitation; <18 becomes a supervised login under the guardian */
   inviteExisting(personId: string, email: string): Promise<void>;
   /** status of the latest mail sent about this person: 'sent' | 'queued' | 'no_key' | 'error: …' | null (admin only) */

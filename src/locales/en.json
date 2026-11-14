@@ -67,16 +67,18 @@
     "phone": "Phone",
     "email": "E-mail",
     "birthYear": "Year of birth",
-    "tooYoung": "Dancers under 13 don't sign up themselves: a parent signs up and adds the child. From age 10 the parent can then give the child a supervised profile.",
+    "tooYoung": "Dancers under 13 do not sign up themselves – a parent signs up and adds the child. The parent uses the app on the child's behalf.",
     "children": "My children at the school",
     "childName": "Child's first name",
     "addChild": "Add child",
-    "childHint": "Under 10: no login – you see and reply on the child's behalf. 10–12: you can give the child a supervised profile you control. 13+: own account.",
+    "childHint": "Under 13: no login – you see and answer on the child's behalf. 13–14: the child may get a login you approve and manage. 15+: the child may use the app alone.",
     "wishedTeams": "Teams (helps Line)",
     "wishedTeamsPh": "E.g. The AXIS, Hip Hop Mini…",
     "terms": "By signing up you accept the",
     "submit": "Send for approval",
-    "birthDate": "Date of birth"
+    "birthDate": "Date of birth",
+    "parentEmail": "Parent's e-mail",
+    "parentEmailHint": "If you are {{from}}–{{to}}, a parent must approve that you use the app. If the parent already has the app, they are notified right away – otherwise Line will contact you."
   },
   "pending": {
     "title": "Thanks, {{name}}",
@@ -404,7 +406,11 @@
       "admin": "Created by admin"
     },
     "styleOn": "{{n}} of {{total}} teams chosen",
-    "styleTeams": "{{n}} teams"
+    "styleTeams": "{{n}} teams",
+    "approveNeedsParent": "{{name}} is 13–14 and has no parent who has approved. Link the parent (Members) or ask the parent to approve under Settings → Children.",
+    "approveTooYoung": "{{name}} is under 13 and cannot have an own login – reject and let the parent sign up.",
+    "approveParentNeedsChild": "{{name}} is parent only and has no children linked – link a child first.",
+    "parentNeedsChild": "A parent needs at least one child linked – pick or create a child first."
   },
   "settings": {
     "language": "Language",
@@ -421,14 +427,18 @@
     "grant": "Give access",
     "childLoginGranted": "{{name}} can now sign in – the code goes to the child's e-mail",
     "childConsent": "By giving access you consent as a parent to your child using the app. You can close the profile at any time.",
-    "childTooYoung": "Child profiles start at age {{age}}.",
-    "childOwnAccount": "From 13 the dancer creates their own profile.",
+    "childTooYoung": "Under {{age}}: no own login – you see and answer on the child's behalf.",
+    "childOwnAccount": "Can sign up in the app – or you can create the login here.",
     "dangerTitle": "Account",
     "deleteAccount": "Delete my account",
     "deleteSure": "Are you sure you want to delete your account?",
     "deleteExplain": "Your profile, your children's profiles without their own login, posts, photos and sign-ups are deleted permanently. This cannot be undone.",
     "deleteYes": "Yes, delete my account",
-    "deleteLastAdmin": "You are the school's only admin – make someone else admin first."
+    "deleteLastAdmin": "You are the school's only admin – make someone else admin first.",
+    "childConfirmOffer": "{{name}} signed up in the app and needs your approval before Line can let them in.",
+    "confirmChild": "Approve that the child may use the app",
+    "childConfirmed": "{{name}} is approved – Line can now let them in.",
+    "childHasLogin": "Has an own login."
   },
   "category": {
     "mini": "Mini kids",
