@@ -324,7 +324,7 @@
     "inviteMessage": "Personlig hilsen (valgfri)",
     "inviteSend": "Send invitation",
     "invited": "{{name}} er oprettet og har fået en mail.",
-    "inviteExists": "Der findes allerede en person med den e-mail.",
+    "inviteExists": "E-mailen bruges allerede af en anden person.",
     "inviteNeedTeam": "Vælg mindst ét hold.",
     "inviteChildName": "Barnets fornavn",
     "inviteBirth": "Fødselsdato",
@@ -379,7 +379,12 @@
     "invitedNoMail": "{{name}} er oprettet – men mailen blev IKKE sendt (mail-nøglen mangler i Supabase Vault). Send invitationen igen, når nøglen er på plads.",
     "resendInvite": "Send invitation igen",
     "inviteResent": "Invitationen er sendt igen.",
-    "inviteResentNoMail": "Ikke sendt – mail-nøglen mangler i Supabase Vault."
+    "inviteResentNoMail": "Ikke sendt – mail-nøglen mangler i Supabase Vault.",
+    "inviteNow": "Inviter til appen",
+    "inviteExistingHint": "Skriv personens e-mail og send. Når de logger ind med den, overtager de denne profil med hold, roller og børn.",
+    "inviteMinorHint": "{{name}} er under 18 og får et børnelogin under {{parent}} – forælderen står som samtykkende og kan slå det fra igen.",
+    "inviteNeedsParent": "Barn under 18 skal have en forælder koblet på, før der kan laves login. Tilføj forælderen først.",
+    "inviteTooYoung": "For ung til eget login (under 10 år) – forælderen bruger appen."
   },
   "settings": {
     "language": "Sprog",

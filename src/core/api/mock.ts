@@ -190,6 +190,7 @@ export const mockApi: Api = {
     save(); emit(); return pid;
   },
   async resendInvite() { /* mail only */ },
+  async inviteExisting(personId: string, email: string) { const p = S.persons.find((x) => x.id === personId); if (!p) throw new Error("not found"); if (S.persons.some((x) => x.id !== personId && x.email?.toLowerCase() === email.toLowerCase())) throw new Error("email exists"); const age = p.birth_year ? new Date().getFullYear() - p.birth_year : null; const par = S.guardians.find((g) => g.child_id === personId)?.parent_id; if (age != null && age < 18 && !par) throw new Error("needs parent"); p.email = email.toLowerCase(); if (age != null && age < 18) p.supervised_by = par ?? null; p.status = "approved"; save(); emit(); },
 };
 
 export function mockReset() { try { localStorage.removeItem(KEY); } catch { /* ignore */ } S = load(); emit(); }

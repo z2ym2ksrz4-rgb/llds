@@ -119,6 +119,8 @@ export interface Api {
   /** Admin invites a person (optionally a parent with children); everyone is created approved and the adult gets a welcome mail with the app link. */
   invitePerson(input: InviteInput): Promise<string>;
   resendInvite(personId: string): Promise<void>;
+  /** admin: give an existing person (imported dancer, child, trainer) an e-mail and send the invitation; <18 becomes a supervised login under the guardian */
+  inviteExisting(personId: string, email: string): Promise<void>;
   /** status of the latest mail sent about this person: 'sent' | 'queued' | 'no_key' | 'error: …' | null (admin only) */
   lastMailStatus(personId: string): Promise<string | null>;
 }

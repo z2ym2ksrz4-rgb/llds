@@ -108,7 +108,7 @@ export function MemberSheet({ member: p, all, teams, onClose, onChanged, onOpen,
   return (
     <Sheet onClose={onClose} eyebrow={t("admin.member")} title={`${p.first_name} ${p.last_name}`}>
       <div className="tiny">{[year ? t("admin.born", { year }) : null, p.phone, login].filter(Boolean).join(" · ")}</div>
-      {!p.user_id && p.email && !p.supervised_by && <button type="button" className="chip small" style={{ marginTop: 6 }} disabled={busy} data-testid="resend-invite" onClick={async () => { setBusy(true); try { await api.resendInvite(p.id); const st = await api.lastMailStatus(p.id).catch(() => null); toast(st === "sent" || st === "queued" ? t("admin.inviteResent") : t("admin.inviteResentNoMail")); } catch (x) { toast(t("common.error") + ": " + String((x as Error).message ?? x)); } finally { setBusy(false); } }}>{t("admin.resendInvite")}</button>}
+      {!p.user_id && <InviteBlock person={p} busy={busy} setBusy={setBusy} toast={toast} onChanged={onChanged} />}
       {p.parents.length > 0 && <div className="tiny" style={{ marginTop: 4 }}>{t("admin.parents")}: {p.parents.map((g) => <button key={g.id} className="linklike" onClick={() => { const m = byId(g.id); if (m) onOpen(m); }}>{g.first_name} {g.last_name}</button>).reduce<ReactNode[]>((acc, el, i) => (i ? [...acc, ", ", el] : [el]), [])}</div>}
 
       {/* 1. Access summary – first, so the consequence of every tick is visible */}
@@ -182,5 +182,35 @@ export function MemberSheet({ member: p, all, teams, onClose, onChanged, onOpen,
       <div className="row"><button className="cta grow" disabled={busy} onClick={() => void save()} data-testid="member-save">{t("common.save")}</button>
         <button className="ghost danger" onClick={async () => { if (!confirmOff) { setConfirmOff(true); setTimeout(() => setConfirmOff(false), 4000); return; } await api.setPersonStatus(p.id, "inactive"); toast(t("admin.deactivated")); onChanged(); onClose(); }}>{confirmOff ? t("admin.deactivateConfirm") : t("admin.deactivate")}</button></div>
     </Sheet>
+  );
+}
+
+/** Member card, person without login: set/confirm the e-mail and send the invitation (or send it again). Under-18s become a supervised login under their parent. */
+function InviteBlock({ person: p, busy, setBusy, toast, onChanged }: { person: Member; busy: boolean; setBusy: (b: boolean) => void; toast: (m: string) => void; onChanged: () => void }) {
+  const { t } = useTranslation();
+  const [email, setEmail] = useState(p.email ?? "");
+  const [open, setOpen] = useState(!p.email);
+  const age = p.birth_date ? Math.floor((Date.now() - new Date(p.birth_date).getTime()) / 31557600000) : p.birth_year ? new Date().getFullYear() - p.birth_year : null;
+  const minor = age != null && age < 18;
+  const needsParent = minor && p.parents.length === 0;
+  const send = async () => {
+    setBusy(true);
+    try {
+      if (p.email && email.trim().toLowerCase() === p.email.toLowerCase()) await api.resendInvite(p.id); else await api.inviteExisting(p.id, email.trim());
+      const st = await api.lastMailStatus(p.id).catch(() => null);
+      toast(st === "sent" || st === "queued" ? t("admin.inviteResent") : t("admin.inviteResentNoMail")); onChanged(); setOpen(false);
+    } catch (x) { const m = String((x as Error).message ?? x); toast(m.includes("needs parent") ? t("admin.inviteNeedsParent") : m.includes("exists") ? t("admin.inviteExists") : m.includes("too young") ? t("admin.inviteTooYoung") : t("common.error") + ": " + m); }
+    finally { setBusy(false); }
+  };
+  if (!open) return <button type="button" className="chip small" style={{ marginTop: 6 }} disabled={busy} data-testid="resend-invite" onClick={() => setOpen(true)}>{p.email ? t("admin.resendInvite") : t("admin.inviteNow")}</button>;
+  return (
+    <div className="card stack" style={{ marginTop: 8 }} data-testid="invite-existing">
+      <div className="eyebrow">{p.email ? t("admin.resendInvite") : t("admin.inviteNow")}</div>
+      <p className="tiny muted" style={{ margin: 0 }}>{minor ? t("admin.inviteMinorHint", { name: p.first_name, parent: p.parents[0]?.first_name ?? "–" }) : t("admin.inviteExistingHint")}</p>
+      {needsParent && <p className="tiny warn" style={{ margin: 0 }}>{t("admin.inviteNeedsParent")}</p>}
+      <div className="row"><input type="email" placeholder="E-mail" value={email} onChange={(e) => setEmail(e.target.value)} data-testid="invite-email" />
+        <button type="button" className="small" disabled={busy || needsParent || !email.includes("@")} onClick={() => void send()} data-testid="invite-send">{t("admin.inviteSend")}</button>
+        {p.email && <button type="button" className="ghost small" onClick={() => setOpen(false)}>{t("common.cancel")}</button>}</div>
+    </div>
   );
 }

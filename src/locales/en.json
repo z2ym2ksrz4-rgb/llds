@@ -324,7 +324,7 @@
     "inviteMessage": "Personal note (optional)",
     "inviteSend": "Send invitation",
     "invited": "{{name}} is created and has received an e-mail.",
-    "inviteExists": "A person with that e-mail already exists.",
+    "inviteExists": "That e-mail is already used by another person.",
     "inviteNeedTeam": "Pick at least one team.",
     "inviteChildName": "Child's first name",
     "inviteBirth": "Date of birth",
@@ -379,7 +379,12 @@
     "invitedNoMail": "{{name}} was created – but the mail was NOT sent (mail key missing in Supabase Vault). Resend the invitation once the key is in place.",
     "resendInvite": "Resend invitation",
     "inviteResent": "Invitation sent again.",
-    "inviteResentNoMail": "Not sent – mail key missing in Supabase Vault."
+    "inviteResentNoMail": "Not sent – mail key missing in Supabase Vault.",
+    "inviteNow": "Invite to the app",
+    "inviteExistingHint": "Enter the person's e-mail and send. When they log in with it, they take over this profile with teams, roles and children.",
+    "inviteMinorHint": "{{name}} is under 18 and gets a child login under {{parent}} – the parent is recorded as consenting and can switch it off again.",
+    "inviteNeedsParent": "A child under 18 needs a parent linked before a login can be made. Add the parent first.",
+    "inviteTooYoung": "Too young for an own login (under 10) – the parent uses the app."
   },
   "settings": {
     "language": "Language",
