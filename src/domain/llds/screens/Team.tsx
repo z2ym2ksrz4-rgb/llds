@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, type ReactElement } from "react";
 import { useTranslation } from "react-i18next";
-import { api, type Thread, type Message, type Absence, type Event, type Member, type PersonBadge, type Result, type Session } from "@/core/api";
+import { api, type TeamDancer, type TeamStaff, type Thread, type Message, type Absence, type Event, type Member, type PersonBadge, type Result, type Session } from "@/core/api";
 import { resolveImage } from "../lib/catalog";
 import { aboutImage, teamAccent } from "../lib/art";
 import { confetti } from "../lib/confetti";
@@ -40,6 +40,7 @@ export function TeamScreen() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [absences, setAbsences] = useState<Absence[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
+  const [roster, setRoster] = useState<{ staff: TeamStaff[]; dancers: TeamDancer[] }>({ staff: [], dancers: [] });   // names only – what dancers/parents may see
   const [events, setEvents] = useState<Event[]>([]);
   const [results, setResults] = useState<Result[]>([]);
   const [stats, setStats] = useState({ videos: 0, media: 0, formations: 0, dancers: 0 });
@@ -69,6 +70,7 @@ export function TeamScreen() {
     void api.listMessages().then(setMsgs).catch(() => setMsgs([]));
     void api.listThreads().then((th) => setThreads(th.filter((x) => x.team_id === teamId))).catch(() => setThreads([]));
     if (staff) setMembers((await api.listMembers()).filter((p) => p.memberships.some((m) => m.team_id === teamId)));
+    else { const [st, dn] = await Promise.all([api.teamStaff(teamId).catch(() => []), api.teamDancers(teamId).catch(() => [])]); setRoster({ staff: st, dancers: dn }); }
   }, [teamId, staff]);
   useEffect(() => { void load(); }, [load]);
   useEffect(() => { setPage("team"); }, [teamId]);
@@ -96,7 +98,9 @@ export function TeamScreen() {
         {trainers.map((p) => <div key={p.id} className="item"><Avatar person={p} /><span className="grow">{p.first_name} {p.last_name}<div className="tiny">{t(`roles.${p.memberships.find((m) => m.team_id === team.id)?.role ?? "trainer"}`)}</div>{p.bio && <div className="tiny bio">{p.bio}</div>}<Contacts person={p} /></span></div>)}
         {dancers.map((p) => <div key={p.id} className="item"><Avatar person={p} /><span className="grow">{p.first_name} {p.last_name}{p.birth_year ? <span className="tiny"> · {p.birth_year}</span> : ""}
           {p.bio && <div className="tiny bio">{p.bio}</div>}<Contacts person={p} />{p.photo_consent === false && <div className="tiny">{t("team.noPhotoConsent")}</div>}<EmblemRow badges={badges.filter((b) => b.person_id === p.id)} size="sm" /></span>{p.supervised_by && <span className="chip small">{t("team.childAccount")}</span>}<button className="ghost small" aria-label={t("badges.give")} data-testid="give-badge" onClick={() => setGiveTo(p)}>🎖</button><button className="ghost small" aria-label={t("milestones.give")} data-testid="give-milestone" onClick={() => { setAward(p); setAwardTitle(""); }}>🏅</button></div>)}
-        {!staff && <p className="muted">{t("team.rosterStaffOnly")}</p>}
+        {!staff && roster.staff.map((x) => <div key={x.person_id} className="item"><span className="avatar">{x.name[0]}</span><span className="grow">{x.name}<div className="tiny">{t(`roles.${x.role === "admin" ? "trainer" : x.role}`)}</div></span></div>)}
+        {!staff && roster.dancers.map((x) => <div key={x.person_id} className="item"><span className="avatar">{x.initials}</span><span className="grow">{x.name}</span></div>)}
+        {!staff && <p className="tiny muted" style={{ padding: "6px 0" }}>{t("team.rosterNamesOnly")}</p>}
       </div>
       {giveTo && <GiveEmblemSheet personId={giveTo.id} personName={giveTo.first_name} teamId={team.id} onClose={() => setGiveTo(null)} onGiven={(b) => { setGiveTo(null); confetti(); say(t("badges.given", { name: giveTo.first_name, badge: `${b.emoji} ${b.name}` })); void load(); }} />}
       {award && (

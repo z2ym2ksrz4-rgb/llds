@@ -138,7 +138,8 @@
     "noPhone": "no phone number",
     "call": "Call",
     "sms": "Text",
-    "officialOnHome": "{{n}} message(s) from the school await your reply"
+    "officialOnHome": "{{n}} message(s) from the school await your reply",
+    "rosterNamesOnly": "Contact details are only visible to the team's trainers and Line."
   },
   "home": {
     "hi": "Hi {{name}}",
@@ -387,7 +388,23 @@
     "inviteTooYoung": "Too young for an own login (under 10) – the parent uses the app.",
     "inviteSentTo": "Invitation sent to {{email}} ✓",
     "inviteNotReady": "The server is missing an update (migration 0048) – try again shortly.",
-    "inviteNoBirth": "No birth date on this person – without it they are treated as an adult (no child login). Fix it under Edit first if this is a child."
+    "inviteNoBirth": "No birth date on this person – without it they are treated as an adult (no child login). Fix it under Edit first if this is a child.",
+    "detBirth": "Birth date",
+    "detEmail": "E-mail",
+    "detPhone": "Phone",
+    "detLogin": "Login",
+    "detMissing": "missing",
+    "detCreated": "created {{date}}",
+    "detEmailLocked": "The e-mail cannot be changed once the person has logged in – it is bound to the login.",
+    "detSaveHint": "Changes are saved with Save at the bottom.",
+    "source": {
+      "app": "Signed up in the app",
+      "web": "Signed up on the website",
+      "invite": "Invited by admin",
+      "admin": "Created by admin"
+    },
+    "styleOn": "{{n}} of {{total}} teams chosen",
+    "styleTeams": "{{n}} teams"
   },
   "settings": {
     "language": "Language",

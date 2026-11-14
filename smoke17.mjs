@@ -31,6 +31,9 @@ out.kidsAfter = await p.$$eval("[data-testid=kids] .checkrow", e => e.length);
 out.accessHasNoa = (await p.locator("[data-testid=access]").innerText()).includes("forælder til Noa");
 // dancer + trainer + admin at the same time, all from the one team list
 await p.click("[data-testid=role-dancer]"); await p.click("[data-testid=role-staff]"); await p.click("[data-testid=admin-toggle]");
+// styles fold out on demand: open every closed group first
+for (const h of await p.$$("[data-testid=teamlist] .tgroup:not(.open) .tgroup-head")) await h.click();
+out.groupsFold = (await p.$$("[data-testid=teamlist] .tgroup.open")).length >= 4;
 const empire = p.locator("[data-testid=teamlist] .trow[data-team=Empire]");
 await empire.locator("button", { hasText: "Danser" }).click();
 await p.locator("[data-testid=teamlist] .trow[data-team='Mini Angels'] button", { hasText: "Hjælpetræner" }).click();

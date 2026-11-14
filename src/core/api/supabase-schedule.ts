@@ -112,7 +112,7 @@ export function supabaseSchedule(sb: SupabaseClient, fail: Fail, schoolId: () =>
       const { error: e2 } = await sb.from("person").update({ photo_path: path }).eq("id", pid); fail(e2);
       return path;
     },
-    async updatePerson(pid: string, patch: { first_name?: string; last_name?: string; birth_date?: string | null; phone?: string | null; bio?: string | null; photo_path?: string | null }) {
+    async updatePerson(pid: string, patch: { first_name?: string; last_name?: string; birth_date?: string | null; phone?: string | null; bio?: string | null; photo_path?: string | null; email?: string | null }) {
       const row: Record<string, unknown> = { ...patch }; if ("birth_date" in patch) row.birth_year = patch.birth_date ? Number(patch.birth_date.slice(0, 4)) : null;
       const { error } = await sb.from("person").update(row).eq("id", pid); fail(error);
     },

@@ -634,3 +634,7 @@ div.checklist{padding-left:0;color:inherit}
 @media (min-width:1500px) { main { max-width:1280px; } }
 .tabnews { border-color:rgba(201,162,74,.35); margin-bottom:10px; } .tabnews .item:disabled { opacity:1; cursor:default; } .tabnews .dot.gold { width:8px; height:8px; border-radius:50%; background:var(--gold2); flex:none; }
 .item .tiny.todo { color:var(--warn); }
+.card.details { padding:12px 14px; } .card.details .small > div { padding:2px 0; } .card.details a { color:var(--gold2); }
+.tgroup-head { display:flex; align-items:center; gap:10px; width:100%; background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:10px 12px; color:var(--fg); font:inherit; text-align:left; } .tgroup-head .eyebrow { margin:0; flex:1; } .tgroup-head .caret { color:var(--muted); } .tgroup.open .tgroup-head { border-color:rgba(201,162,74,.4); margin-bottom:6px; } .tgroup { margin-bottom:8px; }
+.teamlist .trow { padding:6px 4px; border-bottom:1px solid rgba(255,255,255,.05); } .teamlist .trow-main { flex-direction:row; align-items:center; justify-content:space-between; gap:8px; } .teamlist .trow-main > .grow { min-width:0; } .teamlist .trow .chips.tight { flex:none; justify-content:flex-end; }
+@media (max-width:420px) { .teamlist .trow .chips.tight .chip.small { padding:3px 8px; font-size:.72rem; } }

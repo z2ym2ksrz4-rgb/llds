@@ -46,6 +46,11 @@ export function MemberSheet({ member: p, all, teams, onClose, onChanged, onOpen,
   const [drafts, setDrafts] = useState<{ tmp: string; first_name: string; birth_date: string; team_ids: string[] }[]>([]);
   const [busy, setBusy] = useState(false);
   const [confirmOff, setConfirmOff] = useState(false);
+  // personal details – editable by admin, saved with Gem
+  const [det, setDet] = useState({ first_name: p.first_name, last_name: p.last_name, birth_date: p.birth_date ?? "", phone: p.phone ?? "", email: p.email ?? "" });
+  const [detOpen, setDetOpen] = useState(false);
+  const [openStyles, setOpenStyles] = useState<Record<string, boolean>>({});   // team list: styles fold out on demand; styles with ticks start open
+  const detChanged = det.first_name !== p.first_name || det.last_name !== p.last_name || det.birth_date !== (p.birth_date ?? "") || det.phone !== (p.phone ?? "") || det.email.trim().toLowerCase() !== (p.email ?? "").toLowerCase();
 
   const teamName = (id: string) => teams.find((x) => x.id === id)?.name ?? "?";
   const byId = (id: string) => all.find((x) => x.id === id);
@@ -83,6 +88,7 @@ export function MemberSheet({ member: p, all, teams, onClose, onChanged, onOpen,
   const save = async () => {
     setBusy(true);
     try {
+      if (detChanged) await api.updatePerson(p.id, { first_name: det.first_name.trim(), last_name: det.last_name.trim(), birth_date: det.birth_date || null, phone: det.phone.trim() || null, ...(p.user_id ? {} : { email: det.email.trim().toLowerCase() || null }) });
       await api.setMemberships(p.id, ms.filter((m) => (m.role === "dancer" ? dancer : staff)));
       if (canParent) {
         const created: string[] = [];
@@ -102,14 +108,34 @@ export function MemberSheet({ member: p, all, teams, onClose, onChanged, onOpen,
   };
 
   const login = p.supervised_by ? t("admin.loginChild") : p.user_id ? t("admin.loginOwn", { email: p.email ?? "" }) : p.email ? t("admin.loginPending", { email: p.email }) : p.parents.length ? t("admin.loginNone") : t("admin.loginNoEmail");
-  const year = p.birth_date ? new Date(p.birth_date).getFullYear() : p.birth_year;
+
   const anyRole = dancer || staff || (parent && (kids.length > 0 || drafts.length > 0));
 
   return (
     <Sheet onClose={onClose} eyebrow={t("admin.member")} title={`${p.first_name} ${p.last_name}`}>
-      <div className="tiny">{[year ? t("admin.born", { year }) : null, p.phone, login].filter(Boolean).join(" · ")}</div>
+      {/* 0. Personal details – everything admin may know, editable */}
+      <div className="card details" data-testid="member-details">
+        <div className="row between" style={{ alignItems: "flex-start" }}>
+          <div className="grow small">
+            <div><span className="muted">{t("admin.detBirth")}:</span> {p.birth_date ? new Date(p.birth_date).toLocaleDateString("da-DK") + (age != null ? ` · ${age} ${t("settings.years")}` : "") : p.birth_year ? String(p.birth_year) : <span className="warn">{t("admin.detMissing")}</span>}</div>
+            <div><span className="muted">{t("admin.detEmail")}:</span> {p.email ? <a href={`mailto:${p.email}`}>{p.email}</a> : <span className="warn">{t("admin.detMissing")}</span>}</div>
+            <div><span className="muted">{t("admin.detPhone")}:</span> {p.phone ? <a href={`tel:${p.phone.replace(/\s/g, "")}`}>{p.phone}</a> : <span className="muted">–</span>}</div>
+            <div><span className="muted">{t("admin.detLogin")}:</span> {login}</div>
+            {p.parents.length > 0 && <div><span className="muted">{t("admin.parents")}:</span> {p.parents.map((g) => <button key={g.id} className="linklike" onClick={() => { const m = byId(g.id); if (m) onOpen(m); }}>{g.first_name} {g.last_name}</button>).reduce<ReactNode[]>((acc, el, i) => (i ? [...acc, ", ", el] : [el]), [])}</div>}
+            {p.children.length > 0 && <div><span className="muted">{t("admin.childrenHead")}:</span> {p.children.map((c) => <button key={c.id} className="linklike" onClick={() => { const m = byId(c.id); if (m) onOpen(m); }}>{c.first_name}</button>).reduce<ReactNode[]>((acc, el, i) => (i ? [...acc, ", ", el] : [el]), [])}</div>}
+            <div className="tiny muted" style={{ marginTop: 4 }}>{[p.source ? t(`admin.source.${p.source}`) : null, p.created_at ? t("admin.detCreated", { date: new Date(p.created_at).toLocaleDateString("da-DK") }) : null, p.photo_consent === false ? t("team.noPhotoConsent") : null].filter(Boolean).join(" · ")}</div>
+          </div>
+          <button type="button" className="chip small" onClick={() => setDetOpen((o) => !o)} data-testid="details-edit">{detOpen ? t("common.cancel") : t("common.edit")}</button>
+        </div>
+        {detOpen && <div className="stack" style={{ marginTop: 10 }} data-testid="details-form">
+          <div className="grid2"><label>{t("register.firstName")}<input value={det.first_name} onChange={(e) => setDet({ ...det, first_name: e.target.value })} /></label><label>{t("register.lastName")}<input value={det.last_name} onChange={(e) => setDet({ ...det, last_name: e.target.value })} /></label></div>
+          <div className="grid2"><label>{t("admin.detBirth")}<input type="date" value={det.birth_date} onChange={(e) => setDet({ ...det, birth_date: e.target.value })} data-testid="det-birth" /></label><label>{t("admin.detPhone")}<input type="tel" value={det.phone} onChange={(e) => setDet({ ...det, phone: e.target.value })} /></label></div>
+          <label>{t("admin.detEmail")}<input type="email" value={det.email} disabled={!!p.user_id} onChange={(e) => setDet({ ...det, email: e.target.value })} /></label>
+          {p.user_id && <p className="tiny muted" style={{ margin: 0 }}>{t("admin.detEmailLocked")}</p>}
+          <p className="tiny muted" style={{ margin: 0 }}>{t("admin.detSaveHint")}</p>
+        </div>}
+      </div>
       {!p.user_id && <InviteBlock person={p} busy={busy} setBusy={setBusy} toast={toast} onChanged={onChanged} />}
-      {p.parents.length > 0 && <div className="tiny" style={{ marginTop: 4 }}>{t("admin.parents")}: {p.parents.map((g) => <button key={g.id} className="linklike" onClick={() => { const m = byId(g.id); if (m) onOpen(m); }}>{g.first_name} {g.last_name}</button>).reduce<ReactNode[]>((acc, el, i) => (i ? [...acc, ", ", el] : [el]), [])}</div>}
 
       {/* 1. Access summary – first, so the consequence of every tick is visible */}
       <div className="field"><span>{t("admin.accessHead")}</span>
@@ -164,8 +190,9 @@ export function MemberSheet({ member: p, all, teams, onClose, onChanged, onOpen,
       {anyRole && <div className="field"><span>{t("admin.teamsHead")}</span>
         <p className="tiny muted" style={{ margin: "0 0 6px" }}>{(dancer || staff) ? t("admin.teamsHint") : t("admin.teamsParentOnly")}</p>
         <div className="teamlist" data-testid="teamlist">
-          {groups.map(([style, list]) => <div key={style} className="tgroup"><div className="eyebrow">{style}</div>
-            {list.map((tm) => { const kOn = parent ? kidsOn(tm.id) : []; const on = (dancer && has(tm.id, "dancer")) || (staff && (has(tm.id, "trainer") || has(tm.id, "assistant"))) || kOn.length > 0; return (
+          {groups.map(([style, list]) => { const onCount = list.filter((tm) => (dancer && has(tm.id, "dancer")) || (staff && (has(tm.id, "trainer") || has(tm.id, "assistant"))) || (parent && kidsOn(tm.id).length > 0)).length; const isOpen = openStyles[style] ?? onCount > 0; return <div key={style} className={"tgroup" + (isOpen ? " open" : "")}>
+            <button type="button" className="tgroup-head" onClick={() => setOpenStyles((o) => ({ ...o, [style]: !isOpen }))} aria-expanded={isOpen} data-testid="tgroup-head"><span className="eyebrow">{style}</span><span className="tiny">{onCount ? t("admin.styleOn", { n: onCount, total: list.length }) : t("admin.styleTeams", { n: list.length })}</span><span className="caret">{isOpen ? "⌃" : "⌄"}</span></button>
+            {isOpen && list.map((tm) => { const kOn = parent ? kidsOn(tm.id) : []; const on = (dancer && has(tm.id, "dancer")) || (staff && (has(tm.id, "trainer") || has(tm.id, "assistant"))) || kOn.length > 0; return (
               <div key={tm.id} className={"trow" + (on ? " on" : "")} data-team={tm.name}>
                 <div className="trow-main"><span className="grow"><span className="tname">{on ? "✓ " : ""}{tm.name}</span><span className="tiny"> · {tm.level}</span></span>
                   <div className="chips tight">
@@ -175,7 +202,7 @@ export function MemberSheet({ member: p, all, teams, onClose, onChanged, onOpen,
                     {staff && canStaff && <button type="button" className={"chip small" + (has(tm.id, "assistant") ? " on" : "")} onClick={() => toggleRole(tm.id, "assistant")}>{t("roles.assistant")}</button>}
                   </div></div>
               </div>); })}
-          </div>)}
+          </div>; })}
         </div>
       </div>}
 

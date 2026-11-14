@@ -210,7 +210,7 @@ export interface Api {
   /** Admin: create a child without login, linked to a parent, on the given teams as dancer. Returns the child's id. */
   createChild(input: { parent_id: string; first_name: string; last_name: string; birth_date: string | null; team_ids: string[] }): Promise<string>;
   /** Admin: edit basic person fields. */
-  updatePerson(personId: string, patch: { first_name?: string; last_name?: string; birth_date?: string | null; phone?: string | null; bio?: string | null; photo_path?: string | null }): Promise<void>;
+  updatePerson(personId: string, patch: { first_name?: string; last_name?: string; birth_date?: string | null; phone?: string | null; bio?: string | null; photo_path?: string | null; email?: string | null }): Promise<void>;
   /** profile picture for me or my child: downscaled, stored privately; returns the storage path (also written to person.photo_path) */
   uploadAvatar(personId: string, file: File): Promise<string>;
   setPersonStatus(personId: string, status: PersonStatus): Promise<void>;

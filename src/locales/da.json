@@ -138,7 +138,8 @@
     "noPhone": "intet telefonnummer",
     "call": "Ring til",
     "sms": "Sms til",
-    "officialOnHome": "{{n}} besked(er) fra skolen venter på dit svar"
+    "officialOnHome": "{{n}} besked(er) fra skolen venter på dit svar",
+    "rosterNamesOnly": "Kontaktoplysninger ses kun af holdets trænere og Line."
   },
   "home": {
     "hi": "Hej {{name}}",
@@ -387,7 +388,23 @@
     "inviteTooYoung": "For ung til eget login (under 10 år) – forælderen bruger appen.",
     "inviteSentTo": "Invitationen er sendt til {{email}} ✓",
     "inviteNotReady": "Serveren mangler en opdatering (migration 0048) – prøv igen om lidt.",
-    "inviteNoBirth": "Ingen fødselsdato på personen – uden den behandles personen som voksen (ikke børnelogin). Ret den under Redigér først, hvis det er et barn."
+    "inviteNoBirth": "Ingen fødselsdato på personen – uden den behandles personen som voksen (ikke børnelogin). Ret den under Redigér først, hvis det er et barn.",
+    "detBirth": "Fødselsdato",
+    "detEmail": "E-mail",
+    "detPhone": "Telefon",
+    "detLogin": "Login",
+    "detMissing": "mangler",
+    "detCreated": "oprettet {{date}}",
+    "detEmailLocked": "E-mailen kan ikke ændres, når personen har logget ind – den er bundet til login.",
+    "detSaveHint": "Ændringer gemmes med Gem nederst.",
+    "source": {
+      "app": "Tilmeldt via appen",
+      "web": "Tilmeldt via websitet",
+      "invite": "Inviteret af admin",
+      "admin": "Oprettet af admin"
+    },
+    "styleOn": "{{n}} af {{total}} hold valgt",
+    "styleTeams": "{{n}} hold"
   },
   "settings": {
     "language": "Sprog",
