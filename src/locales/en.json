@@ -384,7 +384,10 @@
     "inviteExistingHint": "Enter the person's e-mail and send. When they log in with it, they take over this profile with teams, roles and children.",
     "inviteMinorHint": "{{name}} is under 18 and gets a child login under {{parent}} – the parent is recorded as consenting and can switch it off again.",
     "inviteNeedsParent": "A child under 18 needs a parent linked before a login can be made. Add the parent first.",
-    "inviteTooYoung": "Too young for an own login (under 10) – the parent uses the app."
+    "inviteTooYoung": "Too young for an own login (under 10) – the parent uses the app.",
+    "inviteSentTo": "Invitation sent to {{email}} ✓",
+    "inviteNotReady": "The server is missing an update (migration 0048) – try again shortly.",
+    "inviteNoBirth": "No birth date on this person – without it they are treated as an adult (no child login). Fix it under Edit first if this is a child."
   },
   "settings": {
     "language": "Language",

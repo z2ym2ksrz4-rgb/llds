@@ -384,7 +384,10 @@
     "inviteExistingHint": "Skriv personens e-mail og send. Når de logger ind med den, overtager de denne profil med hold, roller og børn.",
     "inviteMinorHint": "{{name}} er under 18 og får et børnelogin under {{parent}} – forælderen står som samtykkende og kan slå det fra igen.",
     "inviteNeedsParent": "Barn under 18 skal have en forælder koblet på, før der kan laves login. Tilføj forælderen først.",
-    "inviteTooYoung": "For ung til eget login (under 10 år) – forælderen bruger appen."
+    "inviteTooYoung": "For ung til eget login (under 10 år) – forælderen bruger appen.",
+    "inviteSentTo": "Invitationen er sendt til {{email}} ✓",
+    "inviteNotReady": "Serveren mangler en opdatering (migration 0048) – prøv igen om lidt.",
+    "inviteNoBirth": "Ingen fødselsdato på personen – uden den behandles personen som voksen (ikke børnelogin). Ret den under Redigér først, hvis det er et barn."
   },
   "settings": {
     "language": "Sprog",

@@ -190,6 +190,7 @@ function InviteBlock({ person: p, busy, setBusy, toast, onChanged }: { person: M
   const { t } = useTranslation();
   const [email, setEmail] = useState(p.email ?? "");
   const [open, setOpen] = useState(!p.email);
+  const [note, setNote] = useState<{ ok: boolean; text: string } | null>(null);
   const age = p.birth_date ? Math.floor((Date.now() - new Date(p.birth_date).getTime()) / 31557600000) : p.birth_year ? new Date().getFullYear() - p.birth_year : null;
   const minor = age != null && age < 18;
   const needsParent = minor && p.parents.length === 0;
@@ -198,8 +199,8 @@ function InviteBlock({ person: p, busy, setBusy, toast, onChanged }: { person: M
     try {
       if (p.email && email.trim().toLowerCase() === p.email.toLowerCase()) await api.resendInvite(p.id); else await api.inviteExisting(p.id, email.trim());
       const st = await api.lastMailStatus(p.id).catch(() => null);
-      toast(st === "sent" || st === "queued" ? t("admin.inviteResent") : t("admin.inviteResentNoMail")); onChanged(); setOpen(false);
-    } catch (x) { const m = String((x as Error).message ?? x); toast(m.includes("needs parent") ? t("admin.inviteNeedsParent") : m.includes("exists") ? t("admin.inviteExists") : m.includes("too young") ? t("admin.inviteTooYoung") : t("common.error") + ": " + m); }
+      const ok = st === "sent" || st === "queued"; setNote({ ok, text: ok ? t("admin.inviteSentTo", { email: email.trim() }) : t("admin.inviteResentNoMail") }); toast(ok ? t("admin.inviteResent") : t("admin.inviteResentNoMail")); onChanged();
+    } catch (x) { const m = String((x as Error).message ?? x); const text = m.includes("needs parent") ? t("admin.inviteNeedsParent") : m.includes("exists") ? t("admin.inviteExists") : m.includes("too young") ? t("admin.inviteTooYoung") : /function|schema cache|404/i.test(m) ? t("admin.inviteNotReady") : t("common.error") + ": " + m; setNote({ ok: false, text }); toast(text); }
     finally { setBusy(false); }
   };
   if (!open) return <button type="button" className="chip small" style={{ marginTop: 6 }} disabled={busy} data-testid="resend-invite" onClick={() => setOpen(true)}>{p.email ? t("admin.resendInvite") : t("admin.inviteNow")}</button>;
@@ -211,6 +212,8 @@ function InviteBlock({ person: p, busy, setBusy, toast, onChanged }: { person: M
       <div className="row"><input type="email" placeholder="E-mail" value={email} onChange={(e) => setEmail(e.target.value)} data-testid="invite-email" />
         <button type="button" className="small" disabled={busy || needsParent || !email.includes("@")} onClick={() => void send()} data-testid="invite-send">{t("admin.inviteSend")}</button>
         {p.email && <button type="button" className="ghost small" onClick={() => setOpen(false)}>{t("common.cancel")}</button>}</div>
+      {note && <p className={"small " + (note.ok ? "ok" : "warn")} role="status" style={{ margin: 0 }} data-testid="invite-note">{note.text}</p>}
+      {!p.birth_date && !p.birth_year && <p className="tiny muted" style={{ margin: 0 }}>{t("admin.inviteNoBirth")}</p>}
     </div>
   );
 }
