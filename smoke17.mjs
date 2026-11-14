@@ -34,6 +34,8 @@ await p.click("[data-testid=role-dancer]"); await p.click("[data-testid=role-sta
 // styles fold out on demand: open every closed group first
 for (const h of await p.$$("[data-testid=teamlist] .tgroup:not(.open) .tgroup-head")) await h.click();
 out.groupsFold = (await p.$$("[data-testid=teamlist] .tgroup.open")).length >= 4;
+// after Gem the sheet reopens folded – open again before reading chips
+const openAll = async () => { for (const h of await p.$$("[data-testid=teamlist] .tgroup:not(.open) .tgroup-head")) await h.click(); };
 const empire = p.locator("[data-testid=teamlist] .trow[data-team=Empire]");
 await empire.locator("button", { hasText: "Danser" }).click();
 await p.locator("[data-testid=teamlist] .trow[data-team='Mini Angels'] button", { hasText: "Hjælpetræner" }).click();
@@ -50,7 +52,7 @@ const acc2 = await p.locator("[data-testid=access]").innerText(); out.persisted 
 out.adminPersisted = await p.getAttribute("[data-testid=admin-toggle]", "aria-checked");
 // child sheet: only dancer eligible
 await p.locator("[data-testid=kids] .checkrow", { hasText: "Noa" }).locator("button", { hasText: "Redigér" }).click();
-await p.waitForSelector("[data-testid=teamlist]");
+await p.waitForSelector("[data-testid=teamlist]"); await openAll();
 out.childDancerApexion = (await p.locator("[data-testid=teamlist] .trow[data-team=Apexion] button.on", { hasText: "Danser" }).count()) === 1;
 out.childParentDisabled = (await p.getAttribute("[data-testid=role-parent]", "aria-disabled")) === "true";
 await p.screenshot({ path: "smoke17-2.png" });
