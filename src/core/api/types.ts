@@ -67,6 +67,7 @@ export type Team = {
   price_full?: number | null; price_half?: number | null; price_signup?: number | null; price_note?: string | null; installments_allowed?: boolean;
   admission?: "open" | "tryout" | "audition";   // how dancers get on the team (badge on website + app)
   admission_note?: string | null;
+  signup_open?: boolean;         // false = visible but cannot be joined (season break / team not opened yet)
   photos?: string[];            // Line's own photos of the team (website URLs); a second one is shown under "Om holdet"
   gallery?: string[];           // pictures for the Home carousel, chosen by admin/trainer (catalog keys, art/ paths or URLs); empty = random pick
   about_url?: string | null;    // admin-chosen image under "Om holdet" (null = automatic)
@@ -187,7 +188,7 @@ export type Absence = { id: string; session_id: string; person_id: string; reaso
 
 export type RosterEntry = { person_id: string; name: string; birth_year: number | null; role: Role; present: boolean | null; absence: Absence | null; via_punch: boolean };
 
-export type TeamInput = Partial<Pick<Team, "name" | "style" | "category" | "level" | "closed" | "parents_see_video" | "punch_card_open" | "color" | "about_url" | "photos" | "description" | "cover_url" | "admission" | "admission_note" | "price_full" | "price_half" | "price_signup" | "price_note" | "installments_allowed" | "price">> & { max_dancers?: number | null; visibility?: "public" | "private"; archived?: boolean };
+export type TeamInput = Partial<Pick<Team, "name" | "style" | "category" | "level" | "closed" | "parents_see_video" | "punch_card_open" | "color" | "about_url" | "photos" | "signup_open" | "description" | "cover_url" | "admission" | "admission_note" | "price_full" | "price_half" | "price_signup" | "price_note" | "installments_allowed" | "price">> & { max_dancers?: number | null; visibility?: "public" | "private"; archived?: boolean };
 
 export type Member = Person & { memberships: Membership[]; children: Person[]; parents: Person[] };
 
@@ -416,6 +417,10 @@ export interface Api {
   renameCatalogFolder(from: string, to: string): Promise<void>;
   deleteCatalog(id: string): Promise<void>;
 
+  // sign-up window (0055)
+  signupsOpen(): Promise<boolean>;
+  setSignupsOpen(open: boolean): Promise<void>;
+  myQuote(teamId: string, plan: string): Promise<{ before: number | null; discount_pct: number; amount: number | null; installments: number; fee: number; per_rate: number | null; note: string | null }>;
   // insights + feedback (0054)
   touchSeen(): Promise<void>;
   appInsights(): Promise<Insights>;

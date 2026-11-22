@@ -9,7 +9,7 @@ import { shopOps, seedShop, type ShopState } from "./mock-shop";
  * The special address admin@demo signs in as Line (approved admin).
  */
 const KEY = "llds_mock";
-type State = { email: string | null; appearance?: Appearance; feedback?: Feedback[]; payments?: WebSignup[]; persons: Person[]; guardians: { parent_id: string; child_id: string }[]; memberships: Membership[]; teams: Team[]; S: SchedState; X: SocialState; Y: ShopState };
+type State = { email: string | null; appearance?: Appearance; feedback?: Feedback[]; signupsOpen?: boolean; payments?: WebSignup[]; persons: Person[]; guardians: { parent_id: string; child_id: string }[]; memberships: Membership[]; teams: Team[]; S: SchedState; X: SocialState; Y: ShopState };
 
 const SCHOOL = "school-llds";
 const TEAMS: Team[] = [
@@ -138,6 +138,7 @@ export const mockApi: Api = {
   async listMyPayments() { const me = meRow(); if (!me) return []; const mine = new Set([me.id, ...S.guardians.filter((g) => g.parent_id === me.id).map((g) => g.child_id)]); return (S.payments ?? []).filter((p) => mine.has(p.dancer_id) || mine.has(p.contact_id)); },
   async claimPaymentPaid(id) { const p = (S.payments ?? []).find((x) => x.id === id); if (p && !p.claimed_paid_at) { p.claimed_paid_at = now(); for (const a of S.persons.filter((x) => x.is_admin && x.status === "approved")) notify(a.id, "payment", "Betaling meldt", `${p.dancer_name} · ${p.team_name} · ${p.amount_dkk} kr.`, { payment_id: p.id }); } save(); emit(); },
   async appSignupTeam(teamId, personId, plan) {
+    { const tm = S.teams.find((x) => x.id === teamId); if (S.signupsOpen === false || tm?.signup_open === false) throw new Error("signups closed"); if (tm?.admission === "audition") throw new Error("audition required"); }
     const me = meRow()!; const team = S.teams.find((t) => t.id === teamId)!; const p = S.persons.find((x) => x.id === personId)!;
     if (S.memberships.some((m) => m.person_id === personId && m.team_id === teamId)) throw new Error("already member");
     const n = plan === "rates2" ? 2 : plan === "rates4" ? 4 : plan === "rates10" ? 10 : 1;
@@ -160,6 +161,9 @@ export const mockApi: Api = {
   },
   async deleteMyAccount() { const me = meRow(); if (!me) return; const kids = S.guardians.filter((g) => g.parent_id === me.id).map((g) => g.child_id); S.persons = S.persons.filter((p) => p.id !== me.id && !kids.includes(p.id)); S.guardians = S.guardians.filter((g) => g.parent_id !== me.id); S.memberships = S.memberships.filter((m) => m.person_id !== me.id && !kids.includes(m.person_id)); S.email = null; save(); emit(); },
   async getAppearance() { return S.appearance ?? {}; },
+  async signupsOpen() { return S.signupsOpen !== false; },
+  async setSignupsOpen(open) { S.signupsOpen = open; save(); emit(); },
+  async myQuote(teamId, plan) { const tm = S.teams.find((x) => x.id === teamId); const base = plan === "half" ? tm?.price_half ?? tm?.price_full ?? null : tm?.price_full ?? null; const n = plan === "rates2" ? 2 : plan === "rates4" ? 4 : plan === "rates10" ? 10 : 1; const fee = n > 1 ? 50 * n : 0; const amount = base == null ? null : base + fee; return { before: base, discount_pct: 0, amount, installments: n, fee, per_rate: amount != null && n > 1 ? Math.ceil(amount / n) : null, note: tm?.price_note ?? null }; },
   async touchSeen() { const me = meRow(); if (me) { me.last_seen_at = now(); save(); } },
   async appInsights(): Promise<Insights> {
     const ap = S.persons.filter((p) => p.status === "approved"); const login = ap.filter((p) => p.user_id);

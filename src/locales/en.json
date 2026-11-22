@@ -420,7 +420,12 @@
     "teamHeroImage": "Top image on the team page",
     "teamAboutImage": "Image under the team description",
     "teamPhotos": "The team's own photos",
-    "teamPhotosHint": "Tap a photo to remove it from the team (it is not deleted from the website)."
+    "teamPhotosHint": "Tap a photo to remove it from the team (it is not deleted from the website).",
+    "signupsOpenAll": "Sign-up open for all teams",
+    "signupsOpenAllHint": "Turn off during the season break – teams stay visible but cannot be joined. Turn on when sign-up opens.",
+    "signupOpenTeam": "Open for sign-up",
+    "signupOpenTeamHint": "Off: the team is shown with its description but cannot be joined (e.g. a new team not decided yet).",
+    "signupClosedChip": "closed for sign-up"
   },
   "settings": {
     "language": "Language",
@@ -913,7 +918,23 @@
     "reference": "Write in the comment",
     "hint": "On the phone: tap the button. On a computer: scan the QR code with MobilePay. Then tap “I have paid”.",
     "claim": "I have paid",
-    "openFilter": "Open"
+    "openFilter": "Open",
+    "closedToast": "Sign-up is closed right now.",
+    "auditionToast": "This team admits by audition only.",
+    "childCannot": "Signing up for new teams is done by your parents – ask them to do it from their app.",
+    "allClosed": "Sign-up is closed for all teams right now – you can still browse them.",
+    "closedChip": "closed",
+    "otherTeam": "Choose another team",
+    "closedTitle": "Sign-up opens later",
+    "closedBody": "This team cannot be joined right now. You will be notified in the app when it opens.",
+    "auditionTitle": "Admission by audition",
+    "auditionBody": "Dancers join this team through an audition – the trainer announces dates. If you are selected, you are notified here in the app.",
+    "quoteTitle": "Price for {{name}}",
+    "quoteDiscount": "Family discount {{pct}}%",
+    "quoteRates": "{{n}} instalments of {{per}} (incl. instalment fee {{fee}})",
+    "quoteLoading": "Calculating price …",
+    "quoteNext": "Next step: pay with MobilePay. The spot is yours once the payment is registered.",
+    "joinConfirm": "Confirm sign-up"
   },
   "milestones": {
     "title": "Milestones",

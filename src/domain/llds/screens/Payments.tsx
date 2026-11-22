@@ -4,7 +4,7 @@ import { api, type Team, type WebSignup } from "@/core/api";
 import { useAuth } from "@/core/auth";
 import { Sheet, Toast } from "../components/Sheet";
 import { PaySheet } from "../components/Pay";
-import { ago, loc } from "../lib/time";
+import { ageOf, ago, loc } from "../lib/time";
 
 /** Season price text → [full, half] in kr. ("2.400 kr. for hel sæson, eller 1.750 kr. for halv sæson") */
 export const priceAmounts = (p: string | null | undefined): number[] => (p ?? "").match(/([0-9][0-9.]*) kr/g)?.map((x) => parseInt(x.replace(/\D/g, ""), 10)) ?? [];
@@ -62,35 +62,59 @@ function PaymentRow({ p, onPay }: { p: WebSignup; onPay: () => void }) {
 }
 
 /** "Tilmeld nyt hold" for signed-in members: pick dancer + team + plan → payment request with automatic family discount. */
-export function JoinTeam({ onClose, toast }: { onClose: () => void; toast: (m: string) => void }) {
+export function JoinTeam({ onClose, toast, initialTeam }: { onClose: () => void; toast: (m: string) => void; initialTeam?: string | null }) {
   const { t } = useTranslation();
   const me = useAuth((s) => s.me)!;
   const [teams, setTeams] = useState<Team[]>([]);
-  const people = [me.person, ...me.children];
-  const [who, setWho] = useState(people[0].id);
+  const [openAll, setOpenAll] = useState(true);
+  // who may be signed up: me (unless I am a child account – parents sign children up) + my children
+  const childLogin = !!me.person.supervised_by || (ageOf(me.person) ?? 99) < 15;   // child logins: parents sign children up
+  const people = childLogin ? [] : [me.person, ...me.children];
+  const [who, setWho] = useState(people[0]?.id ?? "");
   const [team, setTeam] = useState<Team | null>(null);
   const [plan, setPlan] = useState<Plan>("full");
+  const [q, setQ] = useState<{ before: number | null; discount_pct: number; amount: number | null; installments: number; fee: number; per_rate: number | null; note: string | null } | null>(null);
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState<{ id: string; reference: string; amount_dkk: number | null; discount_pct: number; team: string; installments?: number; per_rate_dkk?: number | null; note?: string | null } | null>(null);
-  useEffect(() => { void api.listTeams().then((ts) => setTeams(ts.filter((x) => x.visibility !== "private"))); }, []);
+  useEffect(() => { void api.listTeams().then((ts) => { const vis = ts.filter((x) => x.visibility !== "private"); setTeams(vis); if (initialTeam) setTeam(vis.find((x) => x.id === initialTeam) ?? null); }); void api.signupsOpen().then(setOpenAll).catch(() => setOpenAll(true)); }, [initialTeam]);
+  useEffect(() => { if (!team) { setQ(null); return; } let on = true; api.myQuote(team.id, plan).then((r) => { if (on) setQ(r); }).catch(() => setQ(null)); return () => { on = false; }; }, [team, plan]);
   const memberOf = new Set(me.memberships.filter((m) => m.person_id === who).map((m) => m.team_id));
-  const submit = async () => { if (!team) return; setBusy(true); try { const r = await api.appSignupTeam(team.id, who, plan); setDone(r); } catch (e) { toast((e as Error).message.includes("already") ? t("pay.already") : (e as Error).message); } finally { setBusy(false); } };
+  const state = (x: Team) => (!openAll || x.signup_open === false ? "closed" : x.admission === "audition" ? "audition" : "open");
+  const submit = async () => { if (!team) return; setBusy(true); try { const r = await api.appSignupTeam(team.id, who, plan); setDone(r); } catch (e) { const m = (e as Error).message; toast(m.includes("already") ? t("pay.already") : m.includes("closed") ? t("pay.closedToast") : m.includes("audition") ? t("pay.auditionToast") : m); } finally { setBusy(false); } };
   if (done && done.amount_dkk == null) return <Sheet onClose={onClose} eyebrow={done.team} title={t("pay.requested")}><p className="small">{done.note ?? t("pay.ratesText")}</p><button className="cta" onClick={onClose}>{t("common.ok")}</button></Sheet>;
-  if (done) return <PaySheet amount={(done.installments ?? 1) > 1 ? done.per_rate_dkk ?? done.amount_dkk ?? 0 : done.amount_dkk ?? 0} reference={(done.installments ?? 1) > 1 ? `${done.reference} rate 1/${done.installments}` : done.reference} title={`${done.team} · ${people.find((p) => p.id === who)?.first_name ?? ""}${done.discount_pct ? ` · ${t("pay.discount", { pct: done.discount_pct })}` : ""}${(done.installments ?? 1) > 1 ? ` · ${t("pay.rateN", { k: 1 })} ${t("pay.ofN", { n: done.installments })}` : ""}`} onClose={onClose} onPaid={async () => { await api.claimPaymentPaid(done.id); toast(t("pay.claimed")); onClose(); }} />;
+  if (done) return <PaySheet amount={(done.installments ?? 1) > 1 ? done.per_rate_dkk ?? done.amount_dkk ?? 0 : done.amount_dkk ?? 0} reference={(done.installments ?? 1) > 1 ? `${done.reference} rate 1/${done.installments}` : done.reference} title={`${done.team}${(done.installments ?? 1) > 1 ? ` · ${t("pay.firstRate")} 1/${done.installments}` : ""}`} onClose={onClose} onPaid={async () => { await api.claimPaymentPaid(done.id); toast(t("pay.claimed")); onClose(); }} />;
+  if (childLogin) return <Sheet onClose={onClose} eyebrow={t("pay.joinEyebrow")} title={t("pay.join")}><p className="small">{t("pay.childCannot")}</p><button className="cta" onClick={onClose}>{t("common.ok")}</button></Sheet>;
+  const st = team ? state(team) : "open";
   return (
-    <Sheet onClose={onClose} eyebrow={t("pay.joinEyebrow")} title={t("pay.join")}>
-      {people.length > 1 && <div className="field"><span>{t("pay.who")}</span><div className="chips">{people.map((p) => <button key={p.id} className={"chip" + (who === p.id ? " on" : "")} onClick={() => { setWho(p.id); setTeam(null); }}>{p.first_name}</button>)}</div></div>}
-      <div className="field"><span>{t("pay.team")}</span>
-        <div className="teamgrid" data-testid="join-teams">{teams.filter((x) => !memberOf.has(x.id)).map((x) => <button key={x.id} className={"item" + (team?.id === x.id ? " on" : "")} onClick={() => setTeam(x)} data-testid="join-team"><span className="grow">{x.name}<div className="tiny">{[x.style, x.years, x.level].filter(Boolean).join(" · ")}{x.admission === "audition" ? ` · ${t("admin.admissionKind.audition")}` : ""}</div></span><span className="tiny">{x.price_full ? kr(x.price_full) : x.price_note ? "·" : ""}</span></button>)}</div>
-      </div>
-      {team && (
-        <div className="field"><span>{t("pay.planLabel")}</span>
-          {team.price_full ? <PlanChips team={team} plan={plan} setPlan={setPlan} /> : <p className="small muted">{team.price_note}</p>}
-          {team.price_note && team.price_full ? <p className="tiny">{team.price_note}</p> : null}
-          <p className="tiny">{t("pay.familyHint")} {team.installments_allowed !== false ? t("pay.feeHint", { fee: RATE_FEE }) : ""}</p>
-        </div>
-      )}
-      <button className="cta" disabled={!team || busy} onClick={() => void submit()} data-testid="join-send">{t("pay.joinSend")}</button>
+    <Sheet onClose={onClose} eyebrow={t("pay.joinEyebrow")} title={team ? team.name : t("pay.join")}>
+      {!openAll && <p className="small" style={{ margin: 0, color: "var(--gold2)" }}>{t("pay.allClosed")}</p>}
+      {people.length > 1 && <div className="field"><span>{t("pay.who")}</span><div className="chips">{people.map((p) => <button key={p.id} className={"chip" + (who === p.id ? " on" : "")} onClick={() => { setWho(p.id); }}>{p.first_name}</button>)}</div></div>}
+      {!team && <div className="field"><span>{t("pay.team")}</span>
+        <div className="teamgrid" data-testid="join-teams">{teams.filter((x) => !memberOf.has(x.id)).map((x) => { const sx = state(x); return <button key={x.id} className={"item" + (sx !== "open" ? " off" : "")} onClick={() => setTeam(x)} data-testid="join-team"><span className="grow">{x.name}<div className="tiny">{x.style} · {x.level}{x.day_time ? ` · ${x.day_time}` : ""}{sx === "closed" ? ` · ${t("pay.closedChip")}` : sx === "audition" ? ` · ${t("admin.admissionKind.audition")}` : ""}</div></span><span className="gold">›</span></button>; })}</div>
+      </div>}
+      {team && (<>
+        <button className="linklike small" style={{ alignSelf: "flex-start" }} onClick={() => setTeam(null)}>‹ {t("pay.otherTeam")}</button>
+        {team.description && <p className="small muted" style={{ margin: 0 }}>{team.description.slice(0, 280)}{team.description.length > 280 ? "…" : ""}</p>}
+        <div className="tiny">{[team.day_time, team.years, team.level].filter(Boolean).join(" · ")}</div>
+        {st === "closed" && <div className="card" data-testid="join-closed"><strong>{t("pay.closedTitle")}</strong><p className="small muted" style={{ margin: "4px 0 0" }}>{t("pay.closedBody")}</p></div>}
+        {st === "audition" && <div className="card" data-testid="join-audition"><strong>{t("pay.auditionTitle")}</strong><p className="small muted" style={{ margin: "4px 0 0" }}>{team.admission_note || t("pay.auditionBody")}</p></div>}
+        {st === "open" && (<>
+          <div className="field"><span>{t("pay.planLabel")}</span>
+            {team.price_full ? <PlanChips team={team} plan={plan} setPlan={setPlan} /> : <p className="small muted">{team.price_note}</p>}
+          </div>
+          <div className="card" data-testid="join-quote">
+            <div className="eyebrow">{t("pay.quoteTitle", { name: people.find((p) => p.id === who)?.first_name })}</div>
+            {q && q.amount != null ? (<>
+              <div className="row between"><span className="small">{t(`pay.plan.${plan}`)}</span><strong>{kr(q.amount)}</strong></div>
+              {q.discount_pct > 0 && <div className="row between tiny"><span>{t("pay.quoteDiscount", { pct: q.discount_pct })}</span><span>{kr(q.before)} → {kr(q.amount)}</span></div>}
+              {q.installments > 1 && <div className="tiny">{t("pay.quoteRates", { n: q.installments, per: kr(q.per_rate), fee: kr(q.fee) })}</div>}
+              {q.note && <div className="tiny">{q.note}</div>}
+            </>) : <div className="tiny">{q?.note ?? team.price_note ?? t("pay.quoteLoading")}</div>}
+            <p className="tiny muted" style={{ margin: "6px 0 0" }}>{t("pay.quoteNext")}</p>
+          </div>
+          <button className="cta" disabled={busy || !who} onClick={() => void submit()} data-testid="join-send">{t("pay.joinConfirm")}</button>
+        </>)}
+      </>)}
     </Sheet>
   );
 }

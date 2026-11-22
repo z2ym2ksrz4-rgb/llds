@@ -420,7 +420,12 @@
     "teamHeroImage": "Topbillede på holdsiden",
     "teamAboutImage": "Billede under holdbeskrivelsen",
     "teamPhotos": "Holdets egne fotos",
-    "teamPhotosHint": "Tryk på et foto for at fjerne det fra holdet (det slettes ikke fra websitet)."
+    "teamPhotosHint": "Tryk på et foto for at fjerne det fra holdet (det slettes ikke fra websitet).",
+    "signupsOpenAll": "Tilmelding åben for alle hold",
+    "signupsOpenAllHint": "Slå fra i sæsonpausen – holdene kan stadig ses, men ikke tilmeldes. Slå til, når der åbnes for tilmelding.",
+    "signupOpenTeam": "Åben for tilmelding",
+    "signupOpenTeamHint": "Fra: holdet vises med beskrivelse, men kan ikke tilmeldes (fx nyt hold, der ikke er besluttet endnu).",
+    "signupClosedChip": "lukket for tilmelding"
   },
   "settings": {
     "language": "Sprog",
@@ -913,7 +918,23 @@
     "reference": "Skriv i kommentar",
     "hint": "På telefonen: tryk knappen. På computer: scan QR-koden med MobilePay. Tryk derefter “Jeg har betalt”.",
     "claim": "Jeg har betalt",
-    "openFilter": "Åbne"
+    "openFilter": "Åbne",
+    "closedToast": "Tilmelding er lukket lige nu.",
+    "auditionToast": "Holdet optager kun via audition.",
+    "childCannot": "Tilmelding til nye hold klares af dine forældre – bed dem gøre det fra deres app.",
+    "allClosed": "Tilmelding er lukket for alle hold lige nu – du kan stadig se holdene.",
+    "closedChip": "lukket",
+    "otherTeam": "Vælg et andet hold",
+    "closedTitle": "Tilmelding åbner senere",
+    "closedBody": "Holdet kan ikke tilmeldes lige nu. Du får besked i appen, når der åbnes.",
+    "auditionTitle": "Optagelse via audition",
+    "auditionBody": "Man kommer på holdet ved audition – datoer meldes ud af træneren. Bliver du udtaget, får du besked her i appen.",
+    "quoteTitle": "Pris for {{name}}",
+    "quoteDiscount": "Familierabat {{pct}} %",
+    "quoteRates": "{{n}} rater à {{per}} (inkl. rategebyr {{fee}})",
+    "quoteLoading": "Beregner pris …",
+    "quoteNext": "Næste trin: betal med MobilePay. Pladsen er klar, når betalingen er registreret.",
+    "joinConfirm": "Bekræft tilmelding"
   },
   "milestones": {
     "title": "Milepæle",

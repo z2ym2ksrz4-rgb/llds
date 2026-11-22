@@ -94,14 +94,16 @@ function Members() {
 function Teams() {
   const { t } = useTranslation();
   const [teams, setTeams] = useState<Team[]>([]); const [open, setOpen] = useState<Team | "new" | null>(null);
-  const load = useCallback(async () => setTeams(await api.listTeams()), []);
+  const [openAll, setOpenAll] = useState(true);
+  const load = useCallback(async () => { setTeams(await api.listTeams()); setOpenAll(await api.signupsOpen().catch(() => true)); }, []);
   useEffect(() => { void load(); }, [load]);
   return (
     <section className="screen">
       <header className="topbar"><h1 className="display">{t("admin.teams")} · {teams.length}</h1><button className="ghost small" onClick={() => setOpen("new")}>+ {t("admin.newTeam")}</button></header>
+      <label className="toggle card" data-testid="signups-open-all"><span>{t("admin.signupsOpenAll")}<div className="tiny">{t("admin.signupsOpenAllHint")}</div></span><input type="checkbox" checked={openAll} onChange={async (e) => { setOpenAll(e.target.checked); await api.setSignupsOpen(e.target.checked); }} /></label>
       {CATS.map((c) => { const list = teams.filter((x) => x.category === c); return list.length ? (
         <div className="sec" key={c}><div className="eyebrow">{t(`category.${c}`)}</div><div className="card list">
-          {list.map((x) => <button key={x.id} className="item" onClick={() => setOpen(x)}><span className="grow">{x.name}<div className="tiny">{x.style} · {x.level}{x.closed ? " · " + t("team.closed") : ""}{x.parents_see_video ? " · " + t("admin.parentsSeeVideo") : ""}{x.punch_card_open ? " · " + t("team.punchOpen") : ""}</div></span><span className="gold">›</span></button>)}
+          {list.map((x) => <button key={x.id} className="item" onClick={() => setOpen(x)}><span className="grow">{x.name}<div className="tiny">{x.style} · {x.level}{x.closed ? " · " + t("team.closed") : ""}{x.signup_open === false ? " · " + t("admin.signupClosedChip") : ""}{x.parents_see_video ? " · " + t("admin.parentsSeeVideo") : ""}{x.punch_card_open ? " · " + t("team.punchOpen") : ""}</div></span><span className="gold">›</span></button>)}
         </div></div>) : null; })}
       {open && <TeamEditor team={open === "new" ? null : open} onClose={() => setOpen(null)} onSaved={() => { setOpen(null); void load(); }} />}
     </section>
@@ -109,11 +111,11 @@ function Teams() {
 }
 function TeamEditor({ team, onClose, onSaved }: { team: Team | null; onClose: () => void; onSaved: () => void }) {
   const { t } = useTranslation();
-  const [f, setF] = useState<TeamInput & { name: string }>({ name: team?.name ?? "", style: team?.style ?? "Showdance", category: team?.category ?? "junior", level: team?.level ?? "", closed: team?.closed ?? false, parents_see_video: team?.parents_see_video ?? false, punch_card_open: team?.punch_card_open ?? false, visibility: team?.visibility ?? "public", description: team?.description ?? "", cover_url: team?.cover_url && !/supabase|token=/.test(team.cover_url) ? team.cover_url : null, about_url: team?.about_url ?? null, admission: team?.admission ?? (team?.closed ? "audition" : "open"), admission_note: team?.admission_note ?? "", price_full: team?.price_full ?? null, price_half: team?.price_half ?? null, price_signup: team?.price_signup ?? null, price_note: team?.price_note ?? "", installments_allowed: team?.installments_allowed ?? true });
+  const [f, setF] = useState<TeamInput & { name: string }>({ name: team?.name ?? "", style: team?.style ?? "Showdance", category: team?.category ?? "junior", level: team?.level ?? "", closed: team?.closed ?? false, parents_see_video: team?.parents_see_video ?? false, punch_card_open: team?.punch_card_open ?? false, visibility: team?.visibility ?? "public", description: team?.description ?? "", cover_url: team?.cover_url && !/supabase|token=/.test(team.cover_url) ? team.cover_url : null, about_url: team?.about_url ?? null, admission: team?.admission ?? (team?.closed ? "audition" : "open"), admission_note: team?.admission_note ?? "", price_full: team?.price_full ?? null, price_half: team?.price_half ?? null, price_signup: team?.price_signup ?? null, price_note: team?.price_note ?? "", installments_allowed: team?.installments_allowed ?? true, signup_open: team?.signup_open ?? true });
   const toRef = (v: string | null | undefined) => v?.startsWith("art/catalog/") ? v.replace("art/catalog/", "").replace(/\.\w+$/, "") : v?.startsWith("http") ? v : null;
   const fromRef = (k: string | null) => !k ? null : k.startsWith("http") ? k : `art/catalog/${CATALOG.find((c) => c.key === k)?.file}`;
   const ownPhotos = [...new Set([team?.cover_url, team?.alt_url, ...(team?.photos ?? [])].filter((u): u is string => !!u && u.startsWith("http") && !/supabase|token=/.test(u)))];
-  const Toggle = ({ k, label, hint }: { k: "closed" | "parents_see_video" | "punch_card_open"; label: string; hint: string }) => <label className="toggle"><span>{label}<div className="tiny">{hint}</div></span><input type="checkbox" checked={!!f[k]} onChange={(e) => setF({ ...f, [k]: e.target.checked })} /></label>;
+  const Toggle = ({ k, label, hint }: { k: "closed" | "parents_see_video" | "punch_card_open" | "signup_open"; label: string; hint: string }) => <label className="toggle"><span>{label}<div className="tiny">{hint}</div></span><input type="checkbox" checked={!!f[k]} onChange={(e) => setF({ ...f, [k]: e.target.checked })} /></label>;
   return (
     <Sheet onClose={onClose} eyebrow={team ? t("common.edit") : t("admin.newTeam")} title={f.name || t("admin.team")}>
       <label className="field"><span>{t("admin.teamName")}</span><input id="tm-name" value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} /></label>
@@ -139,6 +141,7 @@ function TeamEditor({ team, onClose, onSaved }: { team: Team | null; onClose: ()
       </div>
       <Toggle k="parents_see_video" label={t("admin.parentsSeeVideo")} hint={t("admin.parentsSeeVideoHint")} />
       <Toggle k="punch_card_open" label={t("team.punchOpen")} hint={t("admin.punchHint")} />
+      <Toggle k="signup_open" label={t("admin.signupOpenTeam")} hint={t("admin.signupOpenTeamHint")} />
       <label className="toggle"><span>{t("admin.teamPublic")}<div className="tiny">{t("admin.teamPublicHint")}</div></span><input type="checkbox" checked={f.visibility === "public"} onChange={(e) => setF({ ...f, visibility: e.target.checked ? "public" : "private" })} /></label>
       <ImagePicker tag="team" label={t("admin.teamHeroImage")} own={ownPhotos} value={toRef(f.cover_url)} onChange={(k) => setF({ ...f, cover_url: fromRef(k) })} />
       <ImagePicker tag="team" label={t("admin.teamAboutImage")} own={ownPhotos} value={toRef(f.about_url)} onChange={(k) => setF({ ...f, about_url: fromRef(k) })} />

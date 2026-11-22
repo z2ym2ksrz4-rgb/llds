@@ -18,7 +18,7 @@ import { resolveImage } from "../lib/catalog";
 import { TrophyShelf } from "../components/Emblems";
 import { ScrollList } from "../components/ScrollList";
 import { CustomBoxCard } from "../admin/Customize";
-import { MyPayments } from "./Payments";
+import { JoinTeam, MyPayments } from "./Payments";
 
 /** Home, laid out like the approved demo: next event as a photo hero, messages that need you, your (child's) week with absence buttons, open payments. */
 export function Home() {
@@ -41,6 +41,7 @@ export function Home() {
   const openAdmin = useNav((n) => n.openAdmin);
   const [open, setOpen] = useState<Session | null>(null);
   const [openEvent, setOpenEvent] = useState<Event | null>(null);
+  const [join, setJoin] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
 
@@ -169,6 +170,7 @@ export function Home() {
     </>),
     teampick: () => (<>
       {(!isAdmin || teamIds.size > 0) && <TeamPicker ownOnly />}
+      {!me.person.supervised_by && <button type="button" className="linklike small" style={{ alignSelf: "flex-start", marginTop: -4 }} data-testid="home-join" onClick={() => setJoin(true)}>+ {t("pay.join")}</button>}
       {/* week strip: the dots follow the team chosen above – its trainings and events */}
       {(!isAdmin || teamIds.size > 0) && <div className="weekstrip" aria-hidden="true" data-testid="weekstrip">
         {strip.map((d) => { const key = d.toDateString(); const n = sessions.filter((x) => x.team_id === teamId && !x.cancelled && new Date(x.starts_at).toDateString() === key).length + events.filter((e) => new Date(e.starts_at).toDateString() === key && (!e.team_ids.length || (teamId ? e.team_ids.includes(teamId) : false))).length; return <span key={key} className={"d" + (key === today ? " today" : "") + (n ? " has" : "")}><small>{DAY_SHORT[(d.getDay() + 6) % 7]}</small><b>{d.getDate()}</b><i /></span>; })}
@@ -217,6 +219,7 @@ export function Home() {
 
       {order.map((k) => { const box = boxOf(appearance, k); return <Fragment key={k}>{box ? <CustomBoxCard box={box} onTab={(tab) => setTab(tab as Parameters<typeof setTab>[0])} /> : SECTIONS[k]?.()}</Fragment>; })}
 
+      {join && <JoinTeam onClose={() => { setJoin(false); void load(); }} toast={say} />}
       {openEvent && <EventSheet event={openEvent} staff={isStaff} onClose={() => { setOpenEvent(null); void load(); }} onChanged={() => void load()} toast={say} />}
       {open && <SessionSheet session={open} absences={absences} onClose={() => setOpen(null)} onChanged={() => void load()} toast={say} />}
       <Toast msg={toast} />
