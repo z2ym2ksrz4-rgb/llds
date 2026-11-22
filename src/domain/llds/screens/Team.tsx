@@ -38,6 +38,7 @@ export function TeamScreen() {
   const team = me.teams.find((x) => x.id === teamId);
   const staff = me.person.is_admin || (teamId != null && me.memberships.some((m) => m.person_id === me.person.id && m.team_id === teamId && m.role !== "dancer"));
   const [page, setPage] = useState<Page>("team");
+  useEffect(() => { const f = (e: globalThis.Event) => { if ((e as CustomEvent<string>).detail === teamId) setPage("audition"); }; addEventListener("llds:open-audition", f); return () => removeEventListener("llds:open-audition", f); }, [teamId]);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [absences, setAbsences] = useState<Absence[]>([]);
   const [members, setMembers] = useState<Member[]>([]);

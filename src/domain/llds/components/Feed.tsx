@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type Channel, type Comment, type Post } from "@/core/api";
 import { useAuth } from "@/core/auth";
@@ -17,7 +17,10 @@ export function Feed({ teamId, channels, toast, limit }: { teamId: string | null
   const [posts, setPosts] = useState<Post[]>([]);
   const [open, setOpen] = useState<Post | null>(null);
   const [lightbox, setLightbox] = useState<string | null>(null);
-  const load = useCallback(async () => { setPosts(await api.listPosts(channel, teamId)); }, [channel, teamId]);
+  const myTeams = useMemo(() => new Set(me.memberships.map((m) => m.team_id)), [me]);
+  // RLS already limits a real user; in "Vis appen som" the real account reads, so apply the viewed person's rights here too
+  const visible = useCallback((p: Post) => isAdmin || p.channel === "school" || (p.channel === "trainers" ? isStaff : !p.team_id || myTeams.has(p.team_id)), [isAdmin, isStaff, myTeams]);
+  const load = useCallback(async () => { setPosts((await api.listPosts(channel, teamId)).filter(visible)); }, [channel, teamId, visible]);
   useEffect(() => { void load(); }, [load]);
   useEffect(() => { if (!channels.includes(channel)) setChannel(channels[0]); }, [channels, channel]);
   const canPost = channel === "team" ? !!teamId : channel === "school" ? isAdmin : isStaff;

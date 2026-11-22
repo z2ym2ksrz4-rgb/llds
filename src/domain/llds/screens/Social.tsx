@@ -15,7 +15,9 @@ export function Social() {
   const [filter, setFilter] = useState<string>("all"); // all | trainers | <team id>
   const [posts, setPosts] = useState<Post[]>([]);
   const [toast, setToast] = useState<string | null>(null); const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
-  const load = useCallback(async () => setPosts(await api.listFeed()), []);
+  // RLS limits a real user; in "Vis appen som" the real account reads, so the viewed person's rights are applied here too
+  const visible = useCallback((p: Post) => me.person.is_admin || p.channel === "school" || (p.channel === "trainers" ? isStaff : !p.team_id || me.memberships.some((m) => m.team_id === p.team_id)), [me, isStaff]);
+  const load = useCallback(async () => setPosts((await api.listFeed()).filter(visible)), [visible]);
   useEffect(() => { void load(); }, [load]);
   const myTeams = me.teams.filter((x) => me.memberships.some((m) => m.team_id === x.id));
   return (

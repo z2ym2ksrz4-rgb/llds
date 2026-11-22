@@ -619,6 +619,7 @@ div.checklist{padding-left:0;color:inherit}
   .checklist.cols { grid-template-columns:repeat(3,1fr); }
   .galpick { grid-template-columns:repeat(5,1fr); }
   .tcar-slide { flex-basis:46%; }
+  .screen.home .tcar { margin:0; padding:2px 0 6px; } .screen.home .tcar-slide { flex-basis:48%; max-width:none; }
 }
 /* desktop: fixed left navigation, content centred, Home in two columns */
 @media (min-width:1100px) {

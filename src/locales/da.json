@@ -190,7 +190,8 @@
     "carousel": "Holdbilleder",
     "studioEyebrow": "Hele studiet",
     "studioTitle": "Studiet",
-    "studioSub": "På tværs af alle hold – det du som administrator skal forholde dig til."
+    "studioSub": "På tværs af alle hold – det du som administrator skal forholde dig til.",
+    "glimpses": "Små glimt fra dine hold"
   },
   "admin": {
     "users": "Nye brugere",
@@ -1436,6 +1437,10 @@
     "newRoundHint": "Når sæsonens audition er afsluttet og pladserne fordelt: start en ny runde. Listen tømmes (de gamle svar gemmes som historik), krav/video/dato nulstilles, og danserne kan melde sig igen. De, der kom på holdet, er medlemmer og kan ikke melde sig til audition på deres eget hold.",
     "newRoundBtn": "Start ny runde",
     "newRoundSure": "Start ny runde? {{n}} tilmeldte arkiveres, og kravene slettes.",
-    "newRoundDone": "Ny runde startet – klar til nye tilmeldinger"
+    "newRoundDone": "Ny runde startet – klar til nye tilmeldinger",
+    "staffTitle": "Audition – dine hold",
+    "staffLine": "{{applied}} tilmeldt · {{invited}} har fået krav · {{selected}} udtaget",
+    "staffNone": "Ingen tilmeldte endnu",
+    "staffOpen": "Åbn audition"
   }
 }

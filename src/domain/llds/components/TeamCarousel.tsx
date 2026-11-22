@@ -35,13 +35,13 @@ export function TeamCarousel() {
   // gentle auto-advance while visible
   useEffect(() => {
     if (slides.length < 2) return;
-    const i = setInterval(() => { const el = ref.current; if (!el || document.visibilityState !== "visible") return; const r = el.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) return; const next = (idx + 1) % slides.length; const c = el.children[next] as HTMLElement | undefined; if (c) el.scrollTo({ left: c.offsetLeft - 16, behavior: "smooth" }); }, 5000);
+    const i = setInterval(() => { const el = ref.current; if (!el || document.visibilityState !== "visible") return; const r = el.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) return; const next = (idx + 1) % slides.length; const c = el.children[next] as HTMLElement | undefined; if (c) el.scrollTo({ left: c.offsetLeft - (el.firstElementChild as HTMLElement).offsetLeft, behavior: "smooth" }); }, 5000);
     return () => clearInterval(i);
   }, [idx, slides.length]);
   if (!slides.length) return null;
-  const onScroll = () => { const el = ref.current; if (!el) return; let best = 0, bd = 1e9; Array.from(el.children).forEach((c, k) => { const d = Math.abs((c as HTMLElement).offsetLeft - 16 - el.scrollLeft); if (d < bd) { bd = d; best = k; } }); if (best !== idx) setIdx(best); };
+  const onScroll = () => { const el = ref.current; if (!el) return; let best = 0, bd = 1e9; Array.from(el.children).forEach((c, k) => { const base = (el.firstElementChild as HTMLElement).offsetLeft; const d = Math.abs((c as HTMLElement).offsetLeft - base - el.scrollLeft); if (d < bd) { bd = d; best = k; } }); if (best !== idx) setIdx(best); };
   return (
-    <div className="sec" data-testid="team-carousel">
+    <div className="sec" data-testid="team-carousel"><h2>{t("home.glimpses")}</h2>
       <div className="tcar" ref={ref} onScroll={onScroll}>
         {slides.map((s, i) => <button key={s.team.id + i} type="button" className="tcar-slide" style={{ backgroundImage: `url(${s.url})` }} onClick={() => { if (s.child) setViewing({ personId: s.child.id, isChild: true }); else if (viewing?.isChild) setViewing({ personId: me!.person.id, isChild: false }); setTeam(s.team.id); setTab("team"); }}>
           <span className="tcar-cap"><span className="eyebrow">{s.team.style ?? ""}{s.child ? ` · ${s.child.first_name}` : ""}</span><b>{s.team.name}</b></span>

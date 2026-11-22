@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type AuditionCandidate, type AuditionStatus, type Event, type Team } from "@/core/api";
 import { useAuth } from "@/core/auth";
+import { useNav } from "@/core/nav";
 import { Sheet, Toast } from "../components/Sheet";
 import { PaySheet } from "../components/Pay";
 import { ScrollList } from "../components/ScrollList";
@@ -122,10 +123,22 @@ export function AuditionCards() {
   const [pay, setPay] = useState<{ id: string; reference: string; amount: number; title: string } | null>(null);
   const [toast, setToast] = useState<string | null>(null); const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
   const [teams, setTeams] = useState<Team[]>([]);
-  const load = useCallback(async () => { setCands((await api.listAuditionCandidates().catch(() => [])).filter((c) => c.status !== "withdrawn")); }, []);
+  const mine = useMemo(() => new Set([me.person.id, ...me.children.map((c) => c.id)]), [me]);
+  const staffTeams = useMemo(() => me.teams.filter((x) => (x.admission === "audition" || x.closed) && me.memberships.some((m) => m.person_id === me.person.id && m.team_id === x.id && m.role !== "dancer")), [me]);
+  const [all, setAll] = useState<AuditionCandidate[]>([]);
+  const load = useCallback(async () => { const rows = (await api.listAuditionCandidates().catch(() => [])) as AuditionCandidate[]; setAll(rows); setCands(rows.filter((c) => mine.has(c.person_id) && c.status !== "withdrawn")); }, [mine]);
   useEffect(() => { void load(); const f = () => void load(); addEventListener("llds:audition", f); return () => removeEventListener("llds:audition", f); }, [load]);
+  const setTeam = useAuth((s) => s.setTeam); const setTab = useNav((s) => s.setTab);
+  const openAudition = (teamId: string) => { setTeam(teamId); setTab("team"); setTimeout(() => dispatchEvent(new CustomEvent("llds:open-audition", { detail: teamId })), 50); };
+  const staffBlock = staffTeams.length ? (
+    <div className="sec" data-testid="audition-staff"><h2>{t("audition.staffTitle")}</h2>
+      <div className="card list">
+        {staffTeams.map((x) => { const cs = all.filter((c) => c.team_id === x.id && c.status !== "withdrawn"); const n = (st: string) => cs.filter((c) => c.status === st).length;
+          return <button key={x.id} className="item" data-testid="audition-staff-team" onClick={() => openAudition(x.id)}><span className="grow"><strong>{x.name}</strong><div className="tiny">{cs.length ? t("audition.staffLine", { applied: cs.length, invited: n("invited") + n("selected") + n("waitlist") + n("declined") + n("accepted"), selected: n("selected") + n("accepted") }) : t("audition.staffNone")}</div></span><span className="gold">{t("audition.staffOpen")} ›</span></button>; })}
+      </div>
+    </div>) : null;
   useEffect(() => { if (accepting) void api.listTeams().then(setTeams); }, [accepting]);
-  if (!cands.length) return null;
+  if (!cands.length) return staffBlock;
   const who = (pid: string) => (pid === me.person.id ? null : me.children.find((c) => c.id === pid)?.first_name ?? null);
   const respond = async (c: AuditionCandidate, accept: boolean) => {
     const r = await api.auditionRespond(c.id, accept, plan);
@@ -135,7 +148,7 @@ export function AuditionCards() {
     setAccepting(null); await load();
   };
   const team = accepting ? teams.find((x) => x.id === accepting.team_id) : null;
-  return (
+  return (<>{staffBlock}
     <div className="sec" data-testid="audition-cards"><h2>{t("audition.title")}</h2>
       <ScrollList>
         {cands.map((c) => (
@@ -160,6 +173,6 @@ export function AuditionCards() {
       )}
       {pay && <PaySheet amount={pay.amount} reference={pay.reference} title={pay.title} onClose={() => setPay(null)} onPaid={async () => { await api.claimPaymentPaid(pay.id); say(t("pay.claimed")); setPay(null); }} />}
       <Toast msg={toast} />
-    </div>
+    </div></>
   );
 }

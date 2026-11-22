@@ -190,7 +190,8 @@
     "carousel": "Team pictures",
     "studioEyebrow": "The whole studio",
     "studioTitle": "The studio",
-    "studioSub": "Across all teams – what you, as administrator, need to keep an eye on."
+    "studioSub": "Across all teams – what you, as administrator, need to keep an eye on.",
+    "glimpses": "Glimpses from your teams"
   },
   "admin": {
     "users": "New users",
@@ -1436,6 +1437,10 @@
     "newRoundHint": "When this season's audition is done and the spots are given: start a new round. The list is cleared (old answers are kept as history), requirements/video/date are reset, and dancers can apply again. Those who made the team are members and cannot apply to their own team.",
     "newRoundBtn": "Start new round",
     "newRoundSure": "Start a new round? {{n}} applicants are archived and the requirements cleared.",
-    "newRoundDone": "New round started – ready for new applications"
+    "newRoundDone": "New round started – ready for new applications",
+    "staffTitle": "Audition – your teams",
+    "staffLine": "{{applied}} applied · {{invited}} briefed · {{selected}} selected",
+    "staffNone": "No applicants yet",
+    "staffOpen": "Open audition"
   }
 }
