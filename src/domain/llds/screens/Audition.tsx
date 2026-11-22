@@ -25,6 +25,7 @@ export function AuditionAdmin({ team, onBack, toast }: { team: Team; onBack: () 
   const [open, setOpen] = useState<AuditionCandidate | null>(null);
   const [busy, setBusy] = useState(false);
   const [sort, setSort] = useState<"name" | "score">("name");
+  const [confirmRound, setConfirmRound] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const load = useCallback(async () => { const [c, e] = await Promise.all([api.listAuditionCandidates(team.id), api.listEvents().catch(() => [] as Event[])]); setCands(c); setEvents(e); }, [team.id]);
   useEffect(() => { void load(); }, [load]);
@@ -75,6 +76,12 @@ export function AuditionAdmin({ team, onBack, toast }: { team: Team; onBack: () 
         </div>
         <button className="cta" style={{ marginTop: 10 }} disabled={busy || !pendingResults} data-testid="audition-send-results" onClick={() => void sendResults()}>{t("audition.sendResults", { n: pendingResults })}</button>
         <p className="tiny muted">{t("audition.sendResultsHint")}</p>
+      </div>
+
+      <div className="sec"><h2>{t("audition.newRound")}</h2>
+        <p className="tiny muted" style={{ marginTop: 0 }}>{t("audition.newRoundHint")}</p>
+        {!confirmRound ? <button className="ghost" data-testid="audition-new-round" onClick={() => setConfirmRound(true)}>{t("audition.newRoundBtn")}</button>
+          : <div className="card" style={{ borderColor: "#7a3b3b" }}><strong>{t("audition.newRoundSure", { n: cands.length })}</strong><div className="row" style={{ gap: 8, marginTop: 8 }}><button className="ghost danger small" data-testid="audition-new-round-yes" onClick={async () => { setBusy(true); try { await api.auditionNewRound(team.id); setVideo(""); setText(""); setEventId(""); setSentAt(null); setBriefOpen(true); setConfirmRound(false); toast(t("audition.newRoundDone")); await load(); } finally { setBusy(false); } }}>{t("audition.newRoundBtn")}</button><button className="ghost small" onClick={() => setConfirmRound(false)}>{t("common.cancel")}</button></div></div>}
       </div>
 
       {open && <CandidateSheet cand={open} onClose={() => setOpen(null)} onSaved={async () => { await load(); }} />}

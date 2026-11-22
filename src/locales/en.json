@@ -1431,6 +1431,11 @@
     "declinedToast": "You declined – the spot moves on",
     "dateLabel": "Audition",
     "dateTba": "Date and time for the audition are announced by the trainer – you will be notified.",
-    "canCome": "{{name}} can attend the audition at this time"
+    "canCome": "{{name}} can attend the audition at this time",
+    "newRound": "New audition round",
+    "newRoundHint": "When this season's audition is done and the spots are given: start a new round. The list is cleared (old answers are kept as history), requirements/video/date are reset, and dancers can apply again. Those who made the team are members and cannot apply to their own team.",
+    "newRoundBtn": "Start new round",
+    "newRoundSure": "Start a new round? {{n}} applicants are archived and the requirements cleared.",
+    "newRoundDone": "New round started – ready for new applications"
   }
 }

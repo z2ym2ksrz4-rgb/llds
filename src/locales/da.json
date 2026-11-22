@@ -1431,6 +1431,11 @@
     "declinedToast": "Du har takket nej – pladsen går videre",
     "dateLabel": "Audition",
     "dateTba": "Dato og tid for audition meldes ud af træneren – du får besked.",
-    "canCome": "{{name}} kan møde op til audition på dette tidspunkt"
+    "canCome": "{{name}} kan møde op til audition på dette tidspunkt",
+    "newRound": "Ny audition-runde",
+    "newRoundHint": "Når sæsonens audition er afsluttet og pladserne fordelt: start en ny runde. Listen tømmes (de gamle svar gemmes som historik), krav/video/dato nulstilles, og danserne kan melde sig igen. De, der kom på holdet, er medlemmer og kan ikke melde sig til audition på deres eget hold.",
+    "newRoundBtn": "Start ny runde",
+    "newRoundSure": "Start ny runde? {{n}} tilmeldte arkiveres, og kravene slettes.",
+    "newRoundDone": "Ny runde startet – klar til nye tilmeldinger"
   }
 }
