@@ -86,6 +86,12 @@ if not os.path.exists(X):
 """)
 PY
 
+# Firebase (push): google-services plugin only when google-services.json is present (dropped in by CI from GOOGLE_SERVICES_JSON)
+if [ -f android/app/google-services.json ]; then
+  grep -q "com.google.gms:google-services" android/build.gradle || sed -i -E "s/(classpath 'com.android.tools.build:gradle[^']*')/\1\n        classpath 'com.google.gms:google-services:4.4.2'/" android/build.gradle
+  grep -q "com.google.gms.google-services" android/app/build.gradle || printf "\napply plugin: 'com.google.gms.google-services'\n" >> android/app/build.gradle
+fi
+
 # SDK levels: Play automatic protection needs minSdk >= 24 (Capacitor default 23); Play requires targetSdk 36
 V=android/variables.gradle
 [ -f "$V" ] && python3 - "$V" <<'PY'

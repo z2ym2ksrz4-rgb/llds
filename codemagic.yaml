@@ -77,9 +77,9 @@ workflows:
         script: |
           RELEASE=1 npm run build
           [ -d android ] || npx cap add android
-          bash scripts/android-postadd.sh
           # Firebase (push): google-services.json from the GOOGLE_SERVICES_JSON secret (base64) when present
           if [ -n "${GOOGLE_SERVICES_JSON:-}" ]; then echo "$GOOGLE_SERVICES_JSON" | base64 -d > android/app/google-services.json; fi
+          bash scripts/android-postadd.sh
           npx @capacitor/assets generate --android --iconBackgroundColor '#ffffff' --iconBackgroundColorDark '#ffffff' --splashBackgroundColor '#ffffff' --splashBackgroundColorDark '#ffffff'
           npx cap sync android
       - name: Keystore
