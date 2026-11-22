@@ -6,7 +6,7 @@ export type Person = {
   id: string;
   school_id: string;
   user_id: string | null;
-  last_seen_at?: string | null;
+  last_seen_at?: string | null; first_seen_at?: string | null;
   first_name: string;
   last_name: string;
   email: string | null;

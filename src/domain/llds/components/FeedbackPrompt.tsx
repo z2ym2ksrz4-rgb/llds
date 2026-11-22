@@ -5,8 +5,22 @@ import { useAuth } from "@/core/auth";
 import { Sheet, Toast } from "./Sheet";
 
 const KEY = "llds_feedback";           // per device: { at, state: "later" | "done" | "never" }
-const FIRST_AFTER_DAYS = 14;           // ask the first time after two weeks of membership
+const SESSIONS_KEY = "llds_sessions";  // per device + person: number of app sessions (one per 6 h)
+const FIRST_AFTER_DAYS = 30;           // ask the first time after a month of use …
+const FIRST_AFTER_SESSIONS = 10;       // … and at least ten sessions
 const AGAIN_AFTER_DAYS = 90;           // "Senere" → ask again after three months
+const YEARLY_DAYS = 365;               // answered → ask again a year later
+
+/** Counts app sessions per device (at most one per 6 hours); returns { count, first } */
+function bumpSessions(personId: string): { count: number; first: number } {
+  try {
+    const k = SESSIONS_KEY + ":" + personId; const st = JSON.parse(localStorage.getItem(k) ?? "null") as { count: number; first: number; last: number } | null;
+    const now = Date.now();
+    if (!st) { const v = { count: 1, first: now, last: now }; localStorage.setItem(k, JSON.stringify(v)); return v; }
+    if (now - st.last > 6 * 36e5) { st.count += 1; st.last = now; localStorage.setItem(k, JSON.stringify(st)); }
+    return st;
+  } catch { return { count: 0, first: Date.now() }; }
+}
 
 /** Feedback sheet: how is the app for you, what should be better, what is broken. The answer is tied to the person (admin sees who wrote it). */
 export function FeedbackSheet({ onClose, context }: { onClose: (sent: boolean) => void; context: string }) {
@@ -40,10 +54,13 @@ export function FeedbackPrompt() {
   useEffect(() => {
     if (phase !== "ready" || !me || viewAs) return;
     let st: { at?: number; state?: string } | null = null; try { st = JSON.parse(localStorage.getItem(KEY + ":" + me.person.id) ?? "null"); } catch { /* ignore */ }
-    if (st?.state === "done" || st?.state === "never") return;
+    const sessions = bumpSessions(me.person.id);
+    if (st?.state === "never") return;
+    if (st?.state === "done" && st.at && Date.now() - st.at < YEARLY_DAYS * 864e5) return;
     if (st?.state === "later" && st.at && Date.now() - st.at < AGAIN_AFTER_DAYS * 864e5) return;
-    const memberFor = Date.now() - new Date(me.person.created_at).getTime();
-    if (memberFor < FIRST_AFTER_DAYS * 864e5) return;
+    // first time: a month of real use on this device and at least ten sessions (not "member since" – many were imported long before they logged in)
+    const usingSince = Math.max(new Date(me.person.first_seen_at ?? me.person.created_at).getTime(), sessions.first);
+    if (!st && (Date.now() - usingSince < FIRST_AFTER_DAYS * 864e5 || sessions.count < FIRST_AFTER_SESSIONS)) return;
     let notifAsked = false; try { notifAsked = !!localStorage.getItem("llds_notif_asked") || !!localStorage.getItem("llds_notif_asked:" + me.person.id) || !!me.person.notify_prefs?.asked; } catch { /* ignore */ }
     if (!notifAsked) return;   // one prompt at a time – notifications first
     const tm = setTimeout(() => setShow(true), 2500); return () => clearTimeout(tm);
