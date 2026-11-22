@@ -16,10 +16,12 @@ import { useBadges } from "@/core/badges";
 import { SessionEditor } from "../components/SessionSheet";
 import { ImagePicker } from "../components/ImagePicker";
 import { InsightsPage } from "./Insights";
+import { AuditionAdmin } from "../screens/Audition";
+import type { AuditionCandidate } from "@/core/api";
 import { CATALOG } from "../lib/catalog";
 import { addDays, DAY_LONG, hm, mondayOf, startOfDay } from "../lib/time";
 
-type Page = "menu" | "users" | "members" | "teams" | "season" | "bookings" | "messages" | "reports" | "events" | "shop" | "punch" | "import" | "catalog" | "customize" | "payments" | "insights";
+type Page = "menu" | "users" | "members" | "teams" | "season" | "bookings" | "messages" | "reports" | "events" | "shop" | "punch" | "import" | "catalog" | "customize" | "payments" | "insights" | "auditions";
 const CATS = ["mini", "kids", "junior", "adult", "mixed"] as const;
 
 /** Admin: the one place Line runs the school from. Everything else in the app reads what she sets here. */
@@ -44,6 +46,7 @@ export function Admin() {
   if (page === "catalog") return <Back onBack={() => setPage("menu")}><CatalogAdmin /></Back>;
   if (page === "customize") return <Back onBack={() => setPage("menu")}><Customize /></Back>;
   if (page === "insights") return <Back onBack={() => setPage("menu")}><InsightsPage /></Back>;
+  if (page === "auditions") return <Back onBack={() => setPage("menu")}><AuditionsOverview /></Back>;
   if (page === "payments") return <Back onBack={() => setPage("menu")}><PaymentsAdmin /></Back>;
   const items: [Page, string, string, number][] = [
     ["users", t("admin.users"), counts.pending ? t("todo.pending", { count: counts.pending }) : t("admin.usersSub"), counts.pending], ["members", t("admin.members"), t("admin.membersSub"), 0], ["teams", t("admin.teams"), t("admin.teamsSub"), 0],
@@ -53,6 +56,7 @@ export function Admin() {
     ["catalog", t("catalog.adminTitle"), t("catalog.adminSub"), 0],
     ["payments", t("pay.adminTitle"), counts.payments ? t("todo.payments", { count: counts.payments }) : t("pay.adminSub"), counts.payments],
     ["customize", t("customize.title"), t("customize.sub"), 0],
+    ["auditions", t("audition.adminTitle"), t("audition.adminSub"), 0],
     ["insights", t("insights.title"), t("insights.sub"), 0],
     ["import", t("admin.importPhotos"), t("admin.importSub"), 0],
   ];
@@ -342,6 +346,28 @@ function PunchAdmin() {
             {edit !== "new" && <button className="ghost danger" onClick={async () => { await api.savePunchCardType({ name: edit.name, punches: edit.punches, valid_days: edit.valid_days, price_dkk: edit.price_dkk, active: !edit.active }, edit.id); setEdit(null); void load(); }}>{edit.active ? t("admin.deactivate") : t("admin.activate")}</button>}</div>
         </Sheet>
       )}
+      <Toast msg={toast} />
+    </section>
+  );
+}
+
+/** Admin → Auditions: every audition team with candidate counts; opens the trainer module for a team. */
+function AuditionsOverview() {
+  const { t } = useTranslation();
+  const [teams, setTeams] = useState<Team[]>([]); const [cands, setCands] = useState<AuditionCandidate[]>([]); const [open, setOpen] = useState<Team | null>(null);
+  const [toast, setToast] = useState<string | null>(null); const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
+  const load = useCallback(async () => { const [ts, cs] = await Promise.all([api.listTeams(), api.listAuditionCandidates().catch(() => [] as AuditionCandidate[])]); setTeams(ts.filter((x) => x.admission === "audition")); setCands(cs); }, []);
+  useEffect(() => { void load(); }, [load]);
+  if (open) return <><AuditionAdmin team={open} onBack={() => { setOpen(null); void load(); }} toast={say} /><Toast msg={toast} /></>;
+  const n = (tid: string, st?: string[]) => cands.filter((c) => c.team_id === tid && (!st || st.includes(c.status))).length;
+  return (
+    <section className="screen" data-testid="auditions-overview">
+      <header className="topbar"><h1 className="display">{t("audition.adminTitle")}</h1></header>
+      <p className="muted small">{t("audition.adminOverviewIntro")}</p>
+      <div className="card list">
+        {teams.map((x) => <button key={x.id} className="item" onClick={() => setOpen(x)} data-testid="audition-team"><span className="grow">{x.name}<div className="tiny">{t("audition.counts", { applied: n(x.id, ["applied", "invited"]), selected: n(x.id, ["selected"]), waitlist: n(x.id, ["waitlist"]), declined: n(x.id, ["declined"]), accepted: n(x.id, ["accepted"]) })}{x.audition_sent_at ? "" : " · " + t("audition.noBriefShort")}</div></span><span className="gold">›</span></button>)}
+        {!teams.length && <p className="muted">{t("audition.noTeams")}</p>}
+      </div>
       <Toast msg={toast} />
     </section>
   );

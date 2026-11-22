@@ -1105,7 +1105,9 @@
     },
     "pickTitle": "What do you want to hear about?",
     "pickBody": "Everything is on – untick what you don't want to be disturbed by.",
-    "save": "Save"
+    "save": "Save",
+    "mail": "E-mail for important messages",
+    "mailSub": "Sign-ups, audition requirements and results and payment requests are also sent by e-mail. Receipts are always sent; everything else only in the app."
   },
   "customize": {
     "title": "Customise the app",
@@ -1145,7 +1147,8 @@
       "payments": "Open payments",
       "badges": "Trophy shelf (badges + milestones)",
       "gallery": "Team pictures (carousel)",
-      "studioHead": "Heading: The studio"
+      "studioHead": "Heading: The studio",
+      "audition": "Audition (applicants only)"
     },
     "gallery": "Photo carousel on the website",
     "gallerySub": "Pick images for the carousel on the website front page – in the order you tap ({{n}} selected). Empty = the teams' own photos are shown automatically.",
@@ -1344,5 +1347,87 @@
     "later": "Later",
     "thanks": "Thanks – that helps us!",
     "give": "Give feedback on the app"
+  },
+  "audition": {
+    "title": "Audition",
+    "adminTitle": "Auditions",
+    "adminSub": "Applicants, requirements video, scoring and selections",
+    "adminOverviewIntro": "All teams admitting by audition. Tap a team to send requirements, score and select.",
+    "adminIntro": "Send requirements and video to everyone who applied, score them in the hall, and send the selections – the selected accept and pay in the app.",
+    "brief": "Requirements and video",
+    "noBrief": "No requirements written yet.",
+    "noBriefShort": "requirements not sent",
+    "videoSet": "Video ready",
+    "noVideo": "No video",
+    "sentAt": "sent {{when}}",
+    "text": "Requirements / steps to master",
+    "textPh": "E.g.: 1) Double pirouette · 2) Splits both sides · 3) Learn the combination in the video (0:00–0:45) …",
+    "video": "Video",
+    "uploadVideo": "Upload video",
+    "or": "or paste a link",
+    "event": "Audition date (event)",
+    "noEvent": "Not chosen – create the event under Admin → Events first",
+    "eventHint": "The date is shown on the dancers' home screen with the requirements.",
+    "sendBrief": "Send requirements to {{n}} applicants",
+    "sendBriefAgain": "Send again to {{n}} applicants",
+    "briefSaved": "Requirements saved",
+    "briefSent": "Requirements sent to {{n}}",
+    "videoUploaded": "Video uploaded",
+    "candidates": "Applicants",
+    "sortName": "Name",
+    "sortScore": "Score",
+    "counts": "{{applied}} applied · {{selected}} selected · {{waitlist}} waitlist · {{declined}} not this time · {{accepted}} accepted",
+    "noCandidates": "No applicants yet. Dancers apply under + Sign up for a team.",
+    "sendResults": "Send selections ({{n}})",
+    "sendResultsHint": "Notifies everyone with a decision who hasn't heard yet. The selected accept on their home screen – the spot is theirs once payment is registered. If someone declines, the waitlist moves up.",
+    "resultsSent": "Selections sent to {{n}}",
+    "score": {
+      "technique": "Technique",
+      "expression": "Expression",
+      "potential": "Potential"
+    },
+    "total": "Total {{n}}/15",
+    "note": "Note",
+    "notePh": "Trainers only",
+    "decision": "Decision",
+    "undecided": "Undecided",
+    "decisionHint": "The decision is only sent when you tap \"Send selections\".",
+    "status": {
+      "applied": "Applied",
+      "invited": "Got requirements",
+      "selected": "Selected",
+      "waitlist": "Waitlist",
+      "declined": "Not this time",
+      "accepted": "Accepted",
+      "withdrawn": "Declined"
+    },
+    "mine": {
+      "applied": "Applied",
+      "invited": "Requirements received",
+      "selected": "Selected 🎉",
+      "waitlist": "Waitlist",
+      "declined": "Not this time",
+      "accepted": "Accepted",
+      "withdrawn": "Declined"
+    },
+    "mineBody": {
+      "applied": "Thanks for applying. The trainer will send requirements, video and date here – await further instructions.",
+      "invited": "Here are the requirements. Practise until the audition – everyone is welcome on the day.",
+      "selected": "Congratulations! Accept the spot here – the next step is payment.",
+      "waitlist": "You are on the waitlist. If a spot opens up you will be notified right away.",
+      "declined": "Not this time – keep dancing and come back for the next audition.",
+      "accepted": "The spot is yours once payment is registered.",
+      "withdrawn": "You declined the spot."
+    },
+    "apply": "Apply for audition",
+    "appliedToast": "Thanks for applying – the trainer will be in touch",
+    "appliedThanks": "You are signed up for the audition. Await requirements and date here in the app.",
+    "accept": "Accept the spot",
+    "decline": "No thanks",
+    "acceptEyebrow": "You are selected",
+    "acceptIntro": "Choose payment for {{name}} – the spot is secured once payment is registered.",
+    "acceptConfirm": "Accept and go to payment",
+    "acceptedToast": "Spot accepted",
+    "declinedToast": "You declined – the spot moves on"
   }
 }

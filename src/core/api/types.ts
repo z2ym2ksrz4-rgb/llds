@@ -28,7 +28,7 @@ export type Person = {
 };
 
 /** Notification preferences: master switch + per kind. A kind that is not listed is on. */
-export type NotifyPrefs = { on?: boolean; kinds?: Record<string, boolean>; asked?: boolean };
+export type NotifyPrefs = { on?: boolean; kinds?: Record<string, boolean>; asked?: boolean; mail?: boolean };   // mail: e-mail for the important things (sign-ups, audition results, payment requests); missing = on
 
 /** Admin-customised look of the app (Admin → Tilpas appen). Stored on school.appearance; readable without login (login image). */
 export type CustomBox = { id: string; title: string; body: string; image?: string | null; link?: string | null; linkLabel?: string | null; tab?: string | null };
@@ -37,6 +37,9 @@ export type Insights = {
   posts_30d: number; comments_30d: number; messages_30d: number; threads_30d: number; bookings_30d: number; absences_30d: number; feedback_total: number; feedback_unread: number;
   never_list: { id: string; name: string; since: string }[]; inactive_list: { id: string; name: string; last: string }[]; no_team_list: { id: string; name: string }[];
 };
+export type AuditionStatus = "applied" | "invited" | "selected" | "waitlist" | "declined" | "accepted" | "withdrawn";
+export type AuditionCandidate = { id: string; team_id: string; person_id: string; person_name: string; birth_year: number | null; status: AuditionStatus; scores: Record<string, number>; note: string | null; created_at: string; decided_at: string | null; results_sent_at: string | null; responded_at: string | null;
+  team_name: string; audition_video_url: string | null; audition_text: string | null; audition_event_id: string | null; audition_sent_at: string | null; audition_at: string | null; audition_place: string | null };
 export type Feedback = { id: string; person_id: string | null; person_name: string | null; mood: "love" | "ok" | "meh"; body: string; context: string | null; created_at: string; read_at: string | null };
 
 export type Appearance = {
@@ -68,6 +71,7 @@ export type Team = {
   admission?: "open" | "tryout" | "audition";   // how dancers get on the team (badge on website + app)
   admission_note?: string | null;
   signup_open?: boolean;         // false = visible but cannot be joined (season break / team not opened yet)
+  audition_video_url?: string | null; audition_text?: string | null; audition_event_id?: string | null; audition_sent_at?: string | null;
   photos?: string[];            // Line's own photos of the team (website URLs); a second one is shown under "Om holdet"
   gallery?: string[];           // pictures for the Home carousel, chosen by admin/trainer (catalog keys, art/ paths or URLs); empty = random pick
   about_url?: string | null;    // admin-chosen image under "Om holdet" (null = automatic)
@@ -421,6 +425,15 @@ export interface Api {
   signupsOpen(): Promise<boolean>;
   setSignupsOpen(open: boolean): Promise<void>;
   myQuote(teamId: string, plan: string): Promise<{ before: number | null; discount_pct: number; amount: number | null; installments: number; fee: number; per_rate: number | null; note: string | null }>;
+  // auditions (0056)
+  applyAudition(teamId: string, personId: string): Promise<void>;
+  listAuditionCandidates(teamId?: string): Promise<AuditionCandidate[]>;   // staff: a team's candidates; everyone: own + children's
+  auditionSetBrief(teamId: string, video: string | null, text: string | null, eventId: string | null): Promise<void>;
+  auditionSendBrief(teamId: string): Promise<number>;
+  auditionDecide(id: string, status: AuditionStatus | null, scores: Record<string, number> | null, note: string | null): Promise<void>;
+  auditionSendResults(teamId: string): Promise<number>;
+  auditionRespond(id: string, accept: boolean, plan?: string): Promise<{ ok: boolean; already?: boolean; id?: string; reference?: string; amount_dkk?: number | null; team?: string; installments?: number; per_rate_dkk?: number | null; note?: string | null }>;
+  uploadAuditionVideo(teamId: string, file: File): Promise<string>;
   // insights + feedback (0054)
   touchSeen(): Promise<void>;
   appInsights(): Promise<Insights>;

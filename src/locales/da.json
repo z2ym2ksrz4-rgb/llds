@@ -1105,7 +1105,9 @@
     },
     "pickTitle": "Hvad vil du have besked om?",
     "pickBody": "Alt er slået til – fravælg det, du ikke vil forstyrres med.",
-    "save": "Gem"
+    "save": "Gem",
+    "mail": "E-mail ved vigtige beskeder",
+    "mailSub": "Tilmeldinger, audition-krav og -svar og betalingsanmodninger sendes også på mail. Kvitteringer sendes altid; alt andet kun i appen."
   },
   "customize": {
     "title": "Tilpas appen",
@@ -1145,7 +1147,8 @@
       "payments": "Åbne betalinger",
       "badges": "Trofæhylde (emblemer + milepæle)",
       "gallery": "Holdbilleder (karrusel)",
-      "studioHead": "Overskrift: Studiet"
+      "studioHead": "Overskrift: Studiet",
+      "audition": "Audition (kun for tilmeldte)"
     },
     "gallery": "Billedkarrusel på websitet",
     "gallerySub": "Vælg billeder til karrusellen på forsiden af websitet – i den rækkefølge du trykker ({{n}} valgt). Tom = holdenes egne fotos vises automatisk.",
@@ -1344,5 +1347,87 @@
     "later": "Senere",
     "thanks": "Tak – det hjælper os!",
     "give": "Giv feedback på appen"
+  },
+  "audition": {
+    "title": "Audition",
+    "adminTitle": "Auditions",
+    "adminSub": "Tilmeldte, krav-video, scoring og udtagelser",
+    "adminOverviewIntro": "Alle hold med optagelse via audition. Tryk på et hold for at sende krav, score og udtage.",
+    "adminIntro": "Send krav og video til alle tilmeldte, scor dem i salen, og send udtagelserne – de udtagne accepterer og betaler i appen.",
+    "brief": "Krav og video",
+    "noBrief": "Ingen krav skrevet endnu.",
+    "noBriefShort": "krav ikke sendt",
+    "videoSet": "Video klar",
+    "noVideo": "Ingen video",
+    "sentAt": "sendt {{when}}",
+    "text": "Krav / trin man skal kunne",
+    "textPh": "Fx: 1) Pirouette dobbelt · 2) Spagat begge sider · 3) Lær kombinationen i videoen (0:00–0:45) …",
+    "video": "Video",
+    "uploadVideo": "Upload video",
+    "or": "eller indsæt link",
+    "event": "Audition-dato (event)",
+    "noEvent": "Ikke valgt – opret eventet under Admin → Events først",
+    "eventHint": "Datoen vises på dansernes forside sammen med kravene.",
+    "sendBrief": "Send krav til {{n}} tilmeldte",
+    "sendBriefAgain": "Send igen til {{n}} tilmeldte",
+    "briefSaved": "Krav gemt",
+    "briefSent": "Krav sendt til {{n}}",
+    "videoUploaded": "Video uploadet",
+    "candidates": "Tilmeldte",
+    "sortName": "Navn",
+    "sortScore": "Score",
+    "counts": "{{applied}} tilmeldt · {{selected}} udtaget · {{waitlist}} venteliste · {{declined}} ikke denne gang · {{accepted}} accepteret",
+    "noCandidates": "Ingen tilmeldte endnu. Danserne melder sig under + Tilmeld nyt hold.",
+    "sendResults": "Send udtagelser ({{n}})",
+    "sendResultsHint": "Sender besked til alle, der har fået en afgørelse og ikke har hørt endnu. Udtagne accepterer på deres forside – pladsen er deres, når betalingen er registreret. Siger en nej, rykker ventelisten op.",
+    "resultsSent": "Udtagelser sendt til {{n}}",
+    "score": {
+      "technique": "Teknik",
+      "expression": "Udtryk",
+      "potential": "Potentiale"
+    },
+    "total": "Samlet {{n}}/15",
+    "note": "Note",
+    "notePh": "Kun for trænere",
+    "decision": "Afgørelse",
+    "undecided": "Ikke afgjort",
+    "decisionHint": "Afgørelsen sendes først, når du trykker \"Send udtagelser\".",
+    "status": {
+      "applied": "Tilmeldt",
+      "invited": "Har fået krav",
+      "selected": "Udtaget",
+      "waitlist": "Venteliste",
+      "declined": "Ikke denne gang",
+      "accepted": "Accepteret",
+      "withdrawn": "Takkede nej"
+    },
+    "mine": {
+      "applied": "Tilmeldt",
+      "invited": "Krav modtaget",
+      "selected": "Udtaget 🎉",
+      "waitlist": "Venteliste",
+      "declined": "Ikke denne gang",
+      "accepted": "Accepteret",
+      "withdrawn": "Takkede nej"
+    },
+    "mineBody": {
+      "applied": "Tak for din tilmelding. Træneren sender krav, video og dato her – afvent yderligere instrukser.",
+      "invited": "Her er kravene. Øv dig frem til audition – alle er velkomne på dagen.",
+      "selected": "Tillykke! Acceptér pladsen her – næste skridt er betalingen.",
+      "waitlist": "Du står på venteliste. Bliver der en plads, får du besked med det samme.",
+      "declined": "Det blev ikke denne gang – bliv ved med at danse, og kom igen til næste audition.",
+      "accepted": "Pladsen er din, når betalingen er registreret.",
+      "withdrawn": "Du takkede nej til pladsen."
+    },
+    "apply": "Meld til audition",
+    "appliedToast": "Tak for din tilmelding – du hører fra træneren",
+    "appliedThanks": "Du er meldt til audition. Afvent krav og dato her i appen.",
+    "accept": "Acceptér pladsen",
+    "decline": "Nej tak",
+    "acceptEyebrow": "Du er udtaget",
+    "acceptIntro": "Vælg betaling for {{name}} – pladsen er sikret, når betalingen er registreret.",
+    "acceptConfirm": "Acceptér og gå til betaling",
+    "acceptedToast": "Pladsen er accepteret",
+    "declinedToast": "Du har takket nej – pladsen går videre"
   }
 }

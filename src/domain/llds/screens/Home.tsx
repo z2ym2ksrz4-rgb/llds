@@ -19,6 +19,7 @@ import { TrophyShelf } from "../components/Emblems";
 import { ScrollList } from "../components/ScrollList";
 import { CustomBoxCard } from "../admin/Customize";
 import { JoinTeam, MyPayments } from "./Payments";
+import { AuditionCards } from "./Audition";
 
 /** Home, laid out like the approved demo: next event as a photo hero, messages that need you, your (child's) week with absence buttons, open payments. */
 export function Home() {
@@ -195,6 +196,7 @@ export function Home() {
         </div>
       )}
     </>),
+    audition: () => <AuditionCards />,
     payments: () => (<>
       <MyPayments embedded />
       {openPay.length > 0 && (

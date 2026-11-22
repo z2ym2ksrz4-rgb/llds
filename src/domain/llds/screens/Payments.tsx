@@ -75,11 +75,13 @@ export function JoinTeam({ onClose, toast, initialTeam }: { onClose: () => void;
   const [plan, setPlan] = useState<Plan>("full");
   const [q, setQ] = useState<{ before: number | null; discount_pct: number; amount: number | null; installments: number; fee: number; per_rate: number | null; note: string | null } | null>(null);
   const [busy, setBusy] = useState(false);
+  const [applied, setApplied] = useState(false);
   const [done, setDone] = useState<{ id: string; reference: string; amount_dkk: number | null; discount_pct: number; team: string; installments?: number; per_rate_dkk?: number | null; note?: string | null } | null>(null);
   useEffect(() => { void api.listTeams().then((ts) => { const vis = ts.filter((x) => x.visibility !== "private"); setTeams(vis); if (initialTeam) setTeam(vis.find((x) => x.id === initialTeam) ?? null); }); void api.signupsOpen().then(setOpenAll).catch(() => setOpenAll(true)); }, [initialTeam]);
+  useEffect(() => { setApplied(false); }, [team?.id, who]);
   useEffect(() => { if (!team) { setQ(null); return; } let on = true; api.myQuote(team.id, plan).then((r) => { if (on) setQ(r); }).catch(() => setQ(null)); return () => { on = false; }; }, [team, plan]);
   const memberOf = new Set(me.memberships.filter((m) => m.person_id === who).map((m) => m.team_id));
-  const state = (x: Team) => (!openAll || x.signup_open === false ? "closed" : x.admission === "audition" ? "audition" : "open");
+  const state = (x: Team) => (!openAll || x.signup_open === false ? "closed" : x.admission === "audition" ? "audition" : "open");   // the window also closes auditions
   const submit = async () => { if (!team) return; setBusy(true); try { const r = await api.appSignupTeam(team.id, who, plan); setDone(r); } catch (e) { const m = (e as Error).message; toast(m.includes("already") ? t("pay.already") : m.includes("closed") ? t("pay.closedToast") : m.includes("audition") ? t("pay.auditionToast") : m); } finally { setBusy(false); } };
   if (done && done.amount_dkk == null) return <Sheet onClose={onClose} eyebrow={done.team} title={t("pay.requested")}><p className="small">{done.note ?? t("pay.ratesText")}</p><button className="cta" onClick={onClose}>{t("common.ok")}</button></Sheet>;
   if (done) return <PaySheet amount={(done.installments ?? 1) > 1 ? done.per_rate_dkk ?? done.amount_dkk ?? 0 : done.amount_dkk ?? 0} reference={(done.installments ?? 1) > 1 ? `${done.reference} rate 1/${done.installments}` : done.reference} title={`${done.team}${(done.installments ?? 1) > 1 ? ` · ${t("pay.firstRate")} 1/${done.installments}` : ""}`} onClose={onClose} onPaid={async () => { await api.claimPaymentPaid(done.id); toast(t("pay.claimed")); onClose(); }} />;
@@ -97,7 +99,8 @@ export function JoinTeam({ onClose, toast, initialTeam }: { onClose: () => void;
         {team.description && <p className="small muted" style={{ margin: 0 }}>{team.description.slice(0, 280)}{team.description.length > 280 ? "…" : ""}</p>}
         <div className="tiny">{[team.day_time, team.years, team.level].filter(Boolean).join(" · ")}</div>
         {st === "closed" && <div className="card" data-testid="join-closed"><strong>{t("pay.closedTitle")}</strong><p className="small muted" style={{ margin: "4px 0 0" }}>{t("pay.closedBody")}</p></div>}
-        {st === "audition" && <div className="card" data-testid="join-audition"><strong>{t("pay.auditionTitle")}</strong><p className="small muted" style={{ margin: "4px 0 0" }}>{team.admission_note || t("pay.auditionBody")}</p></div>}
+        {st === "audition" && <div className="card" data-testid="join-audition"><strong>{t("pay.auditionTitle")}</strong><p className="small muted" style={{ margin: "4px 0 0" }}>{team.admission_note || t("pay.auditionBody")}</p>
+          {applied ? <p className="small ok" style={{ margin: "8px 0 0" }}>{t("audition.appliedThanks")}</p> : <button className="cta" style={{ marginTop: 10 }} disabled={busy || !who} data-testid="audition-apply" onClick={async () => { setBusy(true); try { await api.applyAudition(team.id, who); setApplied(true); dispatchEvent(new Event("llds:audition")); toast(t("audition.appliedToast")); } catch (e) { const m = (e as Error).message; toast(m.includes("closed") ? t("pay.closedToast") : m.includes("already") ? t("pay.already") : m); } finally { setBusy(false); } }}>{t("audition.apply")}</button>}</div>}
         {st === "open" && (<>
           <div className="field"><span>{t("pay.planLabel")}</span>
             {team.price_full ? <PlanChips team={team} plan={plan} setPlan={setPlan} /> : <p className="small muted">{team.price_note}</p>}

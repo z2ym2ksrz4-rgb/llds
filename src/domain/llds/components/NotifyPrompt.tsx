@@ -66,6 +66,8 @@ export function NotifySettings() {
       <div className="card list">
         <label className="item switch"><span className="grow"><strong>{t("notifPrefs.master")}</strong><div className="tiny">{t("notifPrefs.masterSub")}</div></span>
           <input type="checkbox" role="switch" checked={on} disabled={busy} data-testid="notif-master" onChange={(e) => void set({ ...p, on: e.target.checked })} /></label>
+        <label className="item switch"><span className="avatar small">✉️</span><span className="grow"><strong>{t("notifPrefs.mail")}</strong><div className="tiny">{t("notifPrefs.mailSub")}</div></span>
+          <input type="checkbox" role="switch" checked={p.mail ?? true} disabled={busy} data-testid="notif-mail" onChange={(e) => void set({ ...p, mail: e.target.checked })} /></label>
         {on && notifyKindsFor(me).map((k) => (
           <label className="item switch" key={k.key}><span className="avatar small">{k.emoji}</span><span className="grow">{t(`notifPrefs.kinds.${k.key}`)}</span>
             <input type="checkbox" role="switch" checked={p.kinds?.[k.key] ?? true} disabled={busy} data-testid={`notif-kind-${k.key}`} onChange={(e) => void set({ ...p, kinds: { ...(p.kinds ?? {}), [k.key]: e.target.checked } })} /></label>

@@ -1,4 +1,4 @@
-import type { Api, Appearance, Feedback, Insights, WebSignup, Me, Membership, PendingPerson, Person, Role, SignUpInput, Team } from "./types";
+import type { Api, Appearance, AuditionCandidate, Feedback, Insights, WebSignup, Me, Membership, PendingPerson, Person, Role, SignUpInput, Team } from "./types";
 import { scheduleOps, seedSchedule, type SchedState } from "./mock-schedule";
 import { socialOps, seedSocial, type SocialState } from "./mock-social";
 import { shopOps, seedShop, type ShopState } from "./mock-shop";
@@ -9,7 +9,7 @@ import { shopOps, seedShop, type ShopState } from "./mock-shop";
  * The special address admin@demo signs in as Line (approved admin).
  */
 const KEY = "llds_mock";
-type State = { email: string | null; appearance?: Appearance; feedback?: Feedback[]; signupsOpen?: boolean; payments?: WebSignup[]; persons: Person[]; guardians: { parent_id: string; child_id: string }[]; memberships: Membership[]; teams: Team[]; S: SchedState; X: SocialState; Y: ShopState };
+type State = { email: string | null; appearance?: Appearance; feedback?: Feedback[]; signupsOpen?: boolean; auditions?: AuditionCandidate[]; payments?: WebSignup[]; persons: Person[]; guardians: { parent_id: string; child_id: string }[]; memberships: Membership[]; teams: Team[]; S: SchedState; X: SocialState; Y: ShopState };
 
 const SCHOOL = "school-llds";
 const TEAMS: Team[] = [
@@ -138,7 +138,7 @@ export const mockApi: Api = {
   async listMyPayments() { const me = meRow(); if (!me) return []; const mine = new Set([me.id, ...S.guardians.filter((g) => g.parent_id === me.id).map((g) => g.child_id)]); return (S.payments ?? []).filter((p) => mine.has(p.dancer_id) || mine.has(p.contact_id)); },
   async claimPaymentPaid(id) { const p = (S.payments ?? []).find((x) => x.id === id); if (p && !p.claimed_paid_at) { p.claimed_paid_at = now(); for (const a of S.persons.filter((x) => x.is_admin && x.status === "approved")) notify(a.id, "payment", "Betaling meldt", `${p.dancer_name} · ${p.team_name} · ${p.amount_dkk} kr.`, { payment_id: p.id }); } save(); emit(); },
   async appSignupTeam(teamId, personId, plan) {
-    { const tm = S.teams.find((x) => x.id === teamId); if (S.signupsOpen === false || tm?.signup_open === false) throw new Error("signups closed"); if (tm?.admission === "audition") throw new Error("audition required"); }
+    { const tm = S.teams.find((x) => x.id === teamId); if (S.signupsOpen === false || tm?.signup_open === false) throw new Error("signups closed"); if (tm?.admission === "audition" && !(S.auditions ?? []).some((c) => c.team_id === teamId && c.person_id === personId && c.status === "accepted")) throw new Error("audition required"); }
     const me = meRow()!; const team = S.teams.find((t) => t.id === teamId)!; const p = S.persons.find((x) => x.id === personId)!;
     if (S.memberships.some((m) => m.person_id === personId && m.team_id === teamId)) throw new Error("already member");
     const n = plan === "rates2" ? 2 : plan === "rates4" ? 4 : plan === "rates10" ? 10 : 1;
@@ -162,6 +162,28 @@ export const mockApi: Api = {
   async deleteMyAccount() { const me = meRow(); if (!me) return; const kids = S.guardians.filter((g) => g.parent_id === me.id).map((g) => g.child_id); S.persons = S.persons.filter((p) => p.id !== me.id && !kids.includes(p.id)); S.guardians = S.guardians.filter((g) => g.parent_id !== me.id); S.memberships = S.memberships.filter((m) => m.person_id !== me.id && !kids.includes(m.person_id)); S.email = null; save(); emit(); },
   async getAppearance() { return S.appearance ?? {}; },
   async signupsOpen() { return S.signupsOpen !== false; },
+  async applyAudition(teamId, personId) {
+    const me = meRow()!; const tm = S.teams.find((x) => x.id === teamId)!; const p = S.persons.find((x) => x.id === personId)!;
+    if (S.signupsOpen === false || tm.signup_open === false) throw new Error("signups closed");
+    const list = (S.auditions ??= []); const ex = list.find((c) => c.team_id === teamId && c.person_id === personId);
+    const row: AuditionCandidate = ex ?? { id: "au-" + id(), team_id: teamId, person_id: personId, person_name: `${p.first_name} ${p.last_name}`, birth_year: p.birth_year, status: "applied", scores: {}, note: null, created_at: now(), decided_at: null, results_sent_at: null, responded_at: null, team_name: tm.name, audition_video_url: tm.audition_video_url ?? null, audition_text: tm.audition_text ?? null, audition_event_id: tm.audition_event_id ?? null, audition_sent_at: tm.audition_sent_at ?? null, audition_at: null, audition_place: null };
+    if (!ex) list.push(row); else if (ex.status === "withdrawn" || ex.status === "declined") ex.status = "applied";
+    if (tm.audition_sent_at && row.status === "applied") row.status = "invited";
+    notify(me.id, "message", `Tak for tilmeldingen til audition – ${tm.name}`, "Du får besked her i appen, når træneren sender krav og dato. Indtil da: bare glæd dig.", { audition_team: teamId });
+    for (const st of S.memberships.filter((m) => m.team_id === teamId && m.role !== "dancer")) notify(st.person_id, "signup", `Ny til audition: ${tm.name}`, `${p.first_name} har meldt sig til audition.`, { audition_team: teamId });
+    save(); emit();
+  },
+  async listAuditionCandidates(teamId) {
+    const me = meRow()!; const mine = new Set([me.id, ...S.guardians.filter((g) => g.parent_id === me.id).map((g) => g.child_id)]);
+    const staffOf = (tid: string) => me.is_admin || S.memberships.some((m) => m.person_id === me.id && m.team_id === tid && m.role !== "dancer");
+    return (S.auditions ?? []).filter((c) => (!teamId || c.team_id === teamId) && (staffOf(c.team_id) || mine.has(c.person_id))).map((c) => { const tm = S.teams.find((x) => x.id === c.team_id)!; const ev = S.Y.events?.find((e) => e.id === tm.audition_event_id); return { ...c, audition_video_url: tm.audition_video_url ?? null, audition_text: tm.audition_text ?? null, audition_event_id: tm.audition_event_id ?? null, audition_sent_at: tm.audition_sent_at ?? null, audition_at: ev?.starts_at ?? null, audition_place: ev?.place ?? null }; });
+  },
+  async auditionSetBrief(teamId, video, text, eventId) { const tm = S.teams.find((x) => x.id === teamId)!; tm.audition_video_url = video; tm.audition_text = text; tm.audition_event_id = eventId; save(); emit(); },
+  async auditionSendBrief(teamId) { const tm = S.teams.find((x) => x.id === teamId)!; tm.audition_sent_at = now(); let n = 0; for (const c of (S.auditions ?? []).filter((c) => c.team_id === teamId && (c.status === "applied" || c.status === "invited"))) { c.status = "invited"; n++; for (const pid of [c.person_id, ...S.guardians.filter((g) => g.child_id === c.person_id).map((g) => g.parent_id)]) notify(pid, "message", `Audition ${tm.name}: krav og dato er klar`, "Se video og krav på din forside – og øv dig frem til dagen.", { audition_team: teamId }); } save(); emit(); return n; },
+  async auditionDecide(aid, status, scores, note) { const c = (S.auditions ?? []).find((x) => x.id === aid); if (!c) return; if (status) { c.status = status; c.decided_at = now(); } if (scores) c.scores = scores; if (note != null) c.note = note; save(); emit(); },
+  async auditionSendResults(teamId) { const tm = S.teams.find((x) => x.id === teamId)!; let n = 0; for (const c of (S.auditions ?? []).filter((c) => c.team_id === teamId && ["selected", "waitlist", "declined"].includes(c.status) && !c.results_sent_at)) { c.results_sent_at = now(); n++; const title = c.status === "selected" ? `🎉 Tillykke – du er udtaget til ${tm.name}` : c.status === "waitlist" ? `${tm.name}: du står på venteliste` : `Tak for din audition til ${tm.name}`; for (const pid of [c.person_id, ...S.guardians.filter((g) => g.child_id === c.person_id).map((g) => g.parent_id)]) notify(pid, "message", title, c.status === "selected" ? "Acceptér pladsen på din forside – så er næste skridt betalingen." : "", { audition_team: teamId }); } save(); emit(); return n; },
+  async auditionRespond(aid, accept, plan = "full") { const c = (S.auditions ?? []).find((x) => x.id === aid)!; const tm = S.teams.find((x) => x.id === c.team_id)!; if (!accept) { c.status = "withdrawn"; c.responded_at = now(); const nxt = (S.auditions ?? []).find((x) => x.team_id === c.team_id && x.status === "waitlist"); if (nxt) { nxt.status = "selected"; nxt.results_sent_at = now(); notify(nxt.person_id, "message", `🎉 Der blev en plads: du er udtaget til ${tm.name}`, "Acceptér pladsen på din forside.", { audition_team: c.team_id }); } save(); emit(); return { ok: true }; } c.status = "accepted"; c.responded_at = now(); save(); emit(); const r = await (this as Api).appSignupTeam(c.team_id, c.person_id, plan).catch(() => null); return r ? { ok: true, ...r } : { ok: true, already: true }; },
+  async uploadAuditionVideo(_teamId, file) { return URL.createObjectURL(file); },
   async setSignupsOpen(open) { S.signupsOpen = open; save(); emit(); },
   async myQuote(teamId, plan) { const tm = S.teams.find((x) => x.id === teamId); const base = plan === "half" ? tm?.price_half ?? tm?.price_full ?? null : tm?.price_full ?? null; const n = plan === "rates2" ? 2 : plan === "rates4" ? 4 : plan === "rates10" ? 10 : 1; const fee = n > 1 ? 50 * n : 0; const amount = base == null ? null : base + fee; return { before: base, discount_pct: 0, amount, installments: n, fee, per_rate: amount != null && n > 1 ? Math.ceil(amount / n) : null, note: tm?.price_note ?? null }; },
   async touchSeen() { const me = meRow(); if (me) { me.last_seen_at = now(); save(); } },

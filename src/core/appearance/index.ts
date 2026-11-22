@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { api, type Appearance, type CustomBox } from "@/core/api";
 
 /** Home sections an admin can reorder/hide (Admin → Tilpas appen). Order here = default order. */
-export const HOME_SECTIONS = ["hero", "teampick", "messages", "subs", "yourDay", "week", "gallery", "payments", "badges", "studioHead", "stats", "studio", "upcoming"] as const;
+export const HOME_SECTIONS = ["hero", "teampick", "messages", "subs", "yourDay", "audition", "week", "gallery", "payments", "badges", "studioHead", "stats", "studio", "upcoming"] as const;
 export type HomeSection = (typeof HOME_SECTIONS)[number];
 
 type Store = { a: Appearance; loaded: boolean; load: () => Promise<void>; save: (a: Appearance) => Promise<void> };

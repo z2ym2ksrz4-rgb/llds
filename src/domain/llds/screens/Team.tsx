@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { api, type TeamDancer, type TeamStaff, type Thread, type Message, type Absence, type Event, type Member, type PersonBadge, type Result, type Session } from "@/core/api";
 import { resolveImage } from "../lib/catalog";
 import { aboutImage, teamAccent } from "../lib/art";
+import { AuditionAdmin } from "./Audition";
 import { confetti } from "../lib/confetti";
 import { EmblemRow, EmblemSheet, GiveEmblemSheet } from "../components/Emblems";
 import { useAuth } from "@/core/auth";
@@ -25,7 +26,7 @@ import { MILESTONE_IDEAS } from "../lib/milestones";
 import { artForCategory } from "../lib/art";
 import { addDays, ageOf, ago, dateLabel, DAY_LONG, hm, loc, startOfDay } from "../lib/time";
 
-type Page = "team" | "folders" | "choreo" | "formations" | "notes" | "dancers";
+type Page = "team" | "folders" | "choreo" | "formations" | "notes" | "dancers" | "audition";
 
 /** "Mit hold" like the demo: photo hero, four tiles, next events, trophy shelf, then feed, trainings and (staff) roster. */
 export function TeamScreen() {
@@ -92,6 +93,7 @@ export function TeamScreen() {
   const next = sessions[0];
   const trainerName = next?.trainer_name ?? trainers[0]?.first_name ?? null;
 
+  if (page === "audition") return <AuditionAdmin team={team} onBack={() => setPage("team")} toast={say} />;
   if (page === "dancers") return (
     <section className="screen">
       <button className="linklike" onClick={() => setPage("team")}>‹ {team.name}</button>
@@ -135,6 +137,7 @@ export function TeamScreen() {
         <button className={"card tap" + (seesChoreo ? "" : " dim")} disabled={!seesChoreo} onClick={() => setPage("choreo")} data-testid="go-choreo"><div className="eyebrow">{t("team.choreo")}</div><div className="big">{seesChoreo ? t("team.videosN", { n: stats.videos }) : t("team.choreoLocked")}</div></button>
         <button className="card tap" onClick={() => setPage("folders")} data-testid="go-folders"><div className="eyebrow">{t("team.folders")}</div><div className="big">{t("team.mediaN", { n: stats.media })}</div></button>
         <button className={"card tap" + (seesChoreo ? "" : " dim")} disabled={!seesChoreo} onClick={() => setPage("formations")} data-testid="go-formations"><div className="eyebrow">{t("choreo.formations")}</div><div className="big">{seesChoreo ? t("team.formationsN", { n: stats.formations }) : t("team.choreoLocked")}</div></button>
+        {staff && team.admission === "audition" && <button className="card tap" onClick={() => setPage("audition")} data-testid="go-audition"><div className="eyebrow">{t("audition.title")}</div><div className="big">🎯</div></button>}
         <button className="card tap" onClick={() => setPage("dancers")} data-testid="go-dancers"><div className="eyebrow">{t("team.dancers")}</div><div className="big">{stats.dancers}{staff ? "" : ""}</div></button>
       </div>
       
