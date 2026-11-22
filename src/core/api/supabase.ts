@@ -1,6 +1,6 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import appConfig from "../../../app.config.json";
-import type { Api, Appearance, WebSignup, Me, Membership, PendingPerson, Person, Role, Team } from "./types";
+import type { Api, Appearance, Feedback, Insights, WebSignup, Me, Membership, PendingPerson, Person, Role, Team } from "./types";
 import { supabaseSchedule } from "./supabase-schedule";
 import { supabaseSocial } from "./supabase-social";
 import { supabaseShop } from "./supabase-shop";
@@ -74,6 +74,12 @@ export function supabaseApi(url: string, anonKey: string): Api {
       return ((data as { appearance?: Appearance } | null)?.appearance ?? {}) as Appearance;
     },
     async saveAppearance(a) { const { error } = await sb.from("school").update({ appearance: a }).eq("slug", schoolSlug); fail(error); },
+    async touchSeen() { await sb.rpc("touch_seen"); },
+    async appInsights() { const { data, error } = await sb.rpc("app_insights"); fail(error); return data as Insights; },
+    async sendFeedback(mood, body, context) { const { error } = await sb.from("feedback").insert({ school_id: await schoolId(), person_id: await myPersonId(), mood, body, context }); fail(error); },
+    async listFeedback() { const { data, error } = await sb.from("feedback_view").select("*").order("created_at", { ascending: false }).limit(200); fail(error); return (data ?? []) as Feedback[]; },
+    async markFeedbackRead(fid) { const { error } = await sb.from("feedback").update({ read_at: new Date().toISOString() }).eq("id", fid); fail(error); },
+    async removeMembership(pid, tid, role) { const { error } = await sb.from("membership").delete().eq("person_id", pid).eq("team_id", tid).eq("role", role); fail(error); },
     async deleteMyAccount() { const { error } = await sb.rpc("delete_my_account"); fail(error); await sb.auth.signOut(); },
     async listWebSignups() { const { data, error } = await sb.from("web_signup_view").select("*").order("created_at", { ascending: false }).limit(200); fail(error); return (data ?? []) as WebSignup[]; },
     async listMyPayments() { const { data, error } = await sb.from("web_signup_view").select("*").order("created_at", { ascending: false }); fail(error); return (data ?? []) as WebSignup[]; },

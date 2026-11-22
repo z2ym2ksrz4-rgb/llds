@@ -1,4 +1,4 @@
-import type { Api, Appearance, WebSignup, Me, Membership, PendingPerson, Person, Role, SignUpInput, Team } from "./types";
+import type { Api, Appearance, Feedback, Insights, WebSignup, Me, Membership, PendingPerson, Person, Role, SignUpInput, Team } from "./types";
 import { scheduleOps, seedSchedule, type SchedState } from "./mock-schedule";
 import { socialOps, seedSocial, type SocialState } from "./mock-social";
 import { shopOps, seedShop, type ShopState } from "./mock-shop";
@@ -9,7 +9,7 @@ import { shopOps, seedShop, type ShopState } from "./mock-shop";
  * The special address admin@demo signs in as Line (approved admin).
  */
 const KEY = "llds_mock";
-type State = { email: string | null; appearance?: Appearance; payments?: WebSignup[]; persons: Person[]; guardians: { parent_id: string; child_id: string }[]; memberships: Membership[]; teams: Team[]; S: SchedState; X: SocialState; Y: ShopState };
+type State = { email: string | null; appearance?: Appearance; feedback?: Feedback[]; payments?: WebSignup[]; persons: Person[]; guardians: { parent_id: string; child_id: string }[]; memberships: Membership[]; teams: Team[]; S: SchedState; X: SocialState; Y: ShopState };
 
 const SCHOOL = "school-llds";
 const TEAMS: Team[] = [
@@ -47,6 +47,7 @@ function load(): State {
   const maja: Person = { ...line, id: "p-maja", user_id: "u-maja", first_name: "Maja", last_name: "Kristensen", email: "maja@demo", is_admin: false, wished_roles: ["trainer"] };
   const sofie: Person = { ...line, id: "p-sofie", user_id: "u-sofie", first_name: "Sofie", last_name: "Dahl", email: "sofie@demo", is_admin: false };
   const st: Person = { ...line, id: "p-st", user_id: "u-st", first_name: "Steffen", last_name: "Therkildsen", email: "parent@demo", is_admin: false, wished_roles: ["parent"] };
+  const noah: Person = { ...line, id: "p-noah", user_id: null, first_name: "Noah", last_name: "Jensen", email: null, is_admin: false, birth_year: 2010, wished_roles: ["dancer"] };   // dancer on Hip Hop J&V Elite – lets a trainer remove someone in smoke19
   const freja: Person = { ...line, id: "p-freja", user_id: null, first_name: "Freja", last_name: "Therkildsen", email: null, is_admin: false, birth_year: 2013, wished_roles: ["dancer"] };
   const pendingParent: Person = { ...line, id: "p-karin", user_id: "u-karin", first_name: "Karin", last_name: "Nielsen", email: "karin@demo", status: "pending", is_admin: false, wished_roles: ["parent"], wished_teams: "The AXIS (Alma)" };
   const pendingChild: Person = { ...freja, id: "p-alma", first_name: "Alma", last_name: "Nielsen", birth_year: 2012, status: "pending" };
@@ -57,7 +58,7 @@ function load(): State {
   const testPersons = [tTilde, tMilo, tPia, tIda, tRasmus, tHelle, tJonas, tSanne, tNoor, tCamilla];
   return {
     email: null,
-    persons: [line, maja, sofie, st, freja, pendingParent, pendingChild, ...testPersons],
+    persons: [line, maja, sofie, st, freja, noah, pendingParent, pendingChild, ...testPersons],
     teams: TEAMS,
     S: seedSchedule(TEAMS, [line, maja, sofie]),
     X: seedSocial(TEAMS, [line, maja, sofie, st, freja]),
@@ -65,7 +66,7 @@ function load(): State {
     guardians: [{ parent_id: "p-st", child_id: "p-freja" }, { parent_id: "p-karin", child_id: "p-alma" }, { parent_id: "t-pia", child_id: "t-milo" }, { parent_id: "t-pia", child_id: "t-ida" }, { parent_id: "t-sanne", child_id: "t-noor" }, { parent_id: "t-camilla", child_id: "t-milo" }],
     memberships: [
       { person_id: "p-freja", team_id: "team-0", role: "dancer" }, { person_id: "p-freja", team_id: "team-14", role: "dancer" },
-      { person_id: "p-maja", team_id: "team-12", role: "trainer" }, { person_id: "p-maja", team_id: "team-15", role: "trainer" }, { person_id: "p-maja", team_id: "team-14", role: "dancer" },
+      { person_id: "p-maja", team_id: "team-12", role: "trainer" }, { person_id: "p-noah", team_id: "team-12", role: "dancer" }, { person_id: "p-maja", team_id: "team-15", role: "trainer" }, { person_id: "p-maja", team_id: "team-14", role: "dancer" },
       { person_id: "p-sofie", team_id: "team-8", role: "trainer" }, { person_id: "p-sofie", team_id: "team-11", role: "trainer" }, { person_id: "p-line", team_id: "team-0", role: "trainer" }, { person_id: "p-line", team_id: "team-1", role: "trainer" },
       { person_id: "p-alma", team_id: "team-0", role: "dancer" }, { person_id: "p-karin", team_id: "team-0", role: "dancer" },
       { person_id: "t-tilde", team_id: "team-0", role: "dancer" }, { person_id: "t-milo", team_id: "team-4", role: "dancer" }, { person_id: "t-ida", team_id: "team-11", role: "dancer" },
@@ -159,6 +160,27 @@ export const mockApi: Api = {
   },
   async deleteMyAccount() { const me = meRow(); if (!me) return; const kids = S.guardians.filter((g) => g.parent_id === me.id).map((g) => g.child_id); S.persons = S.persons.filter((p) => p.id !== me.id && !kids.includes(p.id)); S.guardians = S.guardians.filter((g) => g.parent_id !== me.id); S.memberships = S.memberships.filter((m) => m.person_id !== me.id && !kids.includes(m.person_id)); S.email = null; save(); emit(); },
   async getAppearance() { return S.appearance ?? {}; },
+  async touchSeen() { const me = meRow(); if (me) { me.last_seen_at = now(); save(); } },
+  async appInsights(): Promise<Insights> {
+    const ap = S.persons.filter((p) => p.status === "approved"); const login = ap.filter((p) => p.user_id);
+    const ms = (iso?: string | null) => (iso ? Date.now() - new Date(iso).getTime() : Infinity);
+    const hasTeam = (p: Person) => S.memberships.some((m) => m.person_id === p.id) || S.guardians.some((g) => g.parent_id === p.id && S.memberships.some((m) => m.person_id === g.child_id));
+    const noTeam = ap.filter((p) => !p.is_admin && !hasTeam(p));
+    const d30 = 30 * 864e5;
+    return { members: ap.length, with_login: login.length, never_logged_in: login.filter((p) => !p.last_seen_at).length, live_24h: S.persons.filter((p) => ms(p.last_seen_at) < 864e5).length, active_7d: S.persons.filter((p) => ms(p.last_seen_at) < 7 * 864e5).length, active_30d: S.persons.filter((p) => ms(p.last_seen_at) < d30).length, inactive_30d: login.filter((p) => p.last_seen_at && ms(p.last_seen_at) > d30).length, pending: S.persons.filter((p) => p.status === "pending").length, no_team: noTeam.length,
+      posts_30d: S.X.posts.filter((x) => ms(x.created_at) < d30).length, comments_30d: S.X.comments.filter((x) => ms(x.created_at) < d30).length, messages_30d: S.X.messages.filter((x) => ms(x.created_at) < d30).length, threads_30d: (S.X.threadMsgs ?? []).filter((x) => ms(x.created_at) < d30).length, bookings_30d: S.S.bookings.length, absences_30d: S.S.absences.length,
+      feedback_total: (S.feedback ?? []).length, feedback_unread: (S.feedback ?? []).filter((f) => !f.read_at).length,
+      never_list: login.filter((p) => !p.last_seen_at).map((p) => ({ id: p.id, name: `${p.first_name} ${p.last_name}`, since: p.created_at })), inactive_list: login.filter((p) => p.last_seen_at && ms(p.last_seen_at) > d30).map((p) => ({ id: p.id, name: `${p.first_name} ${p.last_name}`, last: p.last_seen_at! })), no_team_list: noTeam.map((p) => ({ id: p.id, name: `${p.first_name} ${p.last_name}` })) };
+  },
+  async sendFeedback(mood, body, context) { const me = meRow(); (S.feedback ??= []).push({ id: "fb-" + id(), person_id: me?.id ?? null, person_name: me ? `${me.first_name} ${me.last_name}` : null, mood, body, context, created_at: now(), read_at: null }); save(); emit(); },
+  async listFeedback() { return [...(S.feedback ?? [])].reverse(); },
+  async markFeedbackRead(fid) { const f = (S.feedback ?? []).find((x) => x.id === fid); if (f) { f.read_at = now(); save(); emit(); } },
+  async removeMembership(pid, tid, role) {
+    S.memberships = S.memberships.filter((m) => !(m.person_id === pid && m.team_id === tid && m.role === role));
+    const p = S.persons.find((x) => x.id === pid);
+    if (p && !p.is_admin && !S.memberships.some((m) => m.person_id === pid)) for (const a of S.persons.filter((x) => x.is_admin && x.status === "approved")) notify(a.id, "signup", `${p.first_name} ${p.last_name} er ikke længere på noget hold`, "Sæt personen på et hold igen – eller slet brugeren under Admin → Medlemmer.", { person_id: pid });
+    save(); emit();
+  },
   async saveAppearance(a) { S.appearance = a; save(); emit(); },
 
   async listPending(): Promise<PendingPerson[]> {

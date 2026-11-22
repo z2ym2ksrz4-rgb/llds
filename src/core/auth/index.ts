@@ -4,6 +4,8 @@ import { registerPush } from "@/core/push";
 import appConfig from "../../../app.config.json";
 
 /** Oldest possible dancer age on a team, from its "årgang" text ("2017–2020", "Fra årgang 2016", "3 år til skolestart", "14 år+"). null = unknown. */
+/** Tell the server we are here – at most once an hour per device (feeds Admin → App insights). */
+function touchSeen() { try { const k = "llds_seen_at"; const last = Number(localStorage.getItem(k) ?? 0); if (Date.now() - last < 36e5) return; localStorage.setItem(k, String(Date.now())); } catch { /* ignore */ } void api.touchSeen().catch(() => 0); }
 export function teamMaxAge(t: Team | undefined): number | null {
   if (!t?.years) return null;
   const y = new Date().getFullYear();
@@ -87,7 +89,7 @@ export const useAuth = create<Store>((set, get) => ({
       const teamsOf = me.memberships.filter((m) => m.person_id === viewing.personId && (!viewing.isChild || m.role === "dancer")).map((m) => m.team_id);
       if (!teamId || !teamsOf.includes(teamId)) teamId = teamsOf[0] ?? (real.person.is_admin ? (teamId && real.teams.some((t) => t.id === teamId) ? teamId : real.teams[0]?.id ?? null) : null);
       set({ phase, email, me, realMe: real, viewAs, viewing, teamId, error: null });
-      if (phase === "ready") void registerPush();
+      if (phase === "ready") { void registerPush(); touchSeen(); }
     } catch (e) {
       set({ phase: "signedOut", error: (e as Error).message });
     }

@@ -1,6 +1,7 @@
 import { ageOf } from "@/domain/llds/lib/time";
 import { resetTour } from "@/domain/llds/components/Tour";
 import { NotifySettings } from "@/domain/llds/components/NotifyPrompt";
+import { FeedbackSheet } from "@/domain/llds/components/FeedbackPrompt";
 import { ProfileSection } from "@/domain/llds/components/Profile";
 import { MyWallet } from "@/domain/llds/screens/PunchCards";
 import { useState } from "react";
@@ -21,7 +22,7 @@ export function SettingsScreen() {
   const signOut = useAuth((a) => a.signOut);
   const [childEmail, setChildEmail] = useState<Record<string, string>>({});
   const [msg, setMsg] = useState<string | null>(null);
-  const [confirmDel, setConfirmDel] = useState(false); const [delErr, setDelErr] = useState<string | null>(null);
+  const [confirmDel, setConfirmDel] = useState(false); const [delErr, setDelErr] = useState<string | null>(null); const [fb, setFb] = useState(false);
   return (
     <section className="screen">
       <header className="topbar"><h1 className="display">{t("nav.settings")}</h1></header>
@@ -52,7 +53,8 @@ export function SettingsScreen() {
       )}
 
       <NotifySettings />
-      <button className="ghost small" style={{ alignSelf: "flex-start" }} onClick={() => { resetTour(); location.reload(); }}>{t("tour.again")}</button>
+      <div className="row" style={{ gap: 8 }}><button className="ghost small" onClick={() => { resetTour(); location.reload(); }}>{t("tour.again")}</button><button className="ghost small" data-testid="settings-feedback" onClick={() => setFb(true)}>{t("feedback.give")}</button></div>
+      {fb && <FeedbackSheet context="settings" onClose={(sent) => { setFb(false); if (sent) setMsg(t("feedback.thanks")); }} />}
       <label className="field"><span>{t("settings.language")}</span>
         <select value={s.language} onChange={(e) => { const l = e.target.value as Lang; s.set("language", l); void i18n.changeLanguage(l); }}>
           {SUPPORTED.map((l) => <option key={l} value={l}>{t(`lang.${l}`)}</option>)}

@@ -9,6 +9,7 @@ import { Icon } from "@/domain/llds/components/Icons";
 import { Logo } from "@/domain/llds/components/Logo";
 import { Tour } from "@/domain/llds/components/Tour";
 import { NotifyPrompt } from "@/domain/llds/components/NotifyPrompt";
+import { FeedbackPrompt } from "@/domain/llds/components/FeedbackPrompt";
 import { Welcome } from "@/domain/llds/components/Welcome";
 import { UpdateBanner } from "./UpdateBanner";
 import { ShopScreen } from "@/domain/llds/screens/ShopScreen";
@@ -48,6 +49,7 @@ export default function App() {
       {phase === "ready" && <Welcome />}
       {phase === "ready" && <Tour />}
       {phase === "ready" && <NotifyPrompt />}
+      {phase === "ready" && <FeedbackPrompt />}
       <UpdateBanner />
       {phase === "ready" && (
         <nav className="tabbar">

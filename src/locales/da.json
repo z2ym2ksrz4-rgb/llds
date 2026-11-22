@@ -141,7 +141,10 @@
     "call": "Ring til",
     "sms": "Sms til",
     "officialOnHome": "{{n}} besked(er) fra skolen venter på dit svar",
-    "rosterNamesOnly": "Kontaktoplysninger ses kun af holdets trænere og administratoren."
+    "rosterNamesOnly": "Kontaktoplysninger ses kun af holdets trænere og administratoren.",
+    "removeFromTeam": "Fjern fra holdet",
+    "removeConfirm": "Fjern {{name}} fra {{team}}? Personen slettes ikke – det kan kun administratoren.",
+    "removed": "{{name}} er fjernet fra holdet"
   },
   "home": {
     "hi": "Hej {{name}}",
@@ -1272,5 +1275,53 @@
     "cards_other": "{{count}} klippekort venter på aktivering",
     "payments_one": "{{count}} betaling meldt – bekræft i MobilePay",
     "payments_other": "{{count}} betalinger meldt – bekræft i MobilePay"
+  },
+  "insights": {
+    "title": "App insights",
+    "sub": "Hvem bruger appen, hvem er faldet fra – og feedback",
+    "intro": "Tal fra appen. Live = set inden for 24 timer. Lister viser op til 50 navne.",
+    "needsMigration": "Serveren mangler en opdatering (migration 0054) – tallene vises, når den er kørt.",
+    "users": "Brugere",
+    "members": "medlemmer",
+    "withLogin": "med login",
+    "live24": "live (24 t)",
+    "active7": "aktive (7 dage)",
+    "never": "aldrig logget ind",
+    "inactive": "inaktive (30+ dage)",
+    "noTeam": "Uden hold",
+    "noTeamSub": "Ikke på noget hold (forældre: ingen børn på hold). Sæt på hold igen eller slet under Medlemmer.",
+    "neverSub": "Har login, men har aldrig åbnet appen – send evt. invitationen igen fra medlemskortet.",
+    "since": "siden",
+    "lastSeen": "sidst set",
+    "social": "Aktivitet",
+    "last30": "Seneste 30 dage.",
+    "posts": "opslag",
+    "comments": "kommentarer",
+    "messages": "beskeder",
+    "threads": "samtalebeskeder",
+    "bookings": "bookinger",
+    "absences": "afbud",
+    "feedback": "Feedback",
+    "feedbackSub": "Det brugerne har skrevet om appen – nyeste øverst, 5 synlige, resten ved scroll.",
+    "noFeedback": "Ingen feedback endnu. Brugerne bliver spurgt efter 14 dage i appen.",
+    "anonymous": "Ukendt",
+    "markRead": "Set"
+  },
+  "feedback": {
+    "eyebrow": "Hjælp os",
+    "title": "Hvordan er appen for dig?",
+    "intro": "Hvad fungerer godt, hvad driller, og hvad ville gøre appen federe? Alt er velkomment – også små ting.",
+    "mood": {
+      "love": "Elsker den",
+      "ok": "Fin nok",
+      "meh": "Ikke så god"
+    },
+    "bodyLabel": "Skriv løs",
+    "placeholder": "Fx: Jeg savner … / Det er svært at finde … / Fedt at …",
+    "named": "Dit navn følger med, så vi kan vende tilbage og spørge ind, hvis noget skal rettes.",
+    "send": "Send",
+    "later": "Senere",
+    "thanks": "Tak – det hjælper os!",
+    "give": "Giv feedback på appen"
   }
 }

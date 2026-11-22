@@ -141,7 +141,10 @@
     "call": "Call",
     "sms": "Text",
     "officialOnHome": "{{n}} message(s) from the school await your reply",
-    "rosterNamesOnly": "Contact details are only visible to the team's trainers and the administrator."
+    "rosterNamesOnly": "Contact details are only visible to the team's trainers and the administrator.",
+    "removeFromTeam": "Remove from team",
+    "removeConfirm": "Remove {{name}} from {{team}}? The person is not deleted – only the administrator can do that.",
+    "removed": "{{name}} removed from the team"
   },
   "home": {
     "hi": "Hi {{name}}",
@@ -1272,5 +1275,53 @@
     "cards_other": "{{count}} punch cards await activation",
     "payments_one": "{{count}} payment claimed – confirm in MobilePay",
     "payments_other": "{{count}} payments claimed – confirm in MobilePay"
+  },
+  "insights": {
+    "title": "App insights",
+    "sub": "Who uses the app, who dropped off – and feedback",
+    "intro": "Numbers from the app. Live = seen within 24 hours. Lists show up to 50 names.",
+    "needsMigration": "The server needs an update (migration 0054) – numbers appear once it has run.",
+    "users": "Users",
+    "members": "members",
+    "withLogin": "with login",
+    "live24": "live (24 h)",
+    "active7": "active (7 days)",
+    "never": "never logged in",
+    "inactive": "inactive (30+ days)",
+    "noTeam": "Without a team",
+    "noTeamSub": "Not on any team (parents: no children on teams). Put back on a team or delete under Members.",
+    "neverSub": "Has a login but never opened the app – resend the invitation from the member card.",
+    "since": "since",
+    "lastSeen": "last seen",
+    "social": "Activity",
+    "last30": "Last 30 days.",
+    "posts": "posts",
+    "comments": "comments",
+    "messages": "messages",
+    "threads": "conversation messages",
+    "bookings": "bookings",
+    "absences": "absences",
+    "feedback": "Feedback",
+    "feedbackSub": "What users wrote about the app – newest first, 5 visible, scroll for the rest.",
+    "noFeedback": "No feedback yet. Users are asked after 14 days in the app.",
+    "anonymous": "Unknown",
+    "markRead": "Seen"
+  },
+  "feedback": {
+    "eyebrow": "Help us",
+    "title": "How is the app for you?",
+    "intro": "What works well, what is annoying, and what would make the app better? Everything is welcome – small things too.",
+    "mood": {
+      "love": "Love it",
+      "ok": "Fine",
+      "meh": "Not great"
+    },
+    "bodyLabel": "Write away",
+    "placeholder": "E.g.: I miss … / It is hard to find … / Great that …",
+    "named": "Your name is attached so we can get back to you if something needs fixing.",
+    "send": "Send",
+    "later": "Later",
+    "thanks": "Thanks – that helps us!",
+    "give": "Give feedback on the app"
   }
 }

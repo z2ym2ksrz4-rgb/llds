@@ -15,10 +15,11 @@ import { useNav } from "@/core/nav";
 import { useBadges } from "@/core/badges";
 import { SessionEditor } from "../components/SessionSheet";
 import { ImagePicker } from "../components/ImagePicker";
+import { InsightsPage } from "./Insights";
 import { CATALOG } from "../lib/catalog";
 import { addDays, DAY_LONG, hm, mondayOf, startOfDay } from "../lib/time";
 
-type Page = "menu" | "users" | "members" | "teams" | "season" | "bookings" | "messages" | "reports" | "events" | "shop" | "punch" | "import" | "catalog" | "customize" | "payments";
+type Page = "menu" | "users" | "members" | "teams" | "season" | "bookings" | "messages" | "reports" | "events" | "shop" | "punch" | "import" | "catalog" | "customize" | "payments" | "insights";
 const CATS = ["mini", "kids", "junior", "adult", "mixed"] as const;
 
 /** Admin: the one place Line runs the school from. Everything else in the app reads what she sets here. */
@@ -42,6 +43,7 @@ export function Admin() {
   if (page === "import") return <Back onBack={() => setPage("menu")}><ImportPhotos /></Back>;
   if (page === "catalog") return <Back onBack={() => setPage("menu")}><CatalogAdmin /></Back>;
   if (page === "customize") return <Back onBack={() => setPage("menu")}><Customize /></Back>;
+  if (page === "insights") return <Back onBack={() => setPage("menu")}><InsightsPage /></Back>;
   if (page === "payments") return <Back onBack={() => setPage("menu")}><PaymentsAdmin /></Back>;
   const items: [Page, string, string, number][] = [
     ["users", t("admin.users"), counts.pending ? t("todo.pending", { count: counts.pending }) : t("admin.usersSub"), counts.pending], ["members", t("admin.members"), t("admin.membersSub"), 0], ["teams", t("admin.teams"), t("admin.teamsSub"), 0],
@@ -51,6 +53,7 @@ export function Admin() {
     ["catalog", t("catalog.adminTitle"), t("catalog.adminSub"), 0],
     ["payments", t("pay.adminTitle"), counts.payments ? t("todo.payments", { count: counts.payments }) : t("pay.adminSub"), counts.payments],
     ["customize", t("customize.title"), t("customize.sub"), 0],
+    ["insights", t("insights.title"), t("insights.sub"), 0],
     ["import", t("admin.importPhotos"), t("admin.importSub"), 0],
   ];
   return (

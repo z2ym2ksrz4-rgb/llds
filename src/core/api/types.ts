@@ -6,6 +6,7 @@ export type Person = {
   id: string;
   school_id: string;
   user_id: string | null;
+  last_seen_at?: string | null;
   first_name: string;
   last_name: string;
   email: string | null;
@@ -31,6 +32,13 @@ export type NotifyPrefs = { on?: boolean; kinds?: Record<string, boolean>; asked
 
 /** Admin-customised look of the app (Admin → Tilpas appen). Stored on school.appearance; readable without login (login image). */
 export type CustomBox = { id: string; title: string; body: string; image?: string | null; link?: string | null; linkLabel?: string | null; tab?: string | null };
+export type Insights = {
+  members: number; with_login: number; never_logged_in: number; live_24h: number; active_7d: number; active_30d: number; inactive_30d: number; pending: number; no_team: number;
+  posts_30d: number; comments_30d: number; messages_30d: number; threads_30d: number; bookings_30d: number; absences_30d: number; feedback_total: number; feedback_unread: number;
+  never_list: { id: string; name: string; since: string }[]; inactive_list: { id: string; name: string; last: string }[]; no_team_list: { id: string; name: string }[];
+};
+export type Feedback = { id: string; person_id: string | null; person_name: string | null; mood: "love" | "ok" | "meh"; body: string; context: string | null; created_at: string; read_at: string | null };
+
 export type Appearance = {
   home?: string[];           // order of Home sections (keys from HOME_SECTIONS plus "box:<id>"); unknown keys appended in default order
   hidden?: string[];         // section keys hidden for everyone
@@ -407,4 +415,13 @@ export interface Api {
   uploadCatalog(files: File[], folder: string): Promise<CatalogEntry[]>;
   renameCatalogFolder(from: string, to: string): Promise<void>;
   deleteCatalog(id: string): Promise<void>;
+
+  // insights + feedback (0054)
+  touchSeen(): Promise<void>;
+  appInsights(): Promise<Insights>;
+  sendFeedback(mood: Feedback["mood"], body: string, context: string): Promise<void>;
+  listFeedback(): Promise<Feedback[]>;
+  markFeedbackRead(id: string): Promise<void>;
+  /** trainer/admin: take one dancer off one team (membership delete; admin may remove any role) */
+  removeMembership(personId: string, teamId: string, role: Role): Promise<void>;
 }
