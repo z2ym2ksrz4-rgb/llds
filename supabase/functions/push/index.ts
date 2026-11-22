@@ -26,7 +26,7 @@ Deno.serve(async (req) => {
   if (!rows?.length) return new Response("nothing");
   const ids = rows.map((r) => r.person_id);
   const { data: toks } = await sb.from("push_token").select("token,person_id,platform").in("person_id", ids);
-  let apns: string | null = null, fcm: { token: string; project: string } | null = null; const dead: string[] = [];
+  let apns: string | null = null, fcm: { token: string; project: string } | null = null; const dead: string[] = []; let sent = 0;
   for (const n of rows) {
     for (const t of (toks ?? []).filter((x) => x.person_id === n.person_id)) {
       try {
@@ -34,15 +34,17 @@ Deno.serve(async (req) => {
           apns ??= await apnsJwt();
           const r = await fetch(`${APNS_HOST}/3/device/${t.token}`, { method: "POST", headers: { authorization: `bearer ${apns}`, "apns-topic": Deno.env.get("APNS_BUNDLE_ID")!, "apns-push-type": "alert" }, body: JSON.stringify({ aps: { alert: { title: n.title, body: n.body ?? "" }, sound: "default", badge: 1 }, ref: n.ref }) });
           if (r.status === 410 || r.status === 400) dead.push(t.token);
+          if (!r.ok) console.error("apns", r.status, (await r.text()).slice(0, 200)); else sent++;
         } else if (t.platform === "android" && Deno.env.get("FCM_SERVICE_ACCOUNT")) {
           fcm ??= await fcmToken();
           const r = await fetch(`https://fcm.googleapis.com/v1/projects/${fcm.project}/messages:send`, { method: "POST", headers: { authorization: `Bearer ${fcm.token}`, "Content-Type": "application/json" }, body: JSON.stringify({ message: { token: t.token, notification: { title: n.title, body: n.body ?? "" }, data: Object.fromEntries(Object.entries(n.ref ?? {}).map(([k, v]) => [k, String(v)])) } }) });
           if (r.status === 404) dead.push(t.token);
+          if (!r.ok) console.error("fcm", r.status, (await r.text()).slice(0, 300)); else sent++;
         }
       } catch (e) { console.error("push failed", t.platform, (e as Error).message); }
     }
   }
   await sb.from("notification").update({ pushed_at: new Date().toISOString() }).in("id", rows.map((r) => r.id));
   if (dead.length) await sb.from("push_token").delete().in("token", dead);
-  return new Response(`pushed ${rows.length}, dead ${dead.length}`);
+  return new Response(`pushed ${rows.length}, sent ${sent}, dead ${dead.length}`);
 });
