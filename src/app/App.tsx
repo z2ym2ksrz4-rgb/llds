@@ -4,6 +4,7 @@ import { useAuth } from "@/core/auth";
 import { useNav, type Tab } from "@/core/nav";
 import { useBadges } from "@/core/badges";
 import { isRelease } from "@/core/release";
+import { initDeepLinks } from "@/core/links";
 import { Home, Login, Register, Pending, Rooms, TeamScreen, Admin, More, Social, Events } from "@/domain";
 import { Icon } from "@/domain/llds/components/Icons";
 import { Logo } from "@/domain/llds/components/Logo";
@@ -25,6 +26,7 @@ export default function App() {
   const hasTeams = !!me && (me.memberships.length > 0 || (realAdmin && !viewAs));
   const blocked = useAuth((s) => s.previewBlocked)();
   const tab = useNav((s) => s.tab); const setTab = useNav((s) => s.setTab);
+  useEffect(() => { initDeepLinks(); }, []);
   useEffect(() => { if (phase !== "ready") setTab("home"); }, [phase, setTab]);
   // unread counters on the tabs: refresh when ready, every minute, and on every tab change; opening a tab marks its notifications seen
   const badges = useBadges((b) => b.tabs); const refreshBadges = useBadges((b) => b.refresh); const seenTab = useBadges((b) => b.seen);

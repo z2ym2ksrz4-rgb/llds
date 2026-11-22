@@ -103,6 +103,7 @@ export const mockApi: Api = {
   async sessionEmail() { return S.email; },
   async sendCode(email) { if (!email.includes("@")) throw new Error("Ugyldig e-mail"); },
   async signInWithPassword(email: string) { await this.verifyCode(email, "000000"); },
+  async handleAuthUrl() { return false; },
   async verifyCode(email, code) {
     if (!/^\d{6}$/.test(code)) throw new Error("Koden skal være 6 cifre");
     S.email = email.toLowerCase(); save(); emit();

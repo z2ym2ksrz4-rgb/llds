@@ -64,6 +64,15 @@ if 'dataExtractionRules' not in m:
 # Billing permission is added by the RevenueCat plugin; notifications must be declared for Android 13+
 if 'POST_NOTIFICATIONS' not in m:
     m = m.replace('</manifest>', '    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />\n</manifest>')
+# App Links: https://ilumie.com/llds/app/… opens the app (verified via /.well-known/assetlinks.json)
+if 'ilumie.com' not in m:
+    m = m.replace('</activity>', """    <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="ilumie.com" android:pathPrefix="/llds/app" />
+            </intent-filter>
+        </activity>""", 1)
 open(M, "w").write(m)
 
 os.makedirs("android/app/src/main/res/xml", exist_ok=True)

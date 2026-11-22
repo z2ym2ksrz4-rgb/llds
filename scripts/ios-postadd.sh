@@ -20,6 +20,6 @@ sed -i '' 's/  assertDeploymentTarget(installer)/  assertDeploymentTarget(instal
 $PB -c "Add :UIBackgroundModes array" "$PLIST" 2>/dev/null || true
 $PB -c "Add :UIBackgroundModes:0 string remote-notification" "$PLIST" 2>/dev/null || true
 ENT=ios/App/App/App.entitlements
-if [ ! -f "$ENT" ]; then printf '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n<plist version="1.0"><dict><key>aps-environment</key><string>production</string></dict></plist>\n' > "$ENT"; fi
+if [ ! -f "$ENT" ]; then printf '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n<plist version="1.0"><dict><key>aps-environment</key><string>production</string><key>com.apple.developer.associated-domains</key><array><string>applinks:ilumie.com</string></array></dict></plist>\n' > "$ENT"; fi
 grep -q "CODE_SIGN_ENTITLEMENTS" ios/App/App.xcodeproj/project.pbxproj || sed -i '' -E 's/(PRODUCT_BUNDLE_IDENTIFIER = [^;]+;)/\1 CODE_SIGN_ENTITLEMENTS = App\/App.entitlements;/g' ios/App/App.xcodeproj/project.pbxproj
 echo "Info.plist and deployment target updated"

@@ -112,6 +112,8 @@ export interface Api {
   verifyCode(email: string, code: string): Promise<void>;
   /** store-review accounts only (review*@ilumie.com): password instead of a one-time code */
   signInWithPassword(email: string, password: string): Promise<void>;
+  /** Native deep link (Universal/App Link) carrying Supabase auth tokens (#access_token=…) – sets the session. Returns true if handled. */
+  handleAuthUrl(url: string): Promise<boolean>;
   signOut(): Promise<void>;
   onAuthChange(cb: () => void): () => void;
   /** me */

@@ -43,6 +43,12 @@ export function supabaseApi(url: string, anonKey: string): Api {
       fail(error);
     },
     async signInWithPassword(email, password) { const { error } = await sb.auth.signInWithPassword({ email, password }); fail(error); },
+    async handleAuthUrl(url) {
+      const hash = url.split("#")[1]; if (!hash) return false;
+      const q = new URLSearchParams(hash); const access_token = q.get("access_token"), refresh_token = q.get("refresh_token");
+      if (!access_token || !refresh_token) return false;
+      const { error } = await sb.auth.setSession({ access_token, refresh_token }); fail(error); return true;
+    },
     async signOut() { await sb.auth.signOut(); },
     onAuthChange(cb) {
       const { data } = sb.auth.onAuthStateChange(() => cb());
