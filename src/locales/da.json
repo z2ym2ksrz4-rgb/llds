@@ -184,7 +184,10 @@
     "openOrders": "åbne ordrer",
     "cardsWaiting": "klippekort til aktivering",
     "overview": "Overblik",
-    "carousel": "Holdbilleder"
+    "carousel": "Holdbilleder",
+    "studioEyebrow": "Hele studiet",
+    "studioTitle": "Studiet",
+    "studioSub": "På tværs af alle hold – det du som administrator skal forholde dig til."
   },
   "admin": {
     "users": "Nye brugere",
@@ -412,7 +415,9 @@
     "approveParentNeedsChild": "{{name}} er kun forælder og har ingen børn koblet på – kobl et barn på først.",
     "parentNeedsChild": "En forælder skal have mindst ét barn koblet på – vælg eller opret et barn først.",
     "teamHeroImage": "Topbillede på holdsiden",
-    "teamAboutImage": "Billede under holdbeskrivelsen"
+    "teamAboutImage": "Billede under holdbeskrivelsen",
+    "teamPhotos": "Holdets egne fotos",
+    "teamPhotosHint": "Tryk på et foto for at fjerne det fra holdet (det slettes ikke fra websitet)."
   },
   "settings": {
     "language": "Sprog",
@@ -1108,7 +1113,8 @@
       "week": "Din/barnets uge",
       "payments": "Åbne betalinger",
       "badges": "Trofæhylde (emblemer + milepæle)",
-      "gallery": "Holdbilleder (karrusel)"
+      "gallery": "Holdbilleder (karrusel)",
+      "studioHead": "Overskrift: Studiet"
     },
     "gallery": "Billedkarrusel på websitet",
     "gallerySub": "Vælg billeder til karrusellen på forsiden af websitet – i den rækkefølge du trykker ({{n}} valgt). Tom = holdenes egne fotos vises automatisk.",
@@ -1116,7 +1122,31 @@
     "galleryOwn": "Egne uploads",
     "galleryCatalog": "Katalog",
     "galleryClear": "Ryd valg",
-    "galleryShuffle": "Bland rækkefølgen"
+    "galleryShuffle": "Bland rækkefølgen",
+    "website": "Website",
+    "websiteSub": "Billeder og video på forsiden af ilumie.com/llds. Ændringer slår igennem med det samme – uden nyt build.",
+    "videoUrl": "Video på forsiden (link til .mp4)",
+    "videoPoster": "Stillbillede før videoen afspilles",
+    "siteHero": "Topbillede på forsiden",
+    "siteApp": "Billede ved app-afsnittet",
+    "siteBand": "Billede i \"Du er altid velkommen\"-båndet",
+    "texts": "Tekster",
+    "textsSub": "Ret teksterne dér, hvor de står. Tomt felt = standardteksten. Brug | for at dele en overskrift, så sidste del står i kursiv.",
+    "textReset": "Standard",
+    "textKeys": {
+      "site.heroTitle": "Website · overskrift i toppen",
+      "site.heroLead": "Website · tekst under overskriften",
+      "site.welcomeTitle": "Website · Velkommen – overskrift",
+      "site.welcome": "Website · Velkommen – tekst",
+      "site.videoTitle": "Website · videoens overskrift",
+      "site.appTitle": "Website · app-afsnit – overskrift",
+      "site.appLead": "Website · app-afsnit – tekst",
+      "site.bandTitle": "Website · bånd nederst – overskrift",
+      "site.band": "Website · bånd nederst – tekst",
+      "app.loginTagline": "App · tekst på login-skærmen",
+      "app.registerIntro": "App · tekst øverst i registreringen",
+      "app.pendingBody": "App · tekst mens man venter på godkendelse"
+    }
   },
   "week": {
     "training": "Træning",

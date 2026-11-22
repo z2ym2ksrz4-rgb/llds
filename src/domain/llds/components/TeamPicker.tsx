@@ -5,7 +5,7 @@ import type { Team } from "@/core/api";
 
 /** Team switcher at the top of "Mit hold": every team the person can open, grouped by WHY they can – trainer on, assistant on,
  *  dancer on, parent of <child>. One tap switches; no hidden sheet. Admins without roles get every team in one scrollable row. */
-export function TeamPicker() {
+export function TeamPicker({ ownOnly = false }: { ownOnly?: boolean } = {}) {
   const { t } = useTranslation();
   const me = useAuth((s) => s.me);
   const viewing = useAuth((s) => s.viewing);
@@ -22,7 +22,7 @@ export function TeamPicker() {
   add("dancer", t("team.groupDancer"), me.person.id, false, own.filter((m) => m.role === "dancer").map((m) => m.team_id));
   for (const c of me.children) add("child-" + c.id, t("team.groupParent", { name: c.first_name }), c.id, true, me.memberships.filter((m) => m.person_id === c.id && m.role === "dancer").map((m) => m.team_id));
   const inGroups = new Set(groups.flatMap((g) => g.teams.map((x) => x.id)));
-  if (me.person.is_admin) { const rest = me.teams.filter((x) => !inGroups.has(x.id)); if (rest.length) groups.push({ key: "all", label: t("team.groupAll"), personId: me.person.id, isChild: false, teams: rest }); }
+  if (me.person.is_admin && !ownOnly) { const rest = me.teams.filter((x) => !inGroups.has(x.id)); if (rest.length) groups.push({ key: "all", label: t("team.groupAll"), personId: me.person.id, isChild: false, teams: rest }); }
   const current = teamOf(teamId ?? "");
   const pickTeam = (g: typeof groups[number], id: string) => { if (g.personId !== viewing.personId) setViewing({ personId: g.personId, isChild: g.isChild }); setTeam(id); };
   const total = groups.reduce((n, g) => n + g.teams.length, 0);

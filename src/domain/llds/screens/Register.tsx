@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { textOverride, useAppearance } from "@/core/appearance";
 import { api, type SignUpInput } from "@/core/api";
 import { useAuth } from "@/core/auth";
 import { ageOf } from "../lib/time";
@@ -11,6 +12,7 @@ const ROLES: R[] = ["parent", "dancer", "trainer", "assistant"];
 /** Self-registration. The admin approves and places people on teams afterwards. */
 export function Register() {
   const { t } = useTranslation();
+  const txOverride = useAppearance((s) => textOverride(s.a, "app.registerIntro"));
   const email = useAuth((s) => s.email);
   const refresh = useAuth((s) => s.refresh);
   const signOut = useAuth((s) => s.signOut);
@@ -39,7 +41,7 @@ export function Register() {
   return (
     <section className="screen">
       <header className="topbar"><h1 className="display">{t("register.title")}</h1></header>
-      <p className="muted">{t("register.intro")}</p>
+      <p className="muted">{(txOverride ?? t("register.intro"))}</p>
       <form className="stack" onSubmit={(e) => { e.preventDefault(); void submit(); }}>
         <div className="field"><span>{t("register.iAm")}</span>
           <div className="chips">

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Appearance, CustomBox } from "@/core/api";
-import { HOME_SECTIONS, homeOrder, useAppearance } from "@/core/appearance";
+import { HOME_SECTIONS, SITE_TEXT_DEFAULTS, TEXT_KEYS, homeOrder, useAppearance } from "@/core/appearance";
 import { ImagePicker } from "../components/ImagePicker";
 import { Sheet } from "../components/Sheet";
 import { CATALOG, catalogUrl, resolveImage } from "../lib/catalog";
@@ -15,7 +15,7 @@ const newId = () => Math.random().toString(36).slice(2, 8);
 export function Customize() {
   const { t } = useTranslation();
   const store = useAppearance();
-  const [a, setA] = useState<Appearance>(() => ({ ...store.a, hidden: [...(store.a.hidden ?? [])], boxes: [...(store.a.boxes ?? [])], images: { ...(store.a.images ?? {}) } }));
+  const [a, setA] = useState<Appearance>(() => ({ ...store.a, hidden: [...(store.a.hidden ?? [])], boxes: [...(store.a.boxes ?? [])], images: { ...(store.a.images ?? {}) }, website: { ...(store.a.website ?? {}) }, texts: { ...(store.a.texts ?? {}) } }));
   const [edit, setEdit] = useState<CustomBox | null>(null);
   const [dirty, setDirty] = useState(false); const [saved, setSaved] = useState(false);
   const me = useAuth((x) => x.me);
@@ -32,6 +32,9 @@ export function Customize() {
   const saveBox = (b: CustomBox) => { const boxes = a.boxes ?? []; const i = boxes.findIndex((x) => x.id === b.id); const nb = i >= 0 ? boxes.map((x) => (x.id === b.id ? b : x)) : [...boxes, b]; upd({ ...a, boxes: nb, home: i >= 0 ? a.home : [...order.filter((k) => k !== "box:" + b.id).slice(0, 1), "box:" + b.id, ...order.slice(1)] }); setEdit(null); };
   const delBox = (id: string) => { upd({ ...a, boxes: (a.boxes ?? []).filter((b) => b.id !== id), home: (a.home ?? []).filter((k) => k !== "box:" + id), hidden: (a.hidden ?? []).filter((k) => k !== "box:" + id) }); setEdit(null); };
   const save = async () => { await store.save(a); setDirty(false); setSaved(true); };
+  const setWeb = (k: NonNullable<Appearance["website"]> extends infer W ? keyof W : never, v: string | null) => upd({ ...a, website: { ...(a.website ?? {}), [k]: v } });
+  const setText = (k: string, v: string) => { const texts = { ...(a.texts ?? {}) }; if (v.trim()) texts[k] = v; else delete texts[k]; upd({ ...a, texts }); };
+  const textDefault = (k: string, appKey?: string) => appKey ? t(appKey) : SITE_TEXT_DEFAULTS[k] ?? "";
   return (
     <section className="screen" data-testid="customize">
       <header className="topbar"><h1 className="display">{t("customize.title")}</h1></header>
@@ -64,6 +67,29 @@ export function Customize() {
             <div className="galpick" data-testid={`gal-${g.key}`}>{g.items.map((it) => { const i = gallery.indexOf(it.ref); return <button key={it.ref} className={"gthumb" + (i >= 0 ? " on" : "")} style={{ backgroundImage: `url(${it.url})` }} onClick={() => toggleG(it.ref)} aria-pressed={i >= 0}>{i >= 0 && <b>{i + 1}</b>}</button>; })}</div></div>
         ))}
         <div className="row" style={{ gap: 8 }}><button className="ghost small" onClick={() => upd({ ...a, websiteGallery: [] })}>{t("customize.galleryClear")}</button><button className="ghost small" onClick={() => upd({ ...a, websiteGallery: [...gallery].sort(() => Math.random() - 0.5) })}>{t("customize.galleryShuffle")}</button></div>
+      </div>
+
+      <div className="sec" data-testid="cz-website"><h2>{t("customize.website")}</h2>
+        <p className="tiny muted" style={{ marginTop: 0 }}>{t("customize.websiteSub")}</p>
+        <div className="card"><div className="eyebrow">{t("customize.siteHero")}</div>
+          <ImagePicker tag="event" label=" " own={teamPhotos} value={a.website?.hero ?? null} onChange={(v) => setWeb("hero", v)} /></div>
+        <div className="card"><label className="field"><span>{t("customize.videoUrl")}</span><input type="url" placeholder="https://…/video.mp4" value={a.website?.video ?? ""} data-testid="cz-video" onChange={(e) => setWeb("video", e.target.value.trim() || null)} /></label>
+          <div className="eyebrow" style={{ marginTop: 8 }}>{t("customize.videoPoster")}</div>
+          <ImagePicker tag="event" label=" " own={teamPhotos} value={a.website?.videoPoster ?? null} onChange={(v) => setWeb("videoPoster", v)} /></div>
+        <div className="card"><div className="eyebrow">{t("customize.siteApp")}</div>
+          <ImagePicker tag="post" label=" " own={teamPhotos} value={a.website?.app ?? null} onChange={(v) => setWeb("app", v)} /></div>
+        <div className="card"><div className="eyebrow">{t("customize.siteBand")}</div>
+          <ImagePicker tag="post" label=" " own={teamPhotos} value={a.website?.band ?? null} onChange={(v) => setWeb("band", v)} /></div>
+      </div>
+
+      <div className="sec" data-testid="cz-texts"><h2>{t("customize.texts")}</h2>
+        <p className="tiny muted" style={{ marginTop: 0 }}>{t("customize.textsSub")}</p>
+        <div className="card list">
+          {TEXT_KEYS.map((x) => { const cur = a.texts?.[x.key] ?? ""; const def = textDefault(x.key, x.appKey); return (
+            <div key={x.key} className="field" style={{ padding: "8px 0" }}><span className="row between">{t(`customize.textKeys.${x.key}`)}{cur && <button type="button" className="linklike small" onClick={() => setText(x.key, "")}>{t("customize.textReset")}</button>}</span>
+              {x.multiline ? <textarea rows={3} value={cur} placeholder={def} data-testid={`cz-text-${x.key}`} onChange={(e) => setText(x.key, e.target.value)} /> : <input value={cur} placeholder={def} data-testid={`cz-text-${x.key}`} onChange={(e) => setText(x.key, e.target.value)} />}
+            </div>); })}
+        </div>
       </div>
 
       <div className="row" style={{ gap: 8 }}>

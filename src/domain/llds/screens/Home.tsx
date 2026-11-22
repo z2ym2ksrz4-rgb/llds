@@ -86,7 +86,7 @@ export function Home() {
     if (mineStaff) week.push({ key: "st" + s.id, at: s.starts_at, end: s.ends_at, kind: "staff", title: s.title ?? s.team_name ?? "", sub: `${s.room_name ?? ""}${s.substitute_id === me.person.id ? " · " + t("session.sub") : ""}`, off: s.cancelled, session: s });
     for (const pid of familyIds) if (s.team_id && familyTeams(pid).has(s.team_id) && !(mineStaff && pid === me.person.id)) { const a = absences.find((x) => x.session_id === s.id && x.person_id === pid); week.push({ key: "tr" + s.id + pid, at: s.starts_at, end: s.ends_at, kind: "training", title: s.team_name ?? "", sub: `${s.room_name ?? ""} · ${s.substitute_name ?? s.trainer_name ?? ""}${a ? " · " + t("session.absenceSentChip") : ""}`, who: nameOf(pid) ?? undefined, off: s.cancelled, session: s }); }
   }
-  for (const e of events) if (new Date(e.starts_at) < weekEnd && (!e.team_ids.length || e.team_ids.some((id) => myTeamIds.has(id)) || isAdmin)) week.push({ key: "ev" + e.id, at: e.starts_at, end: e.ends_at, kind: "event", title: e.title, sub: `${e.place ?? t(`events.kind.${e.kind}`)}${e.meet_time ? " · " + t("events.meet") + " " + e.meet_time : ""}`, event: e });
+  for (const e of events) if (new Date(e.starts_at) < weekEnd && (!e.team_ids.length || e.team_ids.some((id) => myTeamIds.has(id)))) week.push({ key: "ev" + e.id, at: e.starts_at, end: e.ends_at, kind: "event", title: e.title, sub: `${e.place ?? t(`events.kind.${e.kind}`)}${e.meet_time ? " · " + t("events.meet") + " " + e.meet_time : ""}`, event: e });
   for (const b of bookings) if (b.person_id === me.person.id && b.status !== "rejected" && new Date(b.starts_at) < weekEnd) week.push({ key: "bk" + b.id, at: b.starts_at, end: b.ends_at, kind: "booking", title: b.title, sub: `${b.room_name}${b.status === "pending" ? " · " + t("rooms.pending") : ""}` });
   week.sort((a, b) => a.at.localeCompare(b.at));
   const weekDays = [...new Set(week.map((w) => new Date(w.at).toDateString()))];
@@ -157,6 +157,9 @@ export function Home() {
         </div>
       )}
     </>),
+    studioHead: () => (<>
+      {isAdmin && <div className="sec studiohead" data-testid="studio-head"><div className="eyebrow gold">{t("home.studioEyebrow")}</div><h2 className="display">{t("home.studioTitle")}</h2><p className="tiny muted" style={{ margin: 0 }}>{t("home.studioSub")}</p></div>}
+    </>),
     upcoming: () => (<>
       {upcoming.length > 0 && (
         <div className="sec"><h2>{t("home.upcoming")}</h2>
@@ -165,11 +168,11 @@ export function Home() {
       )}
     </>),
     teampick: () => (<>
-      {(!isAdmin || teamIds.size > 0) && <TeamPicker />}
+      {(!isAdmin || teamIds.size > 0) && <TeamPicker ownOnly />}
       {/* week strip: the dots follow the team chosen above – its trainings and events */}
-      <div className="weekstrip" aria-hidden="true" data-testid="weekstrip">
+      {(!isAdmin || teamIds.size > 0) && <div className="weekstrip" aria-hidden="true" data-testid="weekstrip">
         {strip.map((d) => { const key = d.toDateString(); const n = sessions.filter((x) => x.team_id === teamId && !x.cancelled && new Date(x.starts_at).toDateString() === key).length + events.filter((e) => new Date(e.starts_at).toDateString() === key && (!e.team_ids.length || (teamId ? e.team_ids.includes(teamId) : false))).length; return <span key={key} className={"d" + (key === today ? " today" : "") + (n ? " has" : "")}><small>{DAY_SHORT[(d.getDay() + 6) % 7]}</small><b>{d.getDate()}</b><i /></span>; })}
-      </div>
+      </div>}
     </>),
     week: () => (<>
       {(week.length > 0 || teamIds.size > 0) && (

@@ -184,7 +184,10 @@
     "openOrders": "open orders",
     "cardsWaiting": "punch cards to activate",
     "overview": "Overview",
-    "carousel": "Team pictures"
+    "carousel": "Team pictures",
+    "studioEyebrow": "The whole studio",
+    "studioTitle": "The studio",
+    "studioSub": "Across all teams – what you, as administrator, need to keep an eye on."
   },
   "admin": {
     "users": "New users",
@@ -412,7 +415,9 @@
     "approveParentNeedsChild": "{{name}} is parent only and has no children linked – link a child first.",
     "parentNeedsChild": "A parent needs at least one child linked – pick or create a child first.",
     "teamHeroImage": "Top image on the team page",
-    "teamAboutImage": "Image under the team description"
+    "teamAboutImage": "Image under the team description",
+    "teamPhotos": "The team's own photos",
+    "teamPhotosHint": "Tap a photo to remove it from the team (it is not deleted from the website)."
   },
   "settings": {
     "language": "Language",
@@ -1108,7 +1113,8 @@
       "week": "Your/child's week",
       "payments": "Open payments",
       "badges": "Trophy shelf (badges + milestones)",
-      "gallery": "Team pictures (carousel)"
+      "gallery": "Team pictures (carousel)",
+      "studioHead": "Heading: The studio"
     },
     "gallery": "Photo carousel on the website",
     "gallerySub": "Pick images for the carousel on the website front page – in the order you tap ({{n}} selected). Empty = the teams' own photos are shown automatically.",
@@ -1116,7 +1122,31 @@
     "galleryOwn": "Own uploads",
     "galleryCatalog": "Catalogue",
     "galleryClear": "Clear",
-    "galleryShuffle": "Shuffle order"
+    "galleryShuffle": "Shuffle order",
+    "website": "Website",
+    "websiteSub": "Images and video on the front page of ilumie.com/llds. Changes apply immediately – no rebuild.",
+    "videoUrl": "Front-page video (link to .mp4)",
+    "videoPoster": "Still image before the video plays",
+    "siteHero": "Top image on the front page",
+    "siteApp": "Image next to the app section",
+    "siteBand": "Image in the \"You are always welcome\" band",
+    "texts": "Texts",
+    "textsSub": "Edit the texts where they appear. Empty field = default text. Use | to split a heading so the last part is italic.",
+    "textReset": "Default",
+    "textKeys": {
+      "site.heroTitle": "Website · top heading",
+      "site.heroLead": "Website · text under the heading",
+      "site.welcomeTitle": "Website · Welcome – heading",
+      "site.welcome": "Website · Welcome – text",
+      "site.videoTitle": "Website · video heading",
+      "site.appTitle": "Website · app section – heading",
+      "site.appLead": "Website · app section – text",
+      "site.bandTitle": "Website · bottom band – heading",
+      "site.band": "Website · bottom band – text",
+      "app.loginTagline": "App · login screen text",
+      "app.registerIntro": "App · text at the top of registration",
+      "app.pendingBody": "App · text while waiting for approval"
+    }
   },
   "week": {
     "training": "Training",

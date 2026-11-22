@@ -22,7 +22,7 @@ export function ImagePicker({ value, onChange, tag, allowNone = true, label, own
     try { const added = await api.uploadCatalog(list, folder || t("catalog.ownFolder")); setOwn([...added, ...own]); onChange(added[0].url); } finally { setBusy(false); }
   };
   return (
-    <div className="field"><span>{label ?? t("catalog.pick")}</span>
+    <div className="field">{label !== " " && <span>{label ?? t("catalog.pick")}</span>}
       {(folders.length > 0 || isAdmin) && (
         <div className="chips" style={{ marginTop: 4 }}>
           <button className={"chip" + (!folder ? " on" : "")} onClick={() => setFolder("")}>{t("catalog.all")}</button>

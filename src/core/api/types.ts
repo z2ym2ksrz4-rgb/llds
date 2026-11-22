@@ -37,6 +37,8 @@ export type Appearance = {
   boxes?: CustomBox[];
   images?: { login?: string | null; hero?: string | null };  // catalog key or URL
   websiteGallery?: string[];  // image refs (catalog key, art/catalog path or URL) for the carousel on the website front page
+  website?: { hero?: string | null; videoPoster?: string | null; app?: string | null; band?: string | null; video?: string | null };  // front-page images + video URL (Tilpas appen → Website)
+  texts?: Record<string, string>;  // text overrides: "site.<hook>" (website front page) and "app.<key>" (login/registration texts); missing = default
 };
 
 export type Team = {
@@ -177,7 +179,7 @@ export type Absence = { id: string; session_id: string; person_id: string; reaso
 
 export type RosterEntry = { person_id: string; name: string; birth_year: number | null; role: Role; present: boolean | null; absence: Absence | null; via_punch: boolean };
 
-export type TeamInput = Partial<Pick<Team, "name" | "style" | "category" | "level" | "closed" | "parents_see_video" | "punch_card_open" | "color" | "about_url" | "description" | "cover_url" | "admission" | "admission_note" | "price_full" | "price_half" | "price_signup" | "price_note" | "installments_allowed" | "price">> & { max_dancers?: number | null; visibility?: "public" | "private"; archived?: boolean };
+export type TeamInput = Partial<Pick<Team, "name" | "style" | "category" | "level" | "closed" | "parents_see_video" | "punch_card_open" | "color" | "about_url" | "photos" | "description" | "cover_url" | "admission" | "admission_note" | "price_full" | "price_half" | "price_signup" | "price_note" | "installments_allowed" | "price">> & { max_dancers?: number | null; visibility?: "public" | "private"; archived?: boolean };
 
 export type Member = Person & { memberships: Membership[]; children: Person[]; parents: Person[] };
 

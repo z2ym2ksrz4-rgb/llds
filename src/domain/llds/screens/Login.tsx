@@ -4,12 +4,13 @@ import { api, isMock } from "@/core/api";
 import { LangFlags } from "../components/LangFlags";
 import { Logo } from "../components/Logo";
 import { art } from "../lib/art";
-import { useAppearance } from "@/core/appearance";
+import { textOverride, useAppearance } from "@/core/appearance";
 import { catalogUrl } from "../lib/catalog";
 
 /** E-mail + one-time code. No passwords. */
 export function Login() {
   const { t } = useTranslation();
+  const txOverride = useAppearance((s) => textOverride(s.a, "app.loginTagline"));
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [step, setStep] = useState<"email" | "code">("email");
@@ -33,7 +34,7 @@ export function Login() {
       <div className="login-body">
         <Logo draw />
         <h1 className="display">{t("login.welcome")} <em>{t("login.backstage")}</em></h1>
-        <p className="muted">{t("login.tagline")}</p>
+        <p className="muted">{(txOverride ?? t("login.tagline"))}</p>
         {step === "email" ? (
           <form onSubmit={(e) => { e.preventDefault(); void send(); }} className="stack">
             <label className="field"><span>{t("login.email")}</span>
