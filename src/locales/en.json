@@ -979,7 +979,14 @@
     "empty": "No own images yet – upload the first one.",
     "bundledHint": "Built-in illustrations ship with the app and cannot be deleted.",
     "uploaded": "{{n}} image(s) added to {{folder}}",
-    "teamPhoto": "Team photo"
+    "teamPhoto": "Team photo",
+    "choose": "Choose…",
+    "current": "Selected image",
+    "library": "Media library",
+    "libraryEyebrow": "All images",
+    "teamPhotos": "Team photos",
+    "builtIn": "Built-in",
+    "libraryHint": "Folders and uploads are managed under Admin → Image catalogue. Uploading here puts the file in the selected folder."
   },
   "tour": {
     "eyebrow": "Welcome",

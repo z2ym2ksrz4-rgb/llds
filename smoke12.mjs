@@ -16,6 +16,6 @@ await p.click("[data-testid=media] >> nth=1"); await p.waitForSelector("[data-te
 await p.click("[data-testid=make-cover]"); await p.waitForTimeout(500); out.coverToast = await p.textContent(".toast").catch(() => null);
 await p.click(".lightbox", { position: { x: 10, y: 10 } }); await p.click("text=‹ Mapper"); await p.waitForTimeout(300); await p.click("text=‹ Mit hold"); await p.waitForSelector("[data-testid=team-hero]"); await p.waitForTimeout(300);
 out.heroAfter = (await p.getAttribute("[data-testid=team-hero] .bg", "style")).slice(0, 60);
-await p.click("nav.tabbar >> text=Events"); await p.click("text=Nyt event"); await p.waitForSelector("[data-testid=image-picker]"); out.catalogCount = await p.$$eval("[data-testid=image-option]", (e) => e.length);
+await p.click("nav.tabbar >> text=Events"); await p.click("text=Nyt event"); await p.waitForSelector("[data-testid=image-picker]"); await p.click("[data-testid=pick-open]"); await p.waitForSelector("[data-testid=media-library]"); out.catalogCount = await p.$$eval("[data-testid=image-option]", (e) => e.length);
 console.log(JSON.stringify(out, null, 1)); await b.close();
 if (out.errors.length || out.media < 2 || out.heroAfter === out.heroBefore || !out.heroAfter.includes("data:image/png") || out.catalogCount < 30) process.exit(1);

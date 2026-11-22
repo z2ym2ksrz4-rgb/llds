@@ -979,7 +979,14 @@
     "empty": "Ingen egne billeder endnu – upload det første.",
     "bundledHint": "Indbyggede illustrationer følger med appen og kan ikke slettes.",
     "uploaded": "{{n}} billede(r) lagt i {{folder}}",
-    "teamPhoto": "Holdets foto"
+    "teamPhoto": "Holdets foto",
+    "choose": "Vælg…",
+    "current": "Valgt billede",
+    "library": "Billeddatabase",
+    "libraryEyebrow": "Alle billeder",
+    "teamPhotos": "Holdets fotos",
+    "builtIn": "Indbyggede",
+    "libraryHint": "Mapper og uploads administreres under Admin → Billedkatalog. Upload her lægger filen i den valgte mappe."
   },
   "tour": {
     "eyebrow": "Velkommen",

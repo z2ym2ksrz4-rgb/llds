@@ -647,3 +647,8 @@ div.checklist{padding-left:0;color:inherit}
 .screen.home .studiohead { margin-top:26px; padding-top:22px; border-top:1px solid var(--gold3); }
 .screen.home .studiohead h2 { margin:2px 0 4px; font-size:1.6rem; }
 .screen.home .studiohead .eyebrow.gold { color:var(--gold2); }
+
+/* compact image field: current picture + Automatisk / Upload / Vælg… */
+.pickrow { display:flex; align-items:center; gap:12px; margin-top:4px; }
+.pickcur { flex:none; width:72px; height:72px; border-radius:12px; background:var(--bg2) center/cover no-repeat; border:1px solid var(--line2); display:flex; align-items:center; justify-content:center; }
+.pickcur.none .auto { color:var(--gold2); font-size:1.3rem; }

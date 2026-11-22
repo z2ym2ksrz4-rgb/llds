@@ -8,7 +8,7 @@ await p.goto(base, { waitUntil: "networkidle" }); await p.evaluate(() => localSt
 await p.fill("#email", "admin@demo"); await p.click("form button.cta"); await p.fill("#code", "000000"); await p.click("form button.cta"); await p.waitForSelector("nav.tabbar");
 // event with catalogue image
 await p.click("nav.tabbar >> text=Events"); await p.click("text=+ Nyt event").catch(async () => p.click("text=Nyt event")); await p.waitForSelector("#ev-title");
-await p.fill("#ev-title", "Katalogtest"); out.options = await p.$$eval("[data-testid=image-option]", (e) => e.length);
+await p.fill("#ev-title", "Katalogtest"); await p.click("[data-testid=pick-open]"); await p.waitForSelector("[data-testid=media-library]"); out.options = await p.$$eval("[data-testid=image-option]", (e) => e.length);
 await p.click("[data-testid=image-option] >> nth=2"); await p.click("#ev-save"); await p.waitForTimeout(800);
 const card = p.locator("[data-testid=event]", { hasText: "Katalogtest" }); out.eventBg = (await card.getAttribute("style")).includes("art/catalog/");
 // product editor size presets
