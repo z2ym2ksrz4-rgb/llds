@@ -1,6 +1,6 @@
 // Supabase Edge Function: fan out unpushed in-app notifications as native push (APNs for iOS, FCM v1 for Android).
 // Trigger: pg_cron every minute (select net.http_post(...)) or a Database Webhook on notification INSERT.
-// Secrets: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (auto), APNS_KEY_ID, APNS_TEAM_ID, APNS_P8 (base64), APNS_BUNDLE_ID,
+// Secrets: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (auto), CRON_KEY (shared with Vault push-cron-key), APNS_KEY_ID, APNS_TEAM_ID, APNS_P8 (base64), APNS_BUNDLE_ID,
 //          FCM_SERVICE_ACCOUNT (JSON string of the Firebase service account).
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { SignJWT, importPKCS8 } from "npm:jose@5";
@@ -19,7 +19,9 @@ async function fcmToken() {
   return { token: (await r.json()).access_token as string, project: sa.project_id as string };
 }
 
-Deno.serve(async () => {
+Deno.serve(async (req) => {
+  // Called by pg_cron with the shared secret (Vault `push-cron-key` = function secret CRON_KEY); no service-role key leaves the DB.
+  const want = Deno.env.get("CRON_KEY"); if (want && req.headers.get("x-cron-key") !== want) return new Response("forbidden", { status: 403 });
   const { data: rows } = await sb.from("notification").select("id,person_id,title,body,ref").is("pushed_at", null).order("created_at").limit(200);
   if (!rows?.length) return new Response("nothing");
   const ids = rows.map((r) => r.person_id);
