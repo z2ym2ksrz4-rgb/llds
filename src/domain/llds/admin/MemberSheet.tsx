@@ -1,4 +1,5 @@
 import { useMemo, useState, type ReactNode } from "react";
+import { loc } from "../lib/time";
 import { useTranslation } from "react-i18next";
 import { api, type Member, type Role, type Team } from "@/core/api";
 import { useAuth } from "@/core/auth";
@@ -118,13 +119,13 @@ export function MemberSheet({ member: p, all, teams, onClose, onChanged, onOpen,
       <div className="card details" data-testid="member-details">
         <div className="row between" style={{ alignItems: "flex-start" }}>
           <div className="grow small">
-            <div><span className="muted">{t("admin.detBirth")}:</span> {p.birth_date ? new Date(p.birth_date).toLocaleDateString("da-DK") + (age != null ? ` · ${age} ${t("settings.years")}` : "") : p.birth_year ? String(p.birth_year) : <span className="warn">{t("admin.detMissing")}</span>}</div>
+            <div><span className="muted">{t("admin.detBirth")}:</span> {p.birth_date ? new Date(p.birth_date).toLocaleDateString(loc()) + (age != null ? ` · ${age} ${t("settings.years")}` : "") : p.birth_year ? String(p.birth_year) : <span className="warn">{t("admin.detMissing")}</span>}</div>
             <div><span className="muted">{t("admin.detEmail")}:</span> {p.email ? <a href={`mailto:${p.email}`}>{p.email}</a> : <span className="warn">{t("admin.detMissing")}</span>}</div>
             <div><span className="muted">{t("admin.detPhone")}:</span> {p.phone ? <a href={`tel:${p.phone.replace(/\s/g, "")}`}>{p.phone}</a> : <span className="muted">–</span>}</div>
             <div><span className="muted">{t("admin.detLogin")}:</span> {login}</div>
             {p.parents.length > 0 && <div><span className="muted">{t("admin.parents")}:</span> {p.parents.map((g) => <button key={g.id} className="linklike" onClick={() => { const m = byId(g.id); if (m) onOpen(m); }}>{g.first_name} {g.last_name}</button>).reduce<ReactNode[]>((acc, el, i) => (i ? [...acc, ", ", el] : [el]), [])}</div>}
             {p.children.length > 0 && <div><span className="muted">{t("admin.childrenHead")}:</span> {p.children.map((c) => <button key={c.id} className="linklike" onClick={() => { const m = byId(c.id); if (m) onOpen(m); }}>{c.first_name}</button>).reduce<ReactNode[]>((acc, el, i) => (i ? [...acc, ", ", el] : [el]), [])}</div>}
-            <div className="tiny muted" style={{ marginTop: 4 }}>{[p.source ? t(`admin.source.${p.source}`) : null, p.created_at ? t("admin.detCreated", { date: new Date(p.created_at).toLocaleDateString("da-DK") }) : null, p.photo_consent === false ? t("team.noPhotoConsent") : null].filter(Boolean).join(" · ")}</div>
+            <div className="tiny muted" style={{ marginTop: 4 }}>{[p.source ? t(`admin.source.${p.source}`) : null, p.created_at ? t("admin.detCreated", { date: new Date(p.created_at).toLocaleDateString(loc()) }) : null, p.photo_consent === false ? t("team.noPhotoConsent") : null].filter(Boolean).join(" · ")}</div>
           </div>
           <button type="button" className="chip small" onClick={() => setDetOpen((o) => !o)} data-testid="details-edit">{detOpen ? t("common.cancel") : t("common.edit")}</button>
         </div>

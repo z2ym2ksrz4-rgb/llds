@@ -5,7 +5,7 @@ import { useAuth } from "@/core/auth";
 import { useNav } from "@/core/nav";
 import { PaySheet } from "../components/Pay";
 import { Toast } from "../components/Sheet";
-import { ago } from "../lib/time";
+import { ago, loc } from "../lib/time";
 
 /** One punch card as a small card with its punches. */
 export function PunchCardView({ card: c, onPay }: { card: PunchCard; onPay?: (c: PunchCard) => void }) {
@@ -13,7 +13,7 @@ export function PunchCardView({ card: c, onPay }: { card: PunchCard; onPay?: (c:
   return (
     <div className="card punchcard" data-testid="punchcard">
       <div className="row between"><strong>{c.type_name}</strong><span className={"chip small " + (c.status === "active" ? "ok" : c.status === "expired" ? "" : c.claimed_paid_at ? "pend" : "warn")}>{t(`punch.status.${c.status === "awaiting_payment" && c.claimed_paid_at ? "claimed" : c.status}`)}</span></div>
-      <div className="tiny">{c.person_name} · {t("punch.validUntil")} {new Date(c.expires_on).toLocaleDateString("da-DK")}</div>
+      <div className="tiny">{c.person_name} · {t("punch.validUntil")} {new Date(c.expires_on).toLocaleDateString(loc())}</div>
       <div className="punches">{Array.from({ length: c.punches_total }, (_, i) => <span key={i} className={"punch" + (i < c.punches_total - c.punches_left ? " used" : "")} />)}</div>
       <div className="tiny">{t("punch.left", { n: c.punches_left, total: c.punches_total })}</div>
       {c.status === "awaiting_payment" && !c.claimed_paid_at && onPay && <button className="small" onClick={() => onPay(c)}>{t("shop.pay")} · {c.price_dkk} kr.</button>}
@@ -72,7 +72,7 @@ export function PunchStatus({ personId }: { personId: string }) {
     <div className={"card punchstatus" + (left ? "" : " warn")} style={{ margin: 0 }} data-testid="punch-status">
       <div className="eyebrow">{t("punch.title")}</div>
       {left > 0 ? (
-        <><strong>{t("punch.haveLeft", { n: left })}</strong><div className="tiny">{t("punch.afterThis", { n: left - 1 })}{active[0] ? ` · ${t("punch.validUntil")} ${new Date(active[0].expires_on).toLocaleDateString("da-DK")}` : ""}</div>
+        <><strong>{t("punch.haveLeft", { n: left })}</strong><div className="tiny">{t("punch.afterThis", { n: left - 1 })}{active[0] ? ` · ${t("punch.validUntil")} ${new Date(active[0].expires_on).toLocaleDateString(loc())}` : ""}</div>
           {left <= 2 && <button className="linklike small" onClick={() => setTab("shop")}>{t("punch.buyNew")} →</button>}</>
       ) : pending ? (
         <><strong>{t("punch.pendingCard")}</strong><div className="tiny">{pending.claimed_paid_at ? t("punch.status.claimed") : t("punch.status.awaiting_payment")} · {pending.type_name}</div></>

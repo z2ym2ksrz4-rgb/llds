@@ -7,7 +7,7 @@ import { Customize } from "./Customize";
 import { PaymentsAdmin } from "../screens/Payments";
 import { CatalogAdmin } from "./Catalog";
 import { MessageComposer, MessageSheet } from "../components/Messages";
-import { ago, isoDate } from "../lib/time";
+import { ago, isoDate, loc } from "../lib/time";
 import { AdminUsers } from "./Users";
 import { MemberSheet } from "./MemberSheet";
 import { Sheet, Toast } from "../components/Sheet";
@@ -155,7 +155,7 @@ function Season() {
   return (
     <section className="screen">
       <header className="topbar"><h1 className="display">{t("admin.season")}</h1><button className="ghost small" onClick={() => setOpen("new")}>+ {t("session.training")}</button></header>
-      <div className="row between small muted"><button className="linklike" onClick={() => setWeek(addDays(week, -7))}>‹</button><span>{t("admin.week")} {weekNo(week)} · {week.toLocaleDateString("da-DK", { day: "numeric", month: "short" })}</span><button className="linklike" onClick={() => setWeek(addDays(week, 7))}>›</button></div>
+      <div className="row between small muted"><button className="linklike" onClick={() => setWeek(addDays(week, -7))}>‹</button><span>{t("admin.week")} {weekNo(week)} · {week.toLocaleDateString(loc(), { day: "numeric", month: "short" })}</span><button className="linklike" onClick={() => setWeek(addDays(week, 7))}>›</button></div>
       <p className="tiny">{t("admin.seasonHint")} {t("admin.seasonDragHint")}</p>
       {rooms.map((room) => (
         <div className="sec" key={room}><div className="eyebrow">{room}</div>
@@ -185,7 +185,7 @@ function Bookings() {
     <section className="screen">
       <header className="topbar"><h1 className="display">{t("admin.bookings")}</h1></header>
       <div className="card list">
-        {list.map((b) => <div key={b.id} className="item"><span className="time">{new Date(b.starts_at).toLocaleDateString("da-DK", { weekday: "short", day: "numeric", month: "short" })}<br />{hm(b.starts_at)}</span><span className="grow">{b.title}<div className="tiny">{b.room_name} · {b.person_name}</div></span>
+        {list.map((b) => <div key={b.id} className="item"><span className="time">{new Date(b.starts_at).toLocaleDateString(loc(), { weekday: "short", day: "numeric", month: "short" })}<br />{hm(b.starts_at)}</span><span className="grow">{b.title}<div className="tiny">{b.room_name} · {b.person_name}</div></span>
           {b.status === "pending" ? <div className="row"><button className="small" onClick={async () => { await api.setBookingStatus(b.id, "approved"); void load(); }}>{t("admin.approve")}</button><button className="ghost small danger" onClick={async () => { await api.setBookingStatus(b.id, "rejected"); void load(); }}>{t("admin.reject")}</button></div> : <span className="chip ok small">{t("rooms.status.approved")}</span>}</div>)}
         {!list.length && <p className="muted">{t("admin.noBookings")}</p>}
       </div>
@@ -318,7 +318,7 @@ function PunchAdmin() {
       <div className="sec"><h2>{t("admin.cardsWaiting")} · {waiting.length}</h2><div className="card list">
         {waiting.map((c) => <div key={c.id} className="item" data-testid="admin-card"><span className="grow">{c.person_name}<div className="tiny">{c.type_name} · {c.price_dkk} kr. · {ago(c.created_at)}{c.claimed_paid_at ? ` · ${t("punch.status.claimed")}` : ` · ${t("punch.status.awaiting_payment")}`}</div></span><button className="small" onClick={async () => { try { await api.activatePunchCard(c.id); say(t("admin.cardActivated", { name: c.person_name })); } catch (x) { say(t("common.error") + ": " + String((x as Error).message ?? x)); } void load(); }}>{t("admin.activate")}</button></div>)}
         {!waiting.length && <p className="muted">{t("admin.noCards")}</p>}</div></div>
-      <div className="sec"><h2>{t("admin.cardsActive")} · {active.length}</h2><div className="card list">{active.map((c) => <div key={c.id} className="item"><span className="grow">{c.person_name}<div className="tiny">{c.type_name} · {t("punch.left", { n: c.punches_left, total: c.punches_total })} · {t("punch.validUntil")} {new Date(c.expires_on).toLocaleDateString("da-DK")}</div></span></div>)}</div></div>
+      <div className="sec"><h2>{t("admin.cardsActive")} · {active.length}</h2><div className="card list">{active.map((c) => <div key={c.id} className="item"><span className="grow">{c.person_name}<div className="tiny">{c.type_name} · {t("punch.left", { n: c.punches_left, total: c.punches_total })} · {t("punch.validUntil")} {new Date(c.expires_on).toLocaleDateString(loc())}</div></span></div>)}</div></div>
       <div className="sec"><h2>{t("admin.cardTypes")}</h2><div className="card list">{types.map((ty) => <button key={ty.id} className={"item" + (ty.active ? "" : " off")} onClick={() => { setF({ name: ty.name, punches: String(ty.punches), valid_days: String(ty.valid_days), price: String(ty.price_dkk) }); setEdit(ty); }}><span className="grow">{ty.name}<div className="tiny">{ty.punches} {t("punch.punches")} · {ty.valid_days} {t("admin.days")} · {ty.price_dkk} kr.</div></span><span className="gold">›</span></button>)}</div></div>
       <p className="tiny">{t("admin.punchHint")}</p>
       {edit && (

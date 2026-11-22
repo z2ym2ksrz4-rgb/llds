@@ -12,7 +12,7 @@ import { TopRight } from "../components/ProfileMenu";
 import { artFor } from "../lib/art";
 import { catalogUrl } from "../lib/catalog";
 import { EventSheet } from "./Events";
-import { addDays, dateLabel, DAY_SHORT, hm, startOfDay } from "../lib/time";
+import { addDays, dateLabel, DAY_SHORT, hm, loc, startOfDay } from "../lib/time";
 import { boxOf, homeOrder, isHidden, useAppearance } from "@/core/appearance";
 import { resolveImage } from "../lib/catalog";
 import { TrophyShelf } from "../components/Emblems";
@@ -22,7 +22,7 @@ import { MyPayments } from "./Payments";
 
 /** Home, laid out like the approved demo: next event as a photo hero, messages that need you, your (child's) week with absence buttons, open payments. */
 export function Home() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const me = useAuth((s) => s.me)!;
   const viewing = useAuth((s) => s.viewing)!;
   const setTab = useNav((s) => s.setTab);
@@ -104,7 +104,7 @@ export function Home() {
     addEventListener("scroll", on, { passive: true }); return () => { removeEventListener("scroll", on); cancelAnimationFrame(raf); };
   }, []);
   const strip = Array.from({ length: 7 }, (_, i) => addDays(startOfDay(new Date()), i));
-  const dateLine = new Date().toLocaleDateString(i18n.language === "en" ? "en-GB" : "da-DK", { weekday: "long", day: "numeric", month: "long" });
+  const dateLine = new Date().toLocaleDateString(loc(), { weekday: "long", day: "numeric", month: "long" });
   const SECTIONS: Record<string, () => React.ReactNode> = {
     hero: () => (<>
       <div ref={heroRef} className={"homehero tone-" + tone} data-testid="hero" data-tour="hero">

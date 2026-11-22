@@ -4,7 +4,7 @@ import { api, type Member, type Absence, type Person, type Session, type Session
 import { useAuth } from "@/core/auth";
 import { PunchStatus } from "../screens/PunchCards";
 import { Sheet } from "./Sheet";
-import { dateLabel, hm, hhmm, SEASON_END, isoDate } from "../lib/time";
+import { dateLabel, hhmm, hm, isoDate, loc, SEASON_END } from "../lib/time";
 import { shiftOccurrence } from "@/core/api/schedule-util";
 
 type Conflict = { occId: string; date: string; what: string; from: string; to: string; bookingId?: string };
@@ -203,7 +203,7 @@ export function SessionEditor({ session, defaults, moveTo, onClose, onSaved, toa
       {!f.team_id && <label className="field"><span>{t("session.title")}</span><input id="se-title" value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} placeholder={t("session.titlePh")} /></label>}
       {!session ? (
         <button type="button" className={"checkrow" + (f.repeat ? " on" : "")} role="checkbox" aria-checked={f.repeat} data-testid="se-repeat" onClick={() => setF({ ...f, repeat: !f.repeat })}>
-          <span className="box" aria-hidden>{f.repeat ? "✓" : ""}</span><span className="grow"><span className="lbl">{t("session.repeatWeekly")}</span><span className="tiny">{f.repeat ? t("session.repeatHint", { date: new Date(f.until).toLocaleDateString("da-DK", { day: "numeric", month: "short" }) }) : t("session.once")}</span></span></button>
+          <span className="box" aria-hidden>{f.repeat ? "✓" : ""}</span><span className="grow"><span className="lbl">{t("session.repeatWeekly")}</span><span className="tiny">{f.repeat ? t("session.repeatHint", { date: new Date(f.until).toLocaleDateString(loc(), { day: "numeric", month: "short" }) }) : t("session.once")}</span></span></button>
       ) : session.weekly_rule_id ? (
         <div className="field"><span>{t("session.applyTo")}</span><div className="seg2"><button type="button" className={f.scope === "one" ? "on" : ""} onClick={() => setF({ ...f, scope: "one" })}>{t("session.onlyThis")}</button><button type="button" className={f.scope === "future" ? "on" : ""} onClick={() => setF({ ...f, scope: "future" })}>{t("session.thisAndFuture")}</button></div><p className="tiny muted" style={{ margin: "6px 0 0" }}>{f.scope === "future" ? t("session.futureHint") : t("session.oneHint")}</p></div>
       ) : null}

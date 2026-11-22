@@ -4,11 +4,11 @@ import { api, type Team, type WebSignup } from "@/core/api";
 import { useAuth } from "@/core/auth";
 import { Sheet, Toast } from "../components/Sheet";
 import { PaySheet } from "../components/Pay";
-import { ago } from "../lib/time";
+import { ago, loc } from "../lib/time";
 
 /** Season price text → [full, half] in kr. ("2.400 kr. for hel sæson, eller 1.750 kr. for halv sæson") */
 export const priceAmounts = (p: string | null | undefined): number[] => (p ?? "").match(/([0-9][0-9.]*) kr/g)?.map((x) => parseInt(x.replace(/\D/g, ""), 10)) ?? [];
-export const kr = (n: number | null | undefined) => (n == null ? "–" : n.toLocaleString("da-DK") + " kr.");
+export const kr = (n: number | null | undefined) => (n == null ? "–" : n.toLocaleString(loc()) + " kr.");
 export type Plan = "full" | "half" | "rates2" | "rates4" | "rates10";
 export const RATE_FEE = 50;
 /** Client-side preview of what season_quote() returns (server is authoritative). */

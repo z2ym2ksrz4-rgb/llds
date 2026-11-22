@@ -8,7 +8,7 @@ import { catalogUrl } from "../lib/catalog";
 import { TabNews } from "../components/TabNews";
 import { Sheet, Toast } from "../components/Sheet";
 import { PaySheet } from "../components/Pay";
-import { dateLabel, hm, isoDate } from "../lib/time";
+import { dateLabel, hm, isoDate, loc } from "../lib/time";
 import { artFor } from "../lib/art";
 import { TopRight } from "../components/ProfileMenu";
 
@@ -42,7 +42,7 @@ function Results() {
     <div className="stack" style={{ marginTop: 10 }}>
       {isStaff && <button className="ghost small" onClick={() => setAdding(true)}>+ {t("events.addResult")}</button>}
       <div className="card list">
-        {list.map((r) => <div key={r.id} className="item" data-testid="result"><span className="time">{new Date(r.held_on).toLocaleDateString("da-DK", { month: "short", year: "numeric" })}</span><span className="grow">{r.event_title}<div className="tiny">{r.team_name ?? ""}{r.visibility === "public" ? ` · ${t("feed.publicChip")}` : ""}</div></span><span className="chip gold small">{r.placed}</span>{isStaff && <button className="linklike tiny" onClick={async () => { await api.deleteResult(r.id); void load(); }}>×</button>}</div>)}
+        {list.map((r) => <div key={r.id} className="item" data-testid="result"><span className="time">{new Date(r.held_on).toLocaleDateString(loc(), { month: "short", year: "numeric" })}</span><span className="grow">{r.event_title}<div className="tiny">{r.team_name ?? ""}{r.visibility === "public" ? ` · ${t("feed.publicChip")}` : ""}</div></span><span className="chip gold small">{r.placed}</span>{isStaff && <button className="linklike tiny" onClick={async () => { await api.deleteResult(r.id); void load(); }}>×</button>}</div>)}
         {!list.length && <p className="muted">{t("events.noResults")}</p>}
       </div>
       {adding && (
@@ -114,7 +114,7 @@ export function EventSheet({ event, staff, onClose, onEdit, onChanged, toast }: 
         <div className="item"><span className="avatar small">🕒</span><span className="grow">{dateLabel(event.starts_at)} · {hm(event.starts_at)}{event.ends_at ? `–${hm(event.ends_at)}` : ""}{event.meet_time ? <div className="tiny">{t("events.meet")}: {event.meet_time}</div> : null}</span></div>
         {event.place && <div className="item"><span className="avatar small">📍</span><span className="grow">{event.place}</span><a className="linklike small" href={`https://maps.google.com/?q=${encodeURIComponent(event.place)}`} target="_blank" rel="noreferrer">{t("events.map")}</a></div>}
         <div className="item"><span className="avatar small">👯</span><span className="grow">{event.team_names?.length ? event.team_names.join(", ") : t("events.allTeams")}</span></div>
-        {(event.price_dkk || event.signup_deadline) && <div className="item"><span className="avatar small">🎟</span><span className="grow">{event.price_dkk ? `${event.price_dkk} kr.` : t("events.free")}{event.signup_deadline && <div className={"tiny" + (deadlinePassed ? " warn" : "")}>{t("events.deadline")}: {new Date(event.signup_deadline).toLocaleDateString("da-DK")}</div>}</span>{event.signups > 0 && <span className="tiny">{t("events.signups", { n: event.signups })}</span>}</div>}
+        {(event.price_dkk || event.signup_deadline) && <div className="item"><span className="avatar small">🎟</span><span className="grow">{event.price_dkk ? `${event.price_dkk} kr.` : t("events.free")}{event.signup_deadline && <div className={"tiny" + (deadlinePassed ? " warn" : "")}>{t("events.deadline")}: {new Date(event.signup_deadline).toLocaleDateString(loc())}</div>}</span>{event.signups > 0 && <span className="tiny">{t("events.signups", { n: event.signups })}</span>}</div>}
       </div>
       {event.info && <p className="small" style={{ whiteSpace: "pre-wrap", margin: 0 }}>{event.info}</p>}
       {event.plan.length > 0 && <div className="card" style={{ margin: 0 }}><div className="eyebrow">{t("events.plan")}</div>{event.plan.map((p, i) => <div key={i} className="row"><span className="time">{p.time}</span><span>{p.text}</span></div>)}</div>}

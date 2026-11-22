@@ -23,7 +23,7 @@ import { Formations } from "./Formations";
 import { Notes } from "./Notes";
 import { MILESTONE_IDEAS } from "../lib/milestones";
 import { artForCategory } from "../lib/art";
-import { ageOf, addDays, ago, dateLabel, DAY_LONG, hm, startOfDay } from "../lib/time";
+import { addDays, ageOf, ago, dateLabel, DAY_LONG, hm, loc, startOfDay } from "../lib/time";
 
 type Page = "team" | "folders" | "choreo" | "formations" | "notes" | "dancers";
 
@@ -162,7 +162,7 @@ export function TeamScreen() {
       )}
 
       <div className="sec"><div className="row between"><h2>{t("team.trophies")}</h2>{staff && <button className="linklike small" onClick={() => setTab("events")}>+ {t("events.addResult")}</button>}</div><ScrollList testId="trophies">
-        {results.map((r) => <div key={r.id} className="item" data-testid="result"><span className="time">{new Date(r.held_on).toLocaleDateString("da-DK", { month: "short", year: "numeric" })}</span><span className="grow">{r.event_title}</span><span className="chip gold small">{r.placed}</span></div>)}
+        {results.map((r) => <div key={r.id} className="item" data-testid="result"><span className="time">{new Date(r.held_on).toLocaleDateString(loc(), { month: "short", year: "numeric" })}</span><span className="grow">{r.event_title}</span><span className="chip gold small">{r.placed}</span></div>)}
         {!results.length && <p className="muted small" style={{ margin: 0 }}>{events.find((e) => e.kind === "competition") ? t("team.noTrophiesYet", { event: events.find((e) => e.kind === "competition")!.title, date: dateLabel(events.find((e) => e.kind === "competition")!.starts_at) }) : t("team.noTrophies")}</p>}
       </ScrollList></div>
 

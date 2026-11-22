@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { loc } from "../lib/time";
 import { useTranslation } from "react-i18next";
 import { api, type Milestone } from "@/core/api";
 import { useAuth } from "@/core/auth";
@@ -43,7 +44,7 @@ function Milestones({ onBack }: { onBack: () => void }) {
       <header className="topbar"><h1 className="display">{t("milestones.title")}</h1></header>
       {people.map((p) => { const ms = list.filter((m) => m.person_id === p.id); if (!ms.length) return null; return (
         <div key={p.id} className="sec"><h2>{p.first_name}</h2>
-          {ms.map((m) => <div key={m.id} className="card milestone" data-testid="milestone"><div className="display big">{m.title}</div><div className="tiny">{m.reached_on ? new Date(m.reached_on).toLocaleDateString("da-DK") : ""}{m.team_name ? ` · ${m.team_name}` : ""}{m.given_by_name ? ` · ${t("milestones.by", { name: m.given_by_name })}` : ""}</div></div>)}
+          {ms.map((m) => <div key={m.id} className="card milestone" data-testid="milestone"><div className="display big">{m.title}</div><div className="tiny">{m.reached_on ? new Date(m.reached_on).toLocaleDateString(loc()) : ""}{m.team_name ? ` · ${m.team_name}` : ""}{m.given_by_name ? ` · ${t("milestones.by", { name: m.given_by_name })}` : ""}</div></div>)}
         </div>); })}
       {!list.length && <p className="muted">{t("milestones.empty")}</p>}
     </section>

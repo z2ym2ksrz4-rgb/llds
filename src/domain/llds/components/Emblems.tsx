@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type Badge, type PersonBadge } from "@/core/api";
 import { Sheet } from "./Sheet";
-import { ago } from "../lib/time";
+import { ago, loc } from "../lib/time";
 
 /** One emblem: emoji in a gold ring. size "sm" for inline strips, "lg" for the Home row. */
 export function Emblem({ b, size = "lg", onClick }: { b: PersonBadge; size?: "sm" | "lg"; onClick?: () => void }) {
@@ -64,7 +64,7 @@ export function TrophyShelf({ badges, milestones }: { badges: PersonBadge[]; mil
   return (
     <>
       <div className="shelf" data-testid="shelf">
-        {milestones.map((m) => <div key={m.id} className="trophy"><span className="e">🏆</span><span className="n">{m.title}</span>{m.reached_on && <span className="tiny">{new Date(m.reached_on).toLocaleDateString("da-DK", { month: "short", year: "numeric" })}</span>}</div>)}
+        {milestones.map((m) => <div key={m.id} className="trophy"><span className="e">🏆</span><span className="n">{m.title}</span>{m.reached_on && <span className="tiny">{new Date(m.reached_on).toLocaleDateString(loc(), { month: "short", year: "numeric" })}</span>}</div>)}
         {badges.map((b) => <button key={b.id} className="trophy" onClick={() => setOpen(b)} data-testid="emblem"><span className="e">{b.emoji}</span><span className="n">{b.name}</span><span className="tiny">{ago(b.created_at)}</span></button>)}
         <div className="shelf-board" />
       </div>

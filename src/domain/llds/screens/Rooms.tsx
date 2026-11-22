@@ -9,7 +9,7 @@ import { useNav } from "@/core/nav";
 import { TabNews } from "../components/TabNews";
 import { Sheet, Toast } from "../components/Sheet";
 import { SessionSheet, SessionEditor } from "../components/SessionSheet";
-import { addDays, dayLabel, DAY_LONG, hm, mondayOf, sameDay, startOfDay, atTime, overlaps } from "../lib/time";
+import { addDays, atTime, DAY_LONG, dayLabel, hm, loc, mondayOf, overlaps, sameDay, startOfDay } from "../lib/time";
 import { useAppearance } from "@/core/appearance";
 import { catalogUrl } from "../lib/catalog";
 import { art, teamAccent } from "../lib/art";
@@ -75,7 +75,7 @@ export function Rooms() {
       </div>
       <div className="row between small muted"><button className="linklike" onClick={() => setDay(addDays(day, -7))}>‹ {t("rooms.prevWeek")}</button><button className="linklike" onClick={() => setDay(startOfDay(new Date()))}>{t("rooms.today")}</button><button className="linklike" onClick={() => setDay(addDays(day, 7))}>{t("rooms.nextWeek")} ›</button></div>
 
-      <div className="dayhead"><h2 className="display">{DAY_LONG[(day.getDay() + 6) % 7]} {day.getDate()}. {day.toLocaleDateString("da-DK", { month: "long" })}</h2><span className="small muted">{t("rooms.countLine", { n: sessions.filter((x) => !x.cancelled).length, b: bookings.filter((x) => x.status !== "rejected").length })}</span></div>
+      <div className="dayhead"><h2 className="display">{DAY_LONG[(day.getDay() + 6) % 7]} {day.getDate()}{loc() === "da-DK" ? "." : ""} {day.toLocaleDateString(loc(), { month: "long" })}</h2><span className="small muted">{t("rooms.countLine", { n: sessions.filter((x) => !x.cancelled).length, b: bookings.filter((x) => x.status !== "rejected").length })}</span></div>
       {dayEvents.length > 0 && <div className="evstrip" data-testid="day-events">{dayEvents.map((e) => <button key={e.id} className="evcard-mini" style={{ backgroundImage: `url(${catUrl(e.image_key) ?? artFor(e.id)})` }} onClick={() => setOpenEvent(e)}><span className="eyebrow">{t(`events.kind.${e.kind}`)} · {hm(e.starts_at)}{e.ends_at ? `–${hm(e.ends_at)}` : ""}</span><b>{e.title}</b>{e.place && <small>{e.place}</small>}</button>)}</div>}
       <div className="cal calhead" style={{ gridTemplateColumns: `44px repeat(${rooms.length}, 1fr)` }}>
         <div />{rooms.map((r) => <div key={r.id} className="h">{r.name}</div>)}

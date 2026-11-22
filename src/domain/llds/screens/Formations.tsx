@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { loc } from "../lib/time";
 import { useTranslation } from "react-i18next";
 import { api, type FormationSet, type Frame, type Marker, type TeamDancer } from "@/core/api";
 import { Sheet } from "../components/Sheet";
@@ -23,7 +24,7 @@ export function Formations({ teamId, teamName, staff, onBack, toast }: { teamId:
       <header className="topbar"><h1 className="display">{t("form.title")}</h1>{staff && <button className="ghost small" data-testid="form-new" onClick={() => { setTitle(""); setNaming(true); }}>+ {t("form.new")}</button>}</header>
       <p className="small muted" style={{ marginTop: 0 }}>{staff ? t("form.introStaff") : t("form.intro")}</p>
       <div className="card list">
-        {sets.map((s) => <button key={s.id} className="item" onClick={() => setOpen(s)} data-testid="form-set"><span className="avatar small">◆</span><span className="grow">{s.title}<div className="tiny">{t("form.framesN", { n: s.frames.length })} · {new Date(s.updated_at).toLocaleDateString("da-DK")}</div></span><span className="gold">›</span></button>)}
+        {sets.map((s) => <button key={s.id} className="item" onClick={() => setOpen(s)} data-testid="form-set"><span className="avatar small">◆</span><span className="grow">{s.title}<div className="tiny">{t("form.framesN", { n: s.frames.length })} · {new Date(s.updated_at).toLocaleDateString(loc())}</div></span><span className="gold">›</span></button>)}
         {!sets.length && <p className="muted">{t("form.empty")}</p>}
       </div>
       {naming && (
