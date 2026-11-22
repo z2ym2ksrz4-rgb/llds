@@ -55,7 +55,8 @@
     "verify": "Log ind",
     "resend": "Send koden igen",
     "otherEmail": "Brug en anden e-mail",
-    "demoHint": "Demo: enhver 6-cifret kode virker. admin@demo = admin, parent@demo = forælder, maja@demo = træner, ny adresse = opret profil."
+    "demoHint": "Demo: enhver 6-cifret kode virker. admin@demo = admin, parent@demo = forælder, maja@demo = træner, ny adresse = opret profil.",
+    "password": "Adgangskode"
   },
   "register": {
     "title": "Opret profil",

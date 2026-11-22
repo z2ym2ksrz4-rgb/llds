@@ -55,7 +55,8 @@
     "verify": "Sign in",
     "resend": "Resend code",
     "otherEmail": "Use another e-mail",
-    "demoHint": "Demo: any 6-digit code works. admin@demo = admin, parent@demo = parent, maja@demo = trainer, new address = create profile."
+    "demoHint": "Demo: any 6-digit code works. admin@demo = admin, parent@demo = parent, maja@demo = trainer, new address = create profile.",
+    "password": "Password"
   },
   "register": {
     "title": "Create profile",

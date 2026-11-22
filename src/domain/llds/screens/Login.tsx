@@ -18,9 +18,11 @@ export function Login() {
   const [err, setErr] = useState<string | null>(null);
   const loginImg = useAppearance((s) => catalogUrl(s.a.images?.login) ?? catalogUrl(s.a.images?.hero));
 
+  const isReview = /^review[\w.+-]*@ilumie\.com$/i.test(email.trim());   // App Store / Play reviewers: password instead of a mail code
+  const [password, setPassword] = useState("");
   const send = async () => {
     setBusy(true); setErr(null);
-    try { await api.sendCode(email.trim()); setStep("code"); } catch (e) { setErr((e as Error).message); } finally { setBusy(false); }
+    try { if (isReview) { await api.signInWithPassword(email.trim(), password); return; } await api.sendCode(email.trim()); setStep("code"); } catch (e) { setErr((e as Error).message); } finally { setBusy(false); }
   };
   const verify = async () => {
     setBusy(true); setErr(null);
@@ -39,7 +41,8 @@ export function Login() {
           <form onSubmit={(e) => { e.preventDefault(); void send(); }} className="stack">
             <label className="field"><span>{t("login.email")}</span>
               <input id="email" type="email" inputMode="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="dit@navn.dk" /></label>
-            <button className="cta" disabled={busy || !email.includes("@")}>{t("login.sendCode")}</button>
+            {isReview && <label className="field"><span>{t("login.password")}</span><input id="password" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} /></label>}
+            <button className="cta" disabled={busy || !email.includes("@") || (isReview && !password)}>{isReview ? t("login.verify") : t("login.sendCode")}</button>
             <p className="tiny">{t("login.noAccount")}</p>
           </form>
         ) : (

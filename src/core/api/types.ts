@@ -110,6 +110,8 @@ export interface Api {
   sessionEmail(): Promise<string | null>;
   sendCode(email: string): Promise<void>;
   verifyCode(email: string, code: string): Promise<void>;
+  /** store-review accounts only (review*@ilumie.com): password instead of a one-time code */
+  signInWithPassword(email: string, password: string): Promise<void>;
   signOut(): Promise<void>;
   onAuthChange(cb: () => void): () => void;
   /** me */

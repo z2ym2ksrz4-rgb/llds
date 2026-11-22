@@ -42,6 +42,7 @@ export function supabaseApi(url: string, anonKey: string): Api {
       const { error } = await sb.auth.verifyOtp({ email, token: code, type: "email" });
       fail(error);
     },
+    async signInWithPassword(email, password) { const { error } = await sb.auth.signInWithPassword({ email, password }); fail(error); },
     async signOut() { await sb.auth.signOut(); },
     onAuthChange(cb) {
       const { data } = sb.auth.onAuthStateChange(() => cb());
