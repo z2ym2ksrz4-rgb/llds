@@ -609,7 +609,10 @@ div.checklist{padding-left:0;color:inherit}
 }
 /* desktop: fixed left navigation, content centred, Home in two columns */
 @media (min-width:1100px) {
-  .app { display:grid; grid-template-columns:232px minmax(0,1fr); flex-direction:row; }
+  .app { display:grid; grid-template-columns:232px minmax(0,1fr); grid-template-rows:auto minmax(0,1fr); flex-direction:row; }
+  .tabbar { grid-row:1 / -1; grid-column:1; }
+  .viewbar { grid-column:2; grid-row:1; }
+  main { grid-column:2; grid-row:2; }
   .tabbar { position:sticky; top:0; height:100dvh; order:-1; flex-direction:column; justify-content:flex-start; align-items:stretch; gap:4px; padding:22px 14px; border-right:1px solid var(--line); border-bottom:0; background:var(--bg2); }
   .tabbar::before { content:"LL Dance Studio"; position:static; height:auto; background:none; display:block; font-family:var(--display); font-size:1.25rem; color:var(--gold2); padding:4px 12px 18px; letter-spacing:.02em; }
   .tabbar button { flex-direction:row; justify-content:flex-start; width:100%; gap:12px; font-size:.78rem; letter-spacing:.08em; padding:11px 14px; border-radius:12px; }

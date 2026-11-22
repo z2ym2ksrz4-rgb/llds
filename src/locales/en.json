@@ -55,11 +55,11 @@
     "verify": "Sign in",
     "resend": "Resend code",
     "otherEmail": "Use another e-mail",
-    "demoHint": "Demo: any 6-digit code works. admin@demo = Line, parent@demo = parent, maja@demo = trainer, new address = create profile."
+    "demoHint": "Demo: any 6-digit code works. admin@demo = admin, parent@demo = parent, maja@demo = trainer, new address = create profile."
   },
   "register": {
     "title": "Create profile",
-    "intro": "Tell us who you are. Line approves your profile and places you on the right teams.",
+    "intro": "Tell us who you are. The dance school approves your profile and places you on the right teams.",
     "iAm": "I am",
     "rolesHint": "Pick several if needed – e.g. parent and trainer.",
     "firstName": "First name",
@@ -72,18 +72,18 @@
     "childName": "Child's first name",
     "addChild": "Add child",
     "childHint": "Under 13: no login – you see and answer on the child's behalf. 13–14: the child may get a login you approve and manage. 15+: the child may use the app alone.",
-    "wishedTeams": "Teams (helps Line)",
+    "wishedTeams": "Teams (helps us place you)",
     "wishedTeamsPh": "E.g. The AXIS, Hip Hop Mini…",
     "terms": "By signing up you accept the",
     "submit": "Send for approval",
     "birthDate": "Date of birth",
     "parentEmail": "Parent's e-mail",
-    "parentEmailHint": "If you are {{from}}–{{to}}, a parent must approve that you use the app. If the parent already has the app, they are notified right away – otherwise Line will contact you."
+    "parentEmailHint": "If you are {{from}}–{{to}}, a parent must approve that you use the app. If the parent already has the app, they are notified right away – otherwise the dance school will contact you."
   },
   "pending": {
     "title": "Thanks, {{name}}",
-    "body": "Line has received your sign-up and is looking at it – usually the same day. You'll get an e-mail and a message here as soon as you're in.",
-    "step1": "Line sees your sign-up",
+    "body": "The dance school has received your sign-up and is looking at it – usually the same day. You'll get an e-mail and a message here as soon as you're in.",
+    "step1": "The dance school sees your sign-up",
     "step2": "You're put on your teams with the right role",
     "step3": "You get an e-mail – and the app opens automatically",
     "refresh": "Check again",
@@ -94,7 +94,7 @@
     "myTeam": "My team",
     "childsTeam": "{{name}}'s team",
     "none": "No team yet",
-    "noneYet": "Line hasn't placed you on a team yet.",
+    "noneYet": "You are not on a team yet.",
     "viewAs": "View as",
     "pick": "Choose team",
     "closed": "Closed team",
@@ -127,7 +127,7 @@
     "toEveryone": "To everyone – from the school",
     "noTeamMessages": "No messages to the team yet.",
     "childNoDancerTeams": "{{name}} is not a dancer on any team yet – as a parent you only follow teams where {{name}} dances. ({{name}} trains {{teams}}.)",
-    "childNoTeams": "Line has not put {{name}} on a team yet.",
+    "childNoTeams": "{{name}} is not on a team yet.",
     "groupTrainer": "Trainer on",
     "groupAssistant": "Assistant on",
     "groupDancer": "Dancer on",
@@ -141,7 +141,7 @@
     "call": "Call",
     "sms": "Text",
     "officialOnHome": "{{n}} message(s) from the school await your reply",
-    "rosterNamesOnly": "Contact details are only visible to the team's trainers and Line."
+    "rosterNamesOnly": "Contact details are only visible to the team's trainers and the administrator."
   },
   "home": {
     "hi": "Hi {{name}}",
@@ -278,7 +278,7 @@
     "teamDescription": "Website description",
     "teamDescriptionPh": "Who is the team for, what do you dance, how to join?",
     "isAdmin": "Administrator",
-    "isAdminHint": "Full access to the whole school – same as Line. You cannot remove yourself.",
+    "isAdminHint": "Full access to the whole school. You cannot remove yourself.",
     "adminGiven": "{{name}} is now an administrator",
     "adminRemoved": "{{name}} is no longer an administrator",
     "importPhotos": "Import photos",
@@ -298,7 +298,7 @@
     "plan": {
       "full": "Full season",
       "half": "Half season",
-      "rates": "Instalments (agree with Line)"
+      "rates": "Instalments (agreed with the dance school)"
     },
     "admission": "Admission",
     "admissionKind": {
@@ -410,7 +410,9 @@
     "approveNeedsParent": "{{name}} is 13–14 and has no parent who has approved. Link the parent (Members) or ask the parent to approve under Settings → Children.",
     "approveTooYoung": "{{name}} is under 13 and cannot have an own login – reject and let the parent sign up.",
     "approveParentNeedsChild": "{{name}} is parent only and has no children linked – link a child first.",
-    "parentNeedsChild": "A parent needs at least one child linked – pick or create a child first."
+    "parentNeedsChild": "A parent needs at least one child linked – pick or create a child first.",
+    "teamHeroImage": "Top image on the team page",
+    "teamAboutImage": "Image under the team description"
   },
   "settings": {
     "language": "Language",
@@ -435,9 +437,9 @@
     "deleteExplain": "Your profile, your children's profiles without their own login, posts, photos and sign-ups are deleted permanently. This cannot be undone.",
     "deleteYes": "Yes, delete my account",
     "deleteLastAdmin": "You are the school's only admin – make someone else admin first.",
-    "childConfirmOffer": "{{name}} signed up in the app and needs your approval before Line can let them in.",
+    "childConfirmOffer": "{{name}} signed up in the app and needs your approval before the dance school can let them in.",
     "confirmChild": "Approve that the child may use the app",
-    "childConfirmed": "{{name}} is approved – Line can now let them in.",
+    "childConfirmed": "{{name}} is approved – the dance school can now let them in.",
     "childHasLogin": "Has an own login."
   },
   "category": {
@@ -537,7 +539,7 @@
     "nextWeek": "Next week",
     "today": "Today",
     "pending": "pending",
-    "legend": "Trainings from the season plan book the rooms automatically. Tap a free hour to book for solo/duo – Line approves.",
+    "legend": "Trainings from the season plan book the rooms automatically. Tap a free hour to book for solo/duo – bookings need approval.",
     "booking": "Booking",
     "status": {
       "pending": "Awaiting approval",
@@ -553,7 +555,7 @@
     "duration": "Duration",
     "purpose": "Purpose",
     "staffBooks": "As trainer/admin the room is booked immediately.",
-    "needsApproval": "Your booking is sent to Line for approval.",
+    "needsApproval": "Your booking is sent for approval.",
     "taken": "The room is taken in that slot.",
     "book": "Book room",
     "sendForApproval": "Send for approval",
@@ -577,7 +579,7 @@
     "public": "Public on website",
     "post": "Post",
     "posted": "Posted",
-    "rules": "Be kind and respectful – the trainers and Line read along. Report anything that isn't okay.",
+    "rules": "Be kind and respectful – the trainers and the administrator read along. Report anything that isn't okay.",
     "empty": "No posts yet. Be the first!",
     "officialChip": "Official",
     "publicChip": "Public",
@@ -586,7 +588,7 @@
     "report": "Report",
     "reportWhy": "What's wrong? (optional)",
     "sendReport": "Send report",
-    "reported": "Thanks – Line will look at it",
+    "reported": "Thanks – we will look at it",
     "hide": "Hide",
     "unhide": "Show again",
     "makeOfficial": "Make official",
@@ -615,7 +617,7 @@
     },
     "acked": {
       "read": "Marked as read",
-      "accept": "Accepted – Line can see it"
+      "accept": "Accepted – the sender can see it"
     },
     "all": "All messages ({{n}})",
     "eyebrow": "Official messages",
@@ -748,13 +750,13 @@
     "payBtn": "Pay",
     "withdraw": "Withdraw",
     "signUp": "Sign up",
-    "deadlinePassed": "Deadline passed – contact Line.",
+    "deadlinePassed": "Deadline passed – contact the dance school.",
     "signups": "{{n}} signed up",
     "paidN": "{{n}} paid",
     "paid": "Paid",
     "markPaid": "Mark paid",
     "payTitle": "Participation fee",
-    "paidClaimed": "Thanks! The sign-up shows 'Paid – awaiting Line's confirmation' until she has seen the amount.",
+    "paidClaimed": "Thanks! The sign-up shows 'Paid – awaiting confirmation' until the payment has been seen.",
     "signedUp": "Signed up!",
     "withdrawn": "Withdrawn",
     "name": "Title",
@@ -779,8 +781,8 @@
     "map": "Map",
     "free": "Free",
     "awaitingPayment": "Awaiting payment",
-    "signedUpPay": "Sign-up registered – pay with MobilePay and Line will confirm it.",
-    "claimed": "Paid – awaiting Line's confirmation",
+    "signedUpPay": "Sign-up registered – pay with MobilePay and it will be confirmed.",
+    "claimed": "Paid – awaiting confirmation",
     "claimedShort": "Says paid – confirm"
   },
   "shop": {
@@ -799,13 +801,13 @@
       "cancelled": "Cancelled",
       "awaiting_payment": "Awaiting payment"
     },
-    "hint": "Payment via MobilePay. Items are handed out at the studio once Line has seen the payment.",
+    "hint": "Payment via MobilePay. Items are handed out at the studio once the payment is registered.",
     "size": "Size",
     "qty": "Quantity",
     "addToCart": "Add to cart",
     "added": "Added to cart",
     "payTitle": "Order #{{n}}",
-    "claimed": "Thanks – Line checks MobilePay and marks the order paid.",
+    "claimed": "Thanks – the order is marked paid once the payment is seen in MobilePay.",
     "history": "History",
     "buyingAs": "You are shopping as {{name}} – switch person at the top of Home if it should be a child.",
     "cartEmpty": "Your basket is empty.",
@@ -828,8 +830,8 @@
     "valid": "valid {{days}} days",
     "buyBtn": "Buy",
     "none": "No punch cards for sale right now.",
-    "hint": "Line activates the card once payment is received – then you are on the team automatically.",
-    "claimed": "Thanks – Line activates the card once payment is received.",
+    "hint": "The card is activated once payment is received – then you are on the team automatically.",
+    "claimed": "Thanks – the card is activated once payment is received.",
     "forTeams": "Punch cards are only for:",
     "notForOthers": "Other teams pay a season fee and do not use punches.",
     "haveLeft": "You have {{n}} punches left",
@@ -837,13 +839,13 @@
     "buyNew": "Buy a new punch card",
     "pendingCard": "Your punch card awaits activation",
     "noCard": "No active punch card",
-    "noCardSub": "This team runs on punch cards – buy one in the shop and Line activates it once the payment is seen."
+    "noCardSub": "This team runs on punch cards – buy one in the shop – it is activated once the payment is seen."
   },
   "pay": {
     "title": "Season payments",
     "moreSub": "Team payments, receipts and status",
     "none": "No season payments.",
-    "claimed": "Thanks – Line confirms the payment.",
+    "claimed": "Thanks – the payment is confirmed once it has been seen.",
     "cancelled": "Cancelled",
     "discount": "Discount {{pct}} %",
     "plan": {
@@ -895,7 +897,7 @@
     "ofN": "of {{n}}",
     "seeNote": "See note",
     "requested": "Sign-up sent",
-    "ratesText": "Line gets back to you about payment.",
+    "ratesText": "The dance school gets back to you about payment.",
     "feeHint": "Instalments: {{fee}} kr. per instalment – only one fee per instalment, however many teams.",
     "markRate": "Mark instalment {{k}} paid",
     "eyebrow": "MobilePay",
@@ -971,7 +973,8 @@
     "delete": "Delete image",
     "empty": "No own images yet – upload the first one.",
     "bundledHint": "Built-in illustrations ship with the app and cannot be deleted.",
-    "uploaded": "{{n}} image(s) added to {{folder}}"
+    "uploaded": "{{n}} image(s) added to {{folder}}",
+    "teamPhoto": "Team photo"
   },
   "tour": {
     "eyebrow": "Welcome",
@@ -1005,7 +1008,7 @@
       "bell": {
         "label": "Notifications",
         "title": "Know when something happens",
-        "body": "Cancellations, substitutes, messages from Line, new emblems and sign-ups land here."
+        "body": "Cancellations, substitutes, messages from the school, new emblems and sign-ups land here."
       },
       "profile": {
         "label": "Profile",
@@ -1025,7 +1028,7 @@
       "social": {
         "label": "Social",
         "title": "The wall",
-        "body": "Posts from the team and the whole school plus official messages from Line – in one place."
+        "body": "Posts from the team and the whole school plus official messages from the school – in one place."
       },
       "events": {
         "label": "Events",
@@ -1108,8 +1111,8 @@
       "gallery": "Team pictures (carousel)"
     },
     "gallery": "Photo carousel on the website",
-    "gallerySub": "Pick images for the carousel on the website front page – in the order you tap ({{n}} selected). Empty = Line's team photos are shown automatically.",
-    "galleryLine": "Line's photos",
+    "gallerySub": "Pick images for the carousel on the website front page – in the order you tap ({{n}} selected). Empty = the teams' own photos are shown automatically.",
+    "galleryLine": "Team photos",
     "galleryOwn": "Own uploads",
     "galleryCatalog": "Catalogue",
     "galleryClear": "Clear",
@@ -1185,7 +1188,7 @@
   "gallery": {
     "title": "Pictures for the carousel",
     "sub": "{{n}} chosen – in the order you tap. Shown on Home for everyone on the team.",
-    "line": "Line's photos",
+    "line": "Team photos",
     "folders": "Team folders",
     "catalog": "Catalog",
     "clear": "Clear",

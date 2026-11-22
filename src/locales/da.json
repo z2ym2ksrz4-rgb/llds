@@ -55,11 +55,11 @@
     "verify": "Log ind",
     "resend": "Send koden igen",
     "otherEmail": "Brug en anden e-mail",
-    "demoHint": "Demo: enhver 6-cifret kode virker. admin@demo = Line, parent@demo = forælder, maja@demo = træner, ny adresse = opret profil."
+    "demoHint": "Demo: enhver 6-cifret kode virker. admin@demo = admin, parent@demo = forælder, maja@demo = træner, ny adresse = opret profil."
   },
   "register": {
     "title": "Opret profil",
-    "intro": "Fortæl os, hvem du er. Line godkender din profil og sætter dig på de rigtige hold.",
+    "intro": "Fortæl os, hvem du er. Danseskolen godkender din profil og sætter dig på de rigtige hold.",
     "iAm": "Jeg er",
     "rolesHint": "Du kan vælge flere – fx forælder og træner.",
     "firstName": "Fornavn",
@@ -72,18 +72,18 @@
     "childName": "Barnets fornavn",
     "addChild": "Tilføj barn",
     "childHint": "Under 13: ingen login – du ser og svarer på barnets vegne. 13–14: barnet kan få et login, du godkender og styrer. 15+: barnet kan have appen selv.",
-    "wishedTeams": "Hold (hjælp til Line)",
+    "wishedTeams": "Hold (hjælper os med at placere dig)",
     "wishedTeamsPh": "Fx The AXIS, Hip Hop Mini…",
     "terms": "Ved at oprette dig accepterer du",
     "submit": "Send til godkendelse",
     "birthDate": "Fødselsdato",
     "parentEmail": "Forælders e-mail",
-    "parentEmailHint": "Er du {{from}}–{{to}} år, skal en forælder godkende, at du bruger appen. Har forælderen allerede appen, får hun besked med det samme – ellers kontakter Line jer."
+    "parentEmailHint": "Er du {{from}}–{{to}} år, skal en forælder godkende, at du bruger appen. Har forælderen allerede appen, får hun besked med det samme – ellers kontakter danseskolen jer."
   },
   "pending": {
     "title": "Tak, {{name}}",
-    "body": "Line har fået din tilmelding og kigger på den – typisk samme dag. Du får en mail og en besked her, så snart du er inde.",
-    "step1": "Line ser din tilmelding",
+    "body": "Danseskolen har fået din tilmelding og kigger på den – typisk samme dag. Du får en mail og en besked her, så snart du er inde.",
+    "step1": "Danseskolen ser din tilmelding",
     "step2": "Du sættes på dine hold med den rigtige rolle",
     "step3": "Du får en mail – og appen åbner automatisk",
     "refresh": "Tjek igen",
@@ -94,7 +94,7 @@
     "myTeam": "Mit hold",
     "childsTeam": "{{name}}s hold",
     "none": "Intet hold endnu",
-    "noneYet": "Line har ikke sat dig på et hold endnu.",
+    "noneYet": "Du er ikke sat på et hold endnu.",
     "viewAs": "Vis som",
     "pick": "Vælg hold",
     "closed": "Lukket hold",
@@ -127,7 +127,7 @@
     "toEveryone": "Til alle – fra skolen",
     "noTeamMessages": "Ingen beskeder til holdet endnu.",
     "childNoDancerTeams": "{{name}} er ikke danser på noget hold endnu – som forælder følger du kun hold, hvor {{name}} danser. ({{name}} er træner på {{teams}}.)",
-    "childNoTeams": "Line har ikke sat {{name}} på et hold endnu.",
+    "childNoTeams": "{{name}} er ikke sat på et hold endnu.",
     "groupTrainer": "Træner på",
     "groupAssistant": "Hjælpetræner på",
     "groupDancer": "Danser på",
@@ -141,7 +141,7 @@
     "call": "Ring til",
     "sms": "Sms til",
     "officialOnHome": "{{n}} besked(er) fra skolen venter på dit svar",
-    "rosterNamesOnly": "Kontaktoplysninger ses kun af holdets trænere og Line."
+    "rosterNamesOnly": "Kontaktoplysninger ses kun af holdets trænere og administratoren."
   },
   "home": {
     "hi": "Hej {{name}}",
@@ -278,7 +278,7 @@
     "teamDescription": "Beskrivelse til website",
     "teamDescriptionPh": "Hvem er holdet for, hvad danser I, og hvordan kommer man med?",
     "isAdmin": "Administrator",
-    "isAdminHint": "Fuld adgang til hele skolen – samme som Line. Du kan ikke fjerne dig selv.",
+    "isAdminHint": "Fuld adgang til hele skolen. Du kan ikke fjerne dig selv.",
     "adminGiven": "{{name}} er nu administrator",
     "adminRemoved": "{{name}} er ikke længere administrator",
     "importPhotos": "Importér billeder",
@@ -298,7 +298,7 @@
     "plan": {
       "full": "Hel sæson",
       "half": "Halv sæson",
-      "rates": "Rater (aftal med Line)"
+      "rates": "Rater (aftales med danseskolen)"
     },
     "admission": "Optagelse",
     "admissionKind": {
@@ -410,7 +410,9 @@
     "approveNeedsParent": "{{name}} er 13–14 år og mangler en forælder, der har godkendt. Kobl forælderen på (Medlemmer) eller bed forælderen godkende under Indstillinger → Børn.",
     "approveTooYoung": "{{name}} er under 13 og kan ikke have eget login – afvis og lad forælderen oprette sig.",
     "approveParentNeedsChild": "{{name}} er kun forælder og har ingen børn koblet på – kobl et barn på først.",
-    "parentNeedsChild": "En forælder skal have mindst ét barn koblet på – vælg eller opret et barn først."
+    "parentNeedsChild": "En forælder skal have mindst ét barn koblet på – vælg eller opret et barn først.",
+    "teamHeroImage": "Topbillede på holdsiden",
+    "teamAboutImage": "Billede under holdbeskrivelsen"
   },
   "settings": {
     "language": "Sprog",
@@ -435,9 +437,9 @@
     "deleteExplain": "Din profil, dine børns profiler uden eget login, opslag, billeder og tilmeldinger slettes permanent. Det kan ikke fortrydes.",
     "deleteYes": "Ja, slet min konto",
     "deleteLastAdmin": "Du er skolens eneste admin – gør en anden til admin først.",
-    "childConfirmOffer": "{{name}} har oprettet sig selv i appen og skal godkendes af dig, før Line kan lukke ind.",
+    "childConfirmOffer": "{{name}} har oprettet sig selv i appen og skal godkendes af dig, før danseskolen kan lukke ind.",
     "confirmChild": "Godkend at barnet må bruge appen",
-    "childConfirmed": "{{name}} er godkendt – Line kan nu lukke ind.",
+    "childConfirmed": "{{name}} er godkendt – danseskolen kan nu lukke ind.",
     "childHasLogin": "Har eget login."
   },
   "category": {
@@ -537,7 +539,7 @@
     "nextWeek": "Næste uge",
     "today": "I dag",
     "pending": "afventer",
-    "legend": "Træninger fra sæsonplanen booker salene automatisk. Tryk på en ledig time for at booke til solo/duo – Line godkender.",
+    "legend": "Træninger fra sæsonplanen booker salene automatisk. Tryk på en ledig time for at booke til solo/duo – bookingen skal godkendes.",
     "booking": "Booking",
     "status": {
       "pending": "Afventer godkendelse",
@@ -553,7 +555,7 @@
     "duration": "Varighed",
     "purpose": "Formål",
     "staffBooks": "Som træner/admin bookes salen med det samme.",
-    "needsApproval": "Din booking sendes til godkendelse hos Line.",
+    "needsApproval": "Din booking sendes til godkendelse.",
     "taken": "Salen er optaget i det tidsrum.",
     "book": "Book sal",
     "sendForApproval": "Send til godkendelse",
@@ -577,7 +579,7 @@
     "public": "Offentlig på website",
     "post": "Slå op",
     "posted": "Opslået",
-    "rules": "Vær sød og respektfuld – trænerne og Line læser med. Anmeld, hvis noget ikke er okay.",
+    "rules": "Vær sød og respektfuld – trænerne og administratoren læser med. Anmeld, hvis noget ikke er okay.",
     "empty": "Ingen opslag endnu. Vær den første!",
     "officialChip": "Officiel",
     "publicChip": "Offentlig",
@@ -586,7 +588,7 @@
     "report": "Anmeld",
     "reportWhy": "Hvad er galt? (valgfrit)",
     "sendReport": "Send anmeldelse",
-    "reported": "Tak – Line ser på det",
+    "reported": "Tak – vi ser på det",
     "hide": "Skjul",
     "unhide": "Vis igen",
     "makeOfficial": "Gør officiel",
@@ -615,7 +617,7 @@
     },
     "acked": {
       "read": "Markeret som læst",
-      "accept": "Accepteret – Line kan se det"
+      "accept": "Accepteret – afsenderen kan se det"
     },
     "all": "Alle beskeder ({{n}})",
     "eyebrow": "Officielle beskeder",
@@ -748,13 +750,13 @@
     "payBtn": "Betal",
     "withdraw": "Afmeld",
     "signUp": "Tilmeld",
-    "deadlinePassed": "Fristen er overskredet – kontakt Line.",
+    "deadlinePassed": "Fristen er overskredet – kontakt danseskolen.",
     "signups": "{{n}} tilmeldte",
     "paidN": "{{n}} betalt",
     "paid": "Betalt",
     "markPaid": "Markér betalt",
     "payTitle": "Egenbetaling",
-    "paidClaimed": "Tak! Tilmeldingen står som 'Betalt – afventer Lines godkendelse', til hun har set beløbet.",
+    "paidClaimed": "Tak! Tilmeldingen står som 'Betalt – afventer bekræftelse', til betalingen er set.",
     "signedUp": "Tilmeldt!",
     "withdrawn": "Afmeldt",
     "name": "Titel",
@@ -779,8 +781,8 @@
     "map": "Kort",
     "free": "Gratis",
     "awaitingPayment": "Afventer betaling",
-    "signedUpPay": "Tilmeldingen er registreret – betal med MobilePay, så bekræfter Line den.",
-    "claimed": "Betalt – afventer Lines godkendelse",
+    "signedUpPay": "Tilmeldingen er registreret – betal med MobilePay, så bliver den bekræftet.",
+    "claimed": "Betalt – afventer bekræftelse",
     "claimedShort": "Siger betalt – bekræft"
   },
   "shop": {
@@ -799,13 +801,13 @@
       "cancelled": "Annulleret",
       "awaiting_payment": "Afventer betaling"
     },
-    "hint": "Betaling via MobilePay. Varen udleveres i studiet, når Line har set betalingen.",
+    "hint": "Betaling via MobilePay. Varen udleveres i studiet, når betalingen er registreret.",
     "size": "Størrelse",
     "qty": "Antal",
     "addToCart": "Læg i kurv",
     "added": "Lagt i kurven",
     "payTitle": "Ordre #{{n}}",
-    "claimed": "Tak – Line tjekker MobilePay og markerer ordren betalt.",
+    "claimed": "Tak – ordren markeres betalt, når betalingen er set i MobilePay.",
     "history": "Historik",
     "buyingAs": "Du handler som {{name}} – skift person øverst på Hjem, hvis det skal være et barn.",
     "cartEmpty": "Kurven er tom.",
@@ -828,8 +830,8 @@
     "valid": "gælder {{days}} dage",
     "buyBtn": "Køb",
     "none": "Ingen klippekort til salg lige nu.",
-    "hint": "Kortet aktiveres af Line, når betalingen er modtaget – så er du automatisk på holdet.",
-    "claimed": "Tak – Line aktiverer kortet, når betalingen er modtaget.",
+    "hint": "Kortet aktiveres, når betalingen er modtaget – så er du automatisk på holdet.",
+    "claimed": "Tak – kortet aktiveres, når betalingen er modtaget.",
     "forTeams": "Klippekort gælder kun på:",
     "notForOthers": "Andre hold betaler sæsonpris og skal ikke bruge klip.",
     "haveLeft": "Du har {{n}} klip tilbage",
@@ -837,13 +839,13 @@
     "buyNew": "Køb nyt klippekort",
     "pendingCard": "Dit klippekort venter på aktivering",
     "noCard": "Intet aktivt klippekort",
-    "noCardSub": "Holdet kører på klippekort – køb et i shoppen, så aktiverer Line det, når betalingen er set."
+    "noCardSub": "Holdet kører på klippekort – køb et i shoppen – det aktiveres, når betalingen er set."
   },
   "pay": {
     "title": "Sæsonbetalinger",
     "moreSub": "Holdbetalinger, kvitteringer og status",
     "none": "Ingen sæsonbetalinger.",
-    "claimed": "Tak – Line bekræfter betalingen.",
+    "claimed": "Tak – betalingen bekræftes, når den er set.",
     "cancelled": "Annulleret",
     "discount": "Rabat {{pct}} %",
     "plan": {
@@ -895,7 +897,7 @@
     "ofN": "af {{n}}",
     "seeNote": "Se note",
     "requested": "Tilmelding sendt",
-    "ratesText": "Line vender tilbage om betalingen.",
+    "ratesText": "Danseskolen vender tilbage om betalingen.",
     "feeHint": "Ratebetaling: {{fee}} kr. pr. rate – kun ét gebyr pr. rate, uanset hvor mange hold.",
     "markRate": "Markér rate {{k}} betalt",
     "eyebrow": "MobilePay",
@@ -971,7 +973,8 @@
     "delete": "Slet billede",
     "empty": "Ingen egne billeder endnu – upload det første.",
     "bundledHint": "Indbyggede illustrationer følger med appen og kan ikke slettes.",
-    "uploaded": "{{n}} billede(r) lagt i {{folder}}"
+    "uploaded": "{{n}} billede(r) lagt i {{folder}}",
+    "teamPhoto": "Holdets foto"
   },
   "tour": {
     "eyebrow": "Velkommen",
@@ -1005,7 +1008,7 @@
       "bell": {
         "label": "Notifikationer",
         "title": "Besked, når noget sker",
-        "body": "Aflysninger, vikarer, beskeder fra Line, nye emblemer og tilmeldinger lander her."
+        "body": "Aflysninger, vikarer, beskeder fra skolen, nye emblemer og tilmeldinger lander her."
       },
       "profile": {
         "label": "Profil",
@@ -1025,7 +1028,7 @@
       "social": {
         "label": "Social",
         "title": "Væggen",
-        "body": "Opslag fra holdet og hele skolen samt officielle beskeder fra Line – samlet ét sted."
+        "body": "Opslag fra holdet og hele skolen samt officielle beskeder fra skolen – samlet ét sted."
       },
       "events": {
         "label": "Events",
@@ -1035,7 +1038,7 @@
       "admin": {
         "label": "Admin",
         "title": "Alt admin i appen",
-        "body": "Brugere, hold, sæsonplan, bookinger, beskeder, events, shop og billedkatalog – Line rører aldrig en konsol."
+        "body": "Brugere, hold, sæsonplan, bookinger, beskeder, events, shop og billedkatalog – alt styres herfra."
       }
     }
   },
@@ -1108,8 +1111,8 @@
       "gallery": "Holdbilleder (karrusel)"
     },
     "gallery": "Billedkarrusel på websitet",
-    "gallerySub": "Vælg billeder til karrusellen på forsiden af websitet – i den rækkefølge du trykker ({{n}} valgt). Tom = Lines holdfotos vises automatisk.",
-    "galleryLine": "Lines fotos",
+    "gallerySub": "Vælg billeder til karrusellen på forsiden af websitet – i den rækkefølge du trykker ({{n}} valgt). Tom = holdenes egne fotos vises automatisk.",
+    "galleryLine": "Holdets fotos",
     "galleryOwn": "Egne uploads",
     "galleryCatalog": "Katalog",
     "galleryClear": "Ryd valg",
@@ -1185,7 +1188,7 @@
   "gallery": {
     "title": "Billeder til karrusellen",
     "sub": "{{n}} valgt – rækkefølgen er den, du trykker i. Vises på forsiden hos alle på holdet.",
-    "line": "Lines fotos",
+    "line": "Holdets fotos",
     "folders": "Holdets mapper",
     "catalog": "Katalog",
     "clear": "Ryd",

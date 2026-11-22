@@ -59,6 +59,7 @@ export type Team = {
   admission_note?: string | null;
   photos?: string[];            // Line's own photos of the team (website URLs); a second one is shown under "Om holdet"
   gallery?: string[];           // pictures for the Home carousel, chosen by admin/trainer (catalog keys, art/ paths or URLs); empty = random pick
+  about_url?: string | null;    // admin-chosen image under "Om holdet" (null = automatic)
   alt_url?: string | null;      // the raw cover_url when a real cover_path photo overrides it – shown as a mood image on the team page
   price?: string | null;
   years?: string | null;
@@ -176,7 +177,7 @@ export type Absence = { id: string; session_id: string; person_id: string; reaso
 
 export type RosterEntry = { person_id: string; name: string; birth_year: number | null; role: Role; present: boolean | null; absence: Absence | null; via_punch: boolean };
 
-export type TeamInput = Partial<Pick<Team, "name" | "style" | "category" | "level" | "closed" | "parents_see_video" | "punch_card_open" | "color" | "description" | "cover_url" | "admission" | "admission_note" | "price_full" | "price_half" | "price_signup" | "price_note" | "installments_allowed" | "price">> & { max_dancers?: number | null; visibility?: "public" | "private"; archived?: boolean };
+export type TeamInput = Partial<Pick<Team, "name" | "style" | "category" | "level" | "closed" | "parents_see_video" | "punch_card_open" | "color" | "about_url" | "description" | "cover_url" | "admission" | "admission_note" | "price_full" | "price_half" | "price_signup" | "price_note" | "installments_allowed" | "price">> & { max_dancers?: number | null; visibility?: "public" | "private"; archived?: boolean };
 
 export type Member = Person & { memberships: Membership[]; children: Person[]; parents: Person[] };
 

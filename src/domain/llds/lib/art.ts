@@ -16,9 +16,10 @@ export function teamAccent(team: { id: string; color: string | null }): Record<s
 }
 
 /** Image for the "Om holdet" card: another of Line's own photos when the team has any; otherwise a catalogue image for the category that differs from the hero. Never AI next to real photos. */
-export function aboutImage(team: { id: string; category: string; cover_url?: string | null; alt_url?: string | null; cover_path?: string | null; photos?: string[] }, heroUrl: string | null): string | null {
+export function aboutImage(team: { id: string; category: string; cover_url?: string | null; about_url?: string | null; alt_url?: string | null; cover_path?: string | null; photos?: string[] }, heroUrl: string | null): string | null {
+  if (team.about_url) return team.about_url.startsWith("http") ? team.about_url : `${import.meta.env.BASE_URL}${team.about_url}`;
   const own = (team.photos ?? []).filter((p) => p !== heroUrl && p !== team.cover_url);
-  if (/^https?:\/\/(?!.*supabase)/.test(team.alt_url ?? "") && !own.includes(team.alt_url!)) own.push(team.alt_url!); // website photo displaced by an uploaded cover
+  if (/^https?:\/\//.test(team.alt_url ?? "") && !own.includes(team.alt_url!)) own.push(team.alt_url!); // website photo displaced by an uploaded cover
   const hasOwn = !!team.cover_path || (team.photos?.length ?? 0) > 0 || /^https?:/.test(team.cover_url ?? "");
   if (hasOwn) return own[0] ?? null;
   const pool = catalogFor("team").map((c) => `${import.meta.env.BASE_URL}art/catalog/${c.file}`).filter((u) => u !== heroUrl);
