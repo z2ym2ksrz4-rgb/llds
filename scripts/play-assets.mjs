@@ -45,6 +45,24 @@ for (const lang of ["da", "en"]) {
     mkdirSync(`${SITE}/${lang}`, { recursive: true }); copyFileSync(out, `${SITE}/${lang}/store-android-${i + 1}.png`);
   }
 }
+// iOS 6.7" (1290×2796) frames from the same raw captures → store/ios/<lang>-<n>.png
+for (const lang of ["da", "en"]) {
+  const W = 1290, H = 2796; mkdirSync("store/ios", { recursive: true });
+  for (let i = 0; i < 6; i++) {
+    const raw = `${OUT}/raw-${lang}-${["home","team","week","events","social","shop"][i]}.png`;
+    const [title, sub] = COPY[lang][i];
+    const fp = await b.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: 1 });
+    const img = (await sharp(raw).resize(W * 0.78 | 0).png().toBuffer()).toString("base64");
+    await fp.setContent(`<html><head><meta charset=utf-8><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&family=Outfit:wght@300;500&display=swap" rel=stylesheet><style>
+      html,body{margin:0;width:${W}px;height:${H}px;overflow:hidden}body{background:radial-gradient(120% 60% at 50% 0%,#2a2416 0%,#0b0b0d 55%);color:#f3eee4;font-family:Outfit,sans-serif;position:relative}
+      .copy{position:absolute;top:150px;left:0;right:0;text-align:center;padding:0 100px}.eyebrow{color:#c9a24a;letter-spacing:.3em;font-size:30px;text-transform:uppercase;font-weight:500}
+      h1{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:104px;line-height:1.02;margin:26px 0 0}p{font-size:40px;font-weight:300;color:#cfc8ba;margin:28px 0 0;line-height:1.3}
+      .dev{position:absolute;left:50%;transform:translateX(-50%);top:700px;width:${W * 0.78 | 0}px;border-radius:84px;padding:18px;background:#000;border:1px solid rgba(201,162,74,.55);box-shadow:0 70px 140px -50px rgba(201,162,74,.45)}
+      .dev img{display:block;width:100%;border-radius:68px}</style></head><body>
+      <div class=copy><div class=eyebrow>LL Dance Studio · Backstage</div><h1>${title}</h1><p>${sub}</p></div><div class=dev><img src="data:image/png;base64,${img}"></div></body></html>`);
+    await fp.waitForTimeout(1200); await fp.screenshot({ path: `store/ios/${lang}-${i + 1}.png` }); await fp.close();
+  }
+}
 // icon 512 + feature graphic 1024×500
 await sharp("resources/icon.png").resize(512, 512).png().toFile(`${SITE}/icon-512.png`);
 const logo = (await sharp("public/brand/logo-white.png").resize({ height: 220 }).png().toBuffer()).toString("base64");
