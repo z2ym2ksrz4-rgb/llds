@@ -14,7 +14,7 @@ export const TAB_KINDS: Record<Exclude<Tab, "home" | "more" | "admin">, string[]
   events: ["event"],
   shop: ["order", "punch", "payment"],
 };
-export type AdminCounts = { pending: number; bookings: number; subs: number; reports: number; orders: number; cards: number; payments: number };
+export type AdminCounts = { pending: number; bookings: number; subs: number; reports: number; orders: number; cards: number; payments: number; auditions: number };
 type Badges = {
   tabs: Partial<Record<Tab, number>>;
   admin: AdminCounts;
@@ -23,8 +23,8 @@ type Badges = {
   refresh: () => Promise<void>;
   seen: (tab: Tab) => Promise<void>;
 };
-const EMPTY: AdminCounts = { pending: 0, bookings: 0, subs: 0, reports: 0, orders: 0, cards: 0, payments: 0 };
-const sum = (c: AdminCounts) => c.pending + c.bookings + c.subs + c.reports + c.orders + c.cards + c.payments;
+const EMPTY: AdminCounts = { pending: 0, bookings: 0, subs: 0, reports: 0, orders: 0, cards: 0, payments: 0, auditions: 0 };
+const sum = (c: AdminCounts) => c.pending + c.bookings + c.subs + c.reports + c.orders + c.cards + c.payments + c.auditions;
 
 export const useBadges = create<Badges>((set, get) => ({
   tabs: {}, admin: EMPTY, adminTotal: 0, unread: [],
@@ -40,9 +40,9 @@ export const useBadges = create<Badges>((set, get) => ({
     let admin = EMPTY;
     if (isAdmin) {
       const from = new Date(); from.setHours(0, 0, 0, 0); const to = new Date(from); to.setDate(to.getDate() + 60); const to14 = new Date(from); to14.setDate(to14.getDate() + 14);
-      const [p, b, s, r, o, c, w] = await Promise.all([
+      const [p, b, s, r, o, c, w, a] = await Promise.all([
         api.listPending().catch(() => []), api.listBookings(from.toISOString(), to.toISOString()).catch(() => []), api.listSessions(from.toISOString(), to14.toISOString()).catch(() => []),
-        api.listReports().catch(() => []), api.listOrders(true).catch(() => []), api.listPunchCards(true).catch(() => []), api.listWebSignups().catch(() => []),
+        api.listReports().catch(() => []), api.listOrders(true).catch(() => []), api.listPunchCards(true).catch(() => []), api.listWebSignups().catch(() => []), api.listAuditionCandidates().catch(() => []),
       ]);
       admin = {
         pending: p.length,
@@ -52,6 +52,7 @@ export const useBadges = create<Badges>((set, get) => ({
         orders: o.filter((x) => x.status === "awaiting_payment" || x.status === "paid").length,
         cards: c.filter((x) => x.status === "awaiting_payment").length,
         payments: w.filter((x) => x.status === "awaiting_payment" && x.claimed_paid_at).length,   // someone says "I have paid" – Line checks and confirms
+        auditions: a.filter((x) => x.status === "applied").length,   // applied, no brief sent yet – the trainer/admin must send requirements
       };
     }
     const adminTotal = sum(admin); if (adminTotal) tabs.admin = adminTotal;

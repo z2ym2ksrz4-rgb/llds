@@ -1299,7 +1299,9 @@
     "cards_one": "{{count}} klippekort venter på aktivering",
     "cards_other": "{{count}} klippekort venter på aktivering",
     "payments_one": "{{count}} betaling meldt – bekræft i MobilePay",
-    "payments_other": "{{count}} betalinger meldt – bekræft i MobilePay"
+    "payments_other": "{{count}} betalinger meldt – bekræft i MobilePay",
+    "auditions_one": "{{count}} ny audition-tilmelding – send krav og dato",
+    "auditions_other": "{{count}} nye audition-tilmeldinger – send krav og dato"
   },
   "insights": {
     "title": "App insights",

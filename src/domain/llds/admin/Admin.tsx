@@ -56,7 +56,7 @@ export function Admin() {
     ["catalog", t("catalog.adminTitle"), t("catalog.adminSub"), 0],
     ["payments", t("pay.adminTitle"), counts.payments ? t("todo.payments", { count: counts.payments }) : t("pay.adminSub"), counts.payments],
     ["customize", t("customize.title"), t("customize.sub"), 0],
-    ["auditions", t("audition.adminTitle"), t("audition.adminSub"), 0],
+    ["auditions", t("audition.adminTitle"), counts.auditions ? t("todo.auditions", { count: counts.auditions }) : t("audition.adminSub"), counts.auditions],
     ["insights", t("insights.title"), t("insights.sub"), 0],
     ["import", t("admin.importPhotos"), t("admin.importSub"), 0],
   ];

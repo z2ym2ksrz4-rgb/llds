@@ -1299,7 +1299,9 @@
     "cards_one": "{{count}} punch card awaits activation",
     "cards_other": "{{count}} punch cards await activation",
     "payments_one": "{{count}} payment claimed – confirm in MobilePay",
-    "payments_other": "{{count}} payments claimed – confirm in MobilePay"
+    "payments_other": "{{count}} payments claimed – confirm in MobilePay",
+    "auditions_one": "{{count}} new audition application – send requirements and date",
+    "auditions_other": "{{count}} new audition applications – send requirements and date"
   },
   "insights": {
     "title": "App insights",
