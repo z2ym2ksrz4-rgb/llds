@@ -1428,6 +1428,9 @@
     "acceptIntro": "Vælg betaling for {{name}} – pladsen er sikret, når betalingen er registreret.",
     "acceptConfirm": "Acceptér og gå til betaling",
     "acceptedToast": "Pladsen er accepteret",
-    "declinedToast": "Du har takket nej – pladsen går videre"
+    "declinedToast": "Du har takket nej – pladsen går videre",
+    "dateLabel": "Audition",
+    "dateTba": "Dato og tid for audition meldes ud af træneren – du får besked.",
+    "canCome": "{{name}} kan møde op til audition på dette tidspunkt"
   }
 }

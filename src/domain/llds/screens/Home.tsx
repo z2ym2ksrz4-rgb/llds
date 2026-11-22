@@ -171,7 +171,7 @@ export function Home() {
     </>),
     teampick: () => (<>
       {(!isAdmin || teamIds.size > 0) && <TeamPicker ownOnly />}
-      {!me.person.supervised_by && <button type="button" className="linklike small" style={{ alignSelf: "flex-start", marginTop: -4 }} data-testid="home-join" onClick={() => setJoin(true)}>+ {t("pay.join")}</button>}
+      {!me.person.supervised_by && <button type="button" className="linklike small home-join" data-testid="home-join" onClick={() => setJoin(true)}>+ {t("pay.join")}</button>}
       {/* week strip: the dots follow the team chosen above – its trainings and events */}
       {(!isAdmin || teamIds.size > 0) && <div className="weekstrip" aria-hidden="true" data-testid="weekstrip">
         {strip.map((d) => { const key = d.toDateString(); const n = sessions.filter((x) => x.team_id === teamId && !x.cancelled && new Date(x.starts_at).toDateString() === key).length + events.filter((e) => new Date(e.starts_at).toDateString() === key && (!e.team_ids.length || (teamId ? e.team_ids.includes(teamId) : false))).length; return <span key={key} className={"d" + (key === today ? " today" : "") + (n ? " has" : "")}><small>{DAY_SHORT[(d.getDay() + 6) % 7]}</small><b>{d.getDate()}</b><i /></span>; })}

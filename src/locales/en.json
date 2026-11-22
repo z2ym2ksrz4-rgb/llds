@@ -1428,6 +1428,9 @@
     "acceptIntro": "Choose payment for {{name}} – the spot is secured once payment is registered.",
     "acceptConfirm": "Accept and go to payment",
     "acceptedToast": "Spot accepted",
-    "declinedToast": "You declined – the spot moves on"
+    "declinedToast": "You declined – the spot moves on",
+    "dateLabel": "Audition",
+    "dateTba": "Date and time for the audition are announced by the trainer – you will be notified.",
+    "canCome": "{{name}} can attend the audition at this time"
   }
 }

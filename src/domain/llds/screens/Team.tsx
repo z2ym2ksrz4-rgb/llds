@@ -137,7 +137,7 @@ export function TeamScreen() {
         <button className={"card tap" + (seesChoreo ? "" : " dim")} disabled={!seesChoreo} onClick={() => setPage("choreo")} data-testid="go-choreo"><div className="eyebrow">{t("team.choreo")}</div><div className="big">{seesChoreo ? t("team.videosN", { n: stats.videos }) : t("team.choreoLocked")}</div></button>
         <button className="card tap" onClick={() => setPage("folders")} data-testid="go-folders"><div className="eyebrow">{t("team.folders")}</div><div className="big">{t("team.mediaN", { n: stats.media })}</div></button>
         <button className={"card tap" + (seesChoreo ? "" : " dim")} disabled={!seesChoreo} onClick={() => setPage("formations")} data-testid="go-formations"><div className="eyebrow">{t("choreo.formations")}</div><div className="big">{seesChoreo ? t("team.formationsN", { n: stats.formations }) : t("team.choreoLocked")}</div></button>
-        {staff && team.admission === "audition" && <button className="card tap" onClick={() => setPage("audition")} data-testid="go-audition"><div className="eyebrow">{t("audition.title")}</div><div className="big">🎯</div></button>}
+        {staff && (team.admission === "audition" || team.closed) && <button className="card tap" onClick={() => setPage("audition")} data-testid="go-audition"><div className="eyebrow">{t("audition.title")}</div><div className="big">🎯</div></button>}
         <button className="card tap" onClick={() => setPage("dancers")} data-testid="go-dancers"><div className="eyebrow">{t("team.dancers")}</div><div className="big">{stats.dancers}{staff ? "" : ""}</div></button>
       </div>
       

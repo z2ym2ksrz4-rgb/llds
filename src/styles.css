@@ -625,7 +625,7 @@ div.checklist{padding-left:0;color:inherit}
   .screen.home > .homehero, .screen.home > .teampick, .screen.home > .weekstrip, .screen.home > .toast, .screen.home > .sheet-bg { grid-column:1 / -1; }
   .screen.home > .homehero { min-height:380px; }
   .screen.home > .sec, .screen.home > .card { margin-top:0; }
-  .screen.home > .studiohead { grid-column:1 / -1; }
+  .screen.home > .studiohead, .screen.home > .home-join { grid-column:1 / -1; }
   .sheet-bg { padding-left:232px; }
   .toast { left:calc(232px + 16px); }
   .shop-grid { grid-template-columns:repeat(4,1fr); }
@@ -652,3 +652,5 @@ div.checklist{padding-left:0;color:inherit}
 .pickrow { display:flex; align-items:center; gap:12px; margin-top:4px; }
 .pickcur { flex:none; width:72px; height:72px; border-radius:12px; background:var(--bg2) center/cover no-repeat; border:1px solid var(--line2); display:flex; align-items:center; justify-content:center; }
 .pickcur.none .auto { color:var(--gold2); font-size:1.3rem; }
+
+.home-join { align-self:flex-start; padding:0; margin:-6px 0 2px; text-align:left; }

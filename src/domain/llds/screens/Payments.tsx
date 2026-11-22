@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { api, type Team, type WebSignup } from "@/core/api";
+import { api, type Event, type Team, type WebSignup } from "@/core/api";
 import { useAuth } from "@/core/auth";
 import { Sheet, Toast } from "../components/Sheet";
 import { PaySheet } from "../components/Pay";
-import { ageOf, ago, loc } from "../lib/time";
+import { ageOf, ago, dateLabel, hm, loc } from "../lib/time";
 
 /** Season price text → [full, half] in kr. ("2.400 kr. for hel sæson, eller 1.750 kr. for halv sæson") */
 export const priceAmounts = (p: string | null | undefined): number[] => (p ?? "").match(/([0-9][0-9.]*) kr/g)?.map((x) => parseInt(x.replace(/\D/g, ""), 10)) ?? [];
@@ -76,9 +76,12 @@ export function JoinTeam({ onClose, toast, initialTeam }: { onClose: () => void;
   const [q, setQ] = useState<{ before: number | null; discount_pct: number; amount: number | null; installments: number; fee: number; per_rate: number | null; note: string | null } | null>(null);
   const [busy, setBusy] = useState(false);
   const [applied, setApplied] = useState(false);
+  const [canCome, setCanCome] = useState(false);
+  const [events, setEvents] = useState<Event[]>([]);
   const [done, setDone] = useState<{ id: string; reference: string; amount_dkk: number | null; discount_pct: number; team: string; installments?: number; per_rate_dkk?: number | null; note?: string | null } | null>(null);
   useEffect(() => { void api.listTeams().then((ts) => { const vis = ts.filter((x) => x.visibility !== "private"); setTeams(vis); if (initialTeam) setTeam(vis.find((x) => x.id === initialTeam) ?? null); }); void api.signupsOpen().then(setOpenAll).catch(() => setOpenAll(true)); }, [initialTeam]);
-  useEffect(() => { setApplied(false); }, [team?.id, who]);
+  useEffect(() => { setApplied(false); setCanCome(false); }, [team?.id, who]);
+  useEffect(() => { void api.listEvents().then(setEvents).catch(() => setEvents([])); }, []);
   useEffect(() => { if (!team) { setQ(null); return; } let on = true; api.myQuote(team.id, plan).then((r) => { if (on) setQ(r); }).catch(() => setQ(null)); return () => { on = false; }; }, [team, plan]);
   const memberOf = new Set(me.memberships.filter((m) => m.person_id === who).map((m) => m.team_id));
   const state = (x: Team) => (!openAll || x.signup_open === false ? "closed" : x.admission === "audition" ? "audition" : "open");   // the window also closes auditions
@@ -87,12 +90,13 @@ export function JoinTeam({ onClose, toast, initialTeam }: { onClose: () => void;
   if (done) return <PaySheet amount={(done.installments ?? 1) > 1 ? done.per_rate_dkk ?? done.amount_dkk ?? 0 : done.amount_dkk ?? 0} reference={(done.installments ?? 1) > 1 ? `${done.reference} rate 1/${done.installments}` : done.reference} title={`${done.team}${(done.installments ?? 1) > 1 ? ` · ${t("pay.firstRate")} 1/${done.installments}` : ""}`} onClose={onClose} onPaid={async () => { await api.claimPaymentPaid(done.id); toast(t("pay.claimed")); onClose(); }} />;
   if (childLogin) return <Sheet onClose={onClose} eyebrow={t("pay.joinEyebrow")} title={t("pay.join")}><p className="small">{t("pay.childCannot")}</p><button className="cta" onClick={onClose}>{t("common.ok")}</button></Sheet>;
   const st = team ? state(team) : "open";
+  const audAt = team?.audition_event_id ? events.find((e) => e.id === team.audition_event_id) ?? null : null;
   return (
     <Sheet onClose={onClose} eyebrow={t("pay.joinEyebrow")} title={team ? team.name : t("pay.join")}>
       {!openAll && <p className="small" style={{ margin: 0, color: "var(--gold2)" }}>{t("pay.allClosed")}</p>}
       {people.length > 1 && <div className="field"><span>{t("pay.who")}</span><div className="chips">{people.map((p) => <button key={p.id} className={"chip" + (who === p.id ? " on" : "")} onClick={() => { setWho(p.id); }}>{p.first_name}</button>)}</div></div>}
       {!team && <div className="field"><span>{t("pay.team")}</span>
-        <div className="teamgrid" data-testid="join-teams">{teams.filter((x) => !memberOf.has(x.id)).map((x) => { const sx = state(x); return <button key={x.id} className={"item" + (sx !== "open" ? " off" : "")} onClick={() => setTeam(x)} data-testid="join-team"><span className="grow">{x.name}<div className="tiny">{x.style} · {x.level}{x.day_time ? ` · ${x.day_time}` : ""}{sx === "closed" ? ` · ${t("pay.closedChip")}` : sx === "audition" ? ` · ${t("admin.admissionKind.audition")}` : ""}</div></span><span className="gold">›</span></button>; })}</div>
+        <div className="teamgrid" data-testid="join-teams">{teams.filter((x) => !memberOf.has(x.id)).map((x) => { const sx = state(x); return <button key={x.id} className={"item" + (sx === "closed" ? " off" : "")} onClick={() => setTeam(x)} data-testid="join-team"><span className="grow">{x.name}{sx === "audition" && <span className="chip small gold" style={{ marginLeft: 6 }}>{t("admin.admissionKind.audition")}</span>}<div className="tiny">{x.style} · {x.level}{x.day_time ? ` · ${x.day_time}` : ""}{sx === "closed" ? ` · ${t("pay.closedChip")}` : ""}</div></span><span className="gold">›</span></button>; })}</div>
       </div>}
       {team && (<>
         <button className="linklike small" style={{ alignSelf: "flex-start" }} onClick={() => setTeam(null)}>‹ {t("pay.otherTeam")}</button>
@@ -100,7 +104,9 @@ export function JoinTeam({ onClose, toast, initialTeam }: { onClose: () => void;
         <div className="tiny">{[team.day_time, team.years, team.level].filter(Boolean).join(" · ")}</div>
         {st === "closed" && <div className="card" data-testid="join-closed"><strong>{t("pay.closedTitle")}</strong><p className="small muted" style={{ margin: "4px 0 0" }}>{t("pay.closedBody")}</p></div>}
         {st === "audition" && <div className="card" data-testid="join-audition"><strong>{t("pay.auditionTitle")}</strong><p className="small muted" style={{ margin: "4px 0 0" }}>{team.admission_note || t("pay.auditionBody")}</p>
-          {applied ? <p className="small ok" style={{ margin: "8px 0 0" }}>{t("audition.appliedThanks")}</p> : <button className="cta" style={{ marginTop: 10 }} disabled={busy || !who} data-testid="audition-apply" onClick={async () => { setBusy(true); try { await api.applyAudition(team.id, who); setApplied(true); dispatchEvent(new Event("llds:audition")); toast(t("audition.appliedToast")); } catch (e) { const m = (e as Error).message; toast(m.includes("closed") ? t("pay.closedToast") : m.includes("already") ? t("pay.already") : m); } finally { setBusy(false); } }}>{t("audition.apply")}</button>}</div>}
+          <div className="small" style={{ margin: "10px 0 0" }}>📅 {audAt ? `${t("audition.dateLabel")}: ${dateLabel(audAt.starts_at)} ${hm(audAt.starts_at)}${audAt.place ? ` · ${audAt.place}` : ""}` : t("audition.dateTba")}</div>
+          {!applied && audAt && <label className="checkrow" style={{ marginTop: 8 }}><input type="checkbox" checked={canCome} data-testid="audition-cancome" onChange={(e) => setCanCome(e.target.checked)} /><span>{t("audition.canCome", { name: people.find((p) => p.id === who)?.first_name })}</span></label>}
+          {applied ? <p className="small ok" style={{ margin: "8px 0 0" }}>{t("audition.appliedThanks")}</p> : <button className="cta" style={{ marginTop: 10 }} disabled={busy || !who || (!!audAt && !canCome)} data-testid="audition-apply" onClick={async () => { setBusy(true); try { await api.applyAudition(team.id, who); setApplied(true); dispatchEvent(new Event("llds:audition")); toast(t("audition.appliedToast")); } catch (e) { const m = (e as Error).message; toast(m.includes("closed") ? t("pay.closedToast") : m.includes("already") ? t("pay.already") : m); } finally { setBusy(false); } }}>{t("audition.apply")}</button>}</div>}
         {st === "open" && (<>
           <div className="field"><span>{t("pay.planLabel")}</span>
             {team.price_full ? <PlanChips team={team} plan={plan} setPlan={setPlan} /> : <p className="small muted">{team.price_note}</p>}
