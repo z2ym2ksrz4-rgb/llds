@@ -70,6 +70,19 @@ label.check input { width:20px; height:20px; accent-color:var(--gold); }
 .teampick .caret { color:var(--gold); font-size:1rem; }
 .assign { border-top:1px solid var(--line); padding-top:10px; }
 .teamgrid { display:flex; flex-direction:column; gap:4px; margin-top:6px; max-height:280px; overflow:auto; }
+.teamgrid.join { gap:0; max-height:300px; border-bottom:1px solid var(--line); }
+/* JoinTeam: editorial rows – no gold blocks, a hairline per team, gold only on the name, badge and chevron */
+.teamgrid > .item { display:flex; align-items:center; gap:12px; width:100%; padding:14px 6px 14px 14px; background:none; border:0; border-bottom:1px solid var(--line); border-radius:0; color:var(--fg); text-align:left; position:relative; font-weight:300; }
+.teamgrid > .item:last-child { border-bottom:0; }
+.teamgrid > .item::before { content:""; position:absolute; left:0; top:14px; bottom:14px; width:2px; border-radius:2px; background:linear-gradient(180deg, var(--gold2), transparent); opacity:.55; }
+.teamgrid > .item .grow { min-width:0; }
+.teamgrid > .item .name { font-family:var(--display); font-size:1.2rem; font-weight:500; letter-spacing:.005em; color:var(--fg); display:inline-flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.teamgrid > .item .tiny { color:var(--muted); margin-top:2px; font-size:.82rem; line-height:1.35; }
+.teamgrid > .item .caret { color:var(--gold2); font-size:1.3rem; line-height:1; padding:0 8px; transition:transform .15s; }
+.teamgrid > .item:active .caret { transform:translateX(3px); }
+.teamgrid > .item .badge-audition { display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:999px; background:linear-gradient(135deg,var(--gold2),var(--gold)); color:var(--brand-ink); font-family:var(--body); font-size:.68rem; font-weight:600; letter-spacing:.12em; text-transform:uppercase; line-height:1.4; }
+.teamgrid > .item .badge-audition::before { content:"★"; font-size:.7em; }
+.teamgrid > .item.off { opacity:.45; text-decoration:none; } .teamgrid > .item.off .name { text-decoration:line-through; text-decoration-color:rgba(255,255,255,.4); }
 .teamrow { display:flex; align-items:center; gap:8px; padding:6px 8px; border-radius:8px; font-size:.9rem; }
 .teamrow.on { background:var(--gold-soft); }
 
