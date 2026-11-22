@@ -412,5 +412,9 @@
  "Det gemmes i en periode:": "What is kept for a period:",
  "Mere → Indstillinger → Konto → Slet min konto → bekræft. Kontoen, din profil, dine børns profiler uden eget login og dit login slettes med det samme.": "More → Settings → Account → Delete my account → confirm. The account, your profile, your children's profiles without their own login and your login are deleted immediately.",
  "navn, e-mail, telefon, fødselsdato, profilbillede, notifikationsvalg, opslag og kommentarer, billeder i holdets mapper, beskeder og tilmeldinger.": "name, e-mail, phone, date of birth, profile photo, notification choices, posts and comments, photos in the team's folders, messages and sign-ups.",
- "betalingsoplysninger om køb (beløb, reference, dato) i 5 år efter bogføringsloven – uden kobling til din profil, når den er slettet.": "payment records of purchases (amount, reference, date) for 5 years under the Danish Bookkeeping Act – no longer linked to your profile once it is deleted."
+ "betalingsoplysninger om køb (beløb, reference, dato) i 5 år efter bogføringsloven – uden kobling til din profil, når den er slettet.": "payment records of purchases (amount, reference, date) for 5 years under the Danish Bookkeeping Act – no longer linked to your profile once it is deleted.",
+ "Testudgave: installér først TestFlight fra App Store, scan så koden (eller tryk på knappen på telefonen) og vælg Install.": "Test version: first install TestFlight from the App Store, then scan the code (or tap the button on your phone) and choose Install.",
+ "Testudgave: scan koden, tryk Bliv tester og derefter Download i Google Play. Log ind med den Google-konto, du bruger på telefonen.": "Test version: scan the code, tap Become a tester and then Download on Google Play. Sign in with the Google account you use on the phone.",
+ "Hent via TestFlight": "Get via TestFlight",
+ "Hent via Google Play (test)": "Get via Google Play (test)"
 }

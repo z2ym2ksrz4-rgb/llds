@@ -329,6 +329,8 @@
  ],
  "store": {
   "app_store": "",
-  "play": ""
+  "play": "",
+  "testflight": "https://testflight.apple.com/join/ydUVGeNt",
+  "play_test": "https://play.google.com/apps/internaltest/4701228642208505878"
  }
 }
