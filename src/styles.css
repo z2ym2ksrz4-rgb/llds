@@ -384,13 +384,14 @@ button.cta { box-shadow:0 10px 26px -12px rgba(201,162,74,.7); }
 .screen.home { padding-top:0; }
 .homehero { position:relative; z-index:5; margin:calc(-12px - env(safe-area-inset-top)) -16px 0; min-height:62dvh; display:flex; flex-direction:column; justify-content:space-between; }
 .homehero-media { position:absolute; inset:0; overflow:hidden; z-index:0; }
-.homehero .bg { position:absolute; inset:-6% 0 0; background:center 30%/cover no-repeat; transform:translateY(var(--py, 0)); will-change:transform; z-index:0; filter:sepia(.12) saturate(.95) contrast(1.04); }
+.homehero .bg { position:absolute; inset:-6% 0 0; background:center 30%/cover no-repeat; transform:translate3d(0, var(--py, 0px), 0); will-change:transform; z-index:0; backface-visibility:hidden; }
 .homehero::before { content:""; position:absolute; inset:0; z-index:1; background:linear-gradient(180deg, rgba(10,10,11,.55) 0%, rgba(10,10,11,.05) 28%, rgba(10,10,11,.25) 55%, var(--bg) 100%); }
-.homehero.tone-morning .bg { filter:sepia(.2) saturate(1.05) brightness(1.04) contrast(1.02); }
-.homehero.tone-evening .bg { filter:sepia(.1) saturate(.85) brightness(.82) contrast(1.1); }
+.homehero-media::after { content:""; position:absolute; inset:0; z-index:1; pointer-events:none; background:rgba(120,90,40,.12); mix-blend-mode:multiply; }
+.homehero.tone-morning .homehero-media::after { background:rgba(222,186,110,.14); mix-blend-mode:soft-light; }
+.homehero.tone-evening .homehero-media::after { background:rgba(20,14,8,.28); mix-blend-mode:multiply; }
 .homehero.tone-evening::before { background:linear-gradient(180deg, rgba(10,10,11,.65) 0%, rgba(10,10,11,.15) 30%, rgba(10,10,11,.4) 60%, var(--bg) 100%); }
 .homehero-top { position:relative; z-index:3; display:flex; justify-content:flex-end; padding:calc(14px + env(safe-area-inset-top)) 16px 0; }
-.homehero-text { position:relative; z-index:2; padding:0 16px 10px; opacity:var(--fade, 1); transform:translateY(calc(var(--py, 0px) * -.25)); }
+.homehero-text { position:relative; z-index:2; padding:0 16px 10px; opacity:var(--fade, 1); transform:translate3d(0, calc(var(--py, 0px) * -.25), 0); }
 .homehero-text .eyebrow { margin-bottom:6px; text-transform:capitalize; }
 .homehero-text h1.display { font-size:clamp(2.1rem, 9vw, 2.9rem); line-height:1.02; margin:0 0 14px; text-shadow:0 2px 24px rgba(0,0,0,.5); }
 .nextup { display:flex; flex-direction:column; gap:3px; align-items:flex-start; text-align:left; background:rgba(16,15,13,.55); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border:1px solid rgba(201,162,74,.35); border-radius:14px; padding:10px 14px; color:var(--fg); width:100%; font-weight:300; }
@@ -795,3 +796,8 @@ details.fold > summary h2 { flex: 1; } details.fold > summary .caret { color: va
 :root[data-tone="day"] body { background: radial-gradient(90% 40% at 50% -10%, rgba(201,162,74,.16), transparent 60%), var(--bg); }
 :root[data-tone="evening"] body { background: radial-gradient(90% 40% at 50% -10%, rgba(176,122,52,.2), transparent 60%), #09090b; }
 :root[data-tone="evening"] .scene-bg { filter: blur(34px) saturate(.7) brightness(.38); } :root[data-tone="morning"] .scene-bg { filter: blur(34px) saturate(.9) brightness(.52); }
+
+/* performance: the blurred scene lives on its own compositor layer; glass blur only where GPUs are plentiful (mouse devices ≥1100) */
+.scene-bg { will-change: transform; contain: strict; }
+@media (max-width: 1099px), (hover: none) { .card, .teampick, .tabnews, .msgcard, .daypanel, .focuspick, .teamhero-next, .evtile .stamp, .chip.glass { backdrop-filter: none; -webkit-backdrop-filter: none; } .scene-bg { filter: blur(22px) saturate(.8) brightness(.45); } }
+.homehero-text { will-change: opacity, transform; }

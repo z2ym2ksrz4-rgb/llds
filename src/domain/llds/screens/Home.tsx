@@ -113,8 +113,9 @@ export function Home() {
   const hour = new Date().getHours(); const tone = hour < 10 ? "morning" : hour < 17 ? "day" : "evening";
   const greeting = t(`home.greet.${tone}`, { name: me.person.first_name }); // always the logged-in person – the child's name goes on the sections below
   const heroRef = useRef<HTMLDivElement>(null);
-  useEffect(() => { // parallax: image moves slower than the page, text fades
-    let raf = 0; const on = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { const el = heroRef.current; if (!el) return; const y = window.scrollY; el.style.setProperty("--py", `${y * 0.35}px`); el.style.setProperty("--fade", String(Math.max(0, 1 - y / 320))); }); };
+  useEffect(() => { // parallax only with a mouse (pointer:fine) – on touch devices the per-frame style writes stutter; the hero then just scrolls with the page
+    if (!matchMedia("(hover: hover) and (pointer: fine)").matches || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let raf = 0; const on = () => { if (raf) return; raf = requestAnimationFrame(() => { raf = 0; const el = heroRef.current; if (!el) return; const y = Math.min(window.scrollY, 600); el.style.setProperty("--py", `${Math.round(y * 0.35)}px`); el.style.setProperty("--fade", String(Math.max(0, 1 - y / 320))); }); };
     addEventListener("scroll", on, { passive: true }); return () => { removeEventListener("scroll", on); cancelAnimationFrame(raf); };
   }, []);
   const strip = Array.from({ length: 7 }, (_, i) => addDays(startOfDay(new Date()), i));
