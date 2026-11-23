@@ -4,6 +4,7 @@ import { api, type MediaItem, type Team } from "@/core/api";
 import { useAuth } from "@/core/auth";
 import { useNav } from "@/core/nav";
 import { catalogFor, catalogUrl, resolveImage } from "../lib/catalog";
+import { focusStyle } from "../lib/art";
 import { Sheet } from "./Sheet";
 
 /** Pictures for a team's carousel: what admin/trainer chose, else a stable random pick (Line's photos → cover → catalog). */
@@ -43,7 +44,7 @@ export function TeamCarousel() {
   return (
     <div className="sec" data-testid="team-carousel"><h2>{t("home.glimpses")}</h2>
       <div className="tcar" ref={ref} onScroll={onScroll}>
-        {slides.map((s, i) => <button key={s.team.id + i} type="button" className="tcar-slide" style={{ backgroundImage: `url(${s.url})` }} onClick={() => { if (s.child) setViewing({ personId: s.child.id, isChild: true }); else if (viewing?.isChild) setViewing({ personId: me!.person.id, isChild: false }); setTeam(s.team.id); setTab("team"); }}>
+        {slides.map((s, i) => <button key={s.team.id + i} type="button" className="tcar-slide" style={focusStyle(s.url === resolveImage(s.team.cover_url) ? s.team.focus : null, { backgroundImage: `url(${s.url})` })} onClick={() => { if (s.child) setViewing({ personId: s.child.id, isChild: true }); else if (viewing?.isChild) setViewing({ personId: me!.person.id, isChild: false }); setTeam(s.team.id); setTab("team"); }}>
           <span className="tcar-cap"><span className="eyebrow">{s.team.style ?? ""}{s.child ? ` · ${s.child.first_name}` : ""}</span><b>{s.team.name}</b></span>
         </button>)}
       </div>

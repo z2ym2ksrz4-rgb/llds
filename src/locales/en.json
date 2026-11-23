@@ -1012,7 +1012,9 @@
     "libraryEyebrow": "All images",
     "teamPhotos": "Team photos",
     "builtIn": "Built-in",
-    "libraryHint": "Folders and uploads are managed under Admin → Image catalogue. Uploading here puts the file in the selected folder."
+    "libraryHint": "Folders and uploads are managed under Admin → Image catalogue. Uploading here puts the file in the selected folder.",
+    "focusHelp": "Tap the most important part of the picture (faces) – it is never cropped away",
+    "focusReset": "Reset"
   },
   "tour": {
     "eyebrow": "Welcome",

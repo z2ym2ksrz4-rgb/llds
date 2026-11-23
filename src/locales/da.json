@@ -1012,7 +1012,9 @@
     "libraryEyebrow": "Alle billeder",
     "teamPhotos": "Holdets fotos",
     "builtIn": "Indbyggede",
-    "libraryHint": "Mapper og uploads administreres under Admin → Billedkatalog. Upload her lægger filen i den valgte mappe."
+    "libraryHint": "Mapper og uploads administreres under Admin → Billedkatalog. Upload her lægger filen i den valgte mappe.",
+    "focusHelp": "Tryk på det vigtigste i billedet (ansigter) – så beskæres det aldrig væk",
+    "focusReset": "Nulstil"
   },
   "tour": {
     "eyebrow": "Velkommen",

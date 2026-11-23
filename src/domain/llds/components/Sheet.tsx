@@ -1,3 +1,5 @@
+import type { Focus } from "@/core/api";
+import { focusStyle } from "../lib/art";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
@@ -6,7 +8,7 @@ import { useTranslation } from "react-i18next";
  *  Phone behaviour (like iOS/Maps): opens at least half the screen; drag the handle/header up to make it as tall as you like,
  *  drag down (from the header, or from the list when it is scrolled to the top) to close; × in the corner, backdrop tap and
  *  the Escape key close it too. The content scrolls inside the sheet. */
-export function Sheet({ onClose, children, title, eyebrow, photo }: { onClose: () => void; children: ReactNode; title?: string; eyebrow?: string; photo?: string | null }) {
+export function Sheet({ onClose, children, title, eyebrow, photo, focus }: { onClose: () => void; children: ReactNode; title?: string; eyebrow?: string; photo?: string | null; focus?: Focus | null }) {
   const { t } = useTranslation();
   const bodyRef = useRef<HTMLDivElement>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -71,7 +73,7 @@ export function Sheet({ onClose, children, title, eyebrow, photo }: { onClose: (
     </div>
   );
   const hero = photo ? (
-    <div className="hero photo kb sheet-hero" data-testid="sheet-hero"><span className="bg warm" style={{ backgroundImage: `url(${photo})` }} />
+    <div className="hero photo kb sheet-hero" data-testid="sheet-hero"><span className="bg warm" style={focusStyle(focus, { backgroundImage: `url(${photo})` })} />
       <div>{eyebrow && <div className="eyebrow">{eyebrow}</div>}{title && <h2 className="display">{title}</h2>}</div>
     </div>
   ) : null;

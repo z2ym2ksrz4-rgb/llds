@@ -1,4 +1,6 @@
 /** Stock art (AI-generated, no real people) shipped with the app. Used where no real photo exists yet. */
+import type { CSSProperties } from "react";
+import type { Focus } from "@/core/api";
 import { catalogFor } from "./catalog";
 export type ArtKey = "group" | "solo" | "trophy" | "studio" | "trails" | "costume";
 const N: Record<ArtKey, number> = { group: 1, solo: 2, trophy: 3, studio: 4, trails: 5, costume: 6 };
@@ -26,4 +28,10 @@ export function aboutImage(team: { id: string; category: string; cover_url?: str
   if (!pool.length) return null;
   let h = 7; for (const c of team.id) h = (h * 31 + c.charCodeAt(0)) >>> 0;
   return pool[h % pool.length];
+}
+
+/** CSS vars for background-position from a focus point – default: horizontally centred, upper third (where faces usually are). */
+export function focusStyle(f?: Focus | null, extra?: CSSProperties): CSSProperties {
+  const x = f ? Math.round(Math.min(1, Math.max(0, f.x)) * 100) : 50, y = f ? Math.round(Math.min(1, Math.max(0, f.y)) * 100) : 35;
+  return { ...(extra ?? {}), ["--fx" as string]: `${x}%`, ["--fy" as string]: `${y}%` } as CSSProperties;
 }

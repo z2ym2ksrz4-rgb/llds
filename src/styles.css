@@ -672,3 +672,43 @@ div.checklist{padding-left:0;color:inherit}
 /* native: when the preview bar is shown it already carries the status-bar inset */
 .viewbar + main, .viewbar ~ main { padding-top:12px; }
 .viewbar ~ main .homehero { margin-top:-12px; } .viewbar ~ main .homehero-top { padding-top:14px; }
+
+/* ---------------------------------------------------------------- design pass A: pictures that fit every format, scene backgrounds, pattern, empty states */
+/* focus point: every photo surface keeps the chosen point (default: centre, upper third = faces) in view */
+.hero.photo .bg, .homehero .bg, .tcar-slide, .card .mood, .hero.photo, .evcard-mini, .sheet-hero .bg { background-position: var(--fx, 50%) var(--fy, 35%); }
+/* formats: phone = tall-ish cards, PC = wide cinematic strips with a sensible height (not a 150 px sliver) */
+.hero.photo[data-testid="team-hero"] { aspect-ratio: 16/10; min-height: 220px; max-height: 460px; }
+.hero.evcard { aspect-ratio: 16/9; min-height: 170px; }
+.sheet-hero { aspect-ratio: 16/9; min-height: 210px; max-height: 340px; }
+@media (min-width: 640px) {
+  .hero.photo[data-testid="team-hero"] { aspect-ratio: 21/9; min-height: 260px; }
+  .hero.evcard { aspect-ratio: 21/9; min-height: 200px; }
+  .sheet-hero { aspect-ratio: 21/9; }
+}
+@media (min-width: 1100px) {
+  .hero.photo[data-testid="team-hero"] { aspect-ratio: 24/9; min-height: 320px; max-height: 480px; }
+  .screen.events .evlist { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; } .screen.events .evlist .hero.evcard { aspect-ratio: 16/9; margin: 0; }
+  .sideband { display: block; position: fixed; top: 0; bottom: 0; left: 0; width: 232px; background: var(--bg2); border-right: 1px solid var(--line); z-index: 0; pointer-events: none; }   /* sidebar band: full viewport height, whatever the page length */
+}
+/* scene: the screen's picture, blurred and dimmed, fixed behind everything; a faint gold line pattern on top */
+.scene-bg { position: fixed; inset: -40px; z-index: 0; pointer-events: none; background: var(--bg) center 30% / cover no-repeat; opacity: 0; transition: opacity .9s ease; filter: blur(34px) saturate(.8) brightness(.45); transform: translateZ(0) scale(1.06); }
+.scene-bg.on { opacity: .32; }
+.scene-bg::after { content: ""; position: absolute; inset: 0; background:
+  linear-gradient(180deg, rgba(10,10,11,.2), rgba(10,10,11,.75) 60%, var(--bg) 100%),
+  repeating-linear-gradient(135deg, rgba(201,162,74,.05) 0 1px, transparent 1px 28px); }
+.sideband { display: none; }
+.app > *:not(.scene-bg):not(.sideband) { position: relative; z-index: 1; }
+@media (prefers-reduced-motion: reduce) { .scene-bg { transition: none; } }
+@media (max-width: 639px) { .scene-bg.on { opacity: .22; } }
+/* glass panels on the scene: cards, lists and sections get a touch of translucency instead of flat grey */
+.card, .teampick, .tabnews { background: color-mix(in srgb, var(--card) 86%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+/* focus picker (Admin): tap the picture, a dot + a 21:9 frame show what a wide hero will keep */
+.focuspick { margin-top: 8px; } .focuspick-img { position: relative; aspect-ratio: 16/10; border-radius: 12px; background: center/cover no-repeat; border: 1px solid var(--line2); cursor: crosshair; overflow: hidden; touch-action: none; }
+.focuspick-dot { position: absolute; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 2px rgba(201,162,74,.9), 0 0 18px rgba(201,162,74,.8); pointer-events: none; }
+.focuspick-frame { position: absolute; left: 0; right: 0; height: 42%; top: clamp(0%, calc(var(--fy) - 21%), 58%); border-top: 1px dashed rgba(255,255,255,.55); border-bottom: 1px dashed rgba(255,255,255,.55); background: rgba(255,255,255,.04); pointer-events: none; }
+.focuspick .row.between { margin-top: 6px; }
+/* empty state: one quiet line with a small picture – never a bare "Ingen …" */
+.empty { display: flex; align-items: center; gap: 14px; padding: 10px 2px; color: var(--muted); }
+.empty .art { flex: none; width: 56px; height: 56px; border-radius: 14px; background: center/cover; filter: grayscale(.4) brightness(.7); border: 1px solid var(--line); }
+.empty .art.sym { display: grid; place-items: center; font-size: 1.4rem; color: var(--gold2); background: var(--gold-soft); filter: none; }
+.empty p { margin: 0; font-size: .9rem; line-height: 1.35; } .empty .linklike { padding: 0; margin-top: 2px; }

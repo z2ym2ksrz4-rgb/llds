@@ -1,3 +1,6 @@
+/** Focus point of a photo: fractions of width/height where the important part is (faces). */
+export type Focus = { x: number; y: number };
+
 export type Role = "dancer" | "trainer" | "assistant";
 export type PersonStatus = "pending" | "approved" | "rejected" | "inactive";
 export type TeamCategory = "mini" | "kids" | "junior" | "adult" | "mixed";
@@ -75,6 +78,7 @@ export type Team = {
   photos?: string[];            // Line's own photos of the team (website URLs); a second one is shown under "Om holdet"
   gallery?: string[];           // pictures for the Home carousel, chosen by admin/trainer (catalog keys, art/ paths or URLs); empty = random pick
   about_url?: string | null;    // admin-chosen image under "Om holdet" (null = automatic)
+  focus?: Focus | null;         // where the important part of the cover photo is (0–1 × 0–1); null = upper third
   alt_url?: string | null;      // the raw cover_url when a real cover_path photo overrides it – shown as a mood image on the team page
   price?: string | null;
   years?: string | null;
@@ -196,7 +200,7 @@ export type Absence = { id: string; session_id: string; person_id: string; reaso
 
 export type RosterEntry = { person_id: string; name: string; birth_year: number | null; role: Role; present: boolean | null; absence: Absence | null; via_punch: boolean };
 
-export type TeamInput = Partial<Pick<Team, "name" | "style" | "category" | "level" | "closed" | "parents_see_video" | "punch_card_open" | "color" | "about_url" | "photos" | "signup_open" | "description" | "cover_url" | "admission" | "admission_note" | "price_full" | "price_half" | "price_signup" | "price_note" | "installments_allowed" | "price">> & { max_dancers?: number | null; visibility?: "public" | "private"; archived?: boolean };
+export type TeamInput = Partial<Pick<Team, "name" | "style" | "category" | "level" | "closed" | "parents_see_video" | "punch_card_open" | "color" | "about_url" | "photos" | "signup_open" | "description" | "cover_url" | "focus" | "admission" | "admission_note" | "price_full" | "price_half" | "price_signup" | "price_note" | "installments_allowed" | "price">> & { max_dancers?: number | null; visibility?: "public" | "private"; archived?: boolean };
 
 export type Member = Person & { memberships: Membership[]; children: Person[]; parents: Person[] };
 
@@ -332,6 +336,7 @@ export interface Api {
 export type EventKind = "competition" | "show" | "workshop" | "social";
 export type Event = {
   image_key?: string | null;        // catalogue image (public/art/catalog) chosen by the admin; null = automatic
+  focus?: Focus | null;             // focus point of the picture (0–1 × 0–1)
   id: string; title: string; kind: EventKind; starts_at: string; ends_at: string | null; place: string | null; meet_time: string | null;
   team_ids: string[]; team_names: string[] | null; plan: { time: string; text: string }[]; pack_list: string[]; info: string | null;
   signup_deadline: string | null; price_dkk: number | null; visibility: "private" | "public"; signups: number; created_at: string; mySignups?: number; myUnpaid?: number; myClaimed?: number;   // my/children's sign-ups: not yet paid / paid but awaiting Line's confirmation

@@ -1,6 +1,7 @@
+import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { api, type CatalogEntry } from "@/core/api";
+import { api, type CatalogEntry, type Focus } from "@/core/api";
 import { useAuth } from "@/core/auth";
 import { CATALOG, catalogFor, catalogUrl, resolveImage } from "../lib/catalog";
 import { Sheet } from "./Sheet";
@@ -9,7 +10,7 @@ type Tag = "event" | "team" | "post";
 
 /** Compact image field: [Automatisk] [Upload] [Vælg…] + the current picture. "Vælg…" opens the shared media library
  *  (own uploads by folder, the team's photos, the built-in catalogue) where you can also upload. value = bundled key, art/catalog path or URL; null = automatic. */
-export function ImagePicker({ value, onChange, tag, allowNone = true, label, own: ownUrls = [] }: { value: string | null; onChange: (ref: string | null) => void; tag: Tag; allowNone?: boolean; label?: string; own?: string[] }) {
+export function ImagePicker({ value, onChange, tag, allowNone = true, label, own: ownUrls = [], focus, onFocus }: { value: string | null; onChange: (ref: string | null) => void; tag: Tag; allowNone?: boolean; label?: string; own?: string[]; focus?: Focus | null; onFocus?: (f: Focus | null) => void }) {
   const { t } = useTranslation();
   const isAdmin = useAuth((s) => !!s.me?.person.is_admin);
   const [lib, setLib] = useState(false);
@@ -31,6 +32,7 @@ export function ImagePicker({ value, onChange, tag, allowNone = true, label, own
         </div>
       </div>
       <input ref={fileRef} type="file" accept="image/*" multiple hidden onChange={(e) => { void upload(e.target.files); e.target.value = ""; }} />
+      {onFocus && cur && <FocusPicker url={cur} focus={focus ?? null} onChange={onFocus} />}
       {lib && <MediaLibrary tag={tag} value={value} own={ownUrls} onPick={(ref) => { onChange(ref); setLib(false); }} onClose={() => setLib(false)} />}
     </div>
   );
@@ -72,5 +74,21 @@ export function MediaLibrary({ tag, value, own: ownUrls = [], onPick, onClose }:
       <input ref={fileRef} type="file" accept="image/*" multiple hidden onChange={(e) => { void upload(e.target.files); e.target.value = ""; }} />
       <p className="tiny muted" style={{ margin: 0 }}>{t("catalog.libraryHint")}</p>
     </Sheet>
+  );
+}
+
+/** Tap the most important part of the picture (faces): heroes and cards keep that point in view on every screen format. */
+export function FocusPicker({ url, focus, onChange }: { url: string; focus: Focus | null; onChange: (f: Focus | null) => void }) {
+  const { t } = useTranslation();
+  const x = focus?.x ?? 0.5, y = focus?.y ?? 0.35;
+  const pick = (e: React.PointerEvent<HTMLDivElement>) => { const r = e.currentTarget.getBoundingClientRect(); onChange({ x: Math.round(((e.clientX - r.left) / r.width) * 100) / 100, y: Math.round(((e.clientY - r.top) / r.height) * 100) / 100 }); };
+  return (
+    <div className="focuspick" data-testid="focus-picker">
+      <div className="focuspick-img" role="button" aria-label={t("catalog.focusHelp")} style={{ backgroundImage: `url(${url})` }} onPointerDown={pick}>
+        <span className="focuspick-dot" style={{ left: `${x * 100}%`, top: `${y * 100}%` }} />
+        <span className="focuspick-frame wide" style={{ ["--fx" as string]: `${x * 100}%`, ["--fy" as string]: `${y * 100}%` }} />
+      </div>
+      <div className="row between tiny muted"><span>{t("catalog.focusHelp")}</span>{focus && <button type="button" className="linklike small" onClick={() => onChange(null)}>{t("catalog.focusReset")}</button>}</div>
+    </div>
   );
 }

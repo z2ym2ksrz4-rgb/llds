@@ -2,7 +2,9 @@ import { useCallback, useEffect, useState, type ReactElement } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type TeamDancer, type TeamStaff, type Thread, type Message, type Absence, type Event, type Member, type PersonBadge, type Result, type Session } from "@/core/api";
 import { resolveImage } from "../lib/catalog";
-import { aboutImage, teamAccent } from "../lib/art";
+import { aboutImage, teamAccent, focusStyle } from "../lib/art";
+import { useScene } from "../components/Scene";
+import { Empty } from "../components/Empty";
 import { AuditionAdmin } from "./Audition";
 import { confetti } from "../lib/confetti";
 import { EmblemRow, EmblemSheet, GiveEmblemSheet } from "../components/Emblems";
@@ -38,6 +40,8 @@ export function TeamScreen() {
   const team = me.teams.find((x) => x.id === teamId);
   const staff = me.person.is_admin || (teamId != null && me.memberships.some((m) => m.person_id === me.person.id && m.team_id === teamId && m.role !== "dancer"));
   const [page, setPage] = useState<Page>("team");
+  const heroUrl = team ? resolveImage(team.cover_url) ?? artForCategory(team.category) : null;
+  useScene(page === "team" ? heroUrl : null);
   useEffect(() => { const f = (e: globalThis.Event) => { if ((e as CustomEvent<string>).detail === teamId) setPage("audition"); }; addEventListener("llds:open-audition", f); return () => removeEventListener("llds:open-audition", f); }, [teamId]);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [absences, setAbsences] = useState<Absence[]>([]);
@@ -121,14 +125,13 @@ export function TeamScreen() {
     </section>
   );
 
-  const heroUrl = resolveImage(team.cover_url) ?? artForCategory(team.category);
   const aboutImg = aboutImage(team, heroUrl);
   return (
     <section className="screen" style={teamAccent(team)}>
       <header className="topbar"><h1 className="display">{team.name}</h1><TopRight /></header>
       <TabNews tab="team" />
       <TeamPicker />
-      <div className="hero photo kb" data-testid="team-hero" data-tour="team-hero"><span className="bg warm" style={{ backgroundImage: `url(${heroUrl})` }} />
+      <div className="hero photo kb" data-testid="team-hero" data-tour="team-hero"><span className="bg warm" style={focusStyle(team.focus, { backgroundImage: `url(${heroUrl})` })} />
         <div><div className="eyebrow">{team.style} · {t(`category.${team.category}`)} · {team.level}</div><h2 className="display">{team.name}</h2>
           <div className="small muted">{t("team.dancersN", { n: stats.dancers })}{trainerName ? ` · ${trainerName}` : ""}{next ? ` · ${DAY_LONG[(new Date(next.starts_at).getDay() + 6) % 7]} ${hm(next.starts_at)} ${next.room_name ?? ""}` : ""}</div>
           <div className="small muted">{t(`roles.${role ?? "dancer"}`)}{team.punch_card_open ? ` · ${t("team.punchOpen")}` : ""}{(team.admission === "audition" || (team.closed && !team.admission)) ? <span className="chip gold small" style={{ marginLeft: 8 }}>{t("admin.admissionKind.audition")}</span> : team.admission === "tryout" ? <span className="chip small" style={{ marginLeft: 8 }}>{t("admin.admissionKind.tryout")}</span> : null}</div></div>
@@ -136,8 +139,8 @@ export function TeamScreen() {
 
       <div className="grid2 tiles">
         <button className={"card tap" + (seesChoreo ? "" : " dim")} disabled={!seesChoreo} onClick={() => setPage("choreo")} data-testid="go-choreo"><div className="eyebrow">{t("team.choreo")}</div><div className="big">{seesChoreo ? t("team.videosN", { n: stats.videos }) : t("team.choreoLocked")}</div></button>
-        <button className="card tap" onClick={() => setPage("folders")} data-testid="go-folders"><div className="eyebrow">{t("team.folders")}</div><div className="big">{t("team.mediaN", { n: stats.media })}</div></button>
-        <button className={"card tap" + (seesChoreo ? "" : " dim")} disabled={!seesChoreo} onClick={() => setPage("formations")} data-testid="go-formations"><div className="eyebrow">{t("choreo.formations")}</div><div className="big">{seesChoreo ? t("team.formationsN", { n: stats.formations }) : t("team.choreoLocked")}</div></button>
+        {<button className="card tap" onClick={() => setPage("folders")} data-testid="go-folders"><div className="eyebrow">{t("team.folders")}</div><div className="big">{t("team.mediaN", { n: stats.media })}</div></button>}
+        {(staff || stats.formations > 0) && <button className={"card tap" + (seesChoreo ? "" : " dim")} disabled={!seesChoreo} onClick={() => setPage("formations")} data-testid="go-formations"><div className="eyebrow">{t("choreo.formations")}</div><div className="big">{seesChoreo ? t("team.formationsN", { n: stats.formations }) : t("team.choreoLocked")}</div></button>}
         {staff && (team.admission === "audition" || team.closed) && <button className="card tap" onClick={() => setPage("audition")} data-testid="go-audition"><div className="eyebrow">{t("audition.title")}</div><div className="big">🎯</div></button>}
         <button className="card tap" onClick={() => setPage("dancers")} data-testid="go-dancers"><div className="eyebrow">{t("team.dancers")}</div><div className="big">{stats.dancers}{staff ? "" : ""}</div></button>
       </div>
@@ -157,7 +160,7 @@ export function TeamScreen() {
 
       {(team.description || team.price || team.day_time) && (
         <div className="sec"><h2>{t("team.about")}</h2><div className="card" data-testid="team-about">
-          {aboutImg && <div className="mood" data-testid="team-about-img" style={{ backgroundImage: `url(${aboutImg})` }} />}
+          {aboutImg && <div className="mood" data-testid="team-about-img" style={focusStyle(aboutImg === resolveImage(team.cover_url) ? team.focus : null, { backgroundImage: `url(${aboutImg})` })} />}
           {(team.day_time || team.years) && <div className="small muted" style={{ marginBottom: 8 }}>{[team.day_time, team.years].filter(Boolean).join(" · ")}</div>}
           {team.description && <About text={team.description} />}
           {team.price && (staff || role === "parent") && <div className="row between" style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid var(--line)" }}><span className="tiny">{t("team.price")}</span><span className="gold small">{team.price}</span></div>}
@@ -169,24 +172,24 @@ export function TeamScreen() {
         </ScrollList></div>
       )}
 
-      <div className="sec"><div className="row between"><h2>{t("team.trophies")}</h2>{staff && <button className="linklike small" onClick={() => setTab("events")}>+ {t("events.addResult")}</button>}</div><ScrollList testId="trophies">
+      {(staff || results.length > 0) && <div className="sec"><div className="row between"><h2>{t("team.trophies")}</h2>{staff && <button className="linklike small" onClick={() => setTab("events")}>+ {t("events.addResult")}</button>}</div><ScrollList testId="trophies">
         {results.map((r) => <div key={r.id} className="item" data-testid="result"><span className="time">{new Date(r.held_on).toLocaleDateString(loc(), { month: "short", year: "numeric" })}</span><span className="grow">{r.event_title}</span><span className="chip gold small">{r.placed}</span></div>)}
-        {!results.length && <p className="muted small" style={{ margin: 0 }}>{events.find((e) => e.kind === "competition") ? t("team.noTrophiesYet", { event: events.find((e) => e.kind === "competition")!.title, date: dateLabel(events.find((e) => e.kind === "competition")!.starts_at) }) : t("team.noTrophies")}</p>}
-      </ScrollList></div>
+        {!results.length && <Empty symbol="🏆" text={events.find((e) => e.kind === "competition") ? t("team.noTrophiesYet", { event: events.find((e) => e.kind === "competition")!.title, date: dateLabel(events.find((e) => e.kind === "competition")!.starts_at) }) : t("team.noTrophies")} />}
+      </ScrollList></div>}
 
       {staff && <div className="row" style={{ justifyContent: "flex-end", marginTop: -6 }}><button className="linklike small" data-testid="open-gallery" onClick={() => setGalleryOpen(true)}>{t("gallery.edit")}</button></div>}
       {galleryOpen && <GalleryPicker team={team} onClose={() => setGalleryOpen(false)} onSaved={() => { setGalleryOpen(false); say(t("gallery.saved")); void refreshMe(); }} />}
-      <div className="sec"><div className="row between"><h2>{t("badges.title")}</h2>{staff && <button className="linklike small" onClick={() => setPage("dancers")}>{t("badges.give")}</button>}</div><ScrollList testId="team-badges">
+      {(staff || badges.length > 0) && <div className="sec"><div className="row between"><h2>{t("badges.title")}</h2>{staff && <button className="linklike small" onClick={() => setPage("dancers")}>{t("badges.give")}</button>}</div><ScrollList testId="team-badges">
         {[...badges].sort((x, y) => y.created_at.localeCompare(x.created_at)).map((b) => <button key={b.id} className="item" onClick={() => setOpenBadge(b)}><span className="emblem sm"><span className="e">{b.emoji}</span></span><span className="grow">{b.person_name}<div className="tiny">{b.name}{b.note ? ` · “${b.note}”` : ""} · {ago(b.created_at)}</div></span></button>)}
-        {!badges.length && <p className="muted small" style={{ margin: 0 }}>{t("badges.emptyTeam")}</p>}
-      </ScrollList></div>
+        {!badges.length && <Empty symbol="🎖" text={t("badges.emptyTeam")} />}
+      </ScrollList></div>}
       {openBadge && <EmblemSheet b={openBadge} onClose={() => setOpenBadge(null)} onRemove={staff ? async () => { await api.removeBadge(openBadge.id); setOpenBadge(null); void load(); } : undefined} />}
 
 
       <div className="sec"><h2>{t("team.upcoming")}</h2>
         <ScrollList>
           {sessions.map((s) => <button key={s.id} className={"item" + (s.cancelled ? " off" : "")} onClick={() => setOpen(s)}><span className="time">{dateLabel(s.starts_at)}<br />{hm(s.starts_at)}</span><span className="grow">{s.title ?? s.team_name}<div className="tiny">{s.room_name} · {s.substitute_name ?? s.trainer_name}{s.cancelled ? " · " + t("session.cancelled") : ""}</div></span>{staff && <span className="tiny">{absences.filter((a) => a.session_id === s.id).length} {t("team.absent")}</span>}</button>)}
-          {!sessions.length && <p className="muted">{t("home.noTrainings")}</p>}
+          {!sessions.length && <Empty symbol="◷" text={t("home.noTrainings")} />}
         </ScrollList>
       </div>
 
@@ -213,7 +216,7 @@ function MsgGroup({ label, list, Row, empty, cls }: { label: string; list: Messa
       {due.length > 0 && <ScrollList className="m0">{due.map((m) => <Row key={m.id} m={m} />)}</ScrollList>}
       {due.length === 0 && (list.length > 0 ? (
         <button type="button" className={"msg-none" + (history ? " open" : "")} onClick={() => setHistory((h) => !h)} aria-expanded={history}><span className="dot" aria-hidden /><span className="grow">{t("msg.noneNew")}</span><span className="tiny">{t("msg.history", { n: done.length })} <i className="caret">{history ? "⌃" : "⌄"}</i></span></button>
-      ) : empty ? <p className="muted small" style={{ margin: 0 }}>{empty}</p> : null)}
+      ) : empty ? <Empty symbol="✉" text={empty} /> : null)}
       {history && done.length > 0 && <ScrollList className="m0">{done.map((m) => <Row key={m.id} m={m} />)}</ScrollList>}
     </div>
   );
@@ -230,7 +233,7 @@ function ThreadGroup({ label, threads, onOpen, empty }: { label: string; threads
       {due.length > 0 && <ScrollList className="m0">{due.map((th) => <Row key={th.id} th={th} />)}</ScrollList>}
       {due.length === 0 && (threads.length ? (
         <button type="button" className={"msg-none" + (history ? " open" : "")} onClick={() => setHistory((h) => !h)} aria-expanded={history}><span className="dot" aria-hidden /><span className="grow">{t("msg.noneNew")}</span><span className="tiny">{t("msg.history", { n: done.length })} <i className="caret">{history ? "⌃" : "⌄"}</i></span></button>
-      ) : <p className="muted small" style={{ margin: 0 }}>{empty}</p>)}
+      ) : <Empty symbol="💬" text={empty} />)}
       {history && done.length > 0 && <ScrollList className="m0">{done.map((th) => <Row key={th.id} th={th} />)}</ScrollList>}
     </div>
   );

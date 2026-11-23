@@ -5,6 +5,7 @@ import { useNav, type Tab } from "@/core/nav";
 import { useBadges } from "@/core/badges";
 import { isRelease } from "@/core/release";
 import { initDeepLinks } from "@/core/links";
+import { SceneBg } from "@/domain/llds/components/Scene";
 import { Home, Login, Register, Pending, Rooms, TeamScreen, Admin, More, Social, Events } from "@/domain";
 import { Icon } from "@/domain/llds/components/Icons";
 import { Logo } from "@/domain/llds/components/Logo";
@@ -46,6 +47,7 @@ export default function App() {
   const tabs: [Tab, string, string][] = [["home", t("nav.home"), "home"], ["rooms", t("nav.rooms"), "cal"], ...(hasTeams ? [["team", realAdmin && !viewAs ? t("nav.teams") : t("nav.team"), "team"] as [Tab, string, string]] : []), ["social", t("nav.social"), "chat"], ["events", t("nav.events"), "star"], ...(isAdmin ? [["admin", t("nav.admin"), "grid"] as [Tab, string, string]] : [])];
   return (
     <div className="app">
+      <SceneBg />
       {phase === "ready" && viewAs && me && <div className="viewbar" data-testid="viewbar"><span>{t("view.previewing", { role: `${me.person.first_name} ${me.person.last_name}` })}</span><button onClick={() => setViewAs(null)}>{t("view.exit")}</button></div>}
       <main>{body}</main>
       {phase === "ready" && <Welcome />}

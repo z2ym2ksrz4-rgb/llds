@@ -1,15 +1,17 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { api, type Event, type EventInput, type EventSignup, type Result } from "@/core/api";
+import { api, type Event, type Focus, type EventInput, type EventSignup, type Result } from "@/core/api";
 import { useAuth } from "@/core/auth";
 import { useNav } from "@/core/nav";
 import { ImagePicker } from "../components/ImagePicker";
+import { Empty } from "../components/Empty";
+import { useScene } from "../components/Scene";
 import { catalogUrl } from "../lib/catalog";
 import { TabNews } from "../components/TabNews";
 import { Sheet, Toast } from "../components/Sheet";
 import { PaySheet } from "../components/Pay";
 import { dateLabel, hm, isoDate, loc } from "../lib/time";
-import { artFor } from "../lib/art";
+import { artFor , focusStyle } from "../lib/art";
 import { TopRight } from "../components/ProfileMenu";
 
 const KINDS = ["competition", "show", "workshop", "social"] as const;
@@ -19,7 +21,7 @@ export function Events({ admin }: { admin?: boolean }) {
   const { t } = useTranslation();
   const [tab, setTab] = useState<"upcoming" | "results" | "shop">("upcoming");
   return (
-    <section className="screen">
+    <section className="screen events">
       <header className="topbar"><h1 className="display">{t("events.title")}</h1>{!admin && <TopRight />}</header>
       {!admin && <TabNews tab="events" />}
       <div className="subtabs"><button className={tab === "upcoming" ? "on" : ""} onClick={() => setTab("upcoming")}>{t("events.upcoming")}</button><button className={tab === "results" ? "on" : ""} onClick={() => setTab("results")}>{t("events.results")}</button></div>
@@ -77,16 +79,17 @@ function EventsList({ admin }: { admin?: boolean }) {
     void api.listEvents(true).then((all) => { const e = all.find((x) => x.id === eid); if (e) { if (new Date(e.starts_at) < new Date()) setPast(true); setOpen(e); } });
   }, [pendingRef]); // eslint-disable-line react-hooks/exhaustive-deps
   const mine = new Set(me.memberships.map((m) => m.team_id));
+  useScene(events[0] ? catalogUrl(events[0].image_key) ?? artFor(events[0].id) : null);
   return (
     <div className="stack" style={{ marginTop: 10 }}>
       {staff && <button className="ghost small" id="event-new" onClick={() => setEdit("new")}>+ {t("events.new")}</button>}
-      {events.map((e) => { const relevant = !e.team_ids.length || e.team_ids.some((id) => mine.has(id)); return (
-        <button key={e.id} className="hero tap photo evcard" data-testid="event" onClick={() => setOpen(e)} style={{ backgroundImage: `url(${catalogUrl(e.image_key) ?? artFor(e.id)})` }}>
+      <div className="evlist stack">{events.map((e) => { const relevant = !e.team_ids.length || e.team_ids.some((id) => mine.has(id)); return (
+        <button key={e.id} className="hero tap photo evcard" data-testid="event" onClick={() => setOpen(e)} style={focusStyle(e.focus, { backgroundImage: `url(${catalogUrl(e.image_key) ?? artFor(e.id)})` })}>
           <div><div className="eyebrow">{dateLabel(e.starts_at)} · {t(`events.kind.${e.kind}`)}</div><h2 className="display">{e.title}</h2>
             <div className="row between"><span className="small muted">{e.place ?? ""}{e.team_names?.length ? ` · ${e.team_names.join(", ")}` : ` · ${t("events.allTeams")}`}</span>
               {e.mySignups && e.mySignups > 0 ? (e.myUnpaid ? <span className="chip warn small" data-testid="ev-awaiting">{t("events.unpaid")}</span> : e.myClaimed ? <span className="chip small pend" data-testid="ev-claimed">{t("events.claimed")}</span> : <span className="chip ok small">{t("events.on")}</span>) : relevant && (e.signup_deadline || e.price_dkk) ? <span className="chip gold small">{t("events.openSignup")}</span> : null}</div></div>
-        </button>); })}
-      {!events.length && <p className="muted">{t("events.empty")}</p>}
+        </button>); })}</div>
+      {!events.length && <Empty text={t("events.empty")} symbol="★" />}
       <button className="linklike small" onClick={() => setPast(!past)}>{past ? t("events.hidePast") : t("events.showPast")}</button>
       {open && <EventSheet event={open} staff={staff} onClose={() => { setOpen(null); void load(); }} onEdit={() => { setEdit(open); setOpen(null); }} onChanged={() => void load()} toast={say} />}
       {edit && <EventEditor event={edit === "new" ? null : edit} onClose={() => setEdit(null)} onSaved={() => { setEdit(null); void load(); say(t("common.saved")); }} />}
@@ -109,7 +112,7 @@ export function EventSheet({ event, staff, onClose, onEdit, onChanged, toast }: 
   const toggle = async (pid: string) => { const on = !mine(pid); await api.signUp_(event.id, pid, on); toast(on ? (event.price_dkk ? t("events.signedUpPay") : t("events.signedUp")) : t("events.withdrawn")); await load(); onChanged(); if (on && event.price_dkk) setPay(pid); };
   const paid = signups.filter((s) => s.paid).length;
   return (
-    <Sheet onClose={onClose} photo={catalogUrl(event.image_key) ?? artFor(event.id)} eyebrow={`${t(`events.kind.${event.kind}`)} · ${dateLabel(event.starts_at)}`} title={event.title}>
+    <Sheet onClose={onClose} photo={catalogUrl(event.image_key) ?? artFor(event.id)} focus={event.focus} eyebrow={`${t(`events.kind.${event.kind}`)} · ${dateLabel(event.starts_at)}`} title={event.title}>
       <div className="card list" style={{ margin: 0 }} data-testid="event-facts">
         <div className="item"><span className="avatar small">🕒</span><span className="grow">{dateLabel(event.starts_at)} · {hm(event.starts_at)}{event.ends_at ? `–${hm(event.ends_at)}` : ""}{event.meet_time ? <div className="tiny">{t("events.meet")}: {event.meet_time}</div> : null}</span></div>
         {event.place && <div className="item"><span className="avatar small">📍</span><span className="grow">{event.place}</span><a className="linklike small" href={`https://maps.google.com/?q=${encodeURIComponent(event.place)}`} target="_blank" rel="noreferrer">{t("events.map")}</a></div>}
@@ -144,6 +147,7 @@ function EventEditor({ event, onClose, onSaved }: { event: Event | null; onClose
   const me = useAuth((s) => s.me)!;
   const d0 = event ? new Date(event.starts_at) : new Date(Date.now() + 14 * 864e5);
   const [image, setImage] = useState<string | null>(event?.image_key ?? null);
+  const [focus, setFocus] = useState<Focus | null>(event?.focus ?? null);
   const [f, setF] = useState({ title: event?.title ?? "", kind: event?.kind ?? "competition", date: isoDate(d0), time: event ? hm(event.starts_at) : "10:00", place: event?.place ?? "", meet_time: event?.meet_time ?? "", team_ids: event?.team_ids ?? [], plan: event?.plan.map((p) => `${p.time} ${p.text}`).join("\n") ?? "", pack: event?.pack_list.join("\n") ?? "", info: event?.info ?? "", deadline: event?.signup_deadline ?? "", price: event?.price_dkk?.toString() ?? "", pub: event?.visibility === "public" });
   const [busy, setBusy] = useState(false);
   const save = async () => {
@@ -152,7 +156,7 @@ function EventEditor({ event, onClose, onSaved }: { event: Event | null; onClose
       const starts = new Date(`${f.date}T${f.time}:00`);
       const input: EventInput = { title: f.title.trim(), kind: f.kind as Event["kind"], starts_at: starts.toISOString(), ends_at: null, place: f.place || null, meet_time: f.meet_time || null, team_ids: f.team_ids,
         plan: f.plan.split("\n").map((l) => l.trim()).filter(Boolean).map((l) => { const m = l.match(/^(\d{1,2}[.:]\d{2})\s+(.*)$/); return m ? { time: m[1].replace(".", ":"), text: m[2] } : { time: "", text: l }; }),
-        pack_list: f.pack.split("\n").map((l) => l.trim()).filter(Boolean), info: f.info || null, signup_deadline: f.deadline || null, price_dkk: f.price ? Number(f.price) : null, visibility: f.pub ? "public" : "private", image_key: image };
+        pack_list: f.pack.split("\n").map((l) => l.trim()).filter(Boolean), info: f.info || null, signup_deadline: f.deadline || null, price_dkk: f.price ? Number(f.price) : null, visibility: f.pub ? "public" : "private", image_key: image, focus };
       await api.saveEvent(input, event?.id); onSaved();
     } finally { setBusy(false); }
   };
@@ -160,7 +164,7 @@ function EventEditor({ event, onClose, onSaved }: { event: Event | null; onClose
   return (
     <Sheet onClose={onClose} eyebrow={t("events.title")} title={event ? t("common.edit") : t("events.new")}>
       <label className="field"><span>{t("events.name")}</span><input id="ev-title" value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} /></label>
-      <ImagePicker tag="event" value={image} onChange={setImage} />
+      <ImagePicker tag="event" value={image} onChange={(k) => { setImage(k); setFocus(null); }} focus={focus} onFocus={setFocus} />
       <div className="field"><span>{t("events.kindLabel")}</span><div className="chips">{KINDS.map((k) => <button key={k} className={"chip" + (f.kind === k ? " on" : "")} onClick={() => setF({ ...f, kind: k })}>{t(`events.kind.${k}`)}</button>)}</div></div>
       <div className="grid2"><label className="field"><span>{t("events.date")}</span><input id="ev-date" type="date" value={f.date} onChange={(e) => setF({ ...f, date: e.target.value })} /></label><label className="field"><span>{t("events.time")}</span><input type="time" value={f.time} onChange={(e) => setF({ ...f, time: e.target.value })} /></label></div>
       <div className="grid2"><label className="field"><span>{t("events.place")}</span><input value={f.place} onChange={(e) => setF({ ...f, place: e.target.value })} /></label><label className="field"><span>{t("events.meet")}</span><input value={f.meet_time} onChange={(e) => setF({ ...f, meet_time: e.target.value })} placeholder="07:15 ved studiet" /></label></div>

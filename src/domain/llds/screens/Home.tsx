@@ -9,7 +9,9 @@ import { Toast } from "../components/Sheet";
 import { MessageBanner } from "../components/Messages";
 import { TeamCarousel } from "../components/TeamCarousel";
 import { TopRight } from "../components/ProfileMenu";
-import { artFor } from "../lib/art";
+import { artFor, focusStyle } from "../lib/art";
+import { useScene } from "../components/Scene";
+import { Empty } from "../components/Empty";
 import { catalogUrl } from "../lib/catalog";
 import { EventSheet } from "./Events";
 import { addDays, dateLabel, DAY_SHORT, hm, loc, startOfDay } from "../lib/time";
@@ -98,6 +100,8 @@ export function Home() {
   const firstTeam = me.teams.find((x) => teamIds.has(x.id));
   const ownPhoto = firstTeam && /^https?:/.test(firstTeam.cover_url ?? "") ? firstTeam.cover_url : firstTeam?.photos?.[0] ?? null;
   const heroImg = resolveImage(ownPhoto) ?? catalogUrl(hero?.image_key) ?? catalogUrl(appearance.images?.hero) ?? artFor(viewing.personId, ["group", "trails", "studio"]);
+  const heroFocus = resolveImage(ownPhoto) ? firstTeam?.focus : catalogUrl(hero?.image_key) ? hero?.focus : null;
+  useScene(heroImg);
   const hour = new Date().getHours(); const tone = hour < 10 ? "morning" : hour < 17 ? "day" : "evening";
   const greeting = t(`home.greet.${tone}`, { name: me.person.first_name }); // always the logged-in person – the child's name goes on the sections below
   const heroRef = useRef<HTMLDivElement>(null);
@@ -110,7 +114,7 @@ export function Home() {
   const SECTIONS: Record<string, () => React.ReactNode> = {
     hero: () => (<>
       <div ref={heroRef} className={"homehero tone-" + tone} data-testid="hero" data-tour="hero">
-        <div className="homehero-media"><span className="bg" style={{ backgroundImage: `url(${heroImg})` }} /></div>
+        <div className="homehero-media"><span className="bg" style={focusStyle(heroFocus, { backgroundImage: `url(${heroImg})` })} /></div>
         <div className="homehero-top"><TopRight /></div>
         <div className="homehero-text">
           <div className="eyebrow">{dateLine}</div>
@@ -191,7 +195,7 @@ export function Home() {
                     <span className={"chip small " + w.kind}>{t(KIND_CHIP[w.kind])}</span>
                   </button>))}
               </div>); })}
-            {!week.length && <p className="muted">{t("home.noTrainings")}</p>}
+            {!week.length && <Empty symbol="◷" text={t("home.noTrainings")} />}
           </ScrollList>
         </div>
       )}
