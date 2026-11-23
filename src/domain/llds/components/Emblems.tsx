@@ -60,12 +60,14 @@ export function GiveEmblemSheet({ personId, personName, teamId, onClose, onGiven
 
 /** Home "trophy shelf": emblems and milestones on one horizontal, scrollable shelf with a gold glow – the part kids show off. */
 export function TrophyShelf({ badges, milestones }: { badges: PersonBadge[]; milestones: { id: string; title: string; reached_on: string | null; team_name: string | null }[] }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState<PersonBadge | null>(null);
   return (
     <>
       <div className="shelf" data-testid="shelf">
         {milestones.map((m) => <div key={m.id} className="trophy"><span className="e">🏆</span><span className="n">{m.title}</span>{m.reached_on && <span className="tiny">{new Date(m.reached_on).toLocaleDateString(loc(), { month: "short", year: "numeric" })}</span>}</div>)}
         {badges.map((b) => <button key={b.id} className="trophy" onClick={() => setOpen(b)} data-testid="emblem"><span className="e">{b.emoji}</span><span className="n">{b.name}</span><span className="tiny">{ago(b.created_at)}</span></button>)}
+        {badges.length + milestones.length < 3 && !badges.some((b) => b.kind === "auto") && <div className="trophy ghost" aria-hidden="true"><span className="e">🔥</span><span className="n">{t("home.nextBadge")}</span><span className="tiny">{t("home.streak10")}</span></div>}
         <div className="shelf-board" />
       </div>
       {open && <EmblemSheet b={open} onClose={() => setOpen(null)} />}

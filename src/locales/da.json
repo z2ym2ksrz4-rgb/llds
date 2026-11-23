@@ -192,7 +192,15 @@
     "studioEyebrow": "Hele studiet",
     "studioTitle": "Studiet",
     "studioSub": "På tværs af alle hold – det du som administrator skal forholde dig til.",
-    "glimpses": "Små glimt fra dine hold"
+    "glimpses": "Små glimt fra dine hold",
+    "inMin": "om {{n}} min.",
+    "inHours": "om {{h}} t. {{m}} min.",
+    "tomorrow": "i morgen",
+    "onDay": "{{day}}",
+    "allEvents": "Alle events",
+    "dayNothing": "Ingenting denne dag",
+    "nextBadge": "Næste emblem",
+    "streak10": "10 træninger i træk"
   },
   "admin": {
     "users": "Nye brugere",
@@ -664,7 +672,9 @@
     "history": "Historik ({{n}})",
     "comments": "Kommentarer ({{n}})",
     "commentPh": "Skriv en kommentar eller et spørgsmål …",
-    "commentSend": "Send"
+    "commentSend": "Send",
+    "open": "Læs",
+    "acceptBtn": "Acceptér"
   },
   "folders": {
     "new": "Ny mappe",
@@ -1152,7 +1162,8 @@
       "badges": "Trofæhylde (emblemer + milepæle)",
       "gallery": "Holdbilleder (karrusel)",
       "studioHead": "Overskrift: Studiet",
-      "audition": "Audition (kun for tilmeldte)"
+      "audition": "Audition (kun for tilmeldte)",
+      "next": "Næste (stort kort)"
     },
     "gallery": "Billedkarrusel på websitet",
     "gallerySub": "Vælg billeder til karrusellen på forsiden af websitet – i den rækkefølge du trykker ({{n}} valgt). Tom = holdenes egne fotos vises automatisk.",

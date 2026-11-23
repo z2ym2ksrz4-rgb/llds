@@ -20,7 +20,7 @@ export function MessageBanner({ toast }: { toast: (m: string) => void }) {
     <>
       {due.length > 0 && (
         <div className="sec" data-testid="msg-banner"><h2>{t("msg.needsYou", { n: due.length })}</h2>
-          <ScrollList testId="msg-list">{due.map((m) => <button key={m.id} className="item due" onClick={() => setOpen(m)}><span className="grow">{m.title}<div className="tiny">{m.author_name} · {ago(m.created_at)} · {t(`msg.needs.${m.needs}`)}</div></span><span className="gold">● ›</span></button>)}</ScrollList>
+          <div className="msgcards" data-testid="msg-list">{due.map((m) => <button key={m.id} className="msgcard item due" onClick={() => setOpen(m)}><span className="avatar">{m.author_name[0]}</span><span className="grow"><span className="msgcard-head"><b>{m.author_name}</b><span className="tiny muted">· {ago(m.created_at)}</span></span><span className="msgcard-title">{m.title}</span>{m.body && <span className="msgcard-body tiny">{m.body.length > 110 ? m.body.slice(0, 110).replace(/\s+\S*$/, "") + "…" : m.body}</span>}</span><span className={"chip small " + (m.needs === "accept" ? "gold" : "")}>{m.needs === "accept" ? t("msg.acceptBtn") : t("msg.open")}</span></button>)}</div>
         </div>
       )}
       {due.length === 0 && (

@@ -697,7 +697,7 @@ div.checklist{padding-left:0;color:inherit}
   linear-gradient(180deg, rgba(10,10,11,.2), rgba(10,10,11,.75) 60%, var(--bg) 100%),
   repeating-linear-gradient(135deg, rgba(201,162,74,.05) 0 1px, transparent 1px 28px); }
 .sideband { display: none; }
-.app > *:not(.scene-bg):not(.sideband) { position: relative; z-index: 1; }
+.app > main, .app > .viewbar { position: relative; z-index: 1; }   /* the tab bar keeps its own fixed/sticky positioning and z-index */
 @media (prefers-reduced-motion: reduce) { .scene-bg { transition: none; } }
 @media (max-width: 639px) { .scene-bg.on { opacity: .22; } }
 /* glass panels on the scene: cards, lists and sections get a touch of translucency instead of flat grey */
@@ -712,3 +712,46 @@ div.checklist{padding-left:0;color:inherit}
 .empty .art { flex: none; width: 56px; height: 56px; border-radius: 14px; background: center/cover; filter: grayscale(.4) brightness(.7); border: 1px solid var(--line); }
 .empty .art.sym { display: grid; place-items: center; font-size: 1.4rem; color: var(--gold2); background: var(--gold-soft); filter: none; }
 .empty p { margin: 0; font-size: .9rem; line-height: 1.35; } .empty .linklike { padding: 0; margin-top: 2px; }
+
+/* ---------------------------------------------------------------- design pass B: Home as an experience */
+/* next up: one big card with the team's/event's picture, a countdown chip and the trainer */
+.nextcard { position: relative; display: flex; flex-direction: column; justify-content: flex-end; gap: 6px; min-height: 200px; aspect-ratio: 16/10; width: 100%; margin: 6px 0 2px; padding: 16px; border-radius: 22px; overflow: hidden; border: 1px solid rgba(201,162,74,.35); background: #000; color: var(--fg); text-align: left; font: inherit; cursor: pointer; isolation: isolate; box-shadow: 0 24px 50px -30px rgba(201,162,74,.6); }
+.nextcard .bg { position: absolute; inset: -3%; background: center/cover no-repeat; z-index: -2; filter: sepia(.1) saturate(.95); transition: transform .8s ease; }
+.nextcard::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(10,10,11,.15), rgba(10,10,11,.4) 45%, rgba(10,10,11,.92)); }
+.nextcard-top { position: absolute; top: 14px; left: 16px; right: 14px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.nextcard-top .eyebrow { margin: 0; } .chip.glass { background: rgba(10,10,11,.55); border-color: rgba(255,255,255,.18); color: #fff; backdrop-filter: blur(8px); }
+.nextcard-text { display: flex; flex-direction: column; gap: 4px; } .nextcard-text b.display { font-size: clamp(1.5rem, 5.5vw, 2.1rem); line-height: 1.05; font-weight: 500; } .nextcard-text .small { color: var(--fg2); }
+.nextcard-who { display: inline-flex; align-items: center; gap: 8px; margin-top: 2px; } .nextcard-who .avatar.small { width: 26px; height: 26px; font-size: .7rem; }
+@media (hover: hover) { .nextcard:hover .bg { transform: scale(1.04); } }
+@media (min-width: 640px) { .nextcard { aspect-ratio: 21/9; min-height: 240px; padding: 22px; } }
+@media (min-width: 1100px) { .screen.home > .nextcard { grid-column: 1 / -1; aspect-ratio: 24/9; max-height: 400px; } }
+/* week strip: tappable days; a tapped day folds its programme out */
+.weekstrip button.d { background: none; border: 0; padding: 4px 0 2px; border-radius: 12px; cursor: pointer; font: inherit; color: var(--fg3); transition: background .2s; }
+.weekstrip button.d.sel { background: var(--gold-soft); color: var(--gold2); } .weekstrip button.d.sel b { color: var(--gold2); }
+.daypanel { margin: 6px 0 4px; padding: 8px 12px 6px; border-radius: 14px; background: color-mix(in srgb, var(--card) 86%, transparent); border: 1px solid rgba(201,162,74,.25); backdrop-filter: blur(14px); }
+.daypanel .eyebrow { margin: 2px 0 4px; } .daypanel .item { border-bottom: 1px solid rgba(255,255,255,.06); } .daypanel .item:last-child { border-bottom: 0; }
+@media (min-width: 1100px) { .screen.home > .daypanel { grid-column: 1 / -1; } }
+/* messages as dialogue cards */
+.msgcards { display: flex; flex-direction: column; gap: 8px; }
+.msgcard { display: flex; width: 100%; align-items: flex-start; gap: 12px; padding: 12px 12px; color: var(--fg); text-align: left; font: inherit; font-weight: 300; cursor: pointer; border-radius: 16px; border: 1px solid rgba(201,162,74,.3); background: color-mix(in srgb, var(--card) 88%, transparent); backdrop-filter: blur(14px); }
+.msgcard .avatar { width: 38px; height: 38px; flex: none; } .msgcard .grow { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.msgcard-head { display: flex; gap: 6px; align-items: baseline; font-size: .8rem; } .msgcard-head b { font-weight: 500; }
+.msgcard-title { font-family: var(--display); font-size: 1.15rem; line-height: 1.15; } .msgcard-body { color: var(--muted); line-height: 1.35; white-space: normal; }
+.msgcard .chip { align-self: center; flex: none; margin-left: auto; } .chip.gold { background: linear-gradient(135deg, var(--gold2), var(--gold)); color: #15120d; border-color: transparent; font-weight: 500; }
+/* upcoming events as magazine tiles */
+.evgrid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+.evtile { position: relative; display: flex; align-items: flex-end; gap: 12px; min-height: 120px; aspect-ratio: 16/7; padding: 12px 12px 12px 14px; border-radius: 18px; overflow: hidden; border: 1px solid rgba(255,255,255,.1); background: #000 center/cover no-repeat; color: var(--fg); text-align: left; font: inherit; cursor: pointer; isolation: isolate; }
+.evtile::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgba(10,10,11,.88) 0%, rgba(10,10,11,.55) 55%, rgba(10,10,11,.15)); }
+.evtile .stamp { flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 50px; height: 54px; border-radius: 12px; background: rgba(10,10,11,.55); border: 1px solid rgba(201,162,74,.5); backdrop-filter: blur(6px); }
+.evtile .stamp b { font-family: var(--display); font-size: 1.5rem; line-height: 1; color: var(--gold2); } .evtile .stamp small { font-size: .6rem; letter-spacing: .12em; text-transform: uppercase; color: var(--fg2); }
+.evtile-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; } .evtile-text .eyebrow { margin: 0; font-size: .62rem; } .evtile-text b.display { font-size: 1.25rem; line-height: 1.1; font-weight: 500; }
+.evtile .chip { position: absolute; top: 10px; right: 10px; }
+@media (min-width: 640px) { .evgrid { grid-template-columns: 1fr 1fr; } .evtile { aspect-ratio: 16/8; } }
+@media (hover: hover) { .evtile, .tcar-slide, .msgcard { transition: transform .25s ease, box-shadow .25s ease; } .evtile:hover, .tcar-slide:hover { transform: translateY(-2px); box-shadow: 0 18px 36px -22px rgba(201,162,74,.7); } }
+/* photo band: bigger slides, three on a desktop, section spans both columns */
+@media (min-width: 1100px) { .screen.home > .sec:has(> .tcar) { grid-column: 1 / -1; } .screen.home .tcar-slide { flex-basis: 32%; } }
+/* trophy shelf: the next possible emblem as a silhouette */
+.shelf .trophy.ghost { opacity: .55; cursor: default; } .shelf .trophy.ghost .e { border-style: dashed; background: none; box-shadow: none; filter: grayscale(1); }
+/* top bar on phones: flags live in the profile sheet instead */
+@media (max-width: 639px) { .topbar .langflags, .homehero-top .langflags { display: none; } }
+.sheet-lang { padding: 2px 0 8px; border-bottom: 1px solid var(--line); margin-bottom: 8px; }

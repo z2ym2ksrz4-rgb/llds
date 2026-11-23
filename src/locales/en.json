@@ -181,7 +181,7 @@
       "day": "Hi {{name}}",
       "evening": "Good evening, {{name}}"
     },
-    "nextUp": "Next",
+    "nextUp": "Next up",
     "yourShelf": "Your trophy shelf",
     "childsShelf": "{{name}}'s trophy shelf",
     "adminTodo": "For you",
@@ -192,7 +192,15 @@
     "studioEyebrow": "The whole studio",
     "studioTitle": "The studio",
     "studioSub": "Across all teams – what you, as administrator, need to keep an eye on.",
-    "glimpses": "Glimpses from your teams"
+    "glimpses": "Glimpses from your teams",
+    "inMin": "in {{n}} min",
+    "inHours": "in {{h}} h {{m}} min",
+    "tomorrow": "tomorrow",
+    "onDay": "{{day}}",
+    "allEvents": "All events",
+    "dayNothing": "Nothing this day",
+    "nextBadge": "Next emblem",
+    "streak10": "10 trainings in a row"
   },
   "admin": {
     "users": "New users",
@@ -664,7 +672,9 @@
     "history": "History ({{n}})",
     "comments": "Comments ({{n}})",
     "commentPh": "Write a comment or a question …",
-    "commentSend": "Send"
+    "commentSend": "Send",
+    "open": "Read",
+    "acceptBtn": "Accept"
   },
   "folders": {
     "new": "New folder",
@@ -1152,7 +1162,8 @@
       "badges": "Trophy shelf (badges + milestones)",
       "gallery": "Team pictures (carousel)",
       "studioHead": "Heading: The studio",
-      "audition": "Audition (applicants only)"
+      "audition": "Audition (applicants only)",
+      "next": "Next up (big card)"
     },
     "gallery": "Photo carousel on the website",
     "gallerySub": "Pick images for the carousel on the website front page – in the order you tap ({{n}} selected). Empty = the teams' own photos are shown automatically.",

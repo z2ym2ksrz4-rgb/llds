@@ -45,6 +45,7 @@ export function Home() {
   const [open, setOpen] = useState<Session | null>(null);
   const [openEvent, setOpenEvent] = useState<Event | null>(null);
   const [join, setJoin] = useState(false);
+  const [selDay, setSelDay] = useState<string | null>(null);   // week strip: tapped day folds its programme out
   const [toast, setToast] = useState<string | null>(null);
   const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
 
@@ -94,6 +95,10 @@ export function Home() {
   for (const b of bookings) if (b.person_id === me.person.id && b.status !== "rejected" && new Date(b.starts_at) < weekEnd) week.push({ key: "bk" + b.id, at: b.starts_at, end: b.ends_at, kind: "booking", title: b.title, sub: `${b.room_name}${b.status === "pending" ? " · " + t("rooms.pending") : ""}` });
   week.sort((a, b) => a.at.localeCompare(b.at));
   const weekDays = [...new Set(week.map((w) => new Date(w.at).toDateString()))];
+  const nowMs = Date.now();
+  const nextItem = week.find((w) => !w.off && (new Date(w.end ?? w.at).getTime() > nowMs)) ?? null;
+  const rel = (iso: string) => { const d = new Date(iso); const diff = d.getTime() - nowMs; const min = Math.round(diff / 60000); if (min < 1) return t("home.today"); if (min < 60) return t("home.inMin", { n: min }); if (d.toDateString() === today) return t("home.inHours", { h: Math.floor(min / 60), m: min % 60 }); if (d.toDateString() === addDays(startOfDay(new Date()), 1).toDateString()) return `${t("home.tomorrow")} ${hm(iso)}`; return `${dateLabel(iso)} ${hm(iso)}`; };
+  const teamById = (id?: string | null) => me.teams.find((x) => x.id === id);
   const KIND_CHIP: Record<WeekItem["kind"], string> = { training: "week.training", staff: "week.youTrain", event: "week.event", booking: "week.booking" };
 
   /* hero image: the viewed person's own team photo (Line's) → next event's image → school default → art */
@@ -101,6 +106,9 @@ export function Home() {
   const ownPhoto = firstTeam && /^https?:/.test(firstTeam.cover_url ?? "") ? firstTeam.cover_url : firstTeam?.photos?.[0] ?? null;
   const heroImg = resolveImage(ownPhoto) ?? catalogUrl(hero?.image_key) ?? catalogUrl(appearance.images?.hero) ?? artFor(viewing.personId, ["group", "trails", "studio"]);
   const heroFocus = resolveImage(ownPhoto) ? firstTeam?.focus : catalogUrl(hero?.image_key) ? hero?.focus : null;
+  const nextTeam = teamById(nextItem?.session?.team_id);
+  const nextImg = nextItem?.session?.team_id ? ((resolveImage(nextTeam?.cover_url) === heroImg ? resolveImage(nextTeam?.photos?.find((u) => resolveImage(u) !== heroImg) ?? null) ?? resolveImage(nextTeam?.about_url) : null) ?? resolveImage(nextTeam?.cover_url) ?? artFor(nextItem.session.team_id, ["group", "studio"])) : nextItem?.event ? (catalogUrl(nextItem.event.image_key) ?? artFor(nextItem.event.id)) : null;
+  const nextFocus = nextItem?.session?.team_id ? (nextImg === resolveImage(nextTeam?.cover_url) ? nextTeam?.focus : null) : nextItem?.event?.focus;
   useScene(heroImg);
   const hour = new Date().getHours(); const tone = hour < 10 ? "morning" : hour < 17 ? "day" : "evening";
   const greeting = t(`home.greet.${tone}`, { name: me.person.first_name }); // always the logged-in person – the child's name goes on the sections below
@@ -169,17 +177,39 @@ export function Home() {
     upcoming: () => (<>
       {upcoming.length > 0 && (
         <div className="sec"><h2>{t("home.upcoming")}</h2>
-          <ScrollList testId="upcoming">{upcoming.map((e) => <button key={e.id} className="item" onClick={() => setOpenEvent(e)}><span className="time">{dateLabel(e.starts_at)}</span><span className="grow">{e.title}<div className="tiny">{e.place ?? t(`events.kind.${e.kind}`)}{e.team_names?.length ? ` · ${e.team_names.slice(0, 3).join(", ")}${e.team_names.length > 3 ? " …" : ""}` : ""}</div></span><span className="gold">›</span></button>)}</ScrollList>
+          <div className="evgrid" data-testid="upcoming">{upcoming.slice(0, 4).map((e) => { const d = new Date(e.starts_at); return (
+            <button key={e.id} className="evtile" onClick={() => setOpenEvent(e)} style={focusStyle(e.focus, { backgroundImage: `url(${catalogUrl(e.image_key) ?? artFor(e.id)})` })}>
+              <span className="stamp"><b>{d.getDate()}</b><small>{d.toLocaleDateString(loc(), { month: "short" }).replace(".", "")}</small></span>
+              <span className="evtile-text"><span className="eyebrow">{t(`events.kind.${e.kind}`)}{e.team_names?.length ? ` · ${e.team_names.slice(0, 2).join(", ")}${e.team_names.length > 2 ? " …" : ""}` : ""}</span><b className="display">{e.title}</b><span className="tiny">{e.place ?? ""}</span></span>
+              {e.mySignups ? <span className="chip small ok">{t("events.signedUp")}</span> : null}
+            </button>); })}</div>
+          {upcoming.length > 4 && <button className="linklike small" onClick={() => setTab("events")}>{t("home.allEvents")} ›</button>}
         </div>
+      )}
+    </>),
+    next: () => (<>
+      {nextItem && nextImg && (
+        <button type="button" className="nextcard" data-testid="next-card" onClick={() => (nextItem.session ? setOpen(nextItem.session) : nextItem.event ? setOpenEvent(nextItem.event) : setTab("rooms"))}>
+          <span className="bg" style={focusStyle(nextFocus, { backgroundImage: `url(${nextImg})` })} />
+          <span className="nextcard-top"><span className="eyebrow gold">{t("home.nextUp")} · {t(KIND_CHIP[nextItem.kind])}</span><span className="chip small glass">{rel(nextItem.at)}</span></span>
+          <span className="nextcard-text"><b className="display">{nextItem.title}</b><span className="small">{hm(nextItem.at)}{nextItem.end ? `–${hm(nextItem.end)}` : ""} · {nextItem.sub}{nextItem.who ? ` · ${nextItem.who}` : ""}</span></span>
+          {(nextItem.session?.substitute_name || nextItem.session?.trainer_name) && <span className="nextcard-who"><span className="avatar small">{(nextItem.session.substitute_name ?? nextItem.session.trainer_name ?? "?")[0]}</span><span className="tiny">{nextItem.session.substitute_name ?? nextItem.session.trainer_name}</span></span>}
+        </button>
       )}
     </>),
     teampick: () => (<>
       {(!isAdmin || teamIds.size > 0) && <TeamPicker ownOnly />}
       {!me.person.supervised_by && <button type="button" className="linklike small home-join" data-testid="home-join" onClick={() => setJoin(true)}>+ {t("pay.join")}</button>}
       {/* week strip: the dots follow the team chosen above – its trainings and events */}
-      {(!isAdmin || teamIds.size > 0) && <div className="weekstrip" aria-hidden="true" data-testid="weekstrip">
-        {strip.map((d) => { const key = d.toDateString(); const n = sessions.filter((x) => x.team_id === teamId && !x.cancelled && new Date(x.starts_at).toDateString() === key).length + events.filter((e) => new Date(e.starts_at).toDateString() === key && (!e.team_ids.length || (teamId ? e.team_ids.includes(teamId) : false))).length; return <span key={key} className={"d" + (key === today ? " today" : "") + (n ? " has" : "")}><small>{DAY_SHORT[(d.getDay() + 6) % 7]}</small><b>{d.getDate()}</b><i /></span>; })}
+      {(!isAdmin || teamIds.size > 0) && <div className="weekstrip" data-testid="weekstrip">
+        {strip.map((d) => { const key = d.toDateString(); const n = week.filter((w) => new Date(w.at).toDateString() === key).length || sessions.filter((x) => x.team_id === teamId && !x.cancelled && new Date(x.starts_at).toDateString() === key).length; return <button type="button" key={key} className={"d" + (key === today ? " today" : "") + (n ? " has" : "") + (selDay === key ? " sel" : "")} onClick={() => setSelDay(selDay === key ? null : key)} aria-pressed={selDay === key}><small>{DAY_SHORT[(d.getDay() + 6) % 7]}</small><b>{d.getDate()}</b><i /></button>; })}
       </div>}
+      {selDay && (() => { const items = week.filter((w) => new Date(w.at).toDateString() === selDay); return (
+        <div className="daypanel list" data-testid="day-panel">
+          <div className="eyebrow gold">{dateLabel(items[0]?.at ?? new Date(selDay).toISOString())}</div>
+          {items.map((w) => <button key={w.key} className={"item" + (w.off ? " off" : "")} data-kind={w.kind} onClick={() => (w.session ? setOpen(w.session) : w.event ? setOpenEvent(w.event) : setTab("rooms"))}><span className="time">{hm(w.at)}</span><span className="grow">{w.title}{w.who ? <span className="chip small" style={{ marginLeft: 6 }}>{w.who}</span> : null}<div className="tiny">{w.sub}</div></span><span className={"chip small " + w.kind}>{t(KIND_CHIP[w.kind])}</span></button>)}
+          {!items.length && <Empty symbol="◷" text={t("home.dayNothing")} />}
+        </div>); })()}
     </>),
     week: () => (<>
       {(week.length > 0 || teamIds.size > 0) && (

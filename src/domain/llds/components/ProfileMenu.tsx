@@ -29,6 +29,7 @@ export function TopRight() {
       <button className={"avatar" + (me.person.photo_url ? " photo" : "")} style={me.person.photo_url ? { backgroundImage: `url(${me.person.photo_url})` } : undefined} aria-label={t("nav.profile")} data-testid="avatar" data-tour="avatar" onClick={() => setOpen(true)}>{me.person.photo_url ? "" : `${me.person.first_name[0]}${me.person.last_name[0] ?? ""}`}</button>
       {open && (
         <Sheet onClose={() => setOpen(false)} eyebrow={me.person.email ?? ""} title={`${me.person.first_name} ${me.person.last_name}`}>
+          <div className="row between sheet-lang"><span className="tiny muted">{t("settings.language")}</span><LangFlags /></div>
           {realAdmin && (
             <div className="field"><span>{t("view.as")}</span>
               <div className="personas" data-testid="view-as">
