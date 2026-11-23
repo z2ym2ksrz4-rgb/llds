@@ -27,7 +27,11 @@ export default function App() {
   const hasTeams = !!me && (me.memberships.length > 0 || (realAdmin && !viewAs));
   const blocked = useAuth((s) => s.previewBlocked)();
   const tab = useNav((s) => s.tab); const setTab = useNav((s) => s.setTab);
-  useEffect(() => { initDeepLinks(); }, []);
+  useEffect(() => { initDeepLinks(); const tone = () => { const h = new Date().getHours(); document.documentElement.dataset.tone = h < 10 ? "morning" : h < 17 ? "day" : "evening"; }; tone(); const i = setInterval(tone, 60_000);
+    // scroll reveal: sections fade in once as they enter the viewport (no-op with reduced motion or without IntersectionObserver)
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches; let io: IntersectionObserver | null = null; let mo: MutationObserver | null = null;
+    if (!reduce && "IntersectionObserver" in window) { io = new IntersectionObserver((es) => { for (const e of es) if (e.isIntersecting) { e.target.classList.add("in"); io?.unobserve(e.target); } }, { rootMargin: "0px 0px -8% 0px" }); const scan = () => document.querySelectorAll<HTMLElement>("main .sec:not(.rv), main .nextcard:not(.rv), main .card.list:not(.rv)").forEach((el) => { el.classList.add("rv"); if (el.getBoundingClientRect().top < innerHeight) el.classList.add("in"); else { io!.observe(el); setTimeout(() => el.classList.add("in"), 1800); } }); scan(); mo = new MutationObserver(scan); mo.observe(document.body, { childList: true, subtree: true }); }
+    return () => { clearInterval(i); io?.disconnect(); mo?.disconnect(); }; }, []);
   useEffect(() => { if (phase !== "ready") setTab("home"); }, [phase, setTab]);
   // unread counters on the tabs: refresh when ready, every minute, and on every tab change; opening a tab marks its notifications seen
   const badges = useBadges((b) => b.tabs); const refreshBadges = useBadges((b) => b.refresh); const seenTab = useBadges((b) => b.seen);

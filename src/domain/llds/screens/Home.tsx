@@ -221,6 +221,7 @@ export function Home() {
                 {items.map((w) => (
                   <button key={w.key} className={"item" + (w.off ? " off" : "")} data-kind={w.kind} onClick={() => (w.session ? setOpen(w.session) : w.event ? setOpenEvent(w.event) : setTab("rooms"))}>
                     <span className="time">{hm(w.at)}{w.end ? <><br /><span className="tiny">{hm(w.end)}</span></> : null}</span>
+                    {(w.session?.substitute_name || w.session?.trainer_name) && <span className="avatar small" aria-hidden>{(w.session.substitute_name ?? w.session.trainer_name ?? "?")[0]}</span>}
                     <span className="grow">{w.title}{w.who ? <span className="chip small" style={{ marginLeft: 6 }}>{w.who}</span> : null}<div className="tiny">{w.sub}{w.off ? " · " + t("session.cancelled") : ""}</div></span>
                     <span className={"chip small " + w.kind}>{t(KIND_CHIP[w.kind])}</span>
                   </button>))}

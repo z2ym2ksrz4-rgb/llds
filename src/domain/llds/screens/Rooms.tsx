@@ -13,6 +13,7 @@ import { addDays, atTime, DAY_LONG, dayLabel, hm, loc, mondayOf, overlaps, sameD
 import { useAppearance } from "@/core/appearance";
 import { catalogUrl } from "../lib/catalog";
 import { art, teamAccent } from "../lib/art";
+import { resolveImage } from "../lib/catalog";
 
 const HOURS = Array.from({ length: 14 }, (_, i) => 9 + i); // 09–22
 
@@ -45,7 +46,7 @@ export function Rooms() {
   const dayEvents = events.filter((e) => sameDay(new Date(e.starts_at), day));
   const bgImg = useAppearance((a) => catalogUrl(a.a.images?.hero)) ?? art("studio");
   const myTeamIds = new Set(me.memberships.filter((m) => m.person_id === viewing.personId || m.person_id === me.person.id).map((m) => m.team_id));
-  const accentOf = (teamId: string | null) => { const tm = teamId ? me.teams.find((x) => x.id === teamId) : null; return tm ? teamAccent(tm) : {}; };
+  const accentOf = (teamId: string | null) => { const tm = teamId ? me.teams.find((x) => x.id === teamId) : null; const img = tm ? resolveImage(tm.cover_url) ?? resolveImage(tm.photos?.[0] ?? null) : null; return tm ? { ...teamAccent(tm), ...(img ? { ["--evimg" as string]: `url(${img})` } : {}) } : {}; };
   const [nowMin, setNowMin] = useState(() => new Date().getHours() * 60 + new Date().getMinutes());
   useEffect(() => { const i = setInterval(() => setNowMin(new Date().getHours() * 60 + new Date().getMinutes()), 60_000); return () => clearInterval(i); }, []);
   useEffect(() => { void api.listSessions(week.toISOString(), addDays(week, 7).toISOString()).then(setWeekSessions).catch(() => setWeekSessions([])); }, [week.getTime()]); // eslint-disable-line react-hooks/exhaustive-deps

@@ -96,7 +96,6 @@ export function TeamScreen() {
   // choreography + formations belong to the dancers; a parent only sees them when the child has no own login (too young) or the team allows it
   const seesChoreo = staff || role !== "parent" || team.parents_see_video || !child?.user_id || ((ageOf(child) ?? 99) < 13);
   const next = sessions[0];
-  const trainerName = next?.trainer_name ?? trainers[0]?.first_name ?? null;
 
   if (page === "audition") return <AuditionAdmin team={team} onBack={() => setPage("team")} toast={say} />;
   if (page === "dancers") return (
@@ -132,18 +131,30 @@ export function TeamScreen() {
       <TabNews tab="team" />
       <TeamPicker />
       <div className="hero photo kb" data-testid="team-hero" data-tour="team-hero"><span className="bg warm" style={focusStyle(team.focus, { backgroundImage: `url(${heroUrl})` })} />
-        <div><div className="eyebrow">{team.style} · {t(`category.${team.category}`)} · {team.level}</div><h2 className="display">{team.name}</h2>
-          <div className="small muted">{t("team.dancersN", { n: stats.dancers })}{trainerName ? ` · ${trainerName}` : ""}{next ? ` · ${DAY_LONG[(new Date(next.starts_at).getDay() + 6) % 7]} ${hm(next.starts_at)} ${next.room_name ?? ""}` : ""}</div>
-          <div className="small muted">{t(`roles.${role ?? "dancer"}`)}{team.punch_card_open ? ` · ${t("team.punchOpen")}` : ""}{(team.admission === "audition" || (team.closed && !team.admission)) ? <span className="chip gold small" style={{ marginLeft: 8 }}>{t("admin.admissionKind.audition")}</span> : team.admission === "tryout" ? <span className="chip small" style={{ marginLeft: 8 }}>{t("admin.admissionKind.tryout")}</span> : null}</div></div>
+        <div className="teamhero-text"><div className="eyebrow">{team.style} · {t(`category.${team.category}`)} · {team.level}</div><h2 className="display">{team.name}</h2>
+          <div className="teamhero-meta">
+            {(trainers[0] || roster.staff[0]) && <span className="who">{trainers[0] ? <Avatar person={trainers[0]} size="small" /> : <span className="avatar small">{roster.staff[0]!.name[0]}</span>}<span className="small">{trainers[0]?.first_name ?? roster.staff[0]?.name.split(" ")[0]}</span></span>}
+            <span className="small muted">{t("team.dancersN", { n: stats.dancers })} · {t(`roles.${role ?? "dancer"}`)}</span>
+            {(team.admission === "audition" || (team.closed && !team.admission)) ? <span className="chip gold small">{t("admin.admissionKind.audition")}</span> : team.admission === "tryout" ? <span className="chip small">{t("admin.admissionKind.tryout")}</span> : team.punch_card_open ? <span className="chip small">{t("team.punchOpen")}</span> : null}
+          </div>
+          {next && <button type="button" className="teamhero-next" onClick={(e) => { e.stopPropagation(); setOpen(next); }} data-testid="team-hero-next"><span className="eyebrow gold">{t("team.nextTraining")}</span><b>{DAY_LONG[(new Date(next.starts_at).getDay() + 6) % 7]} {hm(next.starts_at)}</b><span className="tiny">{next.room_name ?? ""}{next.substitute_name ? ` · ${next.substitute_name}` : ""}</span></button>}
+        </div>
       </div>
 
-      <div className="grid2 tiles">
+      <div className="tilechips" data-testid="team-tiles">
         <button className={"card tap" + (seesChoreo ? "" : " dim")} disabled={!seesChoreo} onClick={() => setPage("choreo")} data-testid="go-choreo"><div className="eyebrow">{t("team.choreo")}</div><div className="big">{seesChoreo ? t("team.videosN", { n: stats.videos }) : t("team.choreoLocked")}</div></button>
         {<button className="card tap" onClick={() => setPage("folders")} data-testid="go-folders"><div className="eyebrow">{t("team.folders")}</div><div className="big">{t("team.mediaN", { n: stats.media })}</div></button>}
         {(staff || stats.formations > 0) && <button className={"card tap" + (seesChoreo ? "" : " dim")} disabled={!seesChoreo} onClick={() => setPage("formations")} data-testid="go-formations"><div className="eyebrow">{t("choreo.formations")}</div><div className="big">{seesChoreo ? t("team.formationsN", { n: stats.formations }) : t("team.choreoLocked")}</div></button>}
         {staff && (team.admission === "audition" || team.closed) && <button className="card tap" onClick={() => setPage("audition")} data-testid="go-audition"><div className="eyebrow">{t("audition.title")}</div><div className="big">🎯</div></button>}
         <button className="card tap" onClick={() => setPage("dancers")} data-testid="go-dancers"><div className="eyebrow">{t("team.dancers")}</div><div className="big">{stats.dancers}{staff ? "" : ""}</div></button>
       </div>
+      {(dancers.length > 0 || roster.dancers.length > 0) && (
+        <button type="button" className="faces" onClick={() => setPage("dancers")} data-testid="team-faces" aria-label={t("team.dancers")}>
+          {(staff ? dancers.slice(0, 12).map((p) => <Avatar key={p.id} person={p} size="small" className="face" />) : roster.dancers.slice(0, 12).map((x) => <span key={x.person_id} className="avatar small face">{x.initials}</span>))}
+          {(staff ? dancers.length : roster.dancers.length) > 12 && <span className="avatar small face more">+{(staff ? dancers.length : roster.dancers.length) - 12}</span>}
+          <span className="tiny muted faces-label">{t("team.dancersN", { n: stats.dancers })} ›</span>
+        </button>
+      )}
       
 
       {(() => { const teamMsgs = msgs.filter((m) => m.audience.teams?.includes(team.id)); const allMsgs = msgs.filter((m) => m.audience.all); const Row = ({ m }: { m: Message }) => <button className="item" onClick={() => setOpenMsg(m)} data-testid="team-msg"><span className="grow">{m.title}<div className="tiny">{m.author_name} · {ago(m.created_at)}</div></span>{m.acted_at ? <span className="chip ok small">{t(`msg.done.${m.needs}`)}</span> : <span className="chip warn small">{t(`msg.needs.${m.needs}`)}</span>}</button>; return (
@@ -159,12 +170,12 @@ export function TeamScreen() {
       {openThread && <ThreadSheet thread={openThread} onClose={() => { setOpenThread(null); void load(); }} toast={say} />}
 
       {(team.description || team.price || team.day_time) && (
-        <div className="sec"><h2>{t("team.about")}</h2><div className="card" data-testid="team-about">
+        <details className="sec fold" data-testid="team-about-fold"><summary><h2>{t("team.about")}</h2><span className="caret">⌄</span></summary><div className="card" data-testid="team-about">
           {aboutImg && <div className="mood" data-testid="team-about-img" style={focusStyle(aboutImg === resolveImage(team.cover_url) ? team.focus : null, { backgroundImage: `url(${aboutImg})` })} />}
           {(team.day_time || team.years) && <div className="small muted" style={{ marginBottom: 8 }}>{[team.day_time, team.years].filter(Boolean).join(" · ")}</div>}
           {team.description && <About text={team.description} />}
           {team.price && (staff || role === "parent") && <div className="row between" style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid var(--line)" }}><span className="tiny">{t("team.price")}</span><span className="gold small">{team.price}</span></div>}
-        </div></div>
+        </div></details>
       )}
       {events.length > 0 && (
         <div className="sec"><h2>{t("team.nextForTeam")}</h2><ScrollList>

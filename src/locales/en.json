@@ -145,7 +145,8 @@
     "rosterNamesOnly": "Contact details are only visible to the team's trainers and the administrator.",
     "removeFromTeam": "Remove from team",
     "removeConfirm": "Remove {{name}} from {{team}}? The person is not deleted – only the administrator can do that.",
-    "removed": "{{name}} removed from the team"
+    "removed": "{{name}} removed from the team",
+    "nextTraining": "Next training"
   },
   "home": {
     "hi": "Hi {{name}}",

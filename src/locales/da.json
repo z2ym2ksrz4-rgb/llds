@@ -145,7 +145,8 @@
     "rosterNamesOnly": "Kontaktoplysninger ses kun af holdets trænere og administratoren.",
     "removeFromTeam": "Fjern fra holdet",
     "removeConfirm": "Fjern {{name}} fra {{team}}? Personen slettes ikke – det kan kun administratoren.",
-    "removed": "{{name}} er fjernet fra holdet"
+    "removed": "{{name}} er fjernet fra holdet",
+    "nextTraining": "Næste træning"
   },
   "home": {
     "hi": "Hej {{name}}",
