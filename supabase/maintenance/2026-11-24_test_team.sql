@@ -62,11 +62,14 @@ begin
   insert into thread_message(thread_id, sender_id, body) values (ev, pia, 'Hej Rasmus – kan Milo nå at være med til showet, selvom han har været syg to gange?'), (ev, rasmus, 'Hej Pia – ja, sagtens. Han kender koreografien, vi tager de sidste detaljer søndag.');
 
   -- formations
-  insert into formation_set(team_id, title, created_by, frames, markers) values (tid, 'Testshow – åbning', rasmus,
+  insert into formation_set(team_id, title, created_by, frames, markers)
+  select tid, 'Testshow – åbning', rasmus,
     jsonb_build_array(
-      jsonb_build_object('id','f1','label','Start','at','1','positions', (select jsonb_agg(jsonb_build_object('key', p.id, 'label', left(p.first_name,1)||left(p.last_name,1), 'name', p.first_name, 'x', 0.15 + (row_number() over ())*0.12, 'y', 0.6)) from person p where p.id = any(dancers))),
-      jsonb_build_object('id','f2','label','V-formation','at','17','positions', (select jsonb_agg(jsonb_build_object('key', p.id, 'label', left(p.first_name,1)||left(p.last_name,1), 'name', p.first_name, 'x', 0.15 + (row_number() over ())*0.12, 'y', 0.3 + abs(4 - (row_number() over ()))*0.1)) from person p where p.id = any(dancers)))
-    ), '[]'::jsonb) returning id into fs;
+      jsonb_build_object('id','f1','label','Start','at','1','positions', jsonb_agg(jsonb_build_object('key', q.id, 'label', q.ini, 'name', q.first_name, 'x', 0.15 + q.n*0.12, 'y', 0.6))),
+      jsonb_build_object('id','f2','label','V-formation','at','17','positions', jsonb_agg(jsonb_build_object('key', q.id, 'label', q.ini, 'name', q.first_name, 'x', 0.15 + q.n*0.12, 'y', 0.3 + abs(4 - q.n)*0.1)))
+    ), '[]'::jsonb
+  from (select p.id, p.first_name, left(p.first_name,1)||left(p.last_name,1) as ini, row_number() over (order by p.first_name) as n from person p where p.id = any(dancers)) q
+  returning id into fs;
 
   -- event for the team (with sign-ups), a result and a milestone, two emblems
   insert into event(school_id, title, kind, starts_at, place, meet_time, team_ids, plan, pack_list, info, signup_deadline, price_dkk, visibility, created_by, image_key)
