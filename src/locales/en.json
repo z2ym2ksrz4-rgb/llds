@@ -1104,7 +1104,9 @@
     "builtIn": "Built-in",
     "libraryHint": "Folders and uploads are managed under Admin → Image catalogue. Uploading here puts the file in the selected folder.",
     "focusHelp": "Tap the most important part of the picture (faces) – it is never cropped away",
-    "focusReset": "Reset"
+    "focusReset": "Reset",
+    "allTeamPhotos": "Team photos",
+    "everyTeam": "All teams"
   },
   "tour": {
     "eyebrow": "Welcome",

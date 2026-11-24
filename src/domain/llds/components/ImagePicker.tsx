@@ -42,8 +42,12 @@ export function ImagePicker({ value, onChange, tag, allowNone = true, label, own
 export function MediaLibrary({ tag, value, own: ownUrls = [], onPick, onClose }: { tag: Tag; value: string | null; own?: string[]; onPick: (ref: string) => void; onClose: () => void }) {
   const { t } = useTranslation();
   const isAdmin = useAuth((s) => !!s.me?.person.is_admin);
+  const teams = useAuth((s) => s.me?.teams ?? []);
   const [own, setOwn] = useState<CatalogEntry[]>([]);
   const [folder, setFolder] = useState<string>("all");
+  const [teamFilter, setTeamFilter] = useState<string>("all");
+  // every team's photos (Line's site photos, uploaded covers) – so an event can carry the picture of the team it is about
+  const teamPhotos = teams.map((x) => ({ team: x, urls: [...new Set([x.cover_url, x.alt_url, x.about_url, ...(x.photos ?? [])].filter((u): u is string => !!u && /^https?:/.test(u)))] })).filter((x) => x.urls.length > 0);
   const [busy, setBusy] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   useEffect(() => { void api.listCatalog().then(setOwn).catch(() => setOwn([])); }, []);
@@ -62,11 +66,17 @@ export function MediaLibrary({ tag, value, own: ownUrls = [], onPick, onClose }:
       <div className="chips" data-testid="media-folders">
         <button type="button" className={"chip" + (folder === "all" ? " on" : "")} onClick={() => setFolder("all")}>{t("catalog.all")}</button>
         {ownUrls.length > 0 && <button type="button" className={"chip" + (folder === "team" ? " on" : "")} onClick={() => setFolder("team")}>{t("catalog.teamPhotos")}</button>}
+        {teamPhotos.length > 0 && <button type="button" className={"chip" + (folder === "teams" ? " on" : "")} onClick={() => setFolder("teams")} data-testid="media-teams">{t("catalog.allTeamPhotos")}</button>}
         {folders.map((f) => <button key={f} type="button" className={"chip" + (folder === f ? " on" : "")} onClick={() => setFolder(f)}>{f}</button>)}
         <button type="button" className={"chip" + (folder === "catalog" ? " on" : "")} onClick={() => setFolder("catalog")}>{t("catalog.builtIn")}</button>
       </div>
+      {folder === "teams" && <div className="chips scrollx" data-testid="media-team-filter">
+        <button type="button" className={"chip small" + (teamFilter === "all" ? " on" : "")} onClick={() => setTeamFilter("all")}>{t("catalog.everyTeam")}</button>
+        {teamPhotos.map((x) => <button key={x.team.id} type="button" className={"chip small" + (teamFilter === x.team.id ? " on" : "")} onClick={() => setTeamFilter(x.team.id)}>{x.team.name} · {x.urls.length}</button>)}
+      </div>}
       <div className="imgpick" data-testid="media-library">
         {isAdmin && <button type="button" className="ip upload" onClick={() => fileRef.current?.click()} disabled={busy} data-testid="library-upload"><span className="auto">{busy ? "…" : "＋"}</span><small>{t("catalog.upload")}</small></button>}
+        {folder === "teams" && teamPhotos.filter((x) => teamFilter === "all" || x.team.id === teamFilter).flatMap((x) => x.urls.map((u, i) => <button key={x.team.id + i} type="button" className={"ip" + (value === u ? " on" : "")} style={{ backgroundImage: `url(${u})` }} onClick={() => onPick(u)} title={x.team.name} data-testid="image-option"><small>{x.team.name}</small></button>))}
         {showOwnPhotos && ownUrls.map((u, i) => <button key={"own" + i} type="button" className={"ip" + (value === u ? " on" : "")} style={{ backgroundImage: `url(${u})` }} onClick={() => onPick(u)} data-testid="image-option"><small>{t("catalog.teamPhoto")}</small></button>)}
         {showUploads && uploads.map((o) => <button key={o.id} type="button" className={"ip" + (value === o.url ? " on" : "")} style={{ backgroundImage: `url(${o.url})` }} onClick={() => onPick(o.url)} title={o.title ?? ""} data-testid="image-option"><small>{o.title ?? o.folder}</small></button>)}
         {showBundled && bundled.map((c) => <button key={c.key} type="button" className={"ip" + (value === c.key ? " on" : "")} style={{ backgroundImage: `url(${catalogUrl(c.key)})` }} onClick={() => onPick(c.key)} title={c.title} aria-label={c.title} data-testid="image-option"><small>{c.title}</small></button>)}
