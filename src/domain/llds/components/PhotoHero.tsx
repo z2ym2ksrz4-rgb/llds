@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
 import { focusStyle } from "../lib/art";
 import type { Focus } from "@/core/api";
@@ -16,6 +16,7 @@ export const hiRes = (url: string) => url.replace(/-\d{2,4}x\d{2,4}(?=\.(?:jpe?g
 export function HeroMedia({ src, focus, className = "", style, blurClass = "" }: { src: string; focus?: Focus | null; className?: string; style?: CSSProperties; blurClass?: string }) {
   const photo = isSitePhoto(src) && !focus;
   const [img, setImg] = useState(() => (photo ? hiRes(src) : src));
+  useEffect(() => { setImg(photo ? hiRes(src) : src); }, [src, photo]);   // follows the team picker (new src → new image, hi-res attempt again)
   if (!photo) return <span className={"bg " + className} style={focusStyle(focus, { backgroundImage: `url(${src})`, ...style })} />;
   return (
     <>
