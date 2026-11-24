@@ -829,7 +829,7 @@ details.fold > summary h2 { flex: 1; } details.fold > summary .caret { color: va
 .hero.photo.own .pic { -webkit-mask-image:linear-gradient(to bottom, #000 55%, transparent 100%); mask-image:linear-gradient(to bottom, #000 55%, transparent 100%); animation:none; }
 .hero.photo.own .pic.warm { filter:sepia(.12) saturate(.98) contrast(1.03); }
 .homehero-media.photo::after { background:linear-gradient(to bottom, rgba(0,0,0,.08), rgba(0,0,0,.0) 30%, rgba(11,11,13,.55) 75%, rgba(11,11,13,.92)); mix-blend-mode:normal; }
-@media (min-width:1100px) { .homehero-media.photo .pic, .hero.photo.own .pic { object-position:center 20%; } }
+@media (min-width:1100px) { .homehero-media.photo .pic, .hero.photo.own .pic { object-fit:cover; object-position:center 22%; -webkit-mask-image:linear-gradient(to bottom, #000 70%, rgba(0,0,0,.35) 100%); mask-image:linear-gradient(to bottom, #000 70%, rgba(0,0,0,.35) 100%); } }
 
 /* ---- team tiles: dancer faces live inside the Dansere tile; audition chip readable on the hero */
 .tilechips .card.tap.dancers { flex: 1 1 100%; }
