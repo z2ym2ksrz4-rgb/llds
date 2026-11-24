@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { api, type Member, type Absence, type Person, type Session, type SessionInput, type Team, type Room } from "@/core/api";
+import { api, type Member, type Absence, type Person, type RosterEntry, type Session, type SessionInput, type Team, type Room } from "@/core/api";
 import { useAuth } from "@/core/auth";
 import { PunchStatus } from "../screens/PunchCards";
 import { Sheet } from "./Sheet";
@@ -52,6 +52,8 @@ export function SessionSheet({ session, absences, onClose, onChanged, toast }: {
         {session.substitute_wanted && !session.substitute_id && <span className="chip warn">{t("session.subWanted")}</span>}
       </div>
       {session.cancelled && session.cancel_note && <p className="small muted">{session.cancel_note}</p>}
+      {/* staff who do not own this training still get the facts: how many dancers, who is absent, and the roster */}
+      {isStaffAnywhere && !dancerHere && mode === "view" && <StaffFacts session={session} absences={absences} />}
 
       {/* lesson plan (vikar-overlevering) */}
       {canAttend && (mode === "plan" ? (
@@ -244,3 +246,18 @@ export function SessionEditor({ session, defaults, moveTo, onClose, onSaved, toa
   );
 }
 function addMin(hmStr: string, n: number) { const [h, m] = hmStr.split(":").map(Number); const d = new Date(2000, 0, 1, h, m + n); return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; }
+
+function StaffFacts({ session, absences }: { session: Session; absences: Absence[] }) {
+  const { t } = useTranslation();
+  const [roster, setRoster] = useState<RosterEntry[] | null>(null);
+  const [show, setShow] = useState(false);
+  useEffect(() => { void api.roster(session.id).then(setRoster).catch(() => setRoster([])); }, [session.id]);
+  const abs = absences.filter((a) => a.session_id === session.id);
+  const dancers = (roster ?? []).filter((r) => r.role === "dancer");
+  return (
+    <div className="card" style={{ margin: 0 }} data-testid="staff-facts">
+      <div className="row between"><span className="small">{t("team.dancersN", { n: dancers.length })}{abs.length ? ` · ${abs.length} ${t("team.absent")}` : ""}</span>{dancers.length > 0 && <button className="linklike small" onClick={() => setShow((v) => !v)} data-testid="staff-roster">{show ? t("session.hideDancers") : t("team.seeDancers")}</button>}</div>
+      {show && <div className="chips" style={{ marginTop: 8 }}>{dancers.map((r) => <span key={r.person_id} className={"chip small" + (abs.some((a) => a.person_id === r.person_id) ? " cx" : "")}>{r.name}{abs.some((a) => a.person_id === r.person_id) ? ` · ${t("team.absent")}` : ""}</span>)}</div>}
+    </div>
+  );
+}

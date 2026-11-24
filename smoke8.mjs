@@ -9,6 +9,6 @@ out.daTitle = await p.textContent("h1");
 await p.click("[data-testid=lang-en]"); await p.waitForTimeout(300); out.enTitle = await p.textContent("h1");
 await p.fill("#email", "admin@demo"); await p.click("form button.cta"); await p.fill("#code", "000000"); await p.click("form button.cta"); await p.waitForSelector("nav.tabbar");
 out.tabsEn = await p.$$eval("nav.tabbar button span", (e) => e.map((x) => x.textContent));
-await p.click("[data-testid=lang-da]"); await p.waitForTimeout(300); out.tabsDa = await p.$$eval("nav.tabbar button span", (e) => e.map((x) => x.textContent));
+await p.click("[data-testid=avatar]"); await p.waitForTimeout(300); await p.click(".sheet [data-testid=lang-da]"); await p.waitForTimeout(200); await p.click("[data-testid=sheet-close]"); await p.waitForTimeout(300); out.tabsDa = await p.$$eval("nav.tabbar button span", (e) => e.map((x) => x.textContent));
 console.log(JSON.stringify(out, null, 1)); await b.close();
 if (out.errors.length || !/Welcome/.test(out.enTitle) || !out.tabsEn.includes("Home") || !out.tabsDa.includes("Hjem")) process.exit(1);

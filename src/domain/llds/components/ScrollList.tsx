@@ -12,6 +12,7 @@ export function ScrollList({ children, rows = 3, className = "", testId }: { chi
     if (items.length <= rows) { setMax(undefined); setMore(false); return; }
     const first = items[0]; const last = items[rows - 1];
     const h = last.offsetTop + last.offsetHeight - first.offsetTop + 2;
+    if (el.offsetParent === null || h < 12) { setMax(undefined); setMore(false); return; }   // hidden (closed <details>) – measure again when shown (ResizeObserver)
     setMax(h); setMore(el.scrollTop + h < el.scrollHeight - 4);
   };
   useEffect(() => { measure(); const ro = new ResizeObserver(measure); if (ref.current) ro.observe(ref.current); return () => ro.disconnect(); }); // eslint-disable-line react-hooks/exhaustive-deps

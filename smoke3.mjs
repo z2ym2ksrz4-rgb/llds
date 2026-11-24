@@ -41,8 +41,8 @@ const alma = p.locator("[data-testid=post]", { hasText: "hættetrøje" });
 await alma.locator("button[aria-label=Mere]").click(); await alma.locator("text=Anmeld").click(); await alma.locator("input").fill("Upassende"); await alma.locator("text=Send anmeldelse").click();
 await p.waitForSelector(".toast"); out.reported = await p.textContent(".toast");
 // 1d. parent on The AXIS (parents_see_video=false, Freja 13) → choreography locked
-await p.click("nav.tabbar >> text=/^(Mit hold|Hold)$/"); await p.waitForSelector("[data-testid=go-choreo]");
-out.choreoLocked = await p.$eval("[data-testid=go-choreo]", e => e.disabled);
+await p.click("nav.tabbar >> text=/^(Mit hold|Hold)$/"); await p.waitForSelector("[data-testid=team-tiles]"); await p.waitForTimeout(600);
+out.choreoLocked = !(await p.$("[data-testid=go-choreo]"));   // locked choreography is hidden for parents of young dancers
 // folders: open, upload
 await p.click("[data-testid=go-folders]"); await p.waitForSelector("[data-testid=folder]"); out.folders = await p.$$eval("[data-testid=folder]", e => e.length);
 await p.click("[data-testid=folder] >> nth=1"); await p.waitForSelector("#media-files", { state: "attached" }); await p.setInputFiles("#media-files", IMG); await p.waitForSelector("[data-testid=media]"); out.mediaAfterUpload = await p.$$eval("[data-testid=media]", e => e.length); await shot(3);

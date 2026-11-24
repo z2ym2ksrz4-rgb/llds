@@ -8,6 +8,7 @@ const login = async (email) => { await p.goto(base, { waitUntil: "networkidle" }
 await login("admin@demo");
 await p.click("nav.tabbar >> text=/^(Mit hold|Hold)$/"); await p.waitForSelector("[data-testid=team-hero]");
 await p.click(".teampick-head"); await p.click(".teampick .chip:has-text('The AXIS')"); await p.waitForTimeout(300);
+await p.click("[data-testid=team-more-fold] summary"); await p.waitForTimeout(300);
 out.trophiesShown = !!(await p.$("[data-testid=trophies]"));
 out.badgesEmpty = (await p.textContent("[data-testid=team-badges]")).slice(0, 40);
 await p.click("[data-testid=go-dancers]"); await p.waitForSelector("[data-testid=give-badge]");
@@ -16,7 +17,7 @@ await p.waitForSelector("[data-testid=badge-picker]"); await p.click("[data-test
 await p.fill("input[placeholder='En lille hilsen (valgfrit)']", "Blev ved i spagaten"); await p.click("[data-testid=badge-save]");
 await p.waitForSelector(".toast"); out.toast = await p.textContent(".toast");
 await p.waitForTimeout(300); out.stripCount = await row.locator("[data-testid=emblem]").count();
-await p.click("text=‹ The AXIS"); await p.waitForSelector("[data-testid=team-badges]");
+await p.click("text=‹ The AXIS"); await p.waitForSelector("[data-testid=team-more-fold]"); if (!(await p.$("[data-testid=team-more-fold][open]"))) { await p.click("[data-testid=team-more-fold] summary"); } await p.waitForSelector("[data-testid=team-badges]");
 out.teamBadges = (await p.textContent("[data-testid=team-badges]")).slice(0, 60);
 await p.click("[data-testid=team-badges] .item"); out.sheetTitle = await p.textContent(".sheet h2"); await p.mouse.click(195, 140); await p.waitForSelector(".sheet-bg", { state: "detached" });
 // monthly emblem twice → error

@@ -397,7 +397,7 @@ export interface Api {
   addResult(input: Omit<Result, "id" | "team_name">): Promise<void>;
   deleteResult(id: string): Promise<void>;
   /** counts for the team tiles */
-  teamStats(teamId: string): Promise<{ videos: number; media: number; formations: number; dancers: number }>;
+  teamStats(teamId: string): Promise<{ videos: number; media: number; formations: number; dancers: number; folders?: number }>;
   /* formation tool */
   listFormationSets(teamId: string): Promise<FormationSet[]>;
   createFormationSet(teamId: string, title: string): Promise<FormationSet>;

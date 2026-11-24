@@ -30,6 +30,11 @@ export function Home() {
   const me = useAuth((s) => s.me)!;
   const viewing = useAuth((s) => s.viewing)!;
   const selectedTeamId = useAuth((s) => s.teamId);
+  const [moreOpen, setMoreOpen] = useState<boolean>(() => { try { return localStorage.getItem("llds_home_more") === "1"; } catch { return false; } });
+  const toggleMore = () => setMoreOpen((o) => { try { localStorage.setItem("llds_home_more", o ? "0" : "1"); } catch { /* ignore */ } return !o; });
+  const [weekAll, setWeekAll] = useState(false);
+  const [signupsOpen, setSignupsOpen] = useState(true);
+  useEffect(() => { void api.signupsOpen().then(setSignupsOpen).catch(() => setSignupsOpen(true)); }, []);
   const setTab = useNav((s) => s.setTab);
   const appearance = useAppearance((s) => s.a);
   const isAdmin = me.person.is_admin;
@@ -98,6 +103,7 @@ export function Home() {
   week.sort((a, b) => a.at.localeCompare(b.at));
   const weekDays = [...new Set(week.map((w) => new Date(w.at).toDateString()))];
   const nowMs = Date.now();
+  const tomorrow = addDays(startOfDay(new Date()), 1).toDateString();
   const nextItem = week.find((w) => !w.off && (new Date(w.end ?? w.at).getTime() > nowMs)) ?? null;
   const rel = (iso: string) => { const d = new Date(iso); const diff = d.getTime() - nowMs; const min = Math.round(diff / 60000); if (min < 1) return t("home.today"); if (min < 60) return t("home.inMin", { n: min }); if (d.toDateString() === today) return t("home.inHours", { h: Math.floor(min / 60), m: min % 60 }); if (d.toDateString() === addDays(startOfDay(new Date()), 1).toDateString()) return `${t("home.tomorrow")} ${hm(iso)}`; return `${dateLabel(iso)} ${hm(iso)}`; };
   const teamById = (id?: string | null) => me.teams.find((x) => x.id === id);
@@ -193,17 +199,22 @@ export function Home() {
     </>),
     next: () => (<>
       {nextItem && nextImg && (
-        <button type="button" className="nextcard" data-testid="next-card" onClick={() => (nextItem.session ? setOpen(nextItem.session) : nextItem.event ? setOpenEvent(nextItem.event) : setTab("rooms"))}>
+        <div className="nextcard" data-testid="next-card" role="button" tabIndex={0} onClick={() => (nextItem.session ? setOpen(nextItem.session) : nextItem.event ? setOpenEvent(nextItem.event) : setTab("rooms"))} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); (nextItem.session ? setOpen(nextItem.session) : nextItem.event ? setOpenEvent(nextItem.event) : setTab("rooms")); } }}>
           <span className="bg" style={focusStyle(nextFocus, { backgroundImage: `url(${nextImg})` })} />
           <span className="nextcard-top"><span className="eyebrow gold">{nextItem.kind === "training" ? (nextItem.who ? t("home.nextFor", { name: nextItem.who }) : t("home.nextYours")) : nextItem.kind === "staff" ? t("home.nextYouTrain") : `${t("home.nextUp")} · ${t(KIND_CHIP[nextItem.kind])}`}</span><span className="chip small glass">{rel(nextItem.at)}</span></span>
-          <span className="nextcard-text"><b className="display">{nextItem.title}</b><span className="small">{hm(nextItem.at)}{nextItem.end ? `–${hm(nextItem.end)}` : ""} · {nextItem.sub}{nextItem.who ? ` · ${nextItem.who}` : ""}</span></span>
-          {(nextItem.session?.substitute_name || nextItem.session?.trainer_name) && <span className="nextcard-who"><span className="avatar small">{(nextItem.session.substitute_name ?? nextItem.session.trainer_name ?? "?")[0]}</span><span className="tiny">{nextItem.session.substitute_name ?? nextItem.session.trainer_name}</span></span>}
-        </button>
+          <span className="nextcard-text"><b className="display">{nextItem.title}</b><span className="small">{hm(nextItem.at)}{nextItem.end ? `–${hm(nextItem.end)}` : ""} · {nextItem.sub}{nextItem.session?.substitute_name || nextItem.session?.trainer_name ? ` · ${nextItem.session.substitute_name ?? nextItem.session.trainer_name}` : ""}{nextItem.who ? ` · ${nextItem.who}` : ""}</span></span>
+          {/* one visible action: what the person most likely wants to do with this training/event */}
+          <span className="nextcard-actions">
+            {nextItem.kind === "training" && nextItem.session && <button type="button" className="ghost small" data-testid="next-action" onClick={(e) => { e.stopPropagation(); setOpen(nextItem.session!); }}>{nextItem.who ? t("session.reportAbsenceFor", { name: nextItem.who }) : t("session.reportAbsence")}</button>}
+            {nextItem.kind === "staff" && nextItem.session && <button type="button" className="ghost small" data-testid="next-action" onClick={(e) => { e.stopPropagation(); setOpen(nextItem.session!); }}>{nextItem.session.lesson_plan ? t("session.planShort") : t("session.writePlan")}</button>}
+            {nextItem.kind === "event" && nextItem.event && <button type="button" className="ghost small" data-testid="next-action" onClick={(e) => { e.stopPropagation(); setOpenEvent(nextItem.event!); }}>{nextItem.event.mySignups ? t("events.on") : t("events.signUp")}</button>}
+          </span>
+        </div>
       )}
     </>),
     teampick: () => (<>
       {(!isAdmin || me.teams.length > 0) && <TeamPicker />}
-      {!me.person.supervised_by && <button type="button" className="linklike small home-join" data-testid="home-join" onClick={() => setJoin(true)}>+ {t("pay.join")}</button>}
+      {!me.person.supervised_by && signupsOpen && <button type="button" className="linklike small home-join" data-testid="home-join" onClick={() => setJoin(true)}>+ {t("pay.join")}</button>}
       {/* week strip: the dots follow the team chosen above – its trainings and events */}
       {(!isAdmin || teamIds.size > 0) && <div className="weekstrip" data-testid="weekstrip">
         {strip.map((d) => { const key = d.toDateString(); const n = week.filter((w) => new Date(w.at).toDateString() === key).length || sessions.filter((x) => x.team_id === teamId && !x.cancelled && new Date(x.starts_at).toDateString() === key).length; return <button type="button" key={key} className={"d" + (key === today ? " today" : "") + (n ? " has" : "") + (selDay === key ? " sel" : "")} onClick={() => setSelDay(selDay === key ? null : key)} aria-pressed={selDay === key} aria-label={`${DAY_LONG[(d.getDay() + 6) % 7]} ${d.getDate()}. · ${n ? t("home.stripHas", { count: n }) : t("home.stripNone")}`} title={n ? t("home.stripHas", { count: n }) : t("home.stripNone")}><small>{DAY_SHORT[(d.getDay() + 6) % 7]}</small><b>{d.getDate()}</b><i /></button>; })}
@@ -219,7 +230,7 @@ export function Home() {
       {(week.length > 0 || teamIds.size > 0) && (
         <div className="sec" data-tour="week" data-testid="your-week"><h2>{hat ? t("home.childsWeek", { name: hat.first_name }) : t("home.yourWeek")}</h2>
           <ScrollList className="weeklist">
-            {weekDays.map((d) => { const items = week.filter((w) => new Date(w.at).toDateString() === d); const isToday = d === today; return (
+            {weekDays.filter((d) => weekAll || d === today || d === tomorrow).map((d) => { const items = week.filter((w) => new Date(w.at).toDateString() === d); const isToday = d === today; return (
               <div key={d} className="weekday">
                 <div className={"eyebrow" + (isToday ? " gold" : "")}>{isToday ? t("home.today") + " · " : ""}{dateLabel(items[0].at)}</div>
                 {items.map((w) => (
@@ -231,6 +242,9 @@ export function Home() {
                   </button>))}
               </div>); })}
             {!week.length && <Empty symbol="◷" text={t("home.noTrainings")} />}
+            {!weekAll && week.some((w) => { const d = new Date(w.at).toDateString(); return d !== today && d !== tomorrow; }) && (
+              <button type="button" className="linklike small" data-testid="week-more" onClick={() => setWeekAll(true)}>{t("home.restOfWeek", { count: week.filter((w) => { const d = new Date(w.at).toDateString(); return d !== today && d !== tomorrow; }).length })} ›</button>)}
+            {week.length > 0 && !week.some((w) => w.at.slice(0, 10) === new Date().toISOString().slice(0, 10)) && !weekAll && <p className="tiny muted" style={{ margin: "6px 0 0" }}>{t("home.nothingToday")}</p>}
           </ScrollList>
         </div>
       )}
@@ -253,12 +267,25 @@ export function Home() {
     </>),
     milestones: () => null,
   };
-  const order = homeOrder(appearance).filter((k) => !isHidden(appearance, k));
+  let order = homeOrder(appearance).filter((k) => !isHidden(appearance, k));
+  if (isAdmin) { // the studio block is Line's "what happens today" – it goes right under the next-card instead of at the bottom
+    const studioKeys = ["studioHead", "stats", "studio"]; const rest = order.filter((k) => !studioKeys.includes(k)); const at = rest.indexOf("next") + 1 || rest.indexOf("teampick") + 1 || 1;
+    order = [...rest.slice(0, at), ...studioKeys.filter((k) => order.includes(k)), ...rest.slice(at)];
+  }
+  const FOLD = new Set(["gallery", "badges", "upcoming"]);   // nice-to-have content lives under one "Mere" fold – the first screen stays about now
+  const main = order.filter((k) => !FOLD.has(k)); const folded = order.filter((k) => FOLD.has(k));
+  const renderKey = (k: string) => { const box = boxOf(appearance, k); return <Fragment key={k}>{box ? <CustomBoxCard box={box} onTab={(tab) => setTab(tab as Parameters<typeof setTab>[0])} /> : SECTIONS[k]?.()}</Fragment>; };
 
   return (
     <section className="screen home">
 
-      {order.map((k) => { const box = boxOf(appearance, k); return <Fragment key={k}>{box ? <CustomBoxCard box={box} onTab={(tab) => setTab(tab as Parameters<typeof setTab>[0])} /> : SECTIONS[k]?.()}</Fragment>; })}
+      {main.map(renderKey)}
+      {folded.length > 0 && (
+        <div className={"sec home-more" + (moreOpen ? " open" : "")} data-testid="home-more">
+          <button type="button" className="home-more-head" onClick={toggleMore} aria-expanded={moreOpen}><h2>{t("home.more")}</h2><span className="tiny muted">{t("home.moreSub")}</span><span className="caret" aria-hidden>{moreOpen ? "⌃" : "⌄"}</span></button>
+          {moreOpen && <div className="home-more-body">{folded.map(renderKey)}</div>}
+        </div>
+      )}
 
       {join && <JoinTeam onClose={() => { setJoin(false); void load(); }} toast={say} />}
       {openEvent && <EventSheet event={openEvent} staff={isStaff} onClose={() => { setOpenEvent(null); void load(); }} onChanged={() => void load()} toast={say} />}

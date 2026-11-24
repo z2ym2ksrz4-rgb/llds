@@ -147,7 +147,16 @@
     "removed": "{{name}} er fjernet fra holdet",
     "nextTraining": "Næste træning",
     "officialOnHome_one": "1 besked fra skolen venter på dit svar",
-    "officialOnHome_other": "{{count}} beskeder fra skolen venter på dit svar"
+    "officialOnHome_other": "{{count}} beskeder fra skolen venter på dit svar",
+    "startTitle": "Kom i gang med holdet",
+    "startSub": "Når der er videoer, billeder eller formationer, dukker de op her som felter.",
+    "startVideo": "Upload video",
+    "startFolder": "Opret mappe",
+    "noMessagesYet": "Ingen beskeder endnu – træneren skriver her, når der er nyt.",
+    "noMessagesStaff": "Ingen beskeder endnu. Skriv den første til holdet.",
+    "moreAbout": "Mere om holdet",
+    "moreAboutSub": "Beskrivelse · events · trofæer · træninger",
+    "seeDancers": "Se dansere"
   },
   "home": {
     "hi": "Hej {{name}}",
@@ -208,7 +217,12 @@
     "nextYouTrain": "Du træner næste gang",
     "stripHas_one": "1 træning",
     "stripHas_other": "{{count}} træninger",
-    "stripNone": "Ingen træning"
+    "stripNone": "Ingen træning",
+    "more": "Mere",
+    "moreSub": "Events · billeder · trofæer",
+    "restOfWeek_one": "1 mere senere på ugen",
+    "restOfWeek_other": "{{count}} mere senere på ugen",
+    "nothingToday": "Ingen træning i dag."
   },
   "admin": {
     "users": "Nye brugere",
@@ -562,7 +576,8 @@
     "booking": "booking",
     "moveSkip": "Flyt alle undtagen de {{n}} uger",
     "moveOverride": "Flyt alle – afvis de {{n}} bookinger",
-    "moveAnyway": "Flyt alligevel (dobbeltbooking)"
+    "moveAnyway": "Flyt alligevel (dobbeltbooking)",
+    "hideDancers": "Skjul dansere"
   },
   "rooms": {
     "prevWeek": "Forrige uge",
@@ -1236,7 +1251,8 @@
       "trainer": "Træner",
       "assistant": "Hjælpetræner",
       "admin": "Admin"
-    }
+    },
+    "newConversationShort": "Samtale"
   },
   "form": {
     "title": "Formationer",

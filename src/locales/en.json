@@ -147,7 +147,16 @@
     "removed": "{{name}} removed from the team",
     "nextTraining": "Next training",
     "officialOnHome_one": "1 message from the school is waiting for your reply",
-    "officialOnHome_other": "{{count}} messages from the school are waiting for your reply"
+    "officialOnHome_other": "{{count}} messages from the school are waiting for your reply",
+    "startTitle": "Get the team started",
+    "startSub": "Videos, photos and formations appear here as tiles once there are some.",
+    "startVideo": "Upload video",
+    "startFolder": "Create folder",
+    "noMessagesYet": "No messages yet – the trainer writes here when there is news.",
+    "noMessagesStaff": "No messages yet. Write the first one to the team.",
+    "moreAbout": "More about the team",
+    "moreAboutSub": "Description · events · trophies · trainings",
+    "seeDancers": "See dancers"
   },
   "home": {
     "hi": "Hi {{name}}",
@@ -208,7 +217,12 @@
     "nextYouTrain": "You train next",
     "stripHas_one": "1 training",
     "stripHas_other": "{{count}} trainings",
-    "stripNone": "No training"
+    "stripNone": "No training",
+    "more": "More",
+    "moreSub": "Events · photos · trophies",
+    "restOfWeek_one": "1 more later this week",
+    "restOfWeek_other": "{{count}} more later this week",
+    "nothingToday": "No training today."
   },
   "admin": {
     "users": "New users",
@@ -562,7 +576,8 @@
     "booking": "booking",
     "moveSkip": "Move all except those {{n}} weeks",
     "moveOverride": "Move all – reject the {{n}} bookings",
-    "moveAnyway": "Move anyway (double booking)"
+    "moveAnyway": "Move anyway (double booking)",
+    "hideDancers": "Hide dancers"
   },
   "rooms": {
     "prevWeek": "Previous week",
@@ -1236,7 +1251,8 @@
       "trainer": "Trainer",
       "assistant": "Assistant",
       "admin": "Admin"
-    }
+    },
+    "newConversationShort": "Chat"
   },
   "form": {
     "title": "Formations",

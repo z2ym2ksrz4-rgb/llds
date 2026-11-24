@@ -147,7 +147,7 @@ export function supabaseSocial(sb: SupabaseClient, fail: Fail, schoolId: () => P
     async teamDancers(teamId: string) { const { data, error } = await sb.rpc("team_dancers", { p_team: teamId }); fail(error); return (data ?? []) as TeamDancer[]; },
     async teamStats(teamId: string) {
       const [v, f, m, fs] = await Promise.all([sb.from("video").select("formations").eq("team_id", teamId), sb.from("folder_view").select("media_count").eq("team_id", teamId), sb.from("membership").select("person_id").eq("team_id", teamId).eq("role", "dancer"), sb.from("formation_set").select("id").eq("team_id", teamId)]);
-      return { videos: (v.data ?? []).length, formations: (fs.data ?? []).length, media: (f.data ?? []).reduce((n, x) => n + Number(x.media_count ?? 0), 0), dancers: (m.data ?? []).length };
+      return { videos: (v.data ?? []).length, formations: (fs.data ?? []).length, media: (f.data ?? []).reduce((n, x) => n + Number(x.media_count ?? 0), 0), folders: (f.data ?? []).length, dancers: (m.data ?? []).length };
     },
     async importTeamImage(teamId: string, folderName: string, file: Blob, fileName: string, asCover: boolean) {
       const sid = await schoolId(); const pid = await myPersonId();
