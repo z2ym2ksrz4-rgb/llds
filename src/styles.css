@@ -830,3 +830,10 @@ details.fold > summary h2 { flex: 1; } details.fold > summary .caret { color: va
 .hero.photo.own .pic.warm { filter:sepia(.12) saturate(.98) contrast(1.03); }
 .homehero-media.photo::after { background:linear-gradient(to bottom, rgba(0,0,0,.08), rgba(0,0,0,.0) 30%, rgba(11,11,13,.55) 75%, rgba(11,11,13,.92)); mix-blend-mode:normal; }
 @media (min-width:1100px) { .homehero-media.photo .pic, .hero.photo.own .pic { object-position:center 20%; } }
+
+/* ---- team tiles: dancer faces live inside the Dansere tile; audition chip readable on the hero */
+.tilechips .card.tap.dancers { flex: 1 1 100%; }
+.tilefaces { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.faces.inline { display: inline-flex; margin: 0; padding: 0; gap: 0; }
+.faces.inline .face { width: 26px; height: 26px; font-size: .62rem; margin-right: -7px; }
+.teamhero-meta .chip.gold, .screen[style*="--accent"] .teamhero-meta .chip.gold { background: linear-gradient(135deg, var(--gold2), var(--gold)); color: #15120d; border-color: transparent; font-weight: 500; }

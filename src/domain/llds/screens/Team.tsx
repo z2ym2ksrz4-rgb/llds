@@ -147,15 +147,14 @@ export function TeamScreen() {
         {<button className="card tap" onClick={() => setPage("folders")} data-testid="go-folders"><div className="eyebrow">{t("team.folders")}</div><div className="big">{t("team.mediaN", { n: stats.media })}</div></button>}
         {(staff || stats.formations > 0) && <button className={"card tap" + (seesChoreo ? "" : " dim")} disabled={!seesChoreo} onClick={() => setPage("formations")} data-testid="go-formations"><div className="eyebrow">{t("choreo.formations")}</div><div className="big">{seesChoreo ? t("team.formationsN", { n: stats.formations }) : t("team.choreoLocked")}</div></button>}
         {staff && (team.admission === "audition" || team.closed) && <button className="card tap" onClick={() => setPage("audition")} data-testid="go-audition"><div className="eyebrow">{t("audition.title")}</div><div className="big">🎯</div></button>}
-        <button className="card tap" onClick={() => setPage("dancers")} data-testid="go-dancers"><div className="eyebrow">{t("team.dancers")}</div><div className="big">{stats.dancers}{staff ? "" : ""}</div></button>
+        <button className="card tap dancers" onClick={() => setPage("dancers")} data-testid="go-dancers"><div className="eyebrow">{t("team.dancers")}</div>
+          <div className="big tilefaces" data-testid="team-faces">{stats.dancers}
+            {(dancers.length > 0 || roster.dancers.length > 0) && <span className="faces inline">
+              {(staff ? dancers.slice(0, 10).map((p) => <Avatar key={p.id} person={p} size="small" className="face" />) : roster.dancers.slice(0, 10).map((x) => <span key={x.person_id} className="avatar small face">{x.initials}</span>))}
+              {(staff ? dancers.length : roster.dancers.length) > 10 && <span className="avatar small face more">+{(staff ? dancers.length : roster.dancers.length) - 10}</span>}
+            </span>}
+          </div></button>
       </div>
-      {(dancers.length > 0 || roster.dancers.length > 0) && (
-        <button type="button" className="faces" onClick={() => setPage("dancers")} data-testid="team-faces" aria-label={t("team.dancers")}>
-          {(staff ? dancers.slice(0, 12).map((p) => <Avatar key={p.id} person={p} size="small" className="face" />) : roster.dancers.slice(0, 12).map((x) => <span key={x.person_id} className="avatar small face">{x.initials}</span>))}
-          {(staff ? dancers.length : roster.dancers.length) > 12 && <span className="avatar small face more">+{(staff ? dancers.length : roster.dancers.length) - 12}</span>}
-          <span className="tiny muted faces-label">{t("team.dancersN", { n: stats.dancers })} ›</span>
-        </button>
-      )}
       
 
       {(() => { const teamMsgs = msgs.filter((m) => m.audience.teams?.includes(team.id)); const allMsgs = msgs.filter((m) => m.audience.all); const Row = ({ m }: { m: Message }) => <button className="item" onClick={() => setOpenMsg(m)} data-testid="team-msg"><span className="grow">{m.title}<div className="tiny">{m.author_name} · {ago(m.created_at)}</div></span>{m.acted_at ? <span className="chip ok small">{t(`msg.done.${m.needs}`)}</span> : <span className="chip warn small">{t(`msg.needs.${m.needs}`)}</span>}</button>; return (
