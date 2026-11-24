@@ -1,7 +1,7 @@
 import React, { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { HeroMedia, isSitePhoto } from "../components/PhotoHero";
 import { useTranslation } from "react-i18next";
-import { api, type Absence, type Booking, type Event, type Milestone, type PersonBadge, type Order, type PunchCard, type Session } from "@/core/api";
+import { api, type Absence, type Booking, type Event, type Milestone, type PersonBadge, type Order, type PunchCard, type WebSignup, type Session } from "@/core/api";
 import { useAuth } from "@/core/auth";
 import { useNav } from "@/core/nav";
 import { TeamPicker } from "../components/TeamPicker";
@@ -47,7 +47,7 @@ export function Home() {
   const [badges, setBadges] = useState<PersonBadge[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [cards, setCards] = useState<PunchCard[]>([]);
-  const [adminOpen, setAdminOpen] = useState({ orders: 0, cards: 0 });
+  const [adminOpen, setAdminOpen] = useState({ orders: 0, cards: 0, confirm: 0 });
   const openAdmin = useNav((n) => n.openAdmin);
   const [open, setOpen] = useState<Session | null>(null);
   const [openEvent, setOpenEvent] = useState<Event | null>(null);
@@ -61,7 +61,7 @@ export function Home() {
     const [s, b, ev, ms, o, c] = await Promise.all([api.listSessions(from.toISOString(), to.toISOString()), api.listBookings(from.toISOString(), addDays(from, isAdmin ? 30 : 7).toISOString()).catch(() => [] as Booking[]), api.listEvents(), api.listMilestones(), api.listOrders(), api.listPunchCards()]);
     void api.settleAttendance().catch(() => 0).then(() => api.listPersonBadges()).then(setBadges).catch(() => setBadges([]));
     setSessions(s); setBookings(b); setEvents(ev); setMilestones(ms); setOrders(o); setCards(c);
-    if (isAdmin) { const [ao, ac] = await Promise.all([api.listOrders(true).catch(() => [] as Order[]), api.listPunchCards(true).catch(() => [] as PunchCard[])]); setAdminOpen({ orders: ao.filter((x) => x.status === "awaiting_payment" || x.status === "paid").length, cards: ac.filter((x) => x.status === "awaiting_payment").length }); } setAbsences(await api.listAbsences(s.map((x) => x.id)));
+    if (isAdmin) { const [ao, ac, aw] = await Promise.all([api.listOrders(true).catch(() => [] as Order[]), api.listPunchCards(true).catch(() => [] as PunchCard[]), api.listWebSignups().catch(() => [] as WebSignup[])]); const claimed = (x: { status: string; claimed_paid_at: string | null }) => x.status === "awaiting_payment" && !!x.claimed_paid_at; setAdminOpen({ orders: ao.filter((x) => x.status === "awaiting_payment" || x.status === "paid").length, cards: ac.filter((x) => x.status === "awaiting_payment").length, confirm: aw.filter(claimed).length + ao.filter(claimed).length + ac.filter(claimed).length }); } setAbsences(await api.listAbsences(s.map((x) => x.id)));
   }, [isAdmin]);
   useEffect(() => { void load(); }, [load, viewing.personId]);
 
@@ -74,8 +74,10 @@ export function Home() {
   const todayAbs = absences.filter((a) => sessions.some((s) => s.id === a.session_id && new Date(s.starts_at).toDateString() === today));
   const myTeamIds = new Set(me.memberships.map((m) => m.team_id));
   const hero = events.find((e) => !e.team_ids.length || e.team_ids.some((id) => myTeamIds.has(id))) ?? events[0];
-  const openPay = [...orders.filter((o) => o.status === "awaiting_payment").map((o) => ({ id: o.id, label: `${t("shop.title")} #${o.number}`, sub: o.claimed_paid_at ? t("shop.status.claimed") : t("shop.status.awaiting_payment"), amount: o.total_dkk })),
-    ...cards.filter((c) => c.status === "awaiting_payment").map((c) => ({ id: c.id, label: c.type_name, sub: c.claimed_paid_at ? t("punch.status.claimed") : t("punch.status.awaiting_payment"), amount: c.price_dkk }))];
+  const familyIds = viewing.isChild ? [viewing.personId] : [me.person.id, ...me.children.map((c) => c.id)];
+  // shop/punch-card payments the viewed household still has to PAY (claimed ones wait for Line, not for them); admins' RLS sees everyone's, so filter here
+  const openPay = [...orders.filter((o) => o.status === "awaiting_payment" && !o.claimed_paid_at && familyIds.includes(o.person_id)).map((o) => ({ id: o.id, label: `${t("shop.title")} #${o.number}`, sub: t("shop.status.awaiting_payment"), amount: o.total_dkk })),
+    ...cards.filter((c) => c.status === "awaiting_payment" && !c.claimed_paid_at && familyIds.includes(c.person_id)).map((c) => ({ id: c.id, label: c.type_name, sub: t("punch.status.awaiting_payment"), amount: c.price_dkk }))];
   const myMilestones = milestones.filter((m) => m.person_id === viewing.personId);
   const todaysAll = sessions.filter((s) => new Date(s.starts_at).toDateString() === today);
   const nextDay = sessions.find((s) => new Date(s.starts_at) > new Date())?.starts_at;
@@ -86,7 +88,6 @@ export function Home() {
   /* "Din uge": everything the viewed person (or I, as staff) has the next 7 days – trainings, teams I train, competitions/events, my room bookings. */
   type WeekItem = { key: string; at: string; end?: string | null; kind: "training" | "staff" | "event" | "booking"; title: string; sub: string; who?: string; off?: boolean; session?: Session; event?: Event };
   const weekEnd = addDays(startOfDay(new Date()), 7);
-  const familyIds = viewing.isChild ? [viewing.personId] : [me.person.id, ...me.children.map((c) => c.id)];
   const familyTeams = (pid: string) => new Set(me.memberships.filter((m) => m.person_id === pid && m.role === "dancer").map((m) => m.team_id));
   const nameOf = (pid: string) => (pid === me.person.id ? null : me.children.find((c) => c.id === pid)?.first_name ?? null);
   const week: WeekItem[] = [];
@@ -146,7 +147,8 @@ export function Home() {
           { n: sessions.filter((s) => new Date(s.starts_at).toDateString() === today && !s.cancelled).length, label: t("home.trainingsToday"), go: () => setTab("rooms") },
           { n: todayAbs.length, label: t("home.absencesToday"), go: () => setTab("rooms") },
           { n: bookings.filter((b) => b.status === "pending").length, label: t("home.bookingsPending"), go: () => openAdmin("bookings") },
-          { n: subWanted.length, label: t("home.subsWanted"), go: () => openAdmin("season") },
+          ...(subWanted.length > 0 ? [{ n: subWanted.length, label: t("home.subsWanted"), go: () => openAdmin("season") }] : []),
+          { n: adminOpen.confirm, label: t("home.payConfirm"), go: () => openAdmin("payments"), testId: "tile-payconfirm" },
           { n: adminOpen.orders, label: t("home.openOrders"), go: () => openAdmin("shop"), testId: "tile-orders" },
           { n: adminOpen.cards, label: t("home.cardsWaiting"), go: () => openAdmin("punch"), testId: "tile-cards" },
         ]; return (
@@ -253,9 +255,9 @@ export function Home() {
     payments: () => (<>
       <MyPayments embedded />
       {openPay.length > 0 && (
-        <div className="sec"><h2>{t("home.payments")}</h2><ScrollList>
-          {openPay.map((p) => <button key={p.id} className="item" onClick={() => setTab("more")}><span className="grow">{p.label}<div className="tiny">{p.sub}</div></span><span className="gold">{p.amount} kr.</span></button>)}
-        </ScrollList></div>
+        <button type="button" className="card paysum" data-testid="shop-pay-line" onClick={() => setTab("shop")}>
+          <span className="dot rose" aria-hidden /><span className="grow"><b>{t("home.shopPayLine", { count: openPay.length })}</b><span className="tiny muted"> · {openPay.reduce((n, p) => n + p.amount, 0)} kr. · {openPay.map((p) => p.label).join(", ")}</span></span><span className="gold">›</span>
+        </button>
       )}
     </>),
     badges: () => (<>

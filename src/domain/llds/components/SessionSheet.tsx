@@ -4,6 +4,7 @@ import { api, type Member, type Absence, type Person, type RosterEntry, type Ses
 import { useAuth } from "@/core/auth";
 import { PunchStatus } from "../screens/PunchCards";
 import { Sheet } from "./Sheet";
+import { resolveImage } from "../lib/catalog";
 import { dateLabel, hhmm, hm, isoDate, loc, SEASON_END } from "../lib/time";
 import { shiftOccurrence } from "@/core/api/schedule-util";
 
@@ -41,10 +42,12 @@ export function SessionSheet({ session, absences, onClose, onChanged, toast }: {
   const markRead = async () => { await api.updateSession(session.id, { lesson_plan_read_at: new Date().toISOString() }); onChanged(); };
 
   if (mode === "edit") return <SessionEditor session={session} onClose={() => setMode("view")} onSaved={() => { onChanged(); onClose(); }} toast={toast} />;
+  const sheetTeam = session.team_id ? me.teams.find((x) => x.id === session.team_id) : undefined;   // same photo header as the event sheet (P3.13)
+  const sheetPhoto = sheetTeam ? resolveImage(sheetTeam.cover_url) ?? resolveImage(sheetTeam.photos?.[0] ?? null) : null;
   if (mode === "attendance") return <AttendanceSheet session={session} onClose={() => { onChanged(); onClose(); }} toast={toast} />;
 
   return (
-    <Sheet onClose={onClose} eyebrow={session.cancelled ? t("session.cancelled") : session.moved ? t("session.training") + " · " + t("rooms.moved") : t("session.training")} title={session.title ?? session.team_name ?? ""}>
+    <Sheet onClose={onClose} photo={sheetPhoto} focus={sheetTeam?.focus ?? null} eyebrow={session.cancelled ? t("session.cancelled") : session.moved ? t("session.training") + " · " + t("rooms.moved") : t("session.training")} title={session.title ?? session.team_name ?? ""}>
       <div className="chips">
         <span className="chip">{dateLabel(session.starts_at)} {hm(session.starts_at)}–{hm(session.ends_at)}</span>
         {session.room_name && <span className="chip">{session.room_name}</span>}

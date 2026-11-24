@@ -87,7 +87,7 @@ function EventsList({ admin }: { admin?: boolean }) {
         <button key={e.id} className="hero tap photo evcard" data-testid="event" onClick={() => setOpen(e)} style={focusStyle(e.focus, { backgroundImage: `url(${catalogUrl(e.image_key) ?? artFor(e.id)})` })}>
           <div><div className="eyebrow">{dateLabel(e.starts_at)} · {t(`events.kind.${e.kind}`)}</div><h2 className="display">{e.title}</h2>
             <div className="row between"><span className="small muted">{e.place ?? ""}{e.team_names?.length ? ` · ${e.team_names.join(", ")}` : ` · ${t("events.allTeams")}`}</span>
-              {e.mySignups && e.mySignups > 0 ? (e.myUnpaid ? <span className="chip warn small" data-testid="ev-awaiting">{t("events.unpaid")}</span> : e.myClaimed ? <span className="chip small pend" data-testid="ev-claimed">{t("events.claimed")}</span> : <span className="chip ok small">{t("events.on")}</span>) : relevant && (e.signup_deadline || e.price_dkk) ? <span className="chip gold small">{t("events.openSignup")}</span> : null}</div></div>
+              {e.mySignups && e.mySignups > 0 ? (e.myUnpaid ? <span className="chip warn small" data-testid="ev-awaiting">{t("events.unpaid")}</span> : e.myClaimed ? <span className="chip small pend" data-testid="ev-claimed">{t("events.claimed")}</span> : <span className="chip ok small">{t("events.on")}</span>) : relevant && (e.signup_deadline || e.price_dkk) ? <span className="chip gold small evsign" data-testid="ev-signup">{t("events.signUp")} ›</span> : null}</div></div>
         </button>); })}</div>
       {!events.length && <Empty text={t("events.empty")} symbol="★" />}
       <button className="linklike small" onClick={() => setPast(!past)}>{past ? t("events.hidePast") : t("events.showPast")}</button>

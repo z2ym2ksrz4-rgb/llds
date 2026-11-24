@@ -3,8 +3,8 @@
     "home": "Hjem",
     "admin": "Admin",
     "settings": "Indstillinger",
-    "rooms": "Sale",
-    "team": "Mit hold",
+    "rooms": "Kalender",
+    "team": "Hold",
     "more": "Mere",
     "social": "Social",
     "events": "Events",
@@ -222,7 +222,10 @@
     "moreSub": "Events · billeder · trofæer",
     "restOfWeek_one": "1 mere senere på ugen",
     "restOfWeek_other": "{{count}} mere senere på ugen",
-    "nothingToday": "Ingen træning i dag."
+    "nothingToday": "Ingen træning i dag.",
+    "shopPayLine_one": "1 køb mangler betaling",
+    "shopPayLine_other": "{{count}} køb mangler betaling",
+    "payConfirm": "betalinger at bekræfte"
   },
   "admin": {
     "users": "Nye brugere",
@@ -610,7 +613,10 @@
     "purposeRequired": "Skriv et formål med bookingen.",
     "purposePh": "Fx Solo – Liva, duo-træning, prøve",
     "cancelled": "Aflyst",
-    "moved": "Flyttet"
+    "moved": "Flyttet",
+    "legendShort": "Tryk på et ledigt felt (+) for at booke salen til solo/duo. Bookingen godkendes af studiet.",
+    "bookAt": "Book {{room}} kl. {{h}}",
+    "weekLabel": "Uge {{n}} · {{from}}–{{to}}"
   },
   "feed": {
     "title": "Opslag",
@@ -795,7 +801,7 @@
     "plan": "Dagens plan",
     "pack": "Pakkeliste",
     "signup": "Tilmelding",
-    "on": "Tilmeldt",
+    "on": "Tilmeldt ✓",
     "unpaid": "Tilmeldt – mangler betaling",
     "payBtn": "Betal",
     "withdraw": "Afmeld",
@@ -861,7 +867,10 @@
     "history": "Historik",
     "buyingAs": "Du handler som {{name}} – skift person øverst på Hjem, hvis det skal være et barn.",
     "cartEmpty": "Kurven er tom.",
-    "noHistory": "Ingen køb endnu."
+    "noHistory": "Ingen køb endnu.",
+    "merch": "Merchandise",
+    "buyFor": "Køb til",
+    "childHint": "Køb i shoppen går gennem dine forældre – de kan bestille her i appen."
   },
   "punch": {
     "title": "Klippekort",
@@ -975,7 +984,10 @@
     "lineRates": "{{plan}} · {{n}} rater à {{rate}} · {{paid}} af {{n}} betalt",
     "lineOnce": "{{plan}} · {{total}}",
     "lineDiscount": "{{pct}} % familierabat af {{before}}",
-    "created": "Oprettet {{when}}"
+    "created": "Oprettet {{when}}",
+    "summaryOpen_one": "1 betaling mangler",
+    "summaryOpen_other": "{{count}} betalinger mangler",
+    "summaryAllPaid": "Alt er betalt ✓"
   },
   "milestones": {
     "title": "Milepæle",
@@ -994,7 +1006,10 @@
   "social": {
     "feed": "Feed",
     "all": "Alle",
-    "intro": "Holdets eget rum – alle på holdet kan slå op og kommentere. Beskeder til dig og dit hold finder du under Hjem og Mit hold."
+    "intro": "Holdets eget rum – alle på holdet kan slå op og kommentere. Beskeder til dig og dit hold finder du under Hjem og Mit hold.",
+    "newPost": "Nyt opslag",
+    "moreTeams_one": "1 hold mere",
+    "moreTeams_other": "{{count}} hold mere"
   },
   "view": {
     "as": "Vis appen som",
@@ -1489,6 +1504,7 @@
     "staffTitle": "Audition – dine hold",
     "staffLine": "{{applied}} tilmeldt · {{invited}} har fået krav · {{selected}} udtaget",
     "staffNone": "Ingen tilmeldte endnu",
-    "staffOpen": "Åbn audition"
+    "staffOpen": "Åbn audition",
+    "quietLine": "Tilmeldt {{teams}} – du hører fra træneren."
   }
 }

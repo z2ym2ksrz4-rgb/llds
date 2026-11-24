@@ -6,7 +6,7 @@ const p = await b.newPage({ viewport: { width: 390, height: 844 } }); await p.ad
 p.on("pageerror", (e) => out.errors.push(e.message));
 const login = async (email) => { await p.goto(base, { waitUntil: "networkidle" }); await p.fill("#email", email); await p.click("form button.cta"); await p.fill("#code", "000000"); await p.click("form button.cta"); await p.waitForSelector("nav.tabbar"); };
 await login("admin@demo");
-await p.click("nav.tabbar >> text=/^(Mit hold|Hold)$/"); await p.waitForSelector("[data-testid=team-hero]");
+await p.click("nav.tabbar >> text=Hold"); await p.waitForSelector("[data-testid=team-hero]");
 await p.click(".teampick-head"); await p.click(".teampick .chip:has-text('The AXIS')"); await p.waitForTimeout(300);
 await p.click("[data-testid=team-more-fold] summary"); await p.waitForTimeout(300);
 out.trophiesShown = !!(await p.$("[data-testid=trophies]"));

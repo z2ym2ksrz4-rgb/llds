@@ -3,8 +3,8 @@
     "home": "Home",
     "admin": "Admin",
     "settings": "Settings",
-    "rooms": "Rooms",
-    "team": "My team",
+    "rooms": "Calendar",
+    "team": "Team",
     "more": "More",
     "social": "Social",
     "events": "Events",
@@ -222,7 +222,10 @@
     "moreSub": "Events · photos · trophies",
     "restOfWeek_one": "1 more later this week",
     "restOfWeek_other": "{{count}} more later this week",
-    "nothingToday": "No training today."
+    "nothingToday": "No training today.",
+    "shopPayLine_one": "1 purchase awaiting payment",
+    "shopPayLine_other": "{{count}} purchases awaiting payment",
+    "payConfirm": "payments to confirm"
   },
   "admin": {
     "users": "New users",
@@ -610,7 +613,10 @@
     "purposeRequired": "Please state the purpose of the booking.",
     "purposePh": "E.g. Solo – Liva, duo practice, rehearsal",
     "cancelled": "Cancelled",
-    "moved": "Moved"
+    "moved": "Moved",
+    "legendShort": "Tap a free slot (+) to book the room for solo/duo. The studio approves bookings.",
+    "bookAt": "Book {{room}} at {{h}}:00",
+    "weekLabel": "Week {{n}} · {{from}}–{{to}}"
   },
   "feed": {
     "title": "Posts",
@@ -795,7 +801,7 @@
     "plan": "Plan of the day",
     "pack": "Pack list",
     "signup": "Sign-up",
-    "on": "Signed up",
+    "on": "Signed up ✓",
     "unpaid": "Signed up – payment missing",
     "payBtn": "Pay",
     "withdraw": "Withdraw",
@@ -861,7 +867,10 @@
     "history": "History",
     "buyingAs": "You are shopping as {{name}} – switch person at the top of Home if it should be a child.",
     "cartEmpty": "Your basket is empty.",
-    "noHistory": "No purchases yet."
+    "noHistory": "No purchases yet.",
+    "merch": "Merchandise",
+    "buyFor": "Buy for",
+    "childHint": "Purchases go through your parents – they can order here in the app."
   },
   "punch": {
     "title": "Punch cards",
@@ -975,7 +984,10 @@
     "lineRates": "{{plan}} · {{n}} instalments of {{rate}} · {{paid}} of {{n}} paid",
     "lineOnce": "{{plan}} · {{total}}",
     "lineDiscount": "{{pct}} % family discount off {{before}}",
-    "created": "Created {{when}}"
+    "created": "Created {{when}}",
+    "summaryOpen_one": "1 payment outstanding",
+    "summaryOpen_other": "{{count}} payments outstanding",
+    "summaryAllPaid": "Everything is paid ✓"
   },
   "milestones": {
     "title": "Milestones",
@@ -994,7 +1006,10 @@
   "social": {
     "feed": "Feed",
     "all": "All",
-    "intro": "The team's own room – everyone on the team can post and comment. Messages for you and your team are under Home and My team."
+    "intro": "The team's own room – everyone on the team can post and comment. Messages for you and your team are under Home and My team.",
+    "newPost": "New post",
+    "moreTeams_one": "1 more team",
+    "moreTeams_other": "{{count}} more teams"
   },
   "view": {
     "as": "View app as",
@@ -1489,6 +1504,7 @@
     "staffTitle": "Audition – your teams",
     "staffLine": "{{applied}} applied · {{invited}} briefed · {{selected}} selected",
     "staffNone": "No applicants yet",
-    "staffOpen": "Open audition"
+    "staffOpen": "Open audition",
+    "quietLine": "Signed up for {{teams}} – the trainer will be in touch."
   }
 }

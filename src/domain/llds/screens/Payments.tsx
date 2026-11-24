@@ -36,15 +36,24 @@ export function MyPayments({ onBack, embedded }: { onBack?: () => void; embedded
   const familyIds = viewing.isChild ? [viewing.personId] : [me.person.id, ...me.children.map((c) => c.id)];
   const load = useCallback(async () => setList((await api.listMyPayments().catch(() => [])).filter((p) => familyIds.includes(p.dancer_id) || familyIds.includes(p.contact_id))), [familyIds.join(",")]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { void load(); }, [load]);
-  const shown = embedded ? list.filter((p) => p.status === "awaiting_payment") : list;
+  const openOnes = list.filter((p) => p.status === "awaiting_payment");
+  const shown = embedded ? openOnes : list;
+  const [expanded, setExpanded] = useState(false);
   if (embedded && !shown.length) return null;
+  const dueNow = openOnes.reduce((sum, p) => sum + ((p.installments ?? 1) > 1 ? (p.per_rate_dkk ?? 0) : (p.amount_dkk ?? 0)), 0);
   return (
     <section className={embedded ? "stack" : "screen"}>
       {!embedded && <><button className="linklike" onClick={onBack}>‹ {t("nav.more")}</button><header className="topbar"><h1 className="display">{t("pay.title")}</h1></header></>}
-      <div className="card list" data-testid="my-payments">
+      {/* one line first: what is owed right now – the rows follow (on Home only when unfolded) */}
+      {openOnes.length > 0 ? (
+        <button type="button" className="card paysum" data-testid="pay-summary" onClick={() => setExpanded((v) => !v)} aria-expanded={!embedded || expanded}>
+          <span className="dot rose" aria-hidden /><span className="grow"><b>{t("pay.summaryOpen", { count: openOnes.length })}</b><span className="tiny muted"> · {kr(dueNow)}</span></span>{embedded && <span className="gold">{expanded ? "⌃" : "⌄"}</span>}
+        </button>
+      ) : !embedded && <div className="card paysum ok" data-testid="pay-summary"><span className="dot sage" aria-hidden /><span className="grow"><b>{t("pay.summaryAllPaid")}</b></span></div>}
+      {(!embedded || expanded) && <div className="card list" data-testid="my-payments">
         {shown.map((p) => <PaymentRow key={p.id} p={p} onPay={() => setPay(p)} />)}
         {!shown.length && <p className="muted">{t("pay.none")}</p>}
-      </div>
+      </div>}
       {pay && pay.amount_dkk != null && <PaySheet amount={(pay.installments ?? 1) > 1 ? pay.per_rate_dkk ?? pay.amount_dkk : pay.amount_dkk} reference={(pay.installments ?? 1) > 1 ? `${pay.reference} rate ${(pay.rates_paid ?? 0) + 1}/${pay.installments}` : pay.reference} title={`${pay.team_name} · ${pay.dancer_name.split(" ")[0]}`} onClose={() => setPay(null)} onPaid={async () => { await api.claimPaymentPaid(pay.id); setPay(null); say(t("pay.claimed")); await load(); }} />}
       {!embedded && <Toast msg={toast} />}
     </section>

@@ -8,7 +8,7 @@ await p.goto(base, { waitUntil: "networkidle" }); await p.evaluate(() => localSt
 const login = async (email) => { await p.fill("#email", email); await p.click("form button.cta"); await p.fill("#code", "000000"); await p.click("form button.cta"); await p.waitForSelector("nav.tabbar"); };
 const logout = async () => { await p.click("nav.tabbar >> text=Hjem"); await p.click("[data-testid=avatar]"); await p.click("[data-testid=menu-more]"); await p.click("[data-testid=more-settings]"); await p.click("text=Log ud"); await p.waitForSelector("#email"); };
 await login("admin@demo");
-await p.click("nav.tabbar >> text=/^(Mit hold|Hold)$/"); await p.waitForSelector("[data-testid=go-formations]"); await p.click("[data-testid=go-formations]"); await p.waitForSelector("[data-testid=form-new]");
+await p.click("nav.tabbar >> text=Hold"); await p.waitForSelector("[data-testid=go-formations]"); await p.click("[data-testid=go-formations]"); await p.waitForSelector("[data-testid=form-new]");
 await p.click("[data-testid=form-new]"); await p.fill("[data-testid=form-title]", "DM-dansen 2027"); await p.click("[data-testid=form-create]"); await p.waitForSelector("[data-testid=frame-add]");
 await p.click("[data-testid=frame-add]"); await p.waitForSelector("[data-testid=fstage]"); out.dotsAuto = await p.$$eval("[data-testid=fdot]", (e) => e.length);
 // drag first dot to the front-left
@@ -24,6 +24,6 @@ await p.click("[data-testid=form-play]"); await p.waitForTimeout(2200); out.play
 await p.screenshot({ path: "/tmp/f1.png" }); await p.click("[data-testid=form-play]");
 out.saved = await p.evaluate(() => (JSON.parse(localStorage.getItem("llds_mock")).X.formationSets || []).map((f) => f.title + ":" + f.frames.length + ":" + f.frames[0].label + "@" + f.frames[0].at));
 // dancer (parent as Freja's team) sees read-only
-await logout(); await login("parent@demo"); await p.click("nav.tabbar >> text=/^(Mit hold|Hold)$/"); await p.waitForSelector("[data-testid=go-formations]"); await p.click("[data-testid=go-formations]"); await p.waitForSelector("[data-testid=form-set]"); await p.click("[data-testid=form-set]"); await p.waitForSelector("[data-testid=fstage]");
+await logout(); await login("parent@demo"); await p.click("nav.tabbar >> text=Hold"); await p.waitForSelector("[data-testid=go-formations]"); await p.click("[data-testid=go-formations]"); await p.waitForSelector("[data-testid=form-set]"); await p.click("[data-testid=form-set]"); await p.waitForSelector("[data-testid=fstage]");
 out.dancerNoAdd = !(await p.$("[data-testid=frame-add]")); out.dancerSeesDots = await p.$$eval("[data-testid=fdot]", (e) => e.length);
 await b.close(); console.log(JSON.stringify(out, null, 1));

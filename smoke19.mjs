@@ -14,7 +14,7 @@ out.feedbackThanks = (await p.textContent("body")).includes("Tak");
 // 2. trainer removes a dancer from her team
 await p.click("text=Log ud"); await p.waitForSelector("#email");
 await login("maja@demo");
-await p.click("nav.tabbar >> text=Mit hold"); await p.waitForSelector("[data-testid=team-hero]"); await p.click("[data-testid=go-dancers]"); await p.waitForSelector("[data-testid=remove-dancer]");
+await p.click("nav.tabbar >> text=Hold"); await p.waitForSelector("[data-testid=team-hero]"); await p.click("[data-testid=go-dancers]"); await p.waitForSelector("[data-testid=remove-dancer]");
 out.dancersBefore = await p.$$eval("[data-testid=remove-dancer]", (e) => e.length);
 await p.click("[data-testid=remove-dancer] >> nth=0"); await p.waitForSelector("[data-testid=remove-confirm]"); await p.click("[data-testid=remove-yes]"); await p.waitForTimeout(500);
 out.dancersAfter = await p.$$eval("[data-testid=remove-dancer]", (e) => e.length);

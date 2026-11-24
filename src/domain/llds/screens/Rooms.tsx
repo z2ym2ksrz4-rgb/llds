@@ -75,6 +75,8 @@ export function Rooms() {
   const slotTop = (iso: string) => { const d = new Date(iso); return ((d.getHours() - 9) * 60 + d.getMinutes()) / 60 * 48; };
   const slotH = (a: string, b: string) => Math.max(22, (new Date(b).getTime() - new Date(a).getTime()) / 36e5 * 48 - 2);
   const mine = (s: Session) => s.team_id != null && me.memberships.some((m) => m.person_id === viewing.personId && m.team_id === s.team_id);
+  const canBook = !me.person.supervised_by;   // everyone approved may book (solo/duo) – bookings by dancers/parents await approval; child logins ask their parents
+  const isoWeek = (d: Date) => { const x = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())); const n = x.getUTCDay() || 7; x.setUTCDate(x.getUTCDate() + 4 - n); const y = new Date(Date.UTC(x.getUTCFullYear(), 0, 1)); return Math.ceil(((x.getTime() - y.getTime()) / 864e5 + 1) / 7); };
 
   const scroller = useRef<HTMLDivElement>(null);
   useEffect(() => { const el = scroller.current; if (el) el.scrollTop = (15 - 9) * 48; }, [day.getTime()]); // default to the afternoon where the regular trainings are
@@ -83,12 +85,12 @@ export function Rooms() {
       <div className="rooms-bg" aria-hidden="true" style={{ backgroundImage: `url(${bgImg})` }} />
       <TabNews tab="rooms" />
       <header className="topbar"><h1 className="display">{t("nav.rooms")}</h1>{isTrainer && <button className="ghost small" onClick={() => setOpen({ kind: "new", room_id: rooms[0]?.id ?? "", start: "16:00" })}>+ {t("session.training")}</button>}</header>
+      <div className="weeknav2"><button type="button" className="wkbtn" aria-label={t("rooms.prevWeek")} onClick={() => setDay(addDays(day, -7))}>‹</button><span className="small muted">{t("rooms.weekLabel", { n: isoWeek(week), from: `${week.getDate()}. ${week.toLocaleDateString(loc(), { month: "short" }).replace(".", "")}`, to: `${addDays(week, 6).getDate()}. ${addDays(week, 6).toLocaleDateString(loc(), { month: "short" }).replace(".", "")}` })}</span>{!sameDay(day, new Date()) && <button type="button" className="wkbtn today" onClick={() => setDay(startOfDay(new Date()))}>{t("rooms.today")}</button>}<button type="button" className="wkbtn" aria-label={t("rooms.nextWeek")} onClick={() => setDay(addDays(day, 7))}>›</button></div>
       <div className="days">
         {Array.from({ length: 7 }, (_, i) => addDays(week, i)).map((d) => (
           <button key={d.toISOString()} className={"day" + (sameDay(d, day) ? " on" : "") + (sameDay(d, new Date()) ? " today" : "")} onClick={() => setDay(d)}><span>{dayLabel(d).split(" ")[0]}</span><b>{d.getDate()}</b><i className={weekSessions.some((x) => sameDay(new Date(x.starts_at), d) && x.team_id && myTeamIds.has(x.team_id)) ? "mine" : weekSessions.some((x) => sameDay(new Date(x.starts_at), d)) ? "any" : ""} />{events.some((e) => sameDay(new Date(e.starts_at), d)) && <em className="evdot" aria-label="event">★</em>}</button>
         ))}
       </div>
-      <div className="row between small muted"><button className="linklike" onClick={() => setDay(addDays(day, -7))}>‹ {t("rooms.prevWeek")}</button><button className="linklike" onClick={() => setDay(startOfDay(new Date()))}>{t("rooms.today")}</button><button className="linklike" onClick={() => setDay(addDays(day, 7))}>{t("rooms.nextWeek")} ›</button></div>
 
       <div className="dayhead"><h2 className="display">{DAY_LONG[(day.getDay() + 6) % 7]} {day.getDate()}{loc() === "da-DK" ? "." : ""} {day.toLocaleDateString(loc(), { month: "long" })}</h2><span className="small muted">{t("rooms.countLine", { n: sessions.filter((x) => !x.cancelled).length, b: bookings.filter((x) => x.status !== "rejected").length })}</span></div>
       {dayEvents.length > 0 && <div className="evstrip" data-testid="day-events">{dayEvents.map((e) => <button key={e.id} className="evcard-mini" style={{ backgroundImage: `url(${catUrl(e.image_key) ?? artFor(e.id)})` }} onClick={() => setOpenEvent(e)}><span className="eyebrow">{t(`events.kind.${e.kind}`)} · {hm(e.starts_at)}{e.ends_at ? `–${hm(e.ends_at)}` : ""}</span><b>{e.title}</b>{e.place && <small>{e.place}</small>}</button>)}</div>}
@@ -101,14 +103,14 @@ export function Rooms() {
         {rooms.map((r, ri) => (
           <div key={r.id} className="col" style={{ height: HOURS.length * 48 }}>
             {sameDay(day, new Date()) && nowMin >= 9 * 60 && nowMin <= 23 * 60 && <div className="nowline" style={{ top: (nowMin - 9 * 60) / 60 * 48 }} />}
-            {HOURS.map((h) => <button key={h} className="free" style={{ top: (h - 9) * 48 }} aria-label={`${r.name} ${h}:00`} onClick={() => setOpen({ kind: "book", room_id: r.id, start: `${String(h).padStart(2, "0")}:00` })} />)}
+            {HOURS.map((h) => <button key={h} className={"free" + (canBook ? " can" : "")} style={{ top: (h - 9) * 48 }} aria-label={`${t("rooms.bookAt", { room: r.name, h })}`} title={t("rooms.bookAt", { room: r.name, h })} onClick={() => setOpen({ kind: "book", room_id: r.id, start: `${String(h).padStart(2, "0")}:00` })}>{canBook ? <span aria-hidden>+</span> : null}</button>)}
             {(() => { const lane = packLane([
                 ...sessions.filter((s) => s.room_id === r.id).map((s) => ({ id: "s" + s.id, a: s.starts_at, b: s.ends_at, s })),
                 ...bookings.filter((b) => b.room_id === r.id && b.status !== "rejected").map((b) => ({ id: "b" + b.id, a: b.starts_at, b: b.ends_at, bk: b })),
               ]); return lane.map(({ item, col, cols }) => {
                 const pos = { top: slotTop(item.a), height: slotH(item.a, item.b), left: `calc(${(col / cols) * 100}% + 3px)`, width: `calc(${100 / cols}% - 6px)` };
                 if (item.s) { const s = item.s; return (
-                  <button key={item.id} className={"ev l" + ri + (mine(s) ? " mine" : "") + (s.cancelled ? " off cx" : s.moved ? " mv" : "")} style={pos} onClick={() => setOpen({ kind: "session", s })}>
+                  <button key={item.id} className={"ev l" + ri + (mine(s) ? " mine" : isStaff ? "" : " other") + (s.cancelled ? " off cx" : s.moved ? " mv" : "")} style={pos} onClick={() => setOpen({ kind: "session", s })}>
                     <b>{s.title ?? s.team_name}</b><small>{hm(s.starts_at)}–{hm(s.ends_at)}{s.substitute_wanted && !s.substitute_id ? " · " + t("session.subWanted") : ""}{s.cancelled ? <i className="tag cx">{t("rooms.cancelled")}</i> : s.moved ? <i className="tag mv">{t("rooms.moved")}</i> : null}</small>
                   </button>); }
                 const b = item.bk!; return (
@@ -119,7 +121,7 @@ export function Rooms() {
         ))}
       </div>
       <div className="callegend" aria-hidden><span className="lg l0">{rooms[0]?.name}</span>{rooms[1] && <span className="lg l1">{rooms[1].name}</span>}<span className="lg cx">{t("rooms.cancelled")}</span><span className="lg mv">{t("rooms.moved")}</span></div>
-      <p className="tiny">{t("rooms.legend")}</p>
+      {canBook && <p className="tiny muted" style={{ margin: "6px 0 0" }}>{t("rooms.legendShort")}</p>}
       </div>
 
       {openEvent && <EventSheet event={openEvent} staff={isStaff} onClose={() => setOpenEvent(null)} onChanged={() => void api.listEvents(true).then(setEvents)} toast={say} />}

@@ -39,15 +39,19 @@ export function ShopScreen() {
   }, []);
   useEffect(() => { void load(); markShopSeen(); }, [load]);
   const punchTeams = me.teams.filter((x) => x.punch_card_open).map((x) => x.name);
-  const who = viewing.isChild ? me.children.find((c) => c.id === viewing.personId)?.first_name : me.person.first_name;
+  const household = [me.person, ...me.children];   // who the purchase is for – chosen in the cart, not "up on Home"
+  const [buyerId, setBuyerId] = useState(viewing.personId);
+  useEffect(() => { setBuyerId(viewing.personId); }, [viewing.personId]);
+  const who = household.find((x) => x.id === buyerId)?.first_name ?? me.person.first_name;
+  const childLogin = !!me.person.supervised_by;   // children do not buy – they ask their parents
   const total = cart.lines.reduce((s, l) => s + l.qty * l.price_dkk, 0);
   const openCount = orders.filter((o) => o.status === "awaiting_payment").length + cards.filter((c) => c.status === "awaiting_payment").length;
   const checkout = async () => {
-    const o = await api.createOrder(viewing.personId, cart.lines); cart.clear(); setPanel(null); await load();
+    const o = await api.createOrder(buyerId, cart.lines); cart.clear(); setPanel(null); await load();
     setPay({ amount: o.total_dkk, ref: `LLDS #${o.number}`, title: t("shop.payTitle", { n: o.number }), done: async () => { await api.claimPaid(o.id); say(t("shop.claimed")); } });
   };
   const buyCard = async (ty: PunchCardType) => {
-    const c = await api.buyPunchCard(ty.id, viewing.personId); setPickCard(null); await load();
+    const c = await api.buyPunchCard(ty.id, buyerId); setPickCard(null); await load();
     setPay({ amount: c.price_dkk, ref: `Klippekort ${c.person_name.split(" ")[0]}`, title: c.type_name, done: async () => { await api.claimPunchCardPaid(c.id); say(t("punch.claimed")); } });
   };
   return (
@@ -56,14 +60,18 @@ export function ShopScreen() {
       <header className="topbar shophead"><h1 className="display">{t("shop.title")}</h1>
         <div className="row" style={{ gap: 8 }}>
           <button className="iconbtn" aria-label={t("shop.history")} data-testid="shop-history" onClick={() => setPanel("history")}><Icon name="clock" />{openCount > 0 && <span className="tabbadge">{openCount}</span>}</button>
-          <button className="iconbtn" aria-label={t("shop.cart")} data-testid="shop-cart" onClick={() => setPanel("cart")}><Icon name="bag" />{cart.lines.length > 0 && <span className="tabbadge">{cart.lines.reduce((n, l) => n + l.qty, 0)}</span>}</button>
+          {!childLogin && <button className="iconbtn" aria-label={t("shop.cart")} data-testid="shop-cart" onClick={() => setPanel("cart")}><Icon name="bag" />{cart.lines.length > 0 && <span className="tabbadge">{cart.lines.reduce((n, l) => n + l.qty, 0)}</span>}</button>}
         </div>
       </header>
-      <p className="tiny muted" style={{ marginTop: -6 }}>{t("shop.buyingAs", { name: who })}</p>
       <TabNews tab="shop" />
-      <div className="shop-grid">
-        {products.map((p) => <button key={p.id} className="product" onClick={() => setPick(p)} data-testid="product"><div className="cover">{p.image_url ? <img src={p.image_url} alt="" /> : <span className="display">{p.name[0]}</span>}</div><div className="small"><strong>{p.name}</strong><div className="tiny">{p.price_dkk} kr.{p.stock != null && p.stock <= 0 ? ` · ${t("shop.soldOut")}` : ""}</div></div></button>)}
+      {childLogin && <p className="tiny muted" data-testid="shop-child">{t("shop.childHint")}</p>}
+      {types.length > 0 && !childLogin && <><div className="eyebrow" style={{ margin: "6px 0 6px" }}>{t("punch.title")}</div>
+      <div className="shop-grid" data-testid="shop-cards">
         {types.map((ty) => <button key={ty.id} className="product punchprod" onClick={() => setPickCard(ty)} data-testid="buy-card"><div className="cover punchcover"><span className="display">{ty.punches}</span><span className="tiny">{t("punch.punches")}</span></div><div className="small"><strong>{ty.name}</strong><div className="tiny">{ty.price_dkk} kr. · {t("punch.valid", { days: ty.valid_days })}</div></div></button>)}
+      </div></>}
+      {types.length > 0 && products.length > 0 && <div className="eyebrow" style={{ margin: "14px 0 6px" }}>{t("shop.merch")}</div>}
+      <div className="shop-grid">
+        {products.map((p) => <button key={p.id} className="product" disabled={childLogin} onClick={() => setPick(p)} data-testid="product"><div className="cover">{p.image_url ? <img src={p.image_url} alt="" /> : <span className="display">{p.name[0]}</span>}</div><div className="small"><strong>{p.name}</strong><div className="tiny">{p.price_dkk} kr.{p.stock != null && p.stock <= 0 ? ` · ${t("shop.soldOut")}` : ""}</div></div></button>)}
         {!products.length && !types.length && <p className="muted">{t("shop.empty")}</p>}
       </div>
       <p className="tiny">{t("shop.hint")}</p>
@@ -84,6 +92,7 @@ export function ShopScreen() {
       )}
       {panel === "cart" && (
         <Sheet onClose={() => setPanel(null)} eyebrow={who ?? ""} title={t("shop.cart")}>
+          {household.length > 1 && <div className="row" style={{ gap: 6, flexWrap: "wrap", marginBottom: 8 }}><span className="tiny muted" style={{ alignSelf: "center" }}>{t("shop.buyFor")}</span>{household.map((x) => <button key={x.id} className={"chip small" + (buyerId === x.id ? " on" : "")} onClick={() => setBuyerId(x.id)} data-testid="buyer">{x.first_name}</button>)}</div>}
           <div className="list" data-testid="cart">
             {cart.lines.map((l, i) => <div key={i} className="item"><span className="grow">{l.qty} × {l.name}{l.size ? ` (${l.size})` : ""}</span><span>{l.qty * l.price_dkk} kr.</span><button className="chip small danger" aria-label={t("common.remove")} onClick={() => cart.remove(i)}>×</button></div>)}
             {!cart.lines.length && <p className="muted">{t("shop.cartEmpty")}</p>}

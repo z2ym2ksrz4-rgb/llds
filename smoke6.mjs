@@ -16,15 +16,15 @@ out.personas = await p.$$eval("[data-testid=view-as] .persona b", (e) => e.map((
 await p.click("[data-testid=sheet-close]"); await p.waitForSelector(".sheet-bg", { state: "detached" });
 // trainer
 await pick("Rasmus"); out.viewbar = await p.textContent("[data-testid=viewbar]"); out.tabsTrainer = await tabs();
-await p.click("nav.tabbar >> text=/^(Mit hold|Hold)$/"); await p.waitForSelector(".teampick"); out.trainerTeam = await p.textContent(".teampick strong");
+await p.click("nav.tabbar >> text=Hold"); await p.waitForSelector(".teampick"); out.trainerTeam = await p.textContent(".teampick strong");
 // dancer 15: home + team follow The AXIS
 await pick("Tilde"); await p.click("nav.tabbar >> text=Hjem"); await p.waitForTimeout(300);
-await p.click("nav.tabbar >> text=/^(Mit hold|Hold)$/"); await p.waitForSelector(".teampick"); out.dancerTeam = await p.textContent(".teampick strong");
+await p.click("nav.tabbar >> text=Hold"); await p.waitForSelector(".teampick"); out.dancerTeam = await p.textContent(".teampick strong");
 out.tabsDancer = await tabs();
 // child login 11: no photo upload in Social
 await pick("Milo"); await p.click("nav.tabbar >> text=Social"); await p.waitForTimeout(400); out.kidsPhotoButtonHidden = !(await p.$("button:has-text('Tilføj billede')"));
 // parent: wears the child's hat
-await pick("Pia"); await p.click("nav.tabbar >> text=/^(Mit hold|Hold)$/"); await p.waitForSelector(".teampick"); out.parentEyebrow = await p.textContent(".teampick .eyebrow"); out.parentTeam = await p.textContent(".teampick strong");
+await pick("Pia"); await p.click("nav.tabbar >> text=Hold"); await p.waitForSelector(".teampick"); out.parentEyebrow = await p.textContent(".teampick .eyebrow"); out.parentTeam = await p.textContent(".teampick strong");
 // admin + trainer + parent persona keeps Admin tab
 await pick("Camilla"); out.tabsCamilla = await tabs();
 // exit

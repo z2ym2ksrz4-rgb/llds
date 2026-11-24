@@ -16,7 +16,7 @@ for (const lang of ["da", "en"]) {
   await p.goto("http://localhost:4173/", { waitUntil: "networkidle" }); await p.evaluate((l) => { localStorage.clear(); localStorage.setItem("llds_lang", l); localStorage.setItem("llds_settings", JSON.stringify({ language: l })); }, lang); await p.reload({ waitUntil: "networkidle" });
   await p.fill("#email", "parent@demo"); await p.click("form button.cta"); await p.fill("#code", "000000"); await p.click("form button.cta"); await p.waitForSelector("nav.tabbar");
   await p.addStyleTag({ content: ".testmenu,.viewbar{display:none!important}" });
-  const tabs = lang === "da" ? ["Hjem", "Mit hold", "Sale", "Events", "Social"] : ["Home", "My team", "Rooms", "Events", "Social"];
+  const tabs = lang === "da" ? ["Hjem", "Hold", "Kalender", "Events", "Social"] : ["Home", "Team", "Calendar", "Events", "Social"];
   const files = [];
   const snap = async (name) => { await p.waitForTimeout(900); const f = `${OUT}/raw-${lang}-${name}.png`; await p.screenshot({ path: f }); files.push(f); };
   await p.evaluate(() => window.scrollTo(0, 0)); await snap("home");

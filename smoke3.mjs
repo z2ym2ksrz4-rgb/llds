@@ -17,7 +17,7 @@ await p.goto(base, { waitUntil: "networkidle" }); await p.evaluate(() => localSt
 await login("parent@demo");
 await p.waitForSelector("[data-testid=msg-banner]"); out.bannerCount = await p.$$eval("[data-testid=msg-banner] .item", e => e.length);   // Home: only the school-wide message
 // the trainer's team message (accept) lives on the team page – with comments
-await p.click("nav.tabbar >> text=/^(Mit hold|Hold)$/"); await p.waitForSelector("[data-testid=msggroup-team]"); await p.click("[data-testid=msggroup-team] .item >> nth=0"); await p.waitForSelector("#msg-ack"); await p.click("#msg-ack");
+await p.click("nav.tabbar >> text=Hold"); await p.waitForSelector("[data-testid=msggroup-team]"); await p.click("[data-testid=msggroup-team] .item >> nth=0"); await p.waitForSelector("#msg-ack"); await p.click("#msg-ack");
 await p.waitForSelector(".toast"); out.accepted = await p.textContent(".toast"); await shot(1);
 await p.fill("[data-testid=msg-comment-input]", "Vi kommer – Freja glæder sig!"); await p.click("[data-testid=msg-comment-send]"); await p.waitForTimeout(300); out.comments = await p.$$eval("[data-testid=msg-comments] .comment", e => e.length);
 await p.click(".sheet-bg", { position: { x: 5, y: 5 } }); await p.waitForTimeout(200);
@@ -41,7 +41,7 @@ const alma = p.locator("[data-testid=post]", { hasText: "hættetrøje" });
 await alma.locator("button[aria-label=Mere]").click(); await alma.locator("text=Anmeld").click(); await alma.locator("input").fill("Upassende"); await alma.locator("text=Send anmeldelse").click();
 await p.waitForSelector(".toast"); out.reported = await p.textContent(".toast");
 // 1d. parent on The AXIS (parents_see_video=false, Freja 13) → choreography locked
-await p.click("nav.tabbar >> text=/^(Mit hold|Hold)$/"); await p.waitForSelector("[data-testid=team-tiles]"); await p.waitForTimeout(600);
+await p.click("nav.tabbar >> text=Hold"); await p.waitForSelector("[data-testid=team-tiles]"); await p.waitForTimeout(600);
 out.choreoLocked = !(await p.$("[data-testid=go-choreo]"));   // locked choreography is hidden for parents of young dancers
 // folders: open, upload
 await p.click("[data-testid=go-folders]"); await p.waitForSelector("[data-testid=folder]"); out.folders = await p.$$eval("[data-testid=folder]", e => e.length);
@@ -60,7 +60,7 @@ await p.click(".sheet-bg", { position: { x: 5, y: 5 } });
 // team: hidden post visible to admin as hidden; notes; formations
 await p.click("nav.tabbar >> text=Social"); await p.click(".chips .chip:has-text('The AXIS')"); await p.waitForSelector("[data-testid=feed]");
 out.hiddenVisibleToAdmin = await p.$$eval("[data-testid=post].hidden-post", e => e.length);
-await p.click("nav.tabbar >> text=/^(Mit hold|Hold)$/"); await p.waitForSelector("[data-testid=go-choreo]"); out.noNotesBtn = !(await p.$("[data-testid=go-notes]"));
+await p.click("nav.tabbar >> text=Hold"); await p.waitForSelector("[data-testid=go-choreo]"); out.noNotesBtn = !(await p.$("[data-testid=go-notes]"));
 await p.click("[data-testid=go-choreo]"); await p.waitForSelector("[data-testid=video]"); await p.click("[data-testid=video]");
 // notes on the video (trainer writes)
 await p.waitForSelector("[data-testid=video-notes]"); await p.click("[data-testid=video-notes] .linklike"); await p.fill("[data-testid=video-notes-input]", "Tæl 5-6-7-8 før løftet – Freja starter forrest."); await p.click("[data-testid=video-notes] .cta"); await p.waitForSelector(".toast"); await p.waitForTimeout(300); out.videoNotes = await p.textContent("[data-testid=video-notes] p");

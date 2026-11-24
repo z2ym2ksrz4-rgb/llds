@@ -16,10 +16,10 @@ await p.click("[data-testid=your-week] .item[data-kind=training] >> nth=-1"); aw
 await p.click(".sheet >> text=Meld afbud for Freja"); await p.click(".sheet .chip:has-text('Syg')"); await p.fill("#absNote", "Feber"); await p.click("text=Send afbud");
 await p.waitForSelector(".toast"); out.absence = await p.textContent(".toast"); await shot(1);
 // 1b. parent books Store Sal for Freja Friday 10:00
-await p.click("nav.tabbar >> text=Sale"); await p.waitForSelector(".cal");
-if ((new Date().getDay() + 6) % 7 >= 4) { await p.click("text=Næste uge"); await p.waitForTimeout(200); }   // Fri–Sun: book next week's Friday so it is in the future
+await p.click("nav.tabbar >> text=Kalender"); await p.waitForSelector(".cal");
+if ((new Date().getDay() + 6) % 7 >= 4) { await p.click(".weeknav2 .wkbtn >> nth=-1"); await p.waitForTimeout(200); }   // Fri–Sun: book next week's Friday so it is in the future
 await p.click(".days .day >> nth=4"); await p.waitForTimeout(200);
-await p.click("button[aria-label='Store Sal 10:00']"); await p.waitForSelector("#bk-title"); await p.click("text=Send til godkendelse");
+await p.click("button[aria-label='Book Store Sal kl. 10']"); await p.waitForSelector("#bk-title"); await p.click("text=Send til godkendelse");
 await p.waitForSelector(".toast"); out.booking = await p.textContent(".toast"); await shot(2);
 // 1c. parent grants child login (Freja is 2013 → 13 → not eligible in 2026; so expect "own account" text)
 await p.click("nav.tabbar >> text=Hjem"); await p.click("[data-testid=avatar]"); await p.click("[data-testid=menu-more]"); await p.click("[data-testid=more-settings]"); out.childText = await p.textContent(".sec .card .tiny");
@@ -42,8 +42,8 @@ await p.click(".list .item >> text=Godkend"); await p.waitForTimeout(200); out.a
 await shot(3); await logout();
 
 // 3. trainer Maja: today's/ week sessions, attendance, ask substitute
-await login("maja@demo"); await p.click("nav.tabbar >> text=Sale"); await p.waitForSelector(".cal");
-await p.click("text=Næste uge"); await p.waitForTimeout(200); await p.click(".days .day >> nth=0"); await p.waitForTimeout(200);
+await login("maja@demo"); await p.click("nav.tabbar >> text=Kalender"); await p.waitForSelector(".cal");
+await p.click(".weeknav2 .wkbtn >> nth=-1"); await p.waitForTimeout(200); await p.click(".days .day >> nth=0"); await p.waitForTimeout(200);
 await p.click(".cal .ev:has-text('Hip Hop Junior & Voksen Elite')"); await p.waitForSelector(".sheet");
 await p.click("text=Bed om vikar"); await p.waitForSelector(".toast"); out.sub = await p.textContent(".toast");
 await p.click(".days .day >> nth=1"); await p.waitForTimeout(200);
@@ -55,5 +55,5 @@ await shot(4); await logout();
 // 4. Sofie (trainer) sees substitute wanted on Home and takes it
 await login("sofie@demo"); await p.waitForSelector("text=Vikar søges"); await p.click(".card:has-text(\"Vikar søges\") .item >> nth=0"); await p.waitForSelector(".sheet");
 await p.click("text=Jeg tager den som vikar"); await p.waitForSelector(".toast"); out.took = await p.textContent(".toast");
-await p.setViewportSize({ width: 1280, height: 800 }); await p.click("nav.tabbar >> text=Sale"); await p.waitForSelector(".cal"); await shot(5);
+await p.setViewportSize({ width: 1280, height: 800 }); await p.click("nav.tabbar >> text=Kalender"); await p.waitForSelector(".cal"); await shot(5);
 out.errors = errors; console.log(JSON.stringify(out, null, 1)); await b.close(); process.exit(errors.length ? 1 : 0);

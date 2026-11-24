@@ -908,3 +908,32 @@ details.fold.team-more > summary::-webkit-details-marker { display:none; }
 details.fold.team-more > summary h2 { margin:0; flex:none; } details.fold.team-more > summary .tiny { flex:1; } details.fold.team-more > summary .caret { color:var(--gold2); }
 details.fold.team-more[open] > summary { border-bottom:0; } details.fold.team-more[open] > summary .caret { transform:rotate(180deg); }
 details.fold.team-more > .sec { margin-top:8px; }
+
+/* ================= Kørsel 3: Kalender ================= */
+.weeknav2 { display:flex; align-items:center; justify-content:space-between; gap:8px; margin:2px 0 6px; }
+.weeknav2 .wkbtn { min-width:40px; min-height:40px; padding:0 12px; border-radius:999px; background:rgba(255,255,255,.05); border:1px solid var(--line); color:var(--fg); font-size:1.1rem; line-height:1; }
+.weeknav2 .wkbtn.today { font-size:.85rem; color:var(--gold2); border-color:var(--gold3); }
+.weeknav2 .small { flex:1; text-align:center; }
+.cal .ev.other { opacity:.5; }
+.cal .free.can { border-top:1px dashed rgba(255,255,255,.07); }
+.cal .free.can span { position:absolute; left:6px; top:50%; transform:translateY(-50%); width:18px; height:18px; border-radius:50%; border:1px solid rgba(201,162,74,.35); color:rgba(201,162,74,.6); font-size:.8rem; line-height:16px; text-align:center; }
+.cal .free.can:hover span, .cal .free.can:focus-visible span { color:var(--gold2); border-color:var(--gold2); background:var(--gold-soft); }
+/* events: the sign-up chip reads as the action it is */
+.evcard .chip.evsign { background:linear-gradient(135deg, var(--gold2), var(--gold)); color:#15120d; border-color:transparent; font-weight:500; min-height:32px; padding:0 12px; }
+/* payments: one status line first */
+.card.paysum { display:flex; align-items:center; gap:10px; width:100%; text-align:left; padding:12px 14px; margin:0 0 8px; background:var(--card); border:1px solid var(--line); color:var(--fg); font:inherit; cursor:pointer; }
+.card.paysum.ok { cursor:default; }
+.dot.rose { width:10px; height:10px; border-radius:50%; background:var(--rose); box-shadow:0 0 0 3px var(--rose-soft); flex:none; }
+.dot.sage { width:10px; height:10px; border-radius:50%; background:var(--sage); box-shadow:0 0 0 3px var(--sage-soft); flex:none; }
+.card.auditionline { display:flex; align-items:center; gap:10px; width:100%; text-align:left; padding:10px 14px; margin:0 0 8px; background:var(--card); border:1px solid var(--line); color:var(--fg); font:inherit; cursor:pointer; }
+.card.auditionline .eyebrow { margin:0; flex:none; }
+/* photo hero: the picture always spans exactly the content width – never wider (no sideways scroll), never narrower */
+.homehero, .hero.photo.own { overflow:hidden; }
+.homehero-media.photo .pic, .hero.photo.own .pic { width:100% !important; max-width:none !important; height:100% !important; left:0; right:0; }
+/* aspect-ratio + max-height made the hero box WIDER than the viewport (size transfer) → sideways scroll. Height comes from the viewport width instead. */
+@media (max-width:1099px) {
+  .homehero.photo { aspect-ratio:auto; height:clamp(300px, calc(100vw / var(--hero-ar, 1.5)), 62dvh); min-height:0; max-height:none; width:auto; }
+}
+@media (min-width:640px) and (max-width:1099px) { .homehero.photo { height:clamp(320px, calc(100vw / var(--hero-ar, 1.5)), 56dvh); } }
+/* team hero is 16:10 → cover crops little for landscape photos and keeps portrait photos edge to edge */
+.hero.photo.own .pic { object-fit:cover !important; object-position:center 22%; -webkit-mask-image:none; mask-image:none; }

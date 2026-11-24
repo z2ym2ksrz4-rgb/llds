@@ -119,6 +119,7 @@ export function AuditionCards() {
   const me = useAuth((s) => s.me)!;
   const [cands, setCands] = useState<AuditionCandidate[]>([]);
   const [accepting, setAccepting] = useState<AuditionCandidate | null>(null);
+  const [showQuiet, setShowQuiet] = useState(false);
   const [plan, setPlan] = useState<Plan>("full");
   const [pay, setPay] = useState<{ id: string; reference: string; amount: number; title: string } | null>(null);
   const [toast, setToast] = useState<string | null>(null); const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
@@ -139,7 +140,6 @@ export function AuditionCards() {
     </div>) : null;
   useEffect(() => { if (accepting) void api.listTeams().then(setTeams); }, [accepting]);
   if (!cands.length) return staffBlock;
-  const who = (pid: string) => (pid === me.person.id ? null : me.children.find((c) => c.id === pid)?.first_name ?? null);
   const respond = async (c: AuditionCandidate, accept: boolean) => {
     const r = await api.auditionRespond(c.id, accept, plan);
     if (!accept) { say(t("audition.declinedToast")); setAccepting(null); await load(); return; }
@@ -147,11 +147,23 @@ export function AuditionCards() {
     else say(t("audition.acceptedToast"));
     setAccepting(null); await load();
   };
+  const who = (pid: string) => (pid === me.person.id ? null : me.children.find((c) => c.id === pid)?.first_name ?? null);
   const team = accepting ? teams.find((x) => x.id === accepting.team_id) : null;
+  // nothing to do yet (just applied / waitlisted / declined) → one quiet line; the full cards only when the trainer has sent something or a decision is due
+  const active = cands.filter((c) => c.status === "invited" || c.status === "selected" || (c.status === "waitlist" && !!c.audition_sent_at));
+  const quiet = cands.filter((c) => !active.includes(c));
+  const line = quiet.length > 0 && (
+    <button type="button" className="card auditionline" data-testid="audition-line" onClick={() => setShowQuiet((v) => !v)} aria-expanded={showQuiet}>
+      <span className="eyebrow gold">{t("audition.title")}</span>
+      <span className="grow small">{t("audition.quietLine", { teams: quiet.map((c) => c.team_name + (who(c.person_id) ? ` (${who(c.person_id)})` : "")).join(", ") })}</span>
+      <span className="gold">{showQuiet ? "⌃" : "⌄"}</span>
+    </button>);
+  const shown = showQuiet ? cands : active;
   return (<>{staffBlock}
-    <div className="sec" data-testid="audition-cards"><h2>{t("audition.title")}</h2>
+    {line}
+    <div className="sec" data-testid="audition-cards" style={shown.length ? undefined : { display: "none" }}><h2>{t("audition.title")}</h2>
       <ScrollList>
-        {cands.map((c) => (
+        {shown.map((c) => (
           <div key={c.id} className="item" style={{ alignItems: "flex-start", flexDirection: "column", gap: 6 }} data-testid="audition-card">
             <div className="row between" style={{ width: "100%" }}><strong>{c.team_name}{who(c.person_id) ? <span className="chip small" style={{ marginLeft: 6 }}>{who(c.person_id)}</span> : null}</strong>
               <span className={"chip small " + (c.status === "selected" || c.status === "accepted" ? "ok" : c.status === "declined" ? "" : c.status === "waitlist" ? "pend" : "warn")}>{t(`audition.mine.${c.status}`)}</span></div>
