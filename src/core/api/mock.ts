@@ -1,4 +1,5 @@
 import type { Api, Appearance, AuditionCandidate, Feedback, Insights, WebSignup, Me, Membership, PendingPerson, Person, Role, SignUpInput, Team } from "./types";
+import { ANON, anonymize } from "./anon";
 import { scheduleOps, seedSchedule, type SchedState } from "./mock-schedule";
 import { socialOps, seedSocial, type SocialState } from "./mock-social";
 import { shopOps, seedShop, type ShopState } from "./mock-shop";
@@ -75,7 +76,7 @@ function load(): State {
     ],
   };
 }
-let S = load();
+let S = ANON ? anonymize(load()) : load();
 const buildMe = (person: Person): Me => {
   const childIds = S.guardians.filter((g) => g.parent_id === person.id).map((g) => g.child_id);
   const children = S.persons.filter((p) => childIds.includes(p.id));

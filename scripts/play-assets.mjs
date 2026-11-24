@@ -1,5 +1,5 @@
 // Play/App Store assets for LLDS: icon-512, feature graphics (da/en), 6 framed phone screenshots per language from the mock app.
-// Usage: preview on :4173 (mock build) → node scripts/play-assets.mjs → store/ + ../ilumie-site/play-assets/llds/
+// Usage: VITE_MOCK=1 VITE_ANON=1 npx vite build (anonymised mock) → preview on :4173 → node scripts/play-assets.mjs → store/ + ../ilumie-site/play-assets/llds/
 import { chromium } from "playwright";
 import { mkdirSync, copyFileSync, writeFileSync } from "node:fs";
 import sharp from "sharp";
@@ -12,10 +12,9 @@ const COPY = {
 const shots = [];
 for (const lang of ["da", "en"]) {
   const p = await b.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 3 });
-  await p.addInitScript((l) => { try { localStorage.setItem("llds_tour", JSON.stringify({ state: "done", at: Date.now() })); localStorage.setItem("llds_notif_asked", JSON.stringify({ at: Date.now() })); localStorage.setItem("llds_welcome", new Date().toDateString()); localStorage.setItem("llds_lang", l); } catch {} }, lang);
-  await p.goto("http://localhost:4173/", { waitUntil: "networkidle" }); await p.evaluate((l) => { localStorage.clear(); localStorage.setItem("llds_lang", l); }, lang); await p.reload({ waitUntil: "networkidle" });
+  await p.addInitScript((l) => { try { localStorage.setItem("llds_tour", JSON.stringify({ state: "done", at: Date.now() })); localStorage.setItem("llds_notif_asked", JSON.stringify({ at: Date.now() })); localStorage.setItem("llds_welcome", new Date().toDateString()); localStorage.setItem("llds_lang", l); localStorage.setItem("llds_settings", JSON.stringify({ language: l })); } catch {} }, lang);
+  await p.goto("http://localhost:4173/", { waitUntil: "networkidle" }); await p.evaluate((l) => { localStorage.clear(); localStorage.setItem("llds_lang", l); localStorage.setItem("llds_settings", JSON.stringify({ language: l })); }, lang); await p.reload({ waitUntil: "networkidle" });
   await p.fill("#email", "parent@demo"); await p.click("form button.cta"); await p.fill("#code", "000000"); await p.click("form button.cta"); await p.waitForSelector("nav.tabbar");
-  if (lang === "en") { const f = await p.$("[data-testid=lang-en], .langflags button:nth-child(2)"); if (f) { await f.click(); await p.waitForTimeout(600); } }
   await p.addStyleTag({ content: ".testmenu,.viewbar{display:none!important}" });
   const tabs = lang === "da" ? ["Hjem", "Mit hold", "Sale", "Events", "Social"] : ["Home", "My team", "Rooms", "Events", "Social"];
   const files = [];
