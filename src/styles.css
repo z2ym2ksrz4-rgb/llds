@@ -467,7 +467,7 @@ button.cta { box-shadow:0 10px 26px -12px rgba(201,162,74,.7); }
 
 /* lists that show 3 rows and scroll for the history */
 .scrolllist.m0 { margin:0; }
-.scrolllist { position:relative; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+.scrolllist { position:relative; overflow-y:auto; overscroll-behavior-y:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }   /* chain to the page when the inner list ends – otherwise scrolling 'sticks' on list items */
 .scrolllist::-webkit-scrollbar { display:none; }
 .scrolllist { padding-bottom:0 !important; }
 .scrolllist .scroll-more { position:sticky; bottom:0; left:0; right:0; flex:none; height:40px; margin:-40px -16px 0; display:flex; align-items:flex-end; justify-content:center; pointer-events:none; background:linear-gradient(180deg, transparent, var(--card) 75%); z-index:1; }
