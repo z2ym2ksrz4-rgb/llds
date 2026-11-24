@@ -4,7 +4,7 @@ import { api, type Event, type Team, type WebSignup } from "@/core/api";
 import { useAuth } from "@/core/auth";
 import { Sheet, Toast } from "../components/Sheet";
 import { PaySheet } from "../components/Pay";
-import { ageOf, ago, dateLabel, hm, loc } from "../lib/time";
+import { ageOf, ago, agoWords, dateLabel, hm, loc } from "../lib/time";
 
 /** Season price text → [full, half] in kr. ("2.400 kr. for hel sæson, eller 1.750 kr. for halv sæson") */
 export const priceAmounts = (p: string | null | undefined): number[] => (p ?? "").match(/([0-9][0-9.]*) kr/g)?.map((x) => parseInt(x.replace(/\D/g, ""), 10)) ?? [];
@@ -58,7 +58,13 @@ function PaymentRow({ p, onPay }: { p: WebSignup; onPay: () => void }) {
   return (
     <div className="item" data-testid="payment">
       <span className="avatar small">💳</span>
-      <span className="grow">{p.team_name} · {p.dancer_name.split(" ")[0]}<div className="tiny">{plan}{n > 1 ? ` · ${t("pay.ratesPaid", { paid, n })} · ${kr(p.per_rate_dkk)} ${t("pay.perRate")}${p.fee_dkk ? ` (${t("pay.feeIncl", { fee: p.fee_dkk })})` : ""}` : ""}{p.price_note ? ` · ${p.price_note}` : ""}{p.discount_pct ? ` · ${t("pay.discount", { pct: p.discount_pct })}${p.amount_before_dkk ? ` (${kr(p.amount_before_dkk)})` : ""}` : ""}{p.message ? ` · “${p.message}”` : ""} · {ago(p.created_at)}</div></span>
+      <span className="grow">{p.team_name} · {p.dancer_name.split(" ")[0]}
+        <div className="tiny">{n > 1
+          ? t("pay.lineRates", { plan, paid, n, rate: kr(p.per_rate_dkk) }) + (p.fee_dkk ? ` ${t("pay.feeIncl", { fee: p.fee_dkk })}` : "")
+          : p.amount_dkk != null ? t("pay.lineOnce", { plan, total: kr(p.amount_dkk) }) : plan}
+          {p.discount_pct && p.amount_before_dkk ? ` – ${t("pay.lineDiscount", { pct: p.discount_pct, before: kr(p.amount_before_dkk) })}` : ""}</div>
+        {(p.price_note || p.message) && <div className="tiny muted">{[p.price_note, p.message ? `“${p.message}”` : null].filter(Boolean).join(" · ")}</div>}
+        <div className="tiny muted">{t("pay.created", { when: agoWords(p.created_at) })}</div></span>
       {p.status === "paid" ? <span className="chip ok small">{t("shop.status.paid")}</span> : p.status === "cancelled" ? <span className="chip small">{t("pay.cancelled")}</span> : p.claimed_paid_at ? <span className="chip warn small">{t("shop.status.claimed")}</span> : p.amount_dkk != null ? <button className="small" onClick={onPay} data-testid="pay-btn">{n > 1 ? `${t("pay.rateN", { k: paid + 1 })} · ${kr(p.per_rate_dkk)}` : `${t("shop.pay")} · ${kr(p.amount_dkk)}`}</button> : <span className="chip small">{p.price_note ? t("pay.seeNote") : t("pay.plan.rates")}</span>}
     </div>
   );

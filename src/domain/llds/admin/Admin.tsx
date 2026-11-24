@@ -66,7 +66,6 @@ export function Admin() {
       <div className="card list">
         {items.map(([k, label, sub, n]) => <button key={k} className="item" onClick={() => setPage(k)}><span className="grow">{label}<div className={"tiny" + (n > 0 ? " todo" : "")}>{sub}</div></span>{n > 0 && <span className="chip warn small">{n}</span>}<span className="gold">›</span></button>)}
       </div>
-      <p className="tiny">{t("admin.phase4note")}</p>
     </section>
   );
 }

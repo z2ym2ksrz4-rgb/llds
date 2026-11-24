@@ -141,12 +141,13 @@
     "noPhone": "no phone number",
     "call": "Call",
     "sms": "Text",
-    "officialOnHome": "{{n}} message(s) from the school await your reply",
     "rosterNamesOnly": "Contact details are only visible to the team's trainers and the administrator.",
     "removeFromTeam": "Remove from team",
     "removeConfirm": "Remove {{name}} from {{team}}? The person is not deleted – only the administrator can do that.",
     "removed": "{{name}} removed from the team",
-    "nextTraining": "Next training"
+    "nextTraining": "Next training",
+    "officialOnHome_one": "1 message from the school is waiting for your reply",
+    "officialOnHome_other": "{{count}} messages from the school are waiting for your reply"
   },
   "home": {
     "hi": "Hi {{name}}",
@@ -204,7 +205,10 @@
     "streak10": "10 trainings in a row",
     "nextFor": "{{name}}'s next training",
     "nextYours": "Your next training",
-    "nextYouTrain": "You train next"
+    "nextYouTrain": "You train next",
+    "stripHas_one": "1 training",
+    "stripHas_other": "{{count}} trainings",
+    "stripNone": "No training"
   },
   "admin": {
     "users": "New users",
@@ -292,7 +296,6 @@
     "cardTypes": "Card types",
     "days": "days",
     "validDays": "Valid (days)",
-    "phase4note": "Phase 4: events, shop, punch cards, milestones and in-app notifications. Public website comes in phase 5.",
     "teamPublic": "Show on website",
     "teamPublicHint": "The team is listed on the website with style, level and training time (never names or photos)",
     "teamDescription": "Website description",
@@ -631,7 +634,6 @@
     "send": "Send"
   },
   "msg": {
-    "needsYou": "{{n}} message(s) need your answer",
     "needs": {
       "read": "To read",
       "accept": "To accept"
@@ -680,7 +682,9 @@
     "commentPh": "Write a comment or a question …",
     "commentSend": "Send",
     "open": "Read",
-    "acceptBtn": "Accept"
+    "acceptBtn": "Accept",
+    "needsYou_one": "1 message needs your reply",
+    "needsYou_other": "{{count}} messages need your reply"
   },
   "folders": {
     "new": "New folder",
@@ -952,7 +956,11 @@
     "quoteRates": "{{n}} instalments of {{per}} (incl. instalment fee {{fee}})",
     "quoteLoading": "Calculating price …",
     "quoteNext": "Next step: pay with MobilePay. The spot is yours once the payment is registered.",
-    "joinConfirm": "Confirm sign-up"
+    "joinConfirm": "Confirm sign-up",
+    "lineRates": "{{plan}} · {{n}} instalments of {{rate}} · {{paid}} of {{n}} paid",
+    "lineOnce": "{{plan}} · {{total}}",
+    "lineDiscount": "{{pct}} % family discount off {{before}}",
+    "created": "Created {{when}}"
   },
   "milestones": {
     "title": "Milestones",

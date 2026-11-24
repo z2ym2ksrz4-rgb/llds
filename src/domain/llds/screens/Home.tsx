@@ -15,7 +15,7 @@ import { useScene } from "../components/Scene";
 import { Empty } from "../components/Empty";
 import { catalogUrl } from "../lib/catalog";
 import { EventSheet } from "./Events";
-import { addDays, dateLabel, DAY_SHORT, hm, loc, startOfDay } from "../lib/time";
+import { addDays, dateLabel, DAY_LONG, DAY_SHORT, hm, loc, startOfDay } from "../lib/time";
 import { boxOf, homeOrder, isHidden, useAppearance } from "@/core/appearance";
 import { resolveImage } from "../lib/catalog";
 import { TrophyShelf } from "../components/Emblems";
@@ -206,7 +206,7 @@ export function Home() {
       {!me.person.supervised_by && <button type="button" className="linklike small home-join" data-testid="home-join" onClick={() => setJoin(true)}>+ {t("pay.join")}</button>}
       {/* week strip: the dots follow the team chosen above – its trainings and events */}
       {(!isAdmin || teamIds.size > 0) && <div className="weekstrip" data-testid="weekstrip">
-        {strip.map((d) => { const key = d.toDateString(); const n = week.filter((w) => new Date(w.at).toDateString() === key).length || sessions.filter((x) => x.team_id === teamId && !x.cancelled && new Date(x.starts_at).toDateString() === key).length; return <button type="button" key={key} className={"d" + (key === today ? " today" : "") + (n ? " has" : "") + (selDay === key ? " sel" : "")} onClick={() => setSelDay(selDay === key ? null : key)} aria-pressed={selDay === key}><small>{DAY_SHORT[(d.getDay() + 6) % 7]}</small><b>{d.getDate()}</b><i /></button>; })}
+        {strip.map((d) => { const key = d.toDateString(); const n = week.filter((w) => new Date(w.at).toDateString() === key).length || sessions.filter((x) => x.team_id === teamId && !x.cancelled && new Date(x.starts_at).toDateString() === key).length; return <button type="button" key={key} className={"d" + (key === today ? " today" : "") + (n ? " has" : "") + (selDay === key ? " sel" : "")} onClick={() => setSelDay(selDay === key ? null : key)} aria-pressed={selDay === key} aria-label={`${DAY_LONG[(d.getDay() + 6) % 7]} ${d.getDate()}. · ${n ? t("home.stripHas", { count: n }) : t("home.stripNone")}`} title={n ? t("home.stripHas", { count: n }) : t("home.stripNone")}><small>{DAY_SHORT[(d.getDay() + 6) % 7]}</small><b>{d.getDate()}</b><i /></button>; })}
       </div>}
       {selDay && (() => { const items = week.filter((w) => new Date(w.at).toDateString() === selDay); return (
         <div className="daypanel list" data-testid="day-panel">

@@ -33,3 +33,10 @@ export function ago(iso: string) {
 
 /** HH:MM for <input type="time"> (hm() gives the Danish "16.00" display form, which the input rejects). */
 export function hhmm(iso: string) { const d = new Date(iso); return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; }
+
+/** Relative time in words for lists older people read: "i dag", "i går", "for 3 dage siden", else a date. */
+export function agoWords(iso: string) {
+  const d0 = startOfDay(new Date()).getTime(), d = startOfDay(new Date(iso)).getTime(); const days = Math.round((d0 - d) / 864e5);
+  if (days <= 0) return EN() ? "today" : "i dag"; if (days === 1) return EN() ? "yesterday" : "i går"; if (days < 7) return EN() ? `${days} days ago` : `for ${days} dage siden`;
+  return new Date(iso).toLocaleDateString(loc(), { day: "numeric", month: "long" });
+}

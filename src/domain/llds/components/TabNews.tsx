@@ -4,7 +4,7 @@ import { api, type Notification } from "@/core/api";
 import { TAB_KINDS } from "@/core/badges";
 import { useNav, type Tab } from "@/core/nav";
 import { useAuth } from "@/core/auth";
-import { ago } from "../lib/time";
+import { agoWords } from "../lib/time";
 
 const ICON: Record<string, string> = { message: "✉️", booking: "🏠", substitute: "🙋", session: "⚠️", event: "📅", milestone: "🏅", badge: "🔥", order: "🛍", punch: "🎟", payment: "💳", post: "💬", signup: "📝" };
 const DAYS = 3;
@@ -56,7 +56,7 @@ export function TabNews({ tab }: { tab: Tab }) {
           <button type="button" className="item" disabled={!canOpen} onClick={() => tg && openRef(tg.tab, tg.ref)} data-testid="tabnews-row">
             <span className="avatar small">{ICON[n.kind] ?? "•"}</span>
             <span className="grow"><div>{n.title}</div>{n.body && <div className="tiny">{n.body}</div>}</span>
-            <span className="tiny">{ago(n.created_at)}</span>{!n.read_at && <span className="dot gold" aria-label={t("news.unread")} />}{canOpen && <span className="gold">›</span>}
+            <span className="tiny">{agoWords(n.created_at)}</span>{!n.read_at && <span className="dot gold" aria-label={t("news.unread")} />}{canOpen && <span className="gold">›</span>}
           </button>
           <button type="button" className="tabnews-x" aria-label={t("news.dismiss")} title={t("news.dismiss")} onClick={() => dismiss([n.id])} data-testid="tabnews-dismiss">×</button>
         </div>); })}

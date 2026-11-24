@@ -141,12 +141,13 @@
     "noPhone": "intet telefonnummer",
     "call": "Ring til",
     "sms": "Sms til",
-    "officialOnHome": "{{n}} besked(er) fra skolen venter på dit svar",
     "rosterNamesOnly": "Kontaktoplysninger ses kun af holdets trænere og administratoren.",
     "removeFromTeam": "Fjern fra holdet",
     "removeConfirm": "Fjern {{name}} fra {{team}}? Personen slettes ikke – det kan kun administratoren.",
     "removed": "{{name}} er fjernet fra holdet",
-    "nextTraining": "Næste træning"
+    "nextTraining": "Næste træning",
+    "officialOnHome_one": "1 besked fra skolen venter på dit svar",
+    "officialOnHome_other": "{{count}} beskeder fra skolen venter på dit svar"
   },
   "home": {
     "hi": "Hej {{name}}",
@@ -204,7 +205,10 @@
     "streak10": "10 træninger i træk",
     "nextFor": "{{name}}s næste træning",
     "nextYours": "Din næste træning",
-    "nextYouTrain": "Du træner næste gang"
+    "nextYouTrain": "Du træner næste gang",
+    "stripHas_one": "1 træning",
+    "stripHas_other": "{{count}} træninger",
+    "stripNone": "Ingen træning"
   },
   "admin": {
     "users": "Nye brugere",
@@ -292,7 +296,6 @@
     "cardTypes": "Kort-typer",
     "days": "dage",
     "validDays": "Gyldig (dage)",
-    "phase4note": "Fase 4: events, shop, klippekort, milepæle og notifikationer i appen. Offentligt website kommer i fase 5.",
     "teamPublic": "Vis på website",
     "teamPublicHint": "Holdet står på lldancestudio-sitet med stil, niveau og træningstid (aldrig navne eller billeder)",
     "teamDescription": "Beskrivelse til website",
@@ -631,7 +634,6 @@
     "send": "Send"
   },
   "msg": {
-    "needsYou": "{{n}} besked(er) kræver dit svar",
     "needs": {
       "read": "Skal læses",
       "accept": "Skal accepteres"
@@ -680,7 +682,9 @@
     "commentPh": "Skriv en kommentar eller et spørgsmål …",
     "commentSend": "Send",
     "open": "Læs",
-    "acceptBtn": "Acceptér"
+    "acceptBtn": "Acceptér",
+    "needsYou_one": "1 besked kræver dit svar",
+    "needsYou_other": "{{count}} beskeder kræver dit svar"
   },
   "folders": {
     "new": "Ny mappe",
@@ -952,7 +956,11 @@
     "quoteRates": "{{n}} rater à {{per}} (inkl. rategebyr {{fee}})",
     "quoteLoading": "Beregner pris …",
     "quoteNext": "Næste trin: betal med MobilePay. Pladsen er klar, når betalingen er registreret.",
-    "joinConfirm": "Bekræft tilmelding"
+    "joinConfirm": "Bekræft tilmelding",
+    "lineRates": "{{plan}} · {{n}} rater à {{rate}} · {{paid}} af {{n}} betalt",
+    "lineOnce": "{{plan}} · {{total}}",
+    "lineDiscount": "{{pct}} % familierabat af {{before}}",
+    "created": "Oprettet {{when}}"
   },
   "milestones": {
     "title": "Milepæle",
