@@ -118,7 +118,8 @@ export function Home() {
   /* hero image: the viewed person's own team photo (Line's) → next event's image → school default → art */
   const selTeam = selectedTeamId ? me.teams.find((x) => x.id === selectedTeamId && (teamIds.has(x.id) || me.person.is_admin)) : undefined;   // the team chosen in the picker – follows the hat (own team / child's team)
   const firstTeam = selTeam ?? me.teams.find((x) => teamIds.has(x.id));
-  const ownPhoto = firstTeam && /^https?:/.test(firstTeam.cover_url ?? "") ? firstTeam.cover_url : firstTeam?.photos?.[0] ?? (firstTeam && /^https?:/.test(firstTeam.about_url ?? "") ? firstTeam.about_url : null);
+  // the team's chosen top picture wins – whether it is one of Line's photos (http) or a catalogue picture picked in Admin → Hold ("art/catalog/…"); then the team's own photos, then the about-picture
+  const ownPhoto = firstTeam?.cover_url || firstTeam?.photos?.[0] || firstTeam?.about_url || null;
   const heroImg = resolveImage(ownPhoto) ?? catalogUrl(hero?.image_key) ?? catalogUrl(appearance.images?.hero) ?? artFor(viewing.personId, ["group", "trails", "studio"]);
   const heroFocus = resolveImage(ownPhoto) ? firstTeam?.focus : catalogUrl(hero?.image_key) ? hero?.focus : null;
   const nextTeam = teamById(nextItem?.session?.team_id);
