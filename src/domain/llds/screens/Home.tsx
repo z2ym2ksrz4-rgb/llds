@@ -166,7 +166,7 @@ export function Home() {
       )}
     </>),
     yourDay: () => (<>
-      {isStaff && !isAdmin && staffToday.length > 0 && (
+      {false && isStaff && !isAdmin && staffToday.length > 0 && (   /* "Din dag" duplicated the rows of "Din uge" (today + tomorrow) */
         <div className="sec"><h2>{t("home.yourDay")}</h2>
           <div className="card list">{staffToday.map((s) => <button key={s.id} className="item" onClick={() => setOpen(s)}><span className="time">{hm(s.starts_at)}</span><span className="grow">{s.team_name}<div className="tiny">{s.room_name}{s.lesson_plan ? " · " + t("session.planShort") : ""}</div></span><span className="gold">›</span></button>)}</div>
         </div>
@@ -269,7 +269,7 @@ export function Home() {
   };
   let order = homeOrder(appearance).filter((k) => !isHidden(appearance, k));
   if (isAdmin) { // the studio block is Line's "what happens today" – it goes right under the next-card instead of at the bottom
-    const studioKeys = ["studioHead", "stats", "studio"]; const rest = order.filter((k) => !studioKeys.includes(k)); const at = rest.indexOf("next") + 1 || rest.indexOf("teampick") + 1 || 1;
+    const studioKeys = ["studioHead", "stats", "studio"]; const rest = order.filter((k) => !studioKeys.includes(k)); const at = (rest.indexOf("messages") + 1) || (rest.indexOf("next") + 1) || 1;
     order = [...rest.slice(0, at), ...studioKeys.filter((k) => order.includes(k)), ...rest.slice(at)];
   }
   const FOLD = new Set(["gallery", "badges", "upcoming"]);   // nice-to-have content lives under one "Mere" fold – the first screen stays about now
