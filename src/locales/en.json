@@ -1174,7 +1174,7 @@
     "galleryClear": "Clear",
     "galleryShuffle": "Shuffle order",
     "website": "Website",
-    "websiteSub": "Images and video on the front page of ilumie.com/llds. Changes apply immediately – no rebuild.",
+    "websiteSub": "Images and video on the front page of {{site}}. Changes apply immediately – no rebuild.",
     "videoUrl": "Front-page video (link to .mp4)",
     "videoPoster": "Still image before the video plays",
     "siteHero": "Top image on the front page",

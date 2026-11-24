@@ -1174,7 +1174,7 @@
     "galleryClear": "Ryd valg",
     "galleryShuffle": "Bland rækkefølgen",
     "website": "Website",
-    "websiteSub": "Billeder og video på forsiden af ilumie.com/llds. Ændringer slår igennem med det samme – uden nyt build.",
+    "websiteSub": "Billeder og video på forsiden af {{site}}. Ændringer slår igennem med det samme – uden nyt build.",
     "videoUrl": "Video på forsiden (link til .mp4)",
     "videoPoster": "Stillbillede før videoen afspilles",
     "siteHero": "Topbillede på forsiden",

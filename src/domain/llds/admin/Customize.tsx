@@ -1,3 +1,4 @@
+import appConfig from "../../../../app.config.json";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Appearance, CustomBox } from "@/core/api";
@@ -70,7 +71,7 @@ export function Customize() {
       </div>
 
       <div className="sec" data-testid="cz-website"><h2>{t("customize.website")}</h2>
-        <p className="tiny muted" style={{ marginTop: 0 }}>{t("customize.websiteSub")}</p>
+        <p className="tiny muted" style={{ marginTop: 0 }}>{t("customize.websiteSub", { site: appConfig.siteUrl.replace(/^https?:\/\//, "").replace(/\/$/, "") })}</p>
         <div className="card"><div className="eyebrow">{t("customize.siteHero")}</div>
           <ImagePicker tag="event" label=" " own={teamPhotos} value={a.website?.hero ?? null} onChange={(v) => setWeb("hero", v)} /></div>
         <div className="card"><label className="field"><span>{t("customize.videoUrl")}</span><input type="url" placeholder="https://…/video.mp4" value={a.website?.video ?? ""} data-testid="cz-video" onChange={(e) => setWeb("video", e.target.value.trim() || null)} /></label>
