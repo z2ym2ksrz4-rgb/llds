@@ -1,7 +1,7 @@
 {
   "name": "llds",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "LL Dance Studio – app for dancers, parents and trainers (React + Capacitor + Supabase).",
   "type": "module",
   "scripts": {
