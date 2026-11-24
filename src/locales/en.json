@@ -60,7 +60,9 @@
     "password": "Password",
     "badEmail": "Enter the e-mail you are registered with – e.g. name@example.com.",
     "needPassword": "Enter the password.",
-    "whatIs": "What is Backstage?"
+    "whatIs": "What is Backstage?",
+    "applyLink": "Already a dancer or parent, but no access? Apply for access",
+    "applyHint": "Enter your e-mail and tap Send code – then fill in the application (name, phone, birth date, teams and any children). The school approves you. Under 13? A parent applies for both of you."
   },
   "register": {
     "title": "Create profile",

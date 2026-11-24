@@ -17,7 +17,10 @@ export function AdminUsers() {
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
 
-  const load = async () => { const [p, tm, w] = await Promise.all([api.listPending(), api.listTeams(), api.listWebSignups().catch(() => [] as WebSignup[])]); setPending(p); setTeams(tm); setWeb(w); };
+  const load = async () => { const [p, tm, w] = await Promise.all([api.listPending(), api.listTeams(), api.listWebSignups().catch(() => [] as WebSignup[])]); setPending(p); setTeams(tm); setWeb(w);
+    // pre-tick the teams people asked for (wished_teams holds team names from the website/app form) – Line only confirms
+    setDraft((d) => { const next = { ...d }; const norm = (x: string) => x.toLowerCase().replace(/\s*\(.*?\)\s*/g, "").trim(); const pick = (pid: string, wished: string | null, isChild: boolean, wishedRoles: string[]) => { if (next[pid] || !wished) return; const parts = wished.split(/[·;,]| og /).map(norm).filter(Boolean); const hits = tm.filter((x) => parts.some((w) => w && (norm(x.name) === w || norm(x.name).startsWith(w)))); if (hits.length) next[pid] = hits.map((x) => ({ team_id: x.id, role: (!isChild && wishedRoles.includes("trainer") ? "trainer" : "dancer") as Role })); };
+      for (const x of p) { if (!(x.wished_roles.includes("parent") && !x.wished_roles.includes("dancer"))) pick(x.id, x.wished_teams, false, x.wished_roles); for (const c of x.children) pick(c.id, c.wished_teams ?? null, true, []); } return next; }); };
   useEffect(() => { void load(); }, []);
 
   const toggle = (pid: string, team_id: string, role: Role) => setDraft((d) => {

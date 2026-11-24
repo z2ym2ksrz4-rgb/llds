@@ -21,6 +21,7 @@ export function Login() {
 
   const isReview = /^review[\w.+-]*@ilumie\.com$/i.test(email.trim());   // App Store / Play reviewers: password instead of a mail code
   const [password, setPassword] = useState("");
+  const [apply, setApply] = useState(false);
   const send = async () => {
     if (!/^[^@\s]+@[^@\s]+$/.test(email.trim())) { setErr(t("login.badEmail")); document.getElementById("email")?.focus(); return; }
     if (isReview && !password) { setErr(t("login.needPassword")); return; }
@@ -47,6 +48,8 @@ export function Login() {
             {isReview && <label className="field"><span>{t("login.password")}</span><input id="password" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} /></label>}
             <button className="cta" disabled={busy}>{isReview ? t("login.verify") : t("login.sendCode")}</button>
             <p className="tiny">{t("login.noAccount")} <a className="gold" href={`${appConfig.siteUrl}backstage/`} target="_blank" rel="noreferrer">{t("login.whatIs")} ↗</a></p>
+            <button type="button" className="linklike small" data-testid="apply-access" onClick={() => { setApply((v) => !v); document.getElementById("email")?.focus(); }}>{t("login.applyLink")}</button>
+            {apply && <p className="small apply-hint" role="status">{t("login.applyHint")}</p>}
           </form>
         ) : (
           <form onSubmit={(e) => { e.preventDefault(); void verify(); }} className="stack">

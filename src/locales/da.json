@@ -60,7 +60,9 @@
     "password": "Adgangskode",
     "badEmail": "Skriv den e-mail, du er registreret med – fx navn@eksempel.dk.",
     "needPassword": "Skriv adgangskoden.",
-    "whatIs": "Hvad er Backstage?"
+    "whatIs": "Hvad er Backstage?",
+    "applyLink": "Allerede danser eller forælder, men ingen adgang? Ansøg om adgang",
+    "applyHint": "Skriv din e-mail og tryk Send kode – så udfylder du ansøgningen bagefter (navn, telefon, fødselsdato, hold og evt. børn). Danseskolen godkender dig. Er du under 13, skal en forælder ansøge for jer begge."
   },
   "register": {
     "title": "Opret profil",
