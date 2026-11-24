@@ -56,7 +56,7 @@ export function Admin() {
     { key: "program", items: [item("season", t("admin.season"), todo(counts.subs, "subs", t("admin.seasonSub")), counts.subs), item("bookings", t("admin.bookings"), todo(counts.bookings, "bookings", t("admin.bookingsSub")), counts.bookings), item("events", t("events.title"), t("admin.eventsSub")), item("auditions", t("audition.adminTitle"), todo(counts.auditions, "auditions", t("audition.adminSub")), counts.auditions)] },
     { key: "comms", items: [item("messages", t("admin.messages"), t("admin.messagesSub")), item("reports", t("admin.reports"), todo(counts.reports, "reports", t("admin.reportsSub")), counts.reports), item("customize", t("customize.title"), t("customize.sub")), item("catalog", t("catalog.adminTitle"), t("catalog.adminSub"))] },
     { key: "money", items: [item("payments", t("pay.adminTitle"), todo(counts.payments, "payments", t("pay.adminSub")), counts.payments), item("shop", t("admin.shop"), todo(counts.orders, "orders", t("admin.shopSub")), counts.orders), item("punch", t("punch.title"), todo(counts.cards, "cards", t("admin.punchSub")), counts.cards)] },
-    { key: "insight", items: [item("insights", t("insights.title"), t("insights.sub")), item("import", t("admin.importPhotos"), t("admin.importSub"))] },
+    { key: "insight", items: [item("insights", t("insights.title"), t("insights.sub"))] },   // "Importér billeder" was a one-off for Line's photo pack – still reachable via openAdmin("import")
   ];
   const todos = groups.flatMap((g) => g.items).filter(([, , , n]) => n > 0);
   return (

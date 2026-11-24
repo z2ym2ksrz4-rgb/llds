@@ -233,7 +233,8 @@
     "payConfirm": "betalinger at bekræfte",
     "absCount_one": "1 afbud",
     "absCount_other": "{{count}} afbud",
-    "bookingsToday": "bookinger i dag"
+    "bookingsToday": "bookinger i dag",
+    "forYou": "Til dig"
   },
   "admin": {
     "users": "Nye brugere",
@@ -867,7 +868,13 @@
     "awaitingPayment": "Afventer betaling",
     "signedUpPay": "Tilmeldingen er registreret – betal med MobilePay, så bliver den bekræftet.",
     "claimed": "Betalt – afventer bekræftelse",
-    "claimedShort": "Siger betalt – bekræft"
+    "claimedShort": "Siger betalt – bekræft",
+    "editEvent": "Redigér event",
+    "people": "Bestemte dansere",
+    "peopleHint": "Lad stå tomt, hvis eventet gælder hele holdet/holdene. Vælg dansere, når det kun gælder nogle få – fx en solo eller duo.",
+    "peopleOnly_one": "Kun 1 valgt danser (og forældre) ser eventet.",
+    "peopleOnly_other": "Kun de {{count}} valgte dansere (og forældre) ser eventet.",
+    "peopleSearch": "Søg danser…"
   },
   "shop": {
     "title": "Shop",
@@ -1070,7 +1077,7 @@
     "emptyTeam": "Ingen emblemer endnu – de første kommer, når fremmøde registreres (10 i træk 🔥), eller når træneren giver et."
   },
   "catalog": {
-    "title": "Billedkatalog",
+    "title": "Mediekatalog",
     "pick": "Billede",
     "auto": "Automatisk",
     "hint": "{{n}} billeder i kataloget – læg nye i public/art/catalog.",
@@ -1078,8 +1085,8 @@
     "all": "Alle",
     "ownFolder": "Egne billeder",
     "bundled": "Indbygget",
-    "adminTitle": "Billedkatalog",
-    "adminSub": "Upload billeder og organisér i mapper",
+    "adminTitle": "Mediekatalog",
+    "adminSub": "Billeder og videoer i mapper – til hold, events og websitet",
     "newFolder": "Ny mappe",
     "folderName": "Mappenavn",
     "uploadTo": "Upload til {{folder}}",
@@ -1268,7 +1275,10 @@
       "app.loginTagline": "App · tekst på login-skærmen",
       "app.registerIntro": "App · tekst øverst i registreringen",
       "app.pendingBody": "App · tekst mens man venter på godkendelse"
-    }
+    },
+    "galleryCount_one": "1 billede valgt",
+    "galleryCount_other": "{{count}} billeder valgt",
+    "galleryAuto": "Automatisk – holdenes egne fotos"
   },
   "week": {
     "training": "Træning",

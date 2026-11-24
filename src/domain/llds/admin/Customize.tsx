@@ -61,14 +61,14 @@ export function Customize() {
           <ImagePicker tag="event" value={a.images?.hero ?? null} onChange={(v) => upd({ ...a, images: { ...(a.images ?? {}), hero: v } })} /></div>
       </div>
 
-      <div className="sec"><h2>{t("customize.gallery")}</h2>
+      <details className="sec fold" data-testid="cz-gallery"><summary><h2>{t("customize.gallery")}</h2><span className="tiny muted">{gallery.length ? t("customize.galleryCount", { count: gallery.length }) : t("customize.galleryAuto")}</span></summary>
         <p className="tiny muted" style={{ marginTop: 0 }}>{t("customize.gallerySub", { n: gallery.length })}</p>
         {[{ key: "line", title: t("customize.galleryLine"), items: teamPhotos.map((u) => ({ ref: u, url: u })) }, { key: "own", title: t("customize.galleryOwn"), items: own.map((c) => ({ ref: c.url, url: c.url })) }, { key: "cat", title: t("customize.galleryCatalog"), items: CATALOG.map((c) => ({ ref: c.key, url: catalogUrl(c.key)! })) }].filter((g) => g.items.length).map((g) => (
           <div key={g.key} style={{ marginBottom: 10 }}><div className="eyebrow">{g.title}</div>
             <div className="galpick" data-testid={`gal-${g.key}`}>{g.items.map((it) => { const i = gallery.indexOf(it.ref); return <button key={it.ref} className={"gthumb" + (i >= 0 ? " on" : "")} style={{ backgroundImage: `url(${it.url})` }} onClick={() => toggleG(it.ref)} aria-pressed={i >= 0}>{i >= 0 && <b>{i + 1}</b>}</button>; })}</div></div>
         ))}
         <div className="row" style={{ gap: 8 }}><button className="ghost small" onClick={() => upd({ ...a, websiteGallery: [] })}>{t("customize.galleryClear")}</button><button className="ghost small" onClick={() => upd({ ...a, websiteGallery: [...gallery].sort(() => Math.random() - 0.5) })}>{t("customize.galleryShuffle")}</button></div>
-      </div>
+      </details>
 
       <div className="sec" data-testid="cz-website"><h2>{t("customize.website")}</h2>
         <p className="tiny muted" style={{ marginTop: 0 }}>{t("customize.websiteSub", { site: appConfig.siteUrl.replace(/^https?:\/\//, "").replace(/\/$/, "") })}</p>

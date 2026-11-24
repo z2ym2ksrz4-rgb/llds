@@ -5,6 +5,7 @@ import { api, type Absence, type Booking, type Event, type Milestone, type Perso
 import { useAuth } from "@/core/auth";
 import { useNav } from "@/core/nav";
 import { useBadges } from "@/core/badges";
+import { eventsFor } from "../lib/events";
 import { TeamPicker } from "../components/TeamPicker";
 import { SessionSheet } from "../components/SessionSheet";
 import { Toast } from "../components/Sheet";
@@ -62,7 +63,7 @@ export function Home() {
     const from = startOfDay(new Date()), to = addDays(from, 14);   // 14 days so "vikar søges" shows in time; the week view itself cuts at 7
     const [s, b, ev, ms, o, c] = await Promise.all([api.listSessions(from.toISOString(), to.toISOString()), api.listBookings(from.toISOString(), addDays(from, isAdmin ? 30 : 7).toISOString()).catch(() => [] as Booking[]), api.listEvents(), api.listMilestones(), api.listOrders(), api.listPunchCards()]);
     void api.settleAttendance().catch(() => 0).then(() => api.listPersonBadges()).then(setBadges).catch(() => setBadges([]));
-    setSessions(s); setBookings(b); setEvents(ev); setMilestones(ms); setOrders(o); setCards(c);
+    setSessions(s); setBookings(b); setEvents(eventsFor(ev, me, viewing)); setMilestones(ms); setOrders(o); setCards(c);
     setAbsences(await api.listAbsences(s.map((x) => x.id)));
   }, [isAdmin]);
   useEffect(() => { void load(); }, [load, viewing.personId]);
@@ -196,7 +197,7 @@ export function Home() {
         </div>); })()}
     </>),
     studioHead: () => (<>
-      {isAdmin && <div className="sec studiohead" data-testid="studio-head"><div className="eyebrow gold">{t("home.studioEyebrow")}</div><h2 className="display">{t("home.studioTitle")}</h2><p className="tiny muted" style={{ margin: 0 }}>{t("home.studioSub")}</p></div>}
+      {isAdmin && <div className="sec studiohead" data-testid="studio-head"><h2 className="display">{t("home.studioTitle")}</h2><p className="tiny muted" style={{ margin: 0 }}>{t("home.studioSub")}</p></div>}
     </>),
     upcoming: () => (<>
       {upcoming.length > 0 && (
@@ -294,7 +295,12 @@ export function Home() {
   return (
     <section className="screen home">
 
-      {main.map(renderKey)}
+      {(() => { // admin: the school block is one visibly separate zone, then a divider "Til dig" before the personal content
+        if (!isAdmin || viewing.isChild) return main.map(renderKey);
+        const zoneKeys = ["studioHead", "adminTodo", "stats", "studio"]; const first = main.findIndex((k) => zoneKeys.includes(k)); if (first < 0) return main.map(renderKey);
+        const before = main.filter((_, i) => i < first); const zone = main.filter((k) => zoneKeys.includes(k)); const after = main.filter((k, i) => i > first && !zoneKeys.includes(k));
+        return <>{before.map(renderKey)}<div className="adminzone" data-testid="admin-zone">{zone.map(renderKey)}</div>{after.length > 0 && <div className="sec zonedivider" aria-hidden><span className="eyebrow gold">{t("home.forYou")}</span></div>}{after.map(renderKey)}</>;
+      })()}
       {folded.length > 0 && (
         <div className={"sec home-more" + (moreOpen ? " open" : "")} data-testid="home-more">
           <button type="button" className="home-more-head" onClick={toggleMore} aria-expanded={moreOpen}><h2>{t("home.more")}</h2><span className="tiny muted">{t("home.moreSub")}</span><span className="caret" aria-hidden>{moreOpen ? "⌃" : "⌄"}</span></button>

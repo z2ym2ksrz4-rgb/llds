@@ -233,7 +233,8 @@
     "payConfirm": "payments to confirm",
     "absCount_one": "1 absence",
     "absCount_other": "{{count}} absences",
-    "bookingsToday": "bookings today"
+    "bookingsToday": "bookings today",
+    "forYou": "For you"
   },
   "admin": {
     "users": "New users",
@@ -867,7 +868,13 @@
     "awaitingPayment": "Awaiting payment",
     "signedUpPay": "Sign-up registered – pay with MobilePay and it will be confirmed.",
     "claimed": "Paid – awaiting confirmation",
-    "claimedShort": "Says paid – confirm"
+    "claimedShort": "Says paid – confirm",
+    "editEvent": "Edit event",
+    "people": "Specific dancers",
+    "peopleHint": "Leave empty when the event is for the whole team(s). Pick dancers when it concerns only a few – a solo or a duo.",
+    "peopleOnly_one": "Only 1 chosen dancer (and parents) sees the event.",
+    "peopleOnly_other": "Only the {{count}} chosen dancers (and parents) see the event.",
+    "peopleSearch": "Search dancer…"
   },
   "shop": {
     "title": "Shop",
@@ -1070,7 +1077,7 @@
     "emptyTeam": "No emblems yet – the first come when attendance is taken (10 in a row 🔥) or when a trainer gives one."
   },
   "catalog": {
-    "title": "Image catalogue",
+    "title": "Media library",
     "pick": "Image",
     "auto": "Automatic",
     "hint": "{{n}} images in the catalogue – add new ones in public/art/catalog.",
@@ -1078,8 +1085,8 @@
     "all": "All",
     "ownFolder": "Own images",
     "bundled": "Built-in",
-    "adminTitle": "Image catalogue",
-    "adminSub": "Upload images and organise in folders",
+    "adminTitle": "Media library",
+    "adminSub": "Pictures and videos in folders – for teams, events and the website",
     "newFolder": "New folder",
     "folderName": "Folder name",
     "uploadTo": "Upload to {{folder}}",
@@ -1268,7 +1275,10 @@
       "app.loginTagline": "App · login screen text",
       "app.registerIntro": "App · text at the top of registration",
       "app.pendingBody": "App · text while waiting for approval"
-    }
+    },
+    "galleryCount_one": "1 picture chosen",
+    "galleryCount_other": "{{count}} pictures chosen",
+    "galleryAuto": "Automatic – the teams' own photos"
   },
   "week": {
     "training": "Training",

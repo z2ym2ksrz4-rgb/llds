@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { eventsFor } from "../lib/events";
 import { api, type Absence, type Booking, type Event, type Room, type Session } from "@/core/api";
 import { EventSheet } from "./Events";
 import { catalogUrl as catUrl } from "../lib/catalog";
@@ -57,7 +58,7 @@ export function Rooms() {
   }, [pendingRef]); // eslint-disable-line react-hooks/exhaustive-deps
   const [events, setEvents] = useState<Event[]>([]);                   // events live in the calendar automatically – created, moved or deleted in Admin → Events
   const [openEvent, setOpenEvent] = useState<Event | null>(null);
-  useEffect(() => { void api.listEvents(true).then(setEvents).catch(() => setEvents([])); }, [day.getTime()]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { void api.listEvents(true).then((ev) => setEvents(eventsFor(ev, me, viewing))).catch(() => setEvents([])); }, [day.getTime()]); // eslint-disable-line react-hooks/exhaustive-deps
   const dayEvents = events.filter((e) => sameDay(new Date(e.starts_at), day));
   const bgImg = useAppearance((a) => catalogUrl(a.a.images?.hero)) ?? art("studio");
   const myTeamIds = new Set(me.memberships.filter((m) => m.person_id === viewing.personId || m.person_id === me.person.id).map((m) => m.team_id));
@@ -84,7 +85,7 @@ export function Rooms() {
     <section className="screen rooms">
       <div className="rooms-bg" aria-hidden="true" style={{ backgroundImage: `url(${bgImg})` }} />
       <TabNews tab="rooms" />
-      <header className="topbar"><h1 className="display">{t("nav.rooms")}</h1>{isTrainer && <button className="ghost small" onClick={() => setOpen({ kind: "new", room_id: rooms[0]?.id ?? "", start: "16:00" })}>+ {t("session.training")}</button>}</header>
+      <header className="topbar"><h1 className="display">{t("nav.rooms")}</h1><div className="row" style={{ gap: 6 }}>{canBook && <button className="small" data-testid="book-room" onClick={() => { const h = Math.min(21, Math.max(9, new Date().getHours() + 1)); setOpen({ kind: "book", room_id: rooms[0]?.id ?? "", start: `${String(h).padStart(2, "0")}:00` }); }}>{t("rooms.book")}</button>}{isTrainer && <button className="ghost small" onClick={() => setOpen({ kind: "new", room_id: rooms[0]?.id ?? "", start: "16:00" })}>+ {t("session.training")}</button>}</div></header>
       <div className="weeknav2"><button type="button" className="wkbtn" aria-label={t("rooms.prevWeek")} onClick={() => setDay(addDays(day, -7))}>‹</button><span className="small muted">{t("rooms.weekLabel", { n: isoWeek(week), from: `${week.getDate()}. ${week.toLocaleDateString(loc(), { month: "short" }).replace(".", "")}`, to: `${addDays(week, 6).getDate()}. ${addDays(week, 6).toLocaleDateString(loc(), { month: "short" }).replace(".", "")}` })}</span>{!sameDay(day, new Date()) && <button type="button" className="wkbtn today" onClick={() => setDay(startOfDay(new Date()))}>{t("rooms.today")}</button>}<button type="button" className="wkbtn" aria-label={t("rooms.nextWeek")} onClick={() => setDay(addDays(day, 7))}>›</button></div>
       <div className="days">
         {Array.from({ length: 7 }, (_, i) => addDays(week, i)).map((d) => (
@@ -103,7 +104,7 @@ export function Rooms() {
         {rooms.map((r, ri) => (
           <div key={r.id} className="col" style={{ height: HOURS.length * 48 }}>
             {sameDay(day, new Date()) && nowMin >= 9 * 60 && nowMin <= 23 * 60 && <div className="nowline" style={{ top: (nowMin - 9 * 60) / 60 * 48 }} />}
-            {HOURS.map((h) => <button key={h} className={"free" + (canBook ? " can" : "")} style={{ top: (h - 9) * 48 }} aria-label={`${t("rooms.bookAt", { room: r.name, h })}`} title={t("rooms.bookAt", { room: r.name, h })} onClick={() => setOpen({ kind: "book", room_id: r.id, start: `${String(h).padStart(2, "0")}:00` })}>{canBook ? <span aria-hidden>+</span> : null}</button>)}
+            {HOURS.map((h) => <button key={h} className={"free" + (canBook ? " can" : "")} style={{ top: (h - 9) * 48 }} aria-label={`${t("rooms.bookAt", { room: r.name, h })}`} title={t("rooms.bookAt", { room: r.name, h })} onClick={() => setOpen({ kind: "book", room_id: r.id, start: `${String(h).padStart(2, "0")}:00` })}>{null}</button>)}
             {(() => { const lane = packLane([
                 ...sessions.filter((s) => s.room_id === r.id).map((s) => ({ id: "s" + s.id, a: s.starts_at, b: s.ends_at, s })),
                 ...bookings.filter((b) => b.room_id === r.id && b.status !== "rejected").map((b) => ({ id: "b" + b.id, a: b.starts_at, b: b.ends_at, bk: b })),

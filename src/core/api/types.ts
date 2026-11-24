@@ -339,10 +339,10 @@ export type Event = {
   image_key?: string | null;        // catalogue image (public/art/catalog) chosen by the admin; null = automatic
   focus?: Focus | null;             // focus point of the picture (0–1 × 0–1)
   id: string; title: string; kind: EventKind; starts_at: string; ends_at: string | null; place: string | null; meet_time: string | null;
-  team_ids: string[]; team_names: string[] | null; plan: { time: string; text: string }[]; pack_list: string[]; info: string | null;
+  team_ids: string[]; team_names: string[] | null; person_ids?: string[]; person_names?: string[] | null; plan: { time: string; text: string }[]; pack_list: string[]; info: string | null;
   signup_deadline: string | null; price_dkk: number | null; visibility: "private" | "public"; signups: number; created_at: string; mySignups?: number; myUnpaid?: number; myClaimed?: number;   // my/children's sign-ups: not yet paid / paid but awaiting Line's confirmation
 };
-export type EventInput = Omit<Event, "id" | "signups" | "team_names" | "created_at" | "mySignups" | "myUnpaid" | "myClaimed">;
+export type EventInput = Omit<Event, "id" | "signups" | "team_names" | "person_names" | "created_at" | "mySignups" | "myUnpaid" | "myClaimed">;
 export type EventSignup = { event_id: string; person_id: string; person_name: string; team_name: string | null; paid: boolean; claimed_paid_at?: string | null; created_at: string };
 
 export type Product = { id: string; name: string; price_dkk: number; sizes: string[]; stock: number | null; image_path: string | null; image_url?: string | null; visibility: "private" | "public"; active: boolean; created_at?: string };
