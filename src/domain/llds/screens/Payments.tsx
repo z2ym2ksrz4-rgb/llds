@@ -31,7 +31,10 @@ export function MyPayments({ onBack, embedded }: { onBack?: () => void; embedded
   const [list, setList] = useState<WebSignup[]>([]);
   const [pay, setPay] = useState<WebSignup | null>(null);
   const [toast, setToast] = useState<string | null>(null); const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
-  const load = useCallback(async () => setList(await api.listMyPayments().catch(() => [])), []);
+  const me = useAuth((s) => s.me)!; const viewing = useAuth((s) => s.viewing)!;
+  // only the viewed person's household: RLS lets an admin read every sign-up, and "Vis appen som" must look exactly like that person
+  const familyIds = viewing.isChild ? [viewing.personId] : [me.person.id, ...me.children.map((c) => c.id)];
+  const load = useCallback(async () => setList((await api.listMyPayments().catch(() => [])).filter((p) => familyIds.includes(p.dancer_id) || familyIds.includes(p.contact_id))), [familyIds.join(",")]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { void load(); }, [load]);
   const shown = embedded ? list.filter((p) => p.status === "awaiting_payment") : list;
   if (embedded && !shown.length) return null;

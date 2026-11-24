@@ -201,7 +201,10 @@
     "allEvents": "All events",
     "dayNothing": "Nothing this day",
     "nextBadge": "Next emblem",
-    "streak10": "10 trainings in a row"
+    "streak10": "10 trainings in a row",
+    "nextFor": "{{name}}'s next training",
+    "nextYours": "Your next training",
+    "nextYouTrain": "You train next"
   },
   "admin": {
     "users": "New users",
@@ -823,7 +826,7 @@
     "myOrders": "My orders",
     "pay": "Pay",
     "status": {
-      "claimed": "Payment reported",
+      "claimed": "Awaiting confirmation",
       "paid": "Paid",
       "delivered": "Handed out",
       "cancelled": "Cancelled",
@@ -847,7 +850,7 @@
     "mine": "My cards",
     "status": {
       "awaiting_payment": "Awaiting payment",
-      "claimed": "Payment reported",
+      "claimed": "Awaiting confirmation",
       "active": "Active",
       "expired": "Used up/expired"
     },

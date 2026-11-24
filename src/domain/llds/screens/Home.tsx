@@ -1,4 +1,5 @@
 import React, { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { HeroMedia, isSitePhoto } from "../components/PhotoHero";
 import { useTranslation } from "react-i18next";
 import { api, type Absence, type Booking, type Event, type Milestone, type PersonBadge, type Order, type PunchCard, type Session } from "@/core/api";
 import { useAuth } from "@/core/auth";
@@ -28,6 +29,7 @@ export function Home() {
   const { t } = useTranslation();
   const me = useAuth((s) => s.me)!;
   const viewing = useAuth((s) => s.viewing)!;
+  const selectedTeamId = useAuth((s) => s.teamId);
   const setTab = useNav((s) => s.setTab);
   const appearance = useAppearance((s) => s.a);
   const isAdmin = me.person.is_admin;
@@ -102,8 +104,9 @@ export function Home() {
   const KIND_CHIP: Record<WeekItem["kind"], string> = { training: "week.training", staff: "week.youTrain", event: "week.event", booking: "week.booking" };
 
   /* hero image: the viewed person's own team photo (Line's) → next event's image → school default → art */
-  const firstTeam = me.teams.find((x) => teamIds.has(x.id));
-  const ownPhoto = firstTeam && /^https?:/.test(firstTeam.cover_url ?? "") ? firstTeam.cover_url : firstTeam?.photos?.[0] ?? null;
+  const selTeam = selectedTeamId ? me.teams.find((x) => x.id === selectedTeamId && teamIds.has(x.id)) : undefined;   // the team chosen in the picker – follows the hat (own team / child's team)
+  const firstTeam = selTeam ?? me.teams.find((x) => teamIds.has(x.id));
+  const ownPhoto = firstTeam && /^https?:/.test(firstTeam.cover_url ?? "") ? firstTeam.cover_url : firstTeam?.photos?.[0] ?? (firstTeam && /^https?:/.test(firstTeam.about_url ?? "") ? firstTeam.about_url : null);
   const heroImg = resolveImage(ownPhoto) ?? catalogUrl(hero?.image_key) ?? catalogUrl(appearance.images?.hero) ?? artFor(viewing.personId, ["group", "trails", "studio"]);
   const heroFocus = resolveImage(ownPhoto) ? firstTeam?.focus : catalogUrl(hero?.image_key) ? hero?.focus : null;
   const nextTeam = teamById(nextItem?.session?.team_id);
@@ -123,7 +126,7 @@ export function Home() {
   const SECTIONS: Record<string, () => React.ReactNode> = {
     hero: () => (<>
       <div ref={heroRef} className={"homehero tone-" + tone} data-testid="hero" data-tour="hero">
-        <div className="homehero-media"><span className="bg" style={focusStyle(heroFocus, { backgroundImage: `url(${heroImg})` })} /></div>
+        <div className={"homehero-media" + (isSitePhoto(heroImg) && !heroFocus ? " photo" : "")}><HeroMedia src={heroImg} focus={heroFocus} /></div>
         <div className="homehero-top"><TopRight /></div>
         <div className="homehero-text">
           <div className="eyebrow">{dateLine}</div>
@@ -192,7 +195,7 @@ export function Home() {
       {nextItem && nextImg && (
         <button type="button" className="nextcard" data-testid="next-card" onClick={() => (nextItem.session ? setOpen(nextItem.session) : nextItem.event ? setOpenEvent(nextItem.event) : setTab("rooms"))}>
           <span className="bg" style={focusStyle(nextFocus, { backgroundImage: `url(${nextImg})` })} />
-          <span className="nextcard-top"><span className="eyebrow gold">{t("home.nextUp")} · {t(KIND_CHIP[nextItem.kind])}</span><span className="chip small glass">{rel(nextItem.at)}</span></span>
+          <span className="nextcard-top"><span className="eyebrow gold">{nextItem.kind === "training" ? (nextItem.who ? t("home.nextFor", { name: nextItem.who }) : t("home.nextYours")) : nextItem.kind === "staff" ? t("home.nextYouTrain") : `${t("home.nextUp")} · ${t(KIND_CHIP[nextItem.kind])}`}</span><span className="chip small glass">{rel(nextItem.at)}</span></span>
           <span className="nextcard-text"><b className="display">{nextItem.title}</b><span className="small">{hm(nextItem.at)}{nextItem.end ? `–${hm(nextItem.end)}` : ""} · {nextItem.sub}{nextItem.who ? ` · ${nextItem.who}` : ""}</span></span>
           {(nextItem.session?.substitute_name || nextItem.session?.trainer_name) && <span className="nextcard-who"><span className="avatar small">{(nextItem.session.substitute_name ?? nextItem.session.trainer_name ?? "?")[0]}</span><span className="tiny">{nextItem.session.substitute_name ?? nextItem.session.trainer_name}</span></span>}
         </button>

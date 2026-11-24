@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState, type ReactElement } from "react";
+import { HeroMedia, isSitePhoto } from "../components/PhotoHero";
 import { useTranslation } from "react-i18next";
 import { api, type TeamDancer, type TeamStaff, type Thread, type Message, type Absence, type Event, type Member, type PersonBadge, type Result, type Session } from "@/core/api";
 import { resolveImage } from "../lib/catalog";
@@ -40,7 +41,7 @@ export function TeamScreen() {
   const team = me.teams.find((x) => x.id === teamId);
   const staff = me.person.is_admin || (teamId != null && me.memberships.some((m) => m.person_id === me.person.id && m.team_id === teamId && m.role !== "dancer"));
   const [page, setPage] = useState<Page>("team");
-  const heroUrl = team ? resolveImage(team.cover_url) ?? artForCategory(team.category) : null;
+  const heroUrl = team ? resolveImage(team.cover_url) ?? resolveImage(team.photos?.[0] ?? null) ?? artForCategory(team.category) : null;
   useScene(page === "team" ? heroUrl : null);
   useEffect(() => { const f = (e: globalThis.Event) => { if ((e as CustomEvent<string>).detail === teamId) setPage("audition"); }; addEventListener("llds:open-audition", f); return () => removeEventListener("llds:open-audition", f); }, [teamId]);
   const [sessions, setSessions] = useState<Session[]>([]);
@@ -130,7 +131,7 @@ export function TeamScreen() {
       <header className="topbar"><h1 className="display">{team.name}</h1><TopRight /></header>
       <TabNews tab="team" />
       <TeamPicker />
-      <div className="hero photo kb" data-testid="team-hero" data-tour="team-hero"><span className="bg warm" style={focusStyle(team.focus, { backgroundImage: `url(${heroUrl})` })} />
+      <div className={"hero photo kb" + (isSitePhoto(heroUrl) && !team.focus ? " own" : "")} data-testid="team-hero" data-tour="team-hero"><HeroMedia src={heroUrl!} focus={team.focus} className="warm" blurClass="warm" />
         <div className="teamhero-text"><div className="eyebrow">{team.style} · {t(`category.${team.category}`)} · {team.level}</div><h2 className="display">{team.name}</h2>
           <div className="teamhero-meta">
             {(trainers[0] || roster.staff[0]) && <span className="who">{trainers[0] ? <Avatar person={trainers[0]} size="small" /> : <span className="avatar small">{roster.staff[0]!.name[0]}</span>}<span className="small">{trainers[0]?.first_name ?? roster.staff[0]?.name.split(" ")[0]}</span></span>}

@@ -201,7 +201,10 @@
     "allEvents": "Alle events",
     "dayNothing": "Ingenting denne dag",
     "nextBadge": "Næste emblem",
-    "streak10": "10 træninger i træk"
+    "streak10": "10 træninger i træk",
+    "nextFor": "{{name}}s næste træning",
+    "nextYours": "Din næste træning",
+    "nextYouTrain": "Du træner næste gang"
   },
   "admin": {
     "users": "Nye brugere",
@@ -823,7 +826,7 @@
     "myOrders": "Mine ordrer",
     "pay": "Betal",
     "status": {
-      "claimed": "Betaling meldt",
+      "claimed": "Afventer bekræftelse",
       "paid": "Betalt",
       "delivered": "Udleveret",
       "cancelled": "Annulleret",
@@ -847,7 +850,7 @@
     "mine": "Mine kort",
     "status": {
       "awaiting_payment": "Afventer betaling",
-      "claimed": "Betaling meldt",
+      "claimed": "Afventer bekræftelse",
       "active": "Aktivt",
       "expired": "Opbrugt/udløbet"
     },
