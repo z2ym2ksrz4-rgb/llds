@@ -125,7 +125,7 @@ export function Home() {
   const dateLine = new Date().toLocaleDateString(loc(), { weekday: "long", day: "numeric", month: "long" });
   const SECTIONS: Record<string, () => React.ReactNode> = {
     hero: () => (<>
-      <div ref={heroRef} className={"homehero tone-" + tone} data-testid="hero" data-tour="hero">
+      <div ref={heroRef} className={"homehero tone-" + tone + (isSitePhoto(heroImg) && !heroFocus ? " photo" : "")} data-testid="hero" data-tour="hero">
         <div className={"homehero-media" + (isSitePhoto(heroImg) && !heroFocus ? " photo" : "")}><HeroMedia src={heroImg} focus={heroFocus} /></div>
         <div className="homehero-top"><TopRight /></div>
         <div className="homehero-text">

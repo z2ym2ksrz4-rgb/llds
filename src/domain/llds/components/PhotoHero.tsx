@@ -21,7 +21,7 @@ export function HeroMedia({ src, focus, className = "", style, blurClass = "" }:
   return (
     <>
       <span className={"bg blurbg " + blurClass} style={{ backgroundImage: `url(${src})`, ...style }} aria-hidden />
-      <img className={"pic " + className} src={img} alt="" onError={() => { if (img !== src) setImg(src); }} draggable={false} />
+      <img className={"pic " + className} src={img} alt="" onError={() => { if (img !== src) setImg(src); }} onLoad={(e) => { const el = e.currentTarget; const host = el.closest<HTMLElement>(".homehero, .hero.photo"); if (host && el.naturalWidth && el.naturalHeight) host.style.setProperty("--hero-ar", String(el.naturalWidth / el.naturalHeight)); }} draggable={false} />
     </>
   );
 }

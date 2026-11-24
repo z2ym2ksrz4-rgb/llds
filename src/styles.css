@@ -844,3 +844,15 @@ details.fold > summary h2 { flex: 1; } details.fold > summary .caret { color: va
 .tabnews-row .item { flex: 1; min-width: 0; }
 .tabnews-x { flex: none; align-self: center; width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--line2, rgba(255,255,255,.14)); background: transparent; color: var(--muted); font-size: 1rem; line-height: 1; padding: 0; cursor: pointer; }
 .tabnews-x:hover { color: var(--fg); border-color: var(--gold3); }
+
+/* photo hero follows the photo's own format (a little air for the greeting, not half a screen of blur) */
+@media (max-width:1099px) {
+  .homehero.photo { min-height:0; aspect-ratio:var(--hero-ar, 1.5); min-height:min(330px, 62dvh); max-height:72dvh; }
+  .homehero.photo .homehero-media.photo .pic { object-fit:cover; object-position:top center; -webkit-mask-image:linear-gradient(to bottom, #000 70%, transparent 100%); mask-image:linear-gradient(to bottom, #000 70%, transparent 100%); }
+  .homehero.photo::before { background:linear-gradient(180deg, rgba(10,10,11,.45) 0%, rgba(10,10,11,.0) 30%, rgba(10,10,11,.35) 62%, var(--bg) 100%); }
+  .homehero.photo .homehero-text { padding-bottom:6px; }
+}
+/* "Nyt siden sidst" rows wrapped in .tabnews-row keep the plain list-item look */
+.list .tabnews-row { border-bottom:1px solid var(--line); } .list .tabnews-row:last-of-type { border-bottom:0; }
+.tabnews-row .item { display:flex; gap:12px; align-items:center; padding:12px 0; background:none; border:0; color:var(--fg); text-align:left; font-weight:300; font-size:1rem; border-radius:0; font-family:inherit; }
+.tabnews-row .item:disabled { opacity:1; }
