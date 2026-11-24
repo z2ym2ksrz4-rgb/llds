@@ -874,7 +874,8 @@
     "peopleHint": "Lad stå tomt, hvis eventet gælder hele holdet/holdene. Vælg dansere, når det kun gælder nogle få – fx en solo eller duo.",
     "peopleOnly_one": "Kun 1 valgt danser (og forældre) ser eventet.",
     "peopleOnly_other": "Kun de {{count}} valgte dansere (og forældre) ser eventet.",
-    "peopleSearch": "Søg danser…"
+    "peopleSearch": "Søg danser…",
+    "badTime": "Tjek dato og klokkeslæt."
   },
   "shop": {
     "title": "Shop",

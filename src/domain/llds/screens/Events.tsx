@@ -11,7 +11,7 @@ import { catalogUrl } from "../lib/catalog";
 import { TabNews } from "../components/TabNews";
 import { Sheet, Toast } from "../components/Sheet";
 import { PaySheet } from "../components/Pay";
-import { dateLabel, hm, isoDate, loc } from "../lib/time";
+import { dateLabel, hm, isoDate, loc, hhmm } from "../lib/time";
 import { artFor , focusStyle } from "../lib/art";
 import { TopRight } from "../components/ProfileMenu";
 
@@ -151,17 +151,19 @@ function EventEditor({ event, onClose, onSaved }: { event: Event | null; onClose
   const d0 = event ? new Date(event.starts_at) : new Date(Date.now() + 14 * 864e5);
   const [image, setImage] = useState<string | null>(event?.image_key ?? null);
   const [focus, setFocus] = useState<Focus | null>(event?.focus ?? null);
-  const [f, setF] = useState({ title: event?.title ?? "", kind: event?.kind ?? "competition", date: isoDate(d0), time: event ? hm(event.starts_at) : "10:00", place: event?.place ?? "", meet_time: event?.meet_time ?? "", team_ids: event?.team_ids ?? [], plan: event?.plan.map((p) => `${p.time} ${p.text}`).join("\n") ?? "", pack: event?.pack_list.join("\n") ?? "", info: event?.info ?? "", deadline: event?.signup_deadline ?? "", price: event?.price_dkk?.toString() ?? "", pub: event?.visibility === "public" });
+  const [f, setF] = useState({ title: event?.title ?? "", kind: event?.kind ?? "competition", date: isoDate(d0), time: event ? hhmm(event.starts_at) : "10:00", place: event?.place ?? "", meet_time: event?.meet_time ?? "", team_ids: event?.team_ids ?? [], plan: event?.plan.map((p) => `${p.time} ${p.text}`).join("\n") ?? "", pack: event?.pack_list.join("\n") ?? "", info: event?.info ?? "", deadline: event?.signup_deadline ?? "", price: event?.price_dkk?.toString() ?? "", pub: event?.visibility === "public" });
   const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
   const save = async () => {
-    setBusy(true);
+    setBusy(true); setErr(null);
     try {
-      const starts = new Date(`${f.date}T${f.time}:00`);
+      const starts = new Date(`${f.date}T${(f.time || "10:00").replace(".", ":")}:00`);
+      if (Number.isNaN(starts.getTime())) { setErr(t("events.badTime")); return; }
       const input: EventInput = { title: f.title.trim(), kind: f.kind as Event["kind"], starts_at: starts.toISOString(), ends_at: null, place: f.place || null, meet_time: f.meet_time || null, team_ids: f.team_ids,
         plan: f.plan.split("\n").map((l) => l.trim()).filter(Boolean).map((l) => { const m = l.match(/^(\d{1,2}[.:]\d{2})\s+(.*)$/); return m ? { time: m[1].replace(".", ":"), text: m[2] } : { time: "", text: l }; }),
         pack_list: f.pack.split("\n").map((l) => l.trim()).filter(Boolean), person_ids: people, info: f.info || null, signup_deadline: f.deadline || null, price_dkk: f.price ? Number(f.price) : null, visibility: f.pub ? "public" : "private", image_key: image, focus };
       await api.saveEvent(input, event?.id); onSaved();
-    } finally { setBusy(false); }
+    } catch (e) { setErr(`${t("common.error")}: ${(e as Error).message}`); } finally { setBusy(false); }
   };
   const toggleTeam = (id: string) => setF({ ...f, team_ids: f.team_ids.includes(id) ? f.team_ids.filter((x) => x !== id) : [...f.team_ids, id] });
   // specific people (a solo, a duo): dancers of the chosen teams – or of all teams when none are chosen
@@ -193,6 +195,7 @@ function EventEditor({ event, onClose, onSaved }: { event: Event | null; onClose
       <label className="field"><span>{t("events.info")}</span><textarea rows={3} value={f.info} onChange={(e) => setF({ ...f, info: e.target.value })} /></label>
       <div className="grid2"><label className="field"><span>{t("events.deadline")}</span><input type="date" value={f.deadline} onChange={(e) => setF({ ...f, deadline: e.target.value })} /></label><label className="field"><span>{t("events.price")}</span><input type="number" inputMode="numeric" value={f.price} onChange={(e) => setF({ ...f, price: e.target.value })} placeholder="0" /></label></div>
       <label className="check"><input type="checkbox" checked={f.pub} onChange={(e) => setF({ ...f, pub: e.target.checked })} />{t("events.public")}</label>
+      {err && <p className="error" role="alert">{err}</p>}
       <div className="row"><button className="cta grow" id="ev-save" disabled={busy || !f.title.trim()} onClick={() => void save()}>{t("common.save")}</button>{event && <button className="ghost danger" onClick={async () => { await api.deleteEvent(event.id); onSaved(); }}>{t("common.delete")}</button>}</div>
     </Sheet>
   );

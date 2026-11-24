@@ -874,7 +874,8 @@
     "peopleHint": "Leave empty when the event is for the whole team(s). Pick dancers when it concerns only a few – a solo or a duo.",
     "peopleOnly_one": "Only 1 chosen dancer (and parents) sees the event.",
     "peopleOnly_other": "Only the {{count}} chosen dancers (and parents) see the event.",
-    "peopleSearch": "Search dancer…"
+    "peopleSearch": "Search dancer…",
+    "badTime": "Check the date and time."
   },
   "shop": {
     "title": "Shop",
