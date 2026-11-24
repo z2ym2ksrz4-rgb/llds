@@ -128,11 +128,7 @@ export function Home() {
   const hour = new Date().getHours(); const tone = hour < 10 ? "morning" : hour < 17 ? "day" : "evening";
   const greeting = t(`home.greet.${tone}`, { name: me.person.first_name }); // always the logged-in person – the child's name goes on the sections below
   const heroRef = useRef<HTMLDivElement>(null);
-  useEffect(() => { // parallax only with a mouse (pointer:fine) – on touch devices the per-frame style writes stutter; the hero then just scrolls with the page
-    if (!matchMedia("(hover: hover) and (pointer: fine)").matches || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    let raf = 0; const on = () => { if (raf) return; raf = requestAnimationFrame(() => { raf = 0; const el = heroRef.current; if (!el) return; const y = Math.min(window.scrollY, 600); el.style.setProperty("--py", `${Math.round(y * 0.35)}px`); el.style.setProperty("--fade", String(Math.max(0, 1 - y / 320))); }); };
-    addEventListener("scroll", on, { passive: true }); return () => { removeEventListener("scroll", on); cancelAnimationFrame(raf); };
-  }, []);
+  // P3.10: the hero no longer parallaxes – one motion (Ken Burns) is enough; it scrolls with the page
   const strip = Array.from({ length: 7 }, (_, i) => addDays(startOfDay(new Date()), i));
   const dateLine = new Date().toLocaleDateString(loc(), { weekday: "long", day: "numeric", month: "long" });
   const SECTIONS: Record<string, () => React.ReactNode> = {
@@ -141,7 +137,7 @@ export function Home() {
         <div className={"homehero-media" + (isSitePhoto(heroImg) && !heroFocus ? " photo" : "")}><HeroMedia src={heroImg} focus={heroFocus} /></div>
         <div className="homehero-top"><TopRight /></div>
         <div className="homehero-text">
-          <div className="eyebrow">{dateLine}</div>
+          <div className="homehero-date">{dateLine.toLocaleLowerCase(loc())}</div>
           <h1 className="display">{greeting}</h1>
         </div>
       </div>
@@ -290,7 +286,7 @@ export function Home() {
     const studioKeys = ["studioHead", "adminTodo", "stats", "studio"]; const rest = order.filter((k) => !studioKeys.includes(k)); const at = (rest.indexOf("teampick") + 1) || (rest.indexOf("hero") + 1) || 1;
     order = [...rest.slice(0, at), ...studioKeys.filter((k) => order.includes(k) || k === "adminTodo"), ...rest.slice(at)];
   }
-  const FOLD = new Set(["gallery", "badges", "upcoming"]);   // nice-to-have content lives under one "Mere" fold – the first screen stays about now
+  const FOLD = new Set(childLogin ? ["gallery", "upcoming"] : ["gallery", "badges", "upcoming"]);   // children see their emblems right away   // nice-to-have content lives under one "Mere" fold – the first screen stays about now
   const main = order.filter((k) => !FOLD.has(k)); const folded = order.filter((k) => FOLD.has(k));
   const renderKey = (k: string) => { const box = boxOf(appearance, k); return <Fragment key={k}>{box ? <CustomBoxCard box={box} onTab={(tab) => setTab(tab as Parameters<typeof setTab>[0])} /> : SECTIONS[k]?.()}</Fragment>; };
 

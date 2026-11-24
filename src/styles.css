@@ -977,3 +977,31 @@ a.btnlink { display:inline-flex; align-items:center; text-decoration:none; }
 .chip.rose { background:var(--rose-soft); border-color:rgba(184,72,90,.4); color:var(--fg); }
 .chip.sage { background:var(--sage-soft); border-color:rgba(127,182,134,.4); color:var(--fg); }
 .screen.home .sec[data-testid="admin-todo"] .card.todorow { margin:0; }
+
+/* ================= Kørsel 6: polering + PC ================= */
+/* P3.5 – the date under the greeting reads as a sentence, not a label */
+.homehero-date { font-size:14px; color:rgba(255,255,255,.72); letter-spacing:.01em; margin-bottom:4px; text-transform:none; }
+.homehero-date::first-letter { text-transform:uppercase; }
+/* P3.10 – one motion: the hero scrolls with the page (no parallax), pictures crossfade when the team changes */
+.homehero .bg, .homehero-media.photo .pic, .hero.photo.own .pic { transform:none; will-change:auto; }
+.homehero-text { transform:none; opacity:1; }
+@keyframes picfade { from { opacity:0; } to { opacity:1; } }
+.homehero-media .pic, .hero.photo .pic, .homehero-media .blur { animation:picfade .55s ease both; }
+.scene-bg { transition:opacity 1.4s ease; }
+/* P3.3 – lists are borderless with hairlines; a card frame is for things you tap as a whole */
+.screen:not(.adminhome) .sec > .card.list, .screen:not(.adminhome) .sec > .scrolllist > .card.list, .teammsgs > .card.list { background:none; border:0; padding:0; border-radius:0; box-shadow:none; }
+.screen:not(.adminhome) .sec > .card.list::before { display:none; }
+.card.list > .item:first-child { padding-top:4px; }
+/* kids: emblems a little bigger on their own Home */
+.screen.home .sec .emblem, .screen.home .trophy { transform:scale(1); }
+/* P3.14 – two columns on PC for Hold and Social */
+@media (min-width:1100px) {
+  .screen.team { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); column-gap:28px; align-items:start; grid-auto-flow:row dense; }
+  .screen.team > .topbar, .screen.team > .tabnews, .screen.team > .teampick, .screen.team > .hero, .screen.team > .toast, .screen.team > .sheet-bg, .screen.team > p { grid-column:1 / -1; }
+  .screen.team > .card.start, .screen.team > .tilechips, .screen.team > .teammsgs { grid-column:1; }
+  .screen.team > .sec:not(.teammsgs), .screen.team > details.team-more, .screen.team > .row { grid-column:2; }
+  .screen.team > .sec, .screen.team > details { margin-top:0; }
+  .screen.social { max-width:860px; }
+  .screen.social .feed { display:grid; grid-template-columns:1fr 1fr; gap:0 24px; align-items:start; }
+  .screen.social .feed > .composer, .screen.social .feed > .chips, .screen.social .feed > .empty, .screen.social .feed > p, .screen.social .feed > .lightbox, .screen.social .feed > .sheet-bg { grid-column:1 / -1; }
+}

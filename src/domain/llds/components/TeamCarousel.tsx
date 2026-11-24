@@ -31,7 +31,9 @@ export function TeamCarousel() {
     const ids = new Set<string>();
     for (const m of me.memberships) if (m.person_id === me.person.id || (me.children.some((c) => c.id === m.person_id) && m.role === "dancer")) ids.add(m.team_id);
     const teams = me.teams.filter((x) => ids.has(x.id));
-    return teams.flatMap((team) => teamSlides(team, seed).map((url) => ({ team, url, child: me.children.find((c) => me.memberships.some((m) => m.person_id === c.id && m.team_id === team.id && m.role === "dancer")) })));
+    const all = teams.flatMap((team) => teamSlides(team, seed).map((url) => ({ team, url, child: me.children.find((c) => me.memberships.some((m) => m.person_id === c.id && m.team_id === team.id && m.role === "dancer")) })));
+    const seen = new Set<string>(); const distinct = all.filter((x) => { if (seen.has(x.url)) return false; seen.add(x.url); return true; });
+    return distinct.length >= 3 ? distinct : [];   // P3.8: the band only earns its place with three different pictures
   }, [me, viewing]);
   // gentle auto-advance while visible
   useEffect(() => {

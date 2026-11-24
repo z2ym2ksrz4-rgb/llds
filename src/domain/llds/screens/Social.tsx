@@ -29,7 +29,7 @@ export function Social() {
   useEffect(() => { void load(); }, [load]);
   const myTeams = me.teams.filter((x) => me.memberships.some((m) => m.team_id === x.id));
   return (
-    <section className="screen">
+    <section className="screen social">
       <header className="topbar"><h1 className="display">{t("nav.social")}</h1><div className="row" style={{ gap: 8 }}>{myTeams.length > 0 && <button className="small" data-testid="new-post" onClick={() => { if (filter === "all") setFilter(myTeams[0].id); setTimeout(() => { const el = document.getElementById("post-body"); el?.scrollIntoView({ block: "center", behavior: "smooth" }); el?.focus(); }, 120); }}>+ {t("social.newPost")}</button>}<TopRight /></div></header>
       <TabNews tab="social" />
       <p className="tiny muted" style={{ margin: "0 0 6px" }}>{t("social.intro")}</p>

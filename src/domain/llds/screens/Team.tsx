@@ -130,7 +130,7 @@ export function TeamScreen() {
   const aboutImg = aboutImage(team, heroUrl);
   const kidsTeam = ["mini", "kids", "junior"].includes(team.category);   // trophy/emblem ghosts motivate children – adults (Hit Fit) get none
   return (
-    <section className="screen" style={teamAccent(team)}>
+    <section className="screen team" style={teamAccent(team)}>
       <header className="topbar"><h1 className="display">{team.name}</h1><TopRight /></header>
       <TabNews tab="team" />
       <TeamPicker />
