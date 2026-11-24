@@ -937,3 +937,30 @@ details.fold.team-more > .sec { margin-top:8px; }
 @media (min-width:640px) and (max-width:1099px) { .homehero.photo { height:clamp(320px, calc(100vw / var(--hero-ar, 1.5)), 56dvh); } }
 /* team hero is 16:10 → cover crops little for landscape photos and keeps portrait photos edge to edge */
 .hero.photo.own .pic { object-fit:cover !important; object-position:center 22%; -webkit-mask-image:none; mask-image:none; }
+
+/* ================= Kørsel 4: profil-menu, admin-grupper, hjælp ================= */
+.list.menu .item .avatar.small { font-size:.95rem; color:var(--gold2); background:var(--gold-soft); }
+.bell .icolabel { display:none; }
+@media (min-width:1100px) {
+  .bell { display:inline-flex; flex-direction:column; align-items:center; gap:2px; padding:6px 10px; }
+  .bell .icolabel { display:block; font-size:12px; letter-spacing:.02em; color:var(--muted); line-height:1; }
+}
+.card.todorow { display:flex; flex-wrap:wrap; gap:8px; padding:10px 12px; margin-bottom:4px; }
+.todochip { display:inline-flex; align-items:center; gap:8px; min-height:40px; padding:0 12px 0 6px; border-radius:999px; background:var(--rose-soft); border:1px solid rgba(184,72,90,.35); color:var(--fg); font:inherit; font-size:.9rem; cursor:pointer; }
+.todochip b { min-width:28px; height:28px; border-radius:50%; background:var(--rose); color:#fff; display:grid; place-items:center; font-weight:500; font-size:.85rem; }
+.admingroups .sec { margin-top:14px; }
+@media (min-width:1100px) { .admingroups { display:grid; grid-template-columns:1fr 1fr; gap:0 24px; } .screen.adminhome .card.todorow { grid-column:1 / -1; } }
+.chips.scrollx { display:flex; flex-wrap:nowrap; gap:6px; overflow-x:auto; padding:4px 0 6px; scrollbar-width:none; }
+.chips.scrollx .chip { flex:none; }
+.chip[aria-pressed="true"], .chip.on { background:var(--gold-soft); border-color:var(--gold3); color:var(--gold2); }
+.ghost.info { min-width:40px; padding:0 10px; font-size:1.05rem; } .ghost.info.on { color:var(--gold2); border-color:var(--gold3); }
+.hintbox { padding:10px 12px; border-left:2px solid var(--gold3); background:rgba(255,255,255,.03); border-radius:0 10px 10px 0; }
+.card.faq { padding:4px 14px; }
+.faqitem { border-bottom:1px solid var(--line); } .faqitem:last-child { border-bottom:none; }
+.faqitem summary { list-style:none; cursor:pointer; padding:14px 0; font-weight:400; display:flex; justify-content:space-between; gap:12px; min-height:44px; align-items:center; }
+.faqitem summary::-webkit-details-marker { display:none; }
+.faqitem summary::after { content:"+"; color:var(--gold2); font-size:1.2rem; flex:none; }
+.faqitem[open] summary::after { content:"–"; }
+.faqitem p { margin:0 0 14px; color:var(--muted); }
+a.btnlink { display:inline-flex; align-items:center; text-decoration:none; }
+.login .tiny a.gold { color:var(--gold2); text-decoration:none; border-bottom:1px solid var(--gold3); }

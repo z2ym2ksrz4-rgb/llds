@@ -8,6 +8,10 @@ import { useNav } from "@/core/nav";
 import { Sheet } from "./Sheet";
 import { Bell } from "./Notifications";
 import { LangFlags } from "./LangFlags";
+import type { MorePage } from "../screens/More";
+
+/** P2.17: one short menu behind the avatar – no "Mere". */
+const MENU: { key: MorePage; icon: string }[] = [{ key: "profile", icon: "☺" }, { key: "children", icon: "⚑" }, { key: "wallet", icon: "¤" }, { key: "notifications", icon: "♪" }, { key: "milestones", icon: "★" }, { key: "help", icon: "?" }];
 
 /** Top-right of every main screen: bell + avatar. Avatar opens the profile menu (shop, punch cards, milestones, settings, sign out). */
 export function TopRight() {
@@ -18,7 +22,7 @@ export function TopRight() {
   const setViewAs = useAuth((s) => s.setViewAs);
   const personas = useAuth((s) => s.personas); const loadPersonas = useAuth((s) => s.loadPersonas);
   const realAdmin = useAuth((s) => !!s.realMe?.person.is_admin);
-  const setTab = useNav((s) => s.setTab);
+  const setTab = useNav((s) => s.setTab); const openRef = useNav((s) => s.openRef);
   const [open, setOpen] = useState(false);
   useEffect(() => { if (open && realAdmin) void loadPersonas(); }, [open, realAdmin, loadPersonas]);
   return (
@@ -30,6 +34,10 @@ export function TopRight() {
       {open && (
         <Sheet onClose={() => setOpen(false)} eyebrow={me.person.email ?? ""} title={`${me.person.first_name} ${me.person.last_name}`}>
           <div className="row between sheet-lang"><span className="tiny muted">{t("settings.language")}</span><LangFlags /></div>
+          <div className="list menu" data-testid="profile-menu">
+            {me.person.is_admin && <button className="item" data-testid="menu-admin" onClick={() => { setOpen(false); setTab("admin"); }}><span className="avatar small">⚙︎</span><span className="grow">{t("nav.admin")}<div className="tiny">{t("more.adminSub")}</div></span><span className="gold">›</span></button>}
+            {MENU.filter((m) => m.key !== "children" || me.children.length > 0).map((m) => <button key={m.key} className="item" data-testid={`menu-${m.key}`} onClick={() => { setOpen(false); openRef("more", { page: m.key }); }}><span className="avatar small">{m.icon}</span><span className="grow">{t(`more.${m.key}`)}<div className="tiny">{t(`more.${m.key}Sub`)}</div></span><span className="gold">›</span></button>)}
+          </div>
           {realAdmin && (
             <div className="field"><span>{t("view.as")}</span>
               <div className="personas" data-testid="view-as">
@@ -43,11 +51,7 @@ export function TopRight() {
               <div className="tiny">{t("view.hint")}</div>
             </div>
           )}
-          <div className="list">
-            {me.person.is_admin && <button className="item" onClick={() => { setOpen(false); setTab("admin"); }}><span className="grow">{t("nav.admin")}<div className="tiny">{t("more.adminSub")}</div></span><span className="gold">›</span></button>}
-            <button className="item" data-testid="menu-more" onClick={() => { setOpen(false); setTab("more"); }}><span className="grow">{t("nav.more")}<div className="tiny">{t("more.menuSub")}</div></span><span className="gold">›</span></button>
-          </div>
-          <button className="ghost" onClick={() => void signOut()}>{t("common.signOut")}</button>
+          <button className="ghost" data-testid="menu-signout" onClick={() => void signOut()}>{t("common.signOut")}</button>
         </Sheet>
       )}
     </div>
@@ -72,5 +76,5 @@ function ShopButton() {
     };
     void check(); const i = setInterval(() => void check(), 120_000); return () => { alive = false; clearInterval(i); };
   }, []);
-  return <button className="bell" aria-label={t("shop.title")} data-testid="shop" onClick={() => setTab("shop")}><Icon name="bag" />{dot && <span className="dot" data-testid="shop-dot" />}</button>;
+  return <button className="bell" aria-label={t("shop.title")} title={t("shop.title")} data-testid="shop" onClick={() => setTab("shop")}><Icon name="bag" />{dot && <span className="dot" data-testid="shop-dot" />}<span className="icolabel">{t("shop.title")}</span></button>;
 }

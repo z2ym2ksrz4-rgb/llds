@@ -48,23 +48,31 @@ export function Admin() {
   if (page === "insights") return <Back onBack={() => setPage("menu")}><InsightsPage /></Back>;
   if (page === "auditions") return <Back onBack={() => setPage("menu")}><AuditionsOverview /></Back>;
   if (page === "payments") return <Back onBack={() => setPage("menu")}><PaymentsAdmin /></Back>;
-  const items: [Page, string, string, number][] = [
-    ["users", t("admin.users"), counts.pending ? t("todo.pending", { count: counts.pending }) : t("admin.usersSub"), counts.pending], ["members", t("admin.members"), t("admin.membersSub"), 0], ["teams", t("admin.teams"), t("admin.teamsSub"), 0],
-    ["season", t("admin.season"), counts.subs ? t("todo.subs", { count: counts.subs }) : t("admin.seasonSub"), counts.subs], ["bookings", t("admin.bookings"), counts.bookings ? t("todo.bookings", { count: counts.bookings }) : t("admin.bookingsSub"), counts.bookings],
-    ["messages", t("admin.messages"), t("admin.messagesSub"), 0], ["reports", t("admin.reports"), counts.reports ? t("todo.reports", { count: counts.reports }) : t("admin.reportsSub"), counts.reports],
-    ["events", t("events.title"), t("admin.eventsSub"), 0], ["shop", t("admin.shop"), counts.orders ? t("todo.orders", { count: counts.orders }) : t("admin.shopSub"), counts.orders], ["punch", t("punch.title"), counts.cards ? t("todo.cards", { count: counts.cards }) : t("admin.punchSub"), counts.cards],
-    ["catalog", t("catalog.adminTitle"), t("catalog.adminSub"), 0],
-    ["payments", t("pay.adminTitle"), counts.payments ? t("todo.payments", { count: counts.payments }) : t("pay.adminSub"), counts.payments],
-    ["customize", t("customize.title"), t("customize.sub"), 0],
-    ["auditions", t("audition.adminTitle"), counts.auditions ? t("todo.auditions", { count: counts.auditions }) : t("audition.adminSub"), counts.auditions],
-    ["insights", t("insights.title"), t("insights.sub"), 0],
-    ["import", t("admin.importPhotos"), t("admin.importSub"), 0],
+  const todo = (n: number, key: string, sub: string) => (n ? t(`todo.${key}`, { count: n }) : sub);
+  const item = (k: Page, label: string, sub: string, n = 0): [Page, string, string, number] => [k, label, sub, n];
+  const groups: { key: string; items: [Page, string, string, number][] }[] = [
+    { key: "people", items: [item("users", t("admin.users"), todo(counts.pending, "pending", t("admin.usersSub")), counts.pending), item("members", t("admin.members"), t("admin.membersSub")), item("teams", t("admin.teams"), t("admin.teamsSub"))] },
+    { key: "program", items: [item("season", t("admin.season"), todo(counts.subs, "subs", t("admin.seasonSub")), counts.subs), item("bookings", t("admin.bookings"), todo(counts.bookings, "bookings", t("admin.bookingsSub")), counts.bookings), item("events", t("events.title"), t("admin.eventsSub")), item("auditions", t("audition.adminTitle"), todo(counts.auditions, "auditions", t("audition.adminSub")), counts.auditions)] },
+    { key: "comms", items: [item("messages", t("admin.messages"), t("admin.messagesSub")), item("reports", t("admin.reports"), todo(counts.reports, "reports", t("admin.reportsSub")), counts.reports), item("customize", t("customize.title"), t("customize.sub")), item("catalog", t("catalog.adminTitle"), t("catalog.adminSub"))] },
+    { key: "money", items: [item("payments", t("pay.adminTitle"), todo(counts.payments, "payments", t("pay.adminSub")), counts.payments), item("shop", t("admin.shop"), todo(counts.orders, "orders", t("admin.shopSub")), counts.orders), item("punch", t("punch.title"), todo(counts.cards, "cards", t("admin.punchSub")), counts.cards)] },
+    { key: "insight", items: [item("insights", t("insights.title"), t("insights.sub")), item("import", t("admin.importPhotos"), t("admin.importSub"))] },
   ];
+  const todos = groups.flatMap((g) => g.items).filter(([, , , n]) => n > 0);
   return (
     <section className="screen adminhome">
       <header className="topbar"><h1 className="display">{t("nav.admin")}</h1></header>
-      <div className="card list">
-        {items.map(([k, label, sub, n]) => <button key={k} className="item" onClick={() => setPage(k)}><span className="grow">{label}<div className={"tiny" + (n > 0 ? " todo" : "")}>{sub}</div></span>{n > 0 && <span className="chip warn small">{n}</span>}<span className="gold">›</span></button>)}
+      {/* to-dos first: what needs Line right now, one row of chips */}
+      <div className="card todorow" data-testid="admin-todos">
+        {todos.length ? todos.map(([k, , sub, n]) => <button key={k} type="button" className="todochip" onClick={() => setPage(k)}><b>{n}</b><span>{sub.replace(/^\d+\s*/, "")}</span></button>) : <span className="small muted">{t("admin.nothingTodo")}</span>}
+      </div>
+      <div className="admingroups">
+        {groups.map((g) => (
+          <div className="sec" key={g.key}><h2>{t(`adminGroup.${g.key}`)}</h2>
+            <div className="card list">
+              {g.items.map(([k, label, sub, n]) => <button key={k} className="item" data-testid={`admin-${k}`} onClick={() => setPage(k)}><span className="grow">{label}<div className={"tiny" + (n > 0 ? " todo" : "")}>{sub}</div></span>{n > 0 && <span className="chip warn small">{n}</span>}<span className="gold">›</span></button>)}
+            </div>
+          </div>
+        ))}
       </div>
     </section>
   );
@@ -78,11 +86,16 @@ function Members() {
   const [toast, setToast] = useState<string | null>(null); const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
   const load = useCallback(async () => { const [m, tm] = await Promise.all([api.listMembers(), api.listTeams()]); setAll(m.filter((p) => p.status === "approved")); setTeams(tm); }, []);
   useEffect(() => { void load(); }, [load]);
-  const list = all.filter((p) => `${p.first_name} ${p.last_name} ${p.email ?? ""}`.toLowerCase().includes(q.toLowerCase()));
+  type Filter = "all" | "dancers" | "parents" | "staff" | "nologin";
+  const [filter, setFilter] = useState<Filter>("all");
+  const pred = (f: Filter, p: Member) => f === "all" ? true : f === "dancers" ? p.memberships.some((m) => m.role === "dancer") : f === "parents" ? p.children.length > 0 : f === "staff" ? p.memberships.some((m) => m.role === "trainer" || m.role === "assistant") : !p.user_id;
+  const match = (p: Member) => pred(filter, p);
+  const list = all.filter((p) => match(p) && `${p.first_name} ${p.last_name} ${p.email ?? ""}`.toLowerCase().includes(q.toLowerCase()));
   return (
     <section className="screen">
       <header className="topbar"><h1 className="display">{t("admin.members")} · {all.length}</h1></header>
       <input id="mq" placeholder={t("admin.search")} value={q} onChange={(e) => setQ(e.target.value)} />
+      <div className="chips scrollx" data-testid="member-filters">{(["all", "dancers", "parents", "staff", "nologin"] as Filter[]).map((f) => <button key={f} type="button" className={"chip" + (filter === f ? " on" : "")} aria-pressed={filter === f} onClick={() => setFilter(f)}>{t(`admin.filter.${f}`)}{f !== "all" ? ` · ${all.filter((p) => pred(f, p)).length}` : ""}</button>)}</div>
       <div className="card list">
         {list.map((p) => <button key={p.id} className="item" onClick={() => setOpen(p)}><span className="avatar">{p.first_name[0]}</span><span className="grow">{p.first_name} {p.last_name}{p.is_admin ? <span className="chip gold small" style={{ marginLeft: 6 }}>Admin</span> : ""}
           <div className="tiny rolechips">{[p.memberships.some((m) => m.role === "dancer") ? t("roles.dancer") : null, p.children.length ? t("admin.parentOf", { names: p.children.map((c) => c.first_name).join(", ") }) : null, p.memberships.some((m) => m.role === "trainer") ? t("roles.trainer") : null, p.memberships.some((m) => m.role === "assistant") ? t("roles.assistant") : null].filter(Boolean).map((x, i) => <span key={i} className="rc">✓ {x}</span>)}{!p.memberships.length && !p.children.length && <span className="rc off">{t("admin.noTeams")}</span>}</div></span><span className="gold">›</span></button>)}
@@ -162,6 +175,7 @@ function Season() {
   const { t } = useTranslation();
   const [week, setWeek] = useState(mondayOf(new Date()));
   const [sessions, setSessions] = useState<Session[]>([]); const [open, setOpen] = useState<Session | "new" | null>(null);
+  const [hint, setHint] = useState(false);
   const [moveTo, setMoveTo] = useState<{ date: string } | null>(null); const [dragId, setDragId] = useState<string | null>(null); const [over, setOver] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null); const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
   const load = useCallback(async () => setSessions(await api.listSessions(week.toISOString(), addDays(week, 7).toISOString())), [week]);
@@ -169,9 +183,9 @@ function Season() {
   const rooms = Array.from(new Set(sessions.map((s) => s.room_name ?? "?")));
   return (
     <section className="screen">
-      <header className="topbar"><h1 className="display">{t("admin.season")}</h1><button className="ghost small" onClick={() => setOpen("new")}>+ {t("session.training")}</button></header>
+      <header className="topbar"><h1 className="display">{t("admin.season")}</h1><div className="row" style={{ gap: 6 }}><button type="button" className={"ghost small info" + (hint ? " on" : "")} aria-label={t("common.help")} aria-expanded={hint} onClick={() => setHint((v) => !v)}>ⓘ</button><button className="ghost small" onClick={() => setOpen("new")}>+ {t("session.training")}</button></div></header>
       <div className="row between small muted"><button className="linklike" onClick={() => setWeek(addDays(week, -7))}>‹</button><span>{t("admin.week")} {weekNo(week)} · {week.toLocaleDateString(loc(), { day: "numeric", month: "short" })}</span><button className="linklike" onClick={() => setWeek(addDays(week, 7))}>›</button></div>
-      <p className="tiny">{t("admin.seasonHint")} {t("admin.seasonDragHint")}</p>
+      {hint && <p className="small muted hintbox">{t("admin.seasonHint")} {t("admin.seasonDragHint")}</p>}
       {rooms.map((room) => (
         <div className="sec" key={room}><div className="eyebrow">{room}</div>
           <div className="week">

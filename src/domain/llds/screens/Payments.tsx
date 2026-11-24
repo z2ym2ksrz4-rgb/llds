@@ -26,7 +26,8 @@ export function PlanChips({ team, plan, setPlan }: { team: Pick<Team, "price_ful
 }
 
 /** My season payments (web sign-ups + admin requests): pay with MobilePay, "Jeg har betalt". Used on Home (open ones) and under Mere. */
-export function MyPayments({ onBack, embedded }: { onBack?: () => void; embedded?: boolean }) {
+export function MyPayments({ onBack, embedded, inline }: { onBack?: () => void; embedded?: boolean; inline?: boolean }) {
+  const bare = embedded || inline;   // inline = full list without its own screen chrome (wallet page)
   const { t } = useTranslation();
   const [list, setList] = useState<WebSignup[]>([]);
   const [pay, setPay] = useState<WebSignup | null>(null);
@@ -42,8 +43,9 @@ export function MyPayments({ onBack, embedded }: { onBack?: () => void; embedded
   if (embedded && !shown.length) return null;
   const dueNow = openOnes.reduce((sum, p) => sum + ((p.installments ?? 1) > 1 ? (p.per_rate_dkk ?? 0) : (p.amount_dkk ?? 0)), 0);
   return (
-    <section className={embedded ? "stack" : "screen"}>
-      {!embedded && <><button className="linklike" onClick={onBack}>‹ {t("nav.more")}</button><header className="topbar"><h1 className="display">{t("pay.title")}</h1></header></>}
+    <section className={bare ? "stack" : "screen"}>
+      {!bare && <><button className="linklike" onClick={onBack}>‹ {t("nav.home")}</button><header className="topbar"><h1 className="display">{t("pay.title")}</h1></header></>}
+      {inline && <h2>{t("pay.title")}</h2>}
       {/* one line first: what is owed right now – the rows follow (on Home only when unfolded) */}
       {openOnes.length > 0 ? (
         <button type="button" className="card paysum" data-testid="pay-summary" onClick={() => setExpanded((v) => !v)} aria-expanded={!embedded || expanded}>

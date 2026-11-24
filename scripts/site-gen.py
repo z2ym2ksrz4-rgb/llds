@@ -598,7 +598,9 @@ SUPPORTP = f"""<h1 style="font-size:2.6rem">Hjælp</h1>
 <h2>Ofte stillede spørgsmål</h2>
 <p><b>Jeg får ingen kode.</b> Tjek spam/kampagner og stavningen. Koden gælder i 1 time. Bruger du en anden e-mail end den, du er registreret med? Så kan appen ikke finde dig – skriv til danseskolen.</p>
 <p><b>Jeg kan logge ind, men ser ingen hold.</b> Danseskolen skal godkende dig først – typisk samme dag. Du får besked i appen, når det er sket.</p>
-<p><b>Mit barn er 10–12 år – kan det få sit eget login?</b> Ja: Mere → Indstillinger → dit barn → “Giv login”. Børn under 10 ser appen gennem en forælder.</p>
+<p><b>Hvordan melder jeg afbud?</b> I appen: tryk på træningen under Hjem → Din uge (eller i Kalender) og vælg “Meld afbud”. Træneren får besked med det samme.</p>
+<p><b>Hvem skriver jeg til – og hvor?</b> Beskeder fra danseskolen ligger under Hjem. Under Hold finder du trænerens beskeder og “Skriv til træneren”. Social er holdets eget opslag-rum.</p>
+<p><b>Mit barn er 13–17 år – kan det få sit eget login?</b> Ja: menuen bag dit billede → Mine børn → “Giv login”. Børn under 13 bruger appen gennem en forælder.</p>
 <p><b>Jeg ser ikke koreografi-videoer.</b> På junior- og voksenhold er videoer kun for danserne selv.</p>
 <p><b>Betaling.</b> Hold, klippekort og shop betales med Vipps MobilePay til studiets nummer med den reference, du får vist. På telefonen åbner appen MobilePay direkte; på computeren scanner du en QR-kode. Når betalingen er registreret, får du en kvittering på mail.</p>
 <p><b>Slet min konto.</b> Mere → Indstillinger → Slet konto. Dine data slettes med det samme.</p>

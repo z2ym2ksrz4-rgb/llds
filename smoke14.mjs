@@ -6,7 +6,7 @@ const p = await b.newPage({ viewport: { width: 390, height: 844 } }); await p.ad
 p.on("pageerror", (e) => out.errors.push(e.message));
 await p.goto(base, { waitUntil: "networkidle" }); await p.evaluate(() => localStorage.clear()); await p.reload({ waitUntil: "networkidle" });
 const login = async (email) => { await p.fill("#email", email); await p.click("form button.cta"); await p.fill("#code", "000000"); await p.click("form button.cta"); await p.waitForSelector("nav.tabbar"); };
-const logout = async () => { await p.click("nav.tabbar >> text=Hjem"); await p.click("[data-testid=avatar]"); await p.click("[data-testid=menu-more]"); await p.click("[data-testid=more-settings]"); await p.click("text=Log ud"); await p.waitForSelector("#email"); };
+const logout = async () => { await p.click("nav.tabbar >> text=Hjem"); await p.click("[data-testid=avatar]"); await p.click("[data-testid=menu-signout]"); await p.waitForSelector("#email"); };
 await login("parent@demo");
 await p.click("nav.tabbar >> text=Hold"); await p.waitForSelector("[data-testid=team-messages]");
 out.noFeedOnTeam = !(await p.$("[data-testid=composer], .feed")); out.groups = await p.$$eval("[data-testid=team-messages] .group .eyebrow", (e) => e.map((x) => x.textContent));
@@ -22,6 +22,6 @@ await p.click("nav.tabbar >> text=Hold"); await p.waitForSelector("[data-testid=
 // parent sees the reply as unread in Samtaler
 await logout(); await login("parent@demo"); await p.click("nav.tabbar >> text=Hold"); await p.waitForSelector("[data-testid=msggroup-mine]"); await p.waitForSelector("[data-testid=team-thread]"); out.parentUnread = !!(await p.$("[data-testid=team-thread].due"));
 // settings: delete account – confirm appears, cancel
-await p.click("nav.tabbar >> text=Hjem"); await p.click("[data-testid=avatar]"); await p.click("[data-testid=menu-more]"); await p.click("[data-testid=more-settings]"); await p.click("[data-testid=delete-account]"); await p.waitForSelector("[data-testid=delete-confirm]");
+await p.click("nav.tabbar >> text=Hjem"); await p.click("[data-testid=avatar]"); await p.click("[data-testid=menu-profile]"); await p.click("[data-testid=delete-account]"); await p.waitForSelector("[data-testid=delete-confirm]");
 out.deleteConfirm = await p.textContent("[data-testid=delete-confirm] strong"); await p.click("[data-testid=delete-confirm] >> text=Annuller"); out.confirmGone = !(await p.$("[data-testid=delete-confirm]"));
 await b.close(); console.log(JSON.stringify(out, null, 1));

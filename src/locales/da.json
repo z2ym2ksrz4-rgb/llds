@@ -29,7 +29,8 @@
     "ok": "OK",
     "add": "Tilføj",
     "error": "Fejl",
-    "close": "Luk"
+    "close": "Luk",
+    "help": "Hjælp"
   },
   "lang": {
     "da": "Dansk",
@@ -56,7 +57,10 @@
     "resend": "Send koden igen",
     "otherEmail": "Brug en anden e-mail",
     "demoHint": "Demo: enhver 6-cifret kode virker. admin@demo = admin, parent@demo = forælder, maja@demo = træner, ny adresse = opret profil.",
-    "password": "Adgangskode"
+    "password": "Adgangskode",
+    "badEmail": "Skriv den e-mail, du er registreret med – fx navn@eksempel.dk.",
+    "needPassword": "Skriv adgangskoden.",
+    "whatIs": "Hvad er Backstage?"
   },
   "register": {
     "title": "Opret profil",
@@ -459,7 +463,15 @@
     "signupsOpenAllHint": "Slå fra i sæsonpausen – holdene kan stadig ses, men ikke tilmeldes. Slå til, når der åbnes for tilmelding.",
     "signupOpenTeam": "Åben for tilmelding",
     "signupOpenTeamHint": "Fra: holdet vises med beskrivelse, men kan ikke tilmeldes (fx nyt hold, der ikke er besluttet endnu).",
-    "signupClosedChip": "lukket for tilmelding"
+    "signupClosedChip": "lukket for tilmelding",
+    "nothingTodo": "Intet venter på dig lige nu ✓",
+    "filter": {
+      "all": "Alle",
+      "dancers": "Dansere",
+      "parents": "Forældre",
+      "staff": "Trænere",
+      "nologin": "Uden login"
+    }
   },
   "settings": {
     "language": "Sprog",
@@ -487,7 +499,8 @@
     "childConfirmOffer": "{{name}} har oprettet sig selv i appen og skal godkendes af dig, før danseskolen kan lukke ind.",
     "confirmChild": "Godkend at barnet må bruge appen",
     "childConfirmed": "{{name}} er godkendt – danseskolen kan nu lukke ind.",
-    "childHasLogin": "Har eget login."
+    "childHasLogin": "Har eget login.",
+    "noChildren": "Du har ingen børn tilknyttet. Danseskolen kobler børn til din profil."
   },
   "category": {
     "mini": "Mini børn",
@@ -781,7 +794,18 @@
     "milestonesSub": "Det du har nået",
     "settingsSub": "Profil, børneprofiler, sprog, log ud",
     "adminSub": "Brugere, hold, sæsonplan, beskeder, shop",
-    "menuSub": "Shop, klippekort, milepæle, indstillinger"
+    "menuSub": "Shop, klippekort, milepæle, indstillinger",
+    "profile": "Min profil",
+    "profileSub": "Billede, om mig, sprog, konto",
+    "children": "Mine børn",
+    "childrenSub": "Login og adgang for dine børn",
+    "wallet": "Betalinger og klippekort",
+    "walletSub": "Sæsonbetalinger, klip, køb, nyt hold",
+    "notifications": "Notifikationer",
+    "notificationsSub": "Hvad du får besked om",
+    "help": "Hjælp",
+    "helpSub": "Spørgsmål og svar, feedback",
+    "milestones": "Milepæle"
   },
   "events": {
     "title": "Events",
@@ -1001,7 +1025,8 @@
   "notif": {
     "title": "Notifikationer",
     "eyebrow": "Seneste",
-    "empty": "Ingen notifikationer endnu."
+    "empty": "Ingen notifikationer endnu.",
+    "settingsTitle": "Notifikationer"
   },
   "social": {
     "feed": "Feed",
@@ -1506,5 +1531,31 @@
     "staffNone": "Ingen tilmeldte endnu",
     "staffOpen": "Åbn audition",
     "quietLine": "Tilmeldt {{teams}} – du hører fra træneren."
+  },
+  "help": {
+    "title": "Hjælp",
+    "site": "Mere hjælp på websitet",
+    "contact": "Kan du ikke finde svaret? Skriv til {{email}} eller til træneren via Hold.",
+    "q": {
+      "absence": "Hvordan melder jeg afbud?",
+      "pay": "Hvordan betaler jeg?",
+      "video": "Hvor ser jeg koreografi-videoer?",
+      "write": "Hvem skriver jeg til – og hvor?",
+      "child": "Kan mit barn få sit eget login?"
+    },
+    "a": {
+      "absence": "Tryk på træningen under Hjem → Din uge (eller i Kalender) og vælg “Meld afbud”. Vælg årsag, skriv evt. en note, og træneren får besked med det samme.",
+      "pay": "Hold, klippekort og shop betales med Vipps MobilePay til studiets nummer med den reference, appen viser. Åbn Betalinger og klippekort i menuen bag dit billede, tryk “Betal” – på telefonen åbner MobilePay direkte. Når danseskolen har set betalingen, får du en kvittering på mail.",
+      "video": "Under Hold → Koreografi. På mini- og børnehold ser forældre videoerne; på junior- og voksenhold er de kun for danserne selv.",
+      "write": "Beskeder fra danseskolen ligger under Hjem. Under Hold finder du trænerens beskeder og “Skriv til træneren”. Social er holdets eget opslag-rum.",
+      "child": "Ja, fra 13 år. Åbn Mine børn i menuen bag dit billede og tryk “Giv login” – barnet logger ind med sin egen e-mail og ser kun sit eget hold. Under 13 bruger I din profil sammen."
+    }
+  },
+  "adminGroup": {
+    "people": "Mennesker",
+    "program": "Program",
+    "comms": "Kommunikation",
+    "money": "Penge",
+    "insight": "Indsigt"
   }
 }

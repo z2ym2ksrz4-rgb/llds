@@ -11,12 +11,12 @@ await login("admin@demo");
 await p.waitForSelector("[data-testid=notif-prompt]", { timeout: 5000 }); await p.click("[data-testid=notif-on]"); await p.waitForSelector("[data-testid=notif-kinds]"); out.kindsOffered = await p.$$eval("[data-testid=notif-kinds] .checkrow", e => e.length); await p.click("[data-testid=notif-kinds] .checkrow >> nth=1"); await p.click("[data-testid=notif-save]"); await p.waitForTimeout(300);
 out.promptGone = !(await p.$("[data-testid=notif-prompt]"));
 // 2) settings: switch off "order" kind
-await p.click("[data-testid=avatar]"); await p.click("[data-testid=menu-more]"); await p.click("[data-testid=more-settings]"); await p.waitForSelector("[data-testid=notif-settings]");
+await p.click("[data-testid=avatar]"); await p.click("[data-testid=menu-notifications]"); await p.waitForSelector("[data-testid=notif-settings]");
 out.masterOn = await p.isChecked("[data-testid=notif-master]"); out.hasSignupKind = !!(await p.$("[data-testid=notif-kind-signup]"));
 await p.click("[data-testid=notif-kind-order]"); await p.waitForTimeout(300); out.orderOff = !(await p.isChecked("[data-testid=notif-kind-order]"));
 out.prefs = await p.evaluate(() => JSON.parse(localStorage.getItem("llds_mock")).persons.find((x) => x.id === "p-line").notify_prefs);
 // 3) parent buys a punch card + signs up for an event -> admin gets punch + signup notifications, but no order (we'll place an order too and check it is filtered)
-await p.click("text=Log ud"); await p.waitForSelector("#email"); await login("parent@demo");
+await p.click("nav.tabbar >> text=Hjem"); await p.click("[data-testid=avatar]"); await p.click("[data-testid=menu-signout]"); await p.waitForSelector("#email"); await login("parent@demo");
 await p.waitForSelector("[data-testid=notif-prompt]", { timeout: 5000 }); await p.click("[data-testid=notif-off]"); await p.waitForTimeout(200);
 await p.click("[data-testid=shop]"); await p.waitForSelector("[data-testid=shop-screen]"); const hasPunch = await p.$("[data-testid=buy-card]");
 if (hasPunch) { await p.waitForSelector("[data-testid=buy-card]"); await p.click("[data-testid=buy-card] >> nth=0"); await p.waitForTimeout(500); await p.click("[data-testid=sheet-close]"); await p.waitForTimeout(400); }
@@ -29,7 +29,7 @@ out.adminPunchNotif = notifs.some((n) => n.startsWith("punch:Nyt klippekort"));
 out.adminNotifs = notifs.slice(-4);
 // 4) admin: customize – move hero down, hide stats, add a box, pick login image
 await p.evaluate(() => { localStorage.setItem("llds_notif_asked", JSON.stringify({ at: Date.now() })); });
-await p.click("[data-testid=avatar]"); await p.click("[data-testid=menu-more]"); await p.click("[data-testid=more-settings]"); await p.click("text=Log ud"); await p.waitForSelector("#email"); await login("admin@demo");
+await p.click("[data-testid=avatar]"); await p.click("[data-testid=menu-signout]"); await p.waitForSelector("#email"); await login("admin@demo");
 await p.click("nav.tabbar >> text=Admin"); await p.click("text=Tilpas appen"); await p.waitForSelector("[data-testid=customize]");
 await p.click("[data-testid=cz-row-hero] button[aria-label='Flyt ned']"); await p.click("[data-testid=cz-row-stats] >> text=Skjul");
 await p.click("[data-testid=cz-newbox]"); await p.fill("[data-testid=cz-box-title]", "Velkommen til sæsonen"); await p.fill("[data-testid=cz-box-body]", "Husk drikkedunk og godt humør."); await p.click("[data-testid=cz-box-save]"); await p.waitForTimeout(200);

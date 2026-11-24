@@ -6,6 +6,7 @@ import { Logo } from "../components/Logo";
 import { art } from "../lib/art";
 import { textOverride, useAppearance } from "@/core/appearance";
 import { catalogUrl } from "../lib/catalog";
+import appConfig from "../../../../app.config.json";
 
 /** E-mail + one-time code. No passwords. */
 export function Login() {
@@ -21,6 +22,8 @@ export function Login() {
   const isReview = /^review[\w.+-]*@ilumie\.com$/i.test(email.trim());   // App Store / Play reviewers: password instead of a mail code
   const [password, setPassword] = useState("");
   const send = async () => {
+    if (!/^[^@\s]+@[^@\s]+$/.test(email.trim())) { setErr(t("login.badEmail")); document.getElementById("email")?.focus(); return; }
+    if (isReview && !password) { setErr(t("login.needPassword")); return; }
     setBusy(true); setErr(null);
     try { if (isReview) { await api.signInWithPassword(email.trim(), password); return; } await api.sendCode(email.trim()); setStep("code"); } catch (e) { setErr((e as Error).message); } finally { setBusy(false); }
   };
@@ -42,8 +45,8 @@ export function Login() {
             <label className="field"><span>{t("login.email")}</span>
               <input id="email" type="email" inputMode="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="dit@navn.dk" /></label>
             {isReview && <label className="field"><span>{t("login.password")}</span><input id="password" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} /></label>}
-            <button className="cta" disabled={busy || !email.includes("@") || (isReview && !password)}>{isReview ? t("login.verify") : t("login.sendCode")}</button>
-            <p className="tiny">{t("login.noAccount")}</p>
+            <button className="cta" disabled={busy}>{isReview ? t("login.verify") : t("login.sendCode")}</button>
+            <p className="tiny">{t("login.noAccount")} <a className="gold" href={`${appConfig.siteUrl}backstage/`} target="_blank" rel="noreferrer">{t("login.whatIs")} ↗</a></p>
           </form>
         ) : (
           <form onSubmit={(e) => { e.preventDefault(); void verify(); }} className="stack">

@@ -6,7 +6,7 @@ const p = await (await b.newContext({ viewport: { width: 390, height: 844 } })).
 const errors = []; p.on("pageerror", e => errors.push(e.message)); p.on("console", m => { if (m.type() === "error" && !m.text().includes("Failed to load resource")) errors.push(m.text()); });
 const out = {}; const shot = (n) => p.screenshot({ path: `smoke4-${n}.png` });
 const login = async (email) => { await p.waitForSelector("#email"); await p.fill("#email", email); await p.click("form button.cta"); await p.fill("#code", "123456"); await p.click("form button.cta"); await p.waitForSelector("nav.tabbar"); };
-const logout = async () => { await p.click("nav.tabbar >> text=Hjem"); await p.click("[data-testid=avatar]"); await p.click("[data-testid=menu-more]"); await p.click("[data-testid=more-settings]"); await p.click("text=Log ud"); };
+const logout = async () => { await p.click("nav.tabbar >> text=Hjem"); await p.click("[data-testid=avatar]"); await p.click("[data-testid=menu-signout]"); };
 const closeSheet = async () => { await p.click(".sheet-bg", { position: { x: 5, y: 5 } }); await p.waitForTimeout(200); };
 await p.goto(base, { waitUntil: "networkidle" }); await p.evaluate(() => localStorage.clear()); await p.reload({ waitUntil: "networkidle" });
 
@@ -24,7 +24,7 @@ await p.waitForSelector("#pay-claim"); await p.click("#pay-claim"); await p.wait
 // 1c. punch card (Freja is on Contemporary Elite = punch card team) – bought in the same shop screen
 await p.waitForSelector("[data-testid=buy-card]"); await p.click("[data-testid=buy-card]"); await p.waitForSelector("[data-testid=buy-card-confirm]"); await p.click("[data-testid=buy-card-confirm]");
 await p.waitForSelector("#pay-claim"); await p.click("#pay-claim"); await p.waitForTimeout(500); await p.click("[data-testid=shop-history]"); await p.waitForSelector("[data-testid=punchcard]"); out.cardStatus = await p.textContent("[data-testid=punchcard] .chip"); await p.click("[data-testid=sheet-close]"); await p.waitForTimeout(400);
-await p.click("text=‹ Tilbage"); await p.click("nav.tabbar >> text=Hjem"); await p.click("[data-testid=avatar]"); await p.click("[data-testid=menu-more]"); await p.click("[data-testid=more-settings]"); await p.click("text=Log ud");
+await p.click("text=‹ Tilbage"); await p.click("nav.tabbar >> text=Hjem"); await p.click("[data-testid=avatar]"); await p.click("[data-testid=menu-signout]");
 
 // 2. admin: badge, shop → mark paid, punch → activate, events → new, team → milestone, attendance → punch
 await login("admin@demo"); await p.waitForSelector("[data-testid=badge]"); out.adminBadge = await p.textContent("[data-testid=badge]");
@@ -47,8 +47,8 @@ await login("parent@demo"); await p.waitForSelector("[data-testid=badge]"); out.
 await p.click("[data-testid=bell]"); await p.waitForSelector("[data-testid=notif]"); out.notifs = await p.$$eval("[data-testid=notif]", e => e.map(x => x.textContent.slice(0, 40))); await shot(4); await closeSheet();
 out.homeMilestones = await p.$$eval(".sec .chip.gold", e => e.map(x => x.textContent));
 await p.click("nav.tabbar >> text=Hjem"); await p.click("[data-testid=shop]"); await p.waitForSelector("[data-testid=shop-history]"); await p.click("[data-testid=shop-history]"); await p.waitForSelector("[data-testid=punchcard]"); out.punchesLeft = await p.textContent("[data-testid=punchcard] .tiny >> nth=1"); out.usedDots = await p.$$eval(".punch.used", e => e.length); await p.click("[data-testid=sheet-close]"); await p.waitForTimeout(400);
-await p.click("text=‹ Tilbage"); await p.click("nav.tabbar >> text=Hjem"); await p.click("[data-testid=avatar]"); await p.click("[data-testid=menu-more]"); await p.click("[data-testid=more-milestones]"); await p.waitForSelector("[data-testid=milestone]"); out.milestones = await p.$$eval("[data-testid=milestone]", e => e.length);
-await p.setViewportSize({ width: 1280, height: 900 }); await p.click("text=‹ Mere"); await p.click("nav.tabbar >> text=Events"); await p.waitForTimeout(400); await shot(5);
+await p.click("text=‹ Tilbage"); await p.click("nav.tabbar >> text=Hjem"); await p.click("[data-testid=avatar]"); await p.click("[data-testid=menu-milestones]"); await p.waitForSelector("[data-testid=milestone]"); out.milestones = await p.$$eval("[data-testid=milestone]", e => e.length);
+await p.setViewportSize({ width: 1280, height: 900 }); await p.click("nav.tabbar >> text=Events"); await p.waitForTimeout(400); await shot(5);
 
 out.errors = errors; console.log(JSON.stringify(out, null, 1)); await b.close();
 if (errors.length) process.exit(1);

@@ -29,7 +29,8 @@
     "ok": "OK",
     "add": "Add",
     "error": "Error",
-    "close": "Close"
+    "close": "Close",
+    "help": "Help"
   },
   "lang": {
     "da": "Dansk",
@@ -56,7 +57,10 @@
     "resend": "Resend code",
     "otherEmail": "Use another e-mail",
     "demoHint": "Demo: any 6-digit code works. admin@demo = admin, parent@demo = parent, maja@demo = trainer, new address = create profile.",
-    "password": "Password"
+    "password": "Password",
+    "badEmail": "Enter the e-mail you are registered with – e.g. name@example.com.",
+    "needPassword": "Enter the password.",
+    "whatIs": "What is Backstage?"
   },
   "register": {
     "title": "Create profile",
@@ -459,7 +463,15 @@
     "signupsOpenAllHint": "Turn off during the season break – teams stay visible but cannot be joined. Turn on when sign-up opens.",
     "signupOpenTeam": "Open for sign-up",
     "signupOpenTeamHint": "Off: the team is shown with its description but cannot be joined (e.g. a new team not decided yet).",
-    "signupClosedChip": "closed for sign-up"
+    "signupClosedChip": "closed for sign-up",
+    "nothingTodo": "Nothing is waiting for you right now ✓",
+    "filter": {
+      "all": "All",
+      "dancers": "Dancers",
+      "parents": "Parents",
+      "staff": "Trainers",
+      "nologin": "No login"
+    }
   },
   "settings": {
     "language": "Language",
@@ -487,7 +499,8 @@
     "childConfirmOffer": "{{name}} signed up in the app and needs your approval before the dance school can let them in.",
     "confirmChild": "Approve that the child may use the app",
     "childConfirmed": "{{name}} is approved – the dance school can now let them in.",
-    "childHasLogin": "Has an own login."
+    "childHasLogin": "Has an own login.",
+    "noChildren": "No children are linked to you. The dance school links children to your profile."
   },
   "category": {
     "mini": "Mini kids",
@@ -781,7 +794,18 @@
     "milestonesSub": "What you have achieved",
     "settingsSub": "Profile, child accounts, language, sign out",
     "adminSub": "Users, teams, season, messages, shop",
-    "menuSub": "Shop, punch cards, milestones, settings"
+    "menuSub": "Shop, punch cards, milestones, settings",
+    "profile": "My profile",
+    "profileSub": "Photo, about me, language, account",
+    "children": "My children",
+    "childrenSub": "Login and access for your children",
+    "wallet": "Payments and punch cards",
+    "walletSub": "Season payments, punches, purchases, new team",
+    "notifications": "Notifications",
+    "notificationsSub": "What you get notified about",
+    "help": "Help",
+    "helpSub": "Questions and answers, feedback",
+    "milestones": "Milestones"
   },
   "events": {
     "title": "Events",
@@ -1001,7 +1025,8 @@
   "notif": {
     "title": "Notifications",
     "eyebrow": "Latest",
-    "empty": "No notifications yet."
+    "empty": "No notifications yet.",
+    "settingsTitle": "Notifications"
   },
   "social": {
     "feed": "Feed",
@@ -1506,5 +1531,31 @@
     "staffNone": "No applicants yet",
     "staffOpen": "Open audition",
     "quietLine": "Signed up for {{teams}} – the trainer will be in touch."
+  },
+  "help": {
+    "title": "Help",
+    "site": "More help on the website",
+    "contact": "Can't find the answer? Write to {{email}} or to the trainer via Team.",
+    "q": {
+      "absence": "How do I report an absence?",
+      "pay": "How do I pay?",
+      "video": "Where do I find choreography videos?",
+      "write": "Who do I write to – and where?",
+      "child": "Can my child get their own login?"
+    },
+    "a": {
+      "absence": "Tap the training under Home → Your week (or in Calendar) and choose “Report absence”. Pick a reason, add a note if you like, and the trainer is told right away.",
+      "pay": "Teams, punch cards and the shop are paid with Vipps MobilePay to the studio's number with the reference the app shows. Open Payments and punch cards in the menu behind your picture and tap “Pay” – on a phone MobilePay opens directly. Once the school has seen the payment you get a receipt by e-mail.",
+      "video": "Under Team → Choreography. On mini and kids teams parents see the videos; on junior and adult teams they are for the dancers only.",
+      "write": "Messages from the school are under Home. Under Team you find the trainer's messages and “Write to the trainer”. Social is the team's own feed.",
+      "child": "Yes, from age 13. Open My children in the menu behind your picture and tap “Grant login” – the child signs in with their own e-mail and sees only their own team. Under 13 you share your profile."
+    }
+  },
+  "adminGroup": {
+    "people": "People",
+    "program": "Programme",
+    "comms": "Communication",
+    "money": "Money",
+    "insight": "Insight"
   }
 }
