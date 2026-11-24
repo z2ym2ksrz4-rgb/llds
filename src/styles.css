@@ -837,3 +837,10 @@ details.fold > summary h2 { flex: 1; } details.fold > summary .caret { color: va
 .faces.inline { display: inline-flex; margin: 0; padding: 0; gap: 0; }
 .faces.inline .face { width: 26px; height: 26px; font-size: .62rem; margin-right: -7px; }
 .teamhero-meta .chip.gold, .screen[style*="--accent"] .teamhero-meta .chip.gold { background: linear-gradient(135deg, var(--gold2), var(--gold)); color: #15120d; border-color: transparent; font-weight: 500; }
+
+/* ---- "Nyt siden sidst": rows can be dismissed */
+.tabnews-head { display: flex; align-items: center; justify-content: space-between; padding: 4px 0 2px; }
+.tabnews-row { display: flex; align-items: stretch; gap: 4px; }
+.tabnews-row .item { flex: 1; min-width: 0; }
+.tabnews-x { flex: none; align-self: center; width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--line2, rgba(255,255,255,.14)); background: transparent; color: var(--muted); font-size: 1rem; line-height: 1; padding: 0; cursor: pointer; }
+.tabnews-x:hover { color: var(--fg); border-color: var(--gold3); }

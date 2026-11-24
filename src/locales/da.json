@@ -1303,7 +1303,9 @@
   "news": {
     "title": "Nyt siden sidst",
     "unread": "Ulæst",
-    "showAll": "Vis alle {{n}}"
+    "showAll": "Vis alle {{n}}",
+    "clear": "Ryd",
+    "dismiss": "Fjern"
   },
   "todo": {
     "pending_one": "{{count}} ny bruger venter på din godkendelse",

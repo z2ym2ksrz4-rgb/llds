@@ -1303,7 +1303,9 @@
   "news": {
     "title": "New since last time",
     "unread": "Unread",
-    "showAll": "Show all {{n}}"
+    "showAll": "Show all {{n}}",
+    "clear": "Clear",
+    "dismiss": "Dismiss"
   },
   "todo": {
     "pending_one": "{{count}} new user awaits your approval",

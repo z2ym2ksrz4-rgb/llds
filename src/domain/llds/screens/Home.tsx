@@ -104,7 +104,7 @@ export function Home() {
   const KIND_CHIP: Record<WeekItem["kind"], string> = { training: "week.training", staff: "week.youTrain", event: "week.event", booking: "week.booking" };
 
   /* hero image: the viewed person's own team photo (Line's) → next event's image → school default → art */
-  const selTeam = selectedTeamId ? me.teams.find((x) => x.id === selectedTeamId && teamIds.has(x.id)) : undefined;   // the team chosen in the picker – follows the hat (own team / child's team)
+  const selTeam = selectedTeamId ? me.teams.find((x) => x.id === selectedTeamId && (teamIds.has(x.id) || me.person.is_admin)) : undefined;   // the team chosen in the picker – follows the hat (own team / child's team)
   const firstTeam = selTeam ?? me.teams.find((x) => teamIds.has(x.id));
   const ownPhoto = firstTeam && /^https?:/.test(firstTeam.cover_url ?? "") ? firstTeam.cover_url : firstTeam?.photos?.[0] ?? (firstTeam && /^https?:/.test(firstTeam.about_url ?? "") ? firstTeam.about_url : null);
   const heroImg = resolveImage(ownPhoto) ?? catalogUrl(hero?.image_key) ?? catalogUrl(appearance.images?.hero) ?? artFor(viewing.personId, ["group", "trails", "studio"]);
@@ -202,7 +202,7 @@ export function Home() {
       )}
     </>),
     teampick: () => (<>
-      {(!isAdmin || teamIds.size > 0) && <TeamPicker ownOnly />}
+      {(!isAdmin || me.teams.length > 0) && <TeamPicker />}
       {!me.person.supervised_by && <button type="button" className="linklike small home-join" data-testid="home-join" onClick={() => setJoin(true)}>+ {t("pay.join")}</button>}
       {/* week strip: the dots follow the team chosen above – its trainings and events */}
       {(!isAdmin || teamIds.size > 0) && <div className="weekstrip" data-testid="weekstrip">
