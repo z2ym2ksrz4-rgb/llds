@@ -12,6 +12,7 @@ import { AdminUsers } from "./Users";
 import { MemberSheet } from "./MemberSheet";
 import { Sheet, Toast } from "../components/Sheet";
 import { useNav } from "@/core/nav";
+import { useAuth } from "@/core/auth";
 import { useBadges } from "@/core/badges";
 import { SessionEditor } from "../components/SessionSheet";
 import { ImagePicker } from "../components/ImagePicker";
@@ -121,7 +122,7 @@ function Teams() {
         <div className="sec" key={c}><div className="eyebrow">{t(`category.${c}`)}</div><div className="card list">
           {list.map((x) => <button key={x.id} className="item" onClick={() => setOpen(x)}><span className="grow">{x.name}<div className="tiny">{x.style} · {x.level}{x.closed ? " · " + t("team.closed") : ""}{x.signup_open === false ? " · " + t("admin.signupClosedChip") : ""}{x.parents_see_video ? " · " + t("admin.parentsSeeVideo") : ""}{x.punch_card_open ? " · " + t("team.punchOpen") : ""}</div></span><span className="gold">›</span></button>)}
         </div></div>) : null; })}
-      {open && <TeamEditor team={open === "new" ? null : open} onClose={() => setOpen(null)} onSaved={() => { setOpen(null); void load(); }} />}
+      {open && <TeamEditor team={open === "new" ? null : open} onClose={() => setOpen(null)} onSaved={() => { setOpen(null); void load(); void useAuth.getState().refresh(); }} />}   /* refresh me.teams too – the team page reads covers from there */
     </section>
   );
 }
