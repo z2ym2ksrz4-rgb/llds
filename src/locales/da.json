@@ -587,7 +587,9 @@
     "sentForApproval": "Sendt til godkendelse – du får besked",
     "countLine": "{{n}} træninger · {{b}} bookinger",
     "purposeRequired": "Skriv et formål med bookingen.",
-    "purposePh": "Fx Solo – Liva, duo-træning, prøve"
+    "purposePh": "Fx Solo – Liva, duo-træning, prøve",
+    "cancelled": "Aflyst",
+    "moved": "Flyttet"
   },
   "feed": {
     "title": "Opslag",

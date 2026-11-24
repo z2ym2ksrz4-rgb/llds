@@ -12,10 +12,25 @@ import { SessionSheet, SessionEditor } from "../components/SessionSheet";
 import { addDays, atTime, DAY_LONG, dayLabel, hm, loc, mondayOf, overlaps, sameDay, startOfDay } from "../lib/time";
 import { useAppearance } from "@/core/appearance";
 import { catalogUrl } from "../lib/catalog";
-import { art, teamAccent } from "../lib/art";
-import { resolveImage } from "../lib/catalog";
+import { art } from "../lib/art";
 
 const HOURS = Array.from({ length: 14 }, (_, i) => 9 + i); // 09–22
+
+type LaneItem = { id: string; a: string; b: string; s?: Session; bk?: Booking };
+/** Same-room overlaps are laid out side by side (clusters of overlapping items share the lane width). */
+function packLane(items: LaneItem[]): { item: LaneItem; col: number; cols: number }[] {
+  const sorted = [...items].sort((x, y) => +new Date(x.a) - +new Date(y.a) || +new Date(x.b) - +new Date(y.b));
+  const out: { item: LaneItem; col: number; cols: number }[] = [];
+  let cluster: { item: LaneItem; col: number; cols: number }[] = []; let colEnds: number[] = []; let clusterEnd = -Infinity;
+  const flush = () => { const n = colEnds.length || 1; for (const c of cluster) c.cols = n; out.push(...cluster); cluster = []; colEnds = []; clusterEnd = -Infinity; };
+  for (const it of sorted) {
+    const a = +new Date(it.a), b = +new Date(it.b);
+    if (a >= clusterEnd && cluster.length) flush();
+    let col = colEnds.findIndex((e) => e <= a); if (col < 0) { col = colEnds.length; colEnds.push(b); } else colEnds[col] = b;
+    cluster.push({ item: it, col, cols: 1 }); clusterEnd = Math.max(clusterEnd, b);
+  }
+  flush(); return out;
+}
 
 /** "Sale": day picker, both rooms side by side, trainings + bookings, tap a free slot to book. */
 export function Rooms() {
@@ -46,7 +61,6 @@ export function Rooms() {
   const dayEvents = events.filter((e) => sameDay(new Date(e.starts_at), day));
   const bgImg = useAppearance((a) => catalogUrl(a.a.images?.hero)) ?? art("studio");
   const myTeamIds = new Set(me.memberships.filter((m) => m.person_id === viewing.personId || m.person_id === me.person.id).map((m) => m.team_id));
-  const accentOf = (teamId: string | null) => { const tm = teamId ? me.teams.find((x) => x.id === teamId) : null; const img = tm ? resolveImage(tm.cover_url) ?? resolveImage(tm.photos?.[0] ?? null) : null; return tm ? { ...teamAccent(tm), ...(img ? { ["--evimg" as string]: `url(${img})` } : {}) } : {}; };
   const [nowMin, setNowMin] = useState(() => new Date().getHours() * 60 + new Date().getMinutes());
   useEffect(() => { const i = setInterval(() => setNowMin(new Date().getHours() * 60 + new Date().getMinutes()), 60_000); return () => clearInterval(i); }, []);
   useEffect(() => { void api.listSessions(week.toISOString(), addDays(week, 7).toISOString()).then(setWeekSessions).catch(() => setWeekSessions([])); }, [week.getTime()]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -84,23 +98,27 @@ export function Rooms() {
       <div className="calwrap" ref={scroller} data-testid="calwrap">
       <div className="cal" style={{ gridTemplateColumns: `44px repeat(${rooms.length}, 1fr)` }}>
         <div className="hours">{HOURS.map((h) => <div key={h} className="t">{h}.00</div>)}</div>
-        {rooms.map((r) => (
+        {rooms.map((r, ri) => (
           <div key={r.id} className="col" style={{ height: HOURS.length * 48 }}>
             {sameDay(day, new Date()) && nowMin >= 9 * 60 && nowMin <= 23 * 60 && <div className="nowline" style={{ top: (nowMin - 9 * 60) / 60 * 48 }} />}
             {HOURS.map((h) => <button key={h} className="free" style={{ top: (h - 9) * 48 }} aria-label={`${r.name} ${h}:00`} onClick={() => setOpen({ kind: "book", room_id: r.id, start: `${String(h).padStart(2, "0")}:00` })} />)}
-            {sessions.filter((s) => s.room_id === r.id).map((s) => (
-              <button key={s.id} className={"ev" + (mine(s) ? " mine" : "") + (s.cancelled ? " off" : "")} style={{ top: slotTop(s.starts_at), height: slotH(s.starts_at, s.ends_at), ...accentOf(s.team_id) }} onClick={() => setOpen({ kind: "session", s })}>
-                <b>{s.title ?? s.team_name}</b><small>{hm(s.starts_at)}–{hm(s.ends_at)}{s.substitute_wanted && !s.substitute_id ? " · " + t("session.subWanted") : ""}</small>
-              </button>
-            ))}
-            {bookings.filter((b) => b.room_id === r.id && b.status !== "rejected").map((b) => (
-              <button key={b.id} className={"ev booking" + (b.status === "pending" ? " pending" : "")} style={{ top: slotTop(b.starts_at), height: slotH(b.starts_at, b.ends_at) }} onClick={() => setOpen({ kind: "booking", b })}>
-                <b>{b.title}</b><small>{hm(b.starts_at)}–{hm(b.ends_at)}{b.status === "pending" ? " · " + t("rooms.pending") : ""}</small>
-              </button>
-            ))}
+            {(() => { const lane = packLane([
+                ...sessions.filter((s) => s.room_id === r.id).map((s) => ({ id: "s" + s.id, a: s.starts_at, b: s.ends_at, s })),
+                ...bookings.filter((b) => b.room_id === r.id && b.status !== "rejected").map((b) => ({ id: "b" + b.id, a: b.starts_at, b: b.ends_at, bk: b })),
+              ]); return lane.map(({ item, col, cols }) => {
+                const pos = { top: slotTop(item.a), height: slotH(item.a, item.b), left: `calc(${(col / cols) * 100}% + 3px)`, width: `calc(${100 / cols}% - 6px)` };
+                if (item.s) { const s = item.s; return (
+                  <button key={item.id} className={"ev l" + ri + (mine(s) ? " mine" : "") + (s.cancelled ? " off cx" : s.moved ? " mv" : "")} style={pos} onClick={() => setOpen({ kind: "session", s })}>
+                    <b>{s.title ?? s.team_name}</b><small>{hm(s.starts_at)}–{hm(s.ends_at)}{s.substitute_wanted && !s.substitute_id ? " · " + t("session.subWanted") : ""}{s.cancelled ? <i className="tag cx">{t("rooms.cancelled")}</i> : s.moved ? <i className="tag mv">{t("rooms.moved")}</i> : null}</small>
+                  </button>); }
+                const b = item.bk!; return (
+                  <button key={item.id} className={"ev booking" + (b.status === "pending" ? " pending" : "")} style={pos} onClick={() => setOpen({ kind: "booking", b })}>
+                    <b>{b.title}</b><small>{hm(b.starts_at)}–{hm(b.ends_at)}{b.status === "pending" ? " · " + t("rooms.pending") : ""}</small>
+                  </button>); }); })()}
           </div>
         ))}
       </div>
+      <div className="callegend" aria-hidden><span className="lg l0">{rooms[0]?.name}</span>{rooms[1] && <span className="lg l1">{rooms[1].name}</span>}<span className="lg cx">{t("rooms.cancelled")}</span><span className="lg mv">{t("rooms.moved")}</span></div>
       <p className="tiny">{t("rooms.legend")}</p>
       </div>
 

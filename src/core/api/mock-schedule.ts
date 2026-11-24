@@ -39,6 +39,7 @@ export function seedSchedule(teams: Team[], staff: Person[]): SchedState {
         lesson_plan: null, lesson_plan_read_at: null, cancelled: false, cancel_note: null, weekly_rule_id: "rule-" + teamName.replace(/\W/g, "") + wd, substitute_wanted: false });
     }
   }
+  { const mv = sessions.find((x) => x.team_name === "Mini Cuties" && new Date(x.starts_at) >= mon && new Date(x.starts_at) < new Date(mon.getTime() + 7 * 864e5)); if (mv) { const a = new Date(mv.starts_at), b = new Date(mv.ends_at); a.setMinutes(a.getMinutes() + 30); b.setMinutes(b.getMinutes() + 30); mv.starts_at = a.toISOString(); mv.ends_at = b.toISOString(); mv.moved = true; } }
   const fri = at(mon, 5, "16:00"), friEnd = at(mon, 5, "18:00");
   const bookings: Booking[] = [{ id: "b-1", room_id: "room-S", room_name: "Store Sal", person_id: "p-freja", person_name: "Freja Therkildsen", title: "Solo – Freja", starts_at: fri, ends_at: friEnd, status: "pending" }];
   return { rooms: ROOMS, sessions, bookings, absences: [], attendance: [] };

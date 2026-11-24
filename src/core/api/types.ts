@@ -178,6 +178,7 @@ export type Session = {
   cancel_note: string | null;
   weekly_rule_id: string | null;
   substitute_wanted: boolean;
+  moved?: boolean; // differs from the weekly rule's usual slot (server-computed)
 };
 
 export type SessionInput = {

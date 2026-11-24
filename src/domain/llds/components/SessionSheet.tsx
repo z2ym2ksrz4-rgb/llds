@@ -44,7 +44,7 @@ export function SessionSheet({ session, absences, onClose, onChanged, toast }: {
   if (mode === "attendance") return <AttendanceSheet session={session} onClose={() => { onChanged(); onClose(); }} toast={toast} />;
 
   return (
-    <Sheet onClose={onClose} eyebrow={session.cancelled ? t("session.cancelled") : t("session.training")} title={session.title ?? session.team_name ?? ""}>
+    <Sheet onClose={onClose} eyebrow={session.cancelled ? t("session.cancelled") : session.moved ? t("session.training") + " · " + t("rooms.moved") : t("session.training")} title={session.title ?? session.team_name ?? ""}>
       <div className="chips">
         <span className="chip">{dateLabel(session.starts_at)} {hm(session.starts_at)}–{hm(session.ends_at)}</span>
         {session.room_name && <span className="chip">{session.room_name}</span>}

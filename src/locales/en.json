@@ -587,7 +587,9 @@
     "sentForApproval": "Sent for approval – you'll be notified",
     "countLine": "{{n}} trainings · {{b}} bookings",
     "purposeRequired": "Please state the purpose of the booking.",
-    "purposePh": "E.g. Solo – Liva, duo practice, rehearsal"
+    "purposePh": "E.g. Solo – Liva, duo practice, rehearsal",
+    "cancelled": "Cancelled",
+    "moved": "Moved"
   },
   "feed": {
     "title": "Posts",
