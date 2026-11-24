@@ -160,7 +160,8 @@
     "noMessagesStaff": "Ingen beskeder endnu. Skriv den første til holdet.",
     "moreAbout": "Mere om holdet",
     "moreAboutSub": "Beskrivelse · events · trofæer · træninger",
-    "seeDancers": "Se dansere"
+    "seeDancers": "Se dansere",
+    "assistantHint": "Som hjælpetræner ser du fremmøde, timeplan og beskeder. Holdets profil, videoer og billeder styres af træneren."
   },
   "home": {
     "hi": "Hej {{name}}",
@@ -199,7 +200,7 @@
     "nextUp": "Næste",
     "yourShelf": "Din trofæhylde",
     "childsShelf": "{{name}}s trofæhylde",
-    "adminTodo": "Til dig",
+    "adminTodo": "Venter på dig",
     "openOrders": "åbne ordrer",
     "cardsWaiting": "klippekort til aktivering",
     "overview": "Overblik",
@@ -229,7 +230,10 @@
     "nothingToday": "Ingen træning i dag.",
     "shopPayLine_one": "1 køb mangler betaling",
     "shopPayLine_other": "{{count}} køb mangler betaling",
-    "payConfirm": "betalinger at bekræfte"
+    "payConfirm": "betalinger at bekræfte",
+    "absCount_one": "1 afbud",
+    "absCount_other": "{{count}} afbud",
+    "bookingsToday": "bookinger i dag"
   },
   "admin": {
     "users": "Nye brugere",

@@ -964,3 +964,16 @@ details.fold.team-more > .sec { margin-top:8px; }
 .faqitem p { margin:0 0 14px; color:var(--muted); }
 a.btnlink { display:inline-flex; align-items:center; text-decoration:none; }
 .login .tiny a.gold { color:var(--gold2); text-decoration:none; border-bottom:1px solid var(--gold3); }
+
+/* ================= Kørsel 5: roller ================= */
+.todaycards { display:grid; gap:8px; }
+@media (min-width:640px) { .todaycards { grid-template-columns:1fr 1fr; } }
+.card.todaycard { padding:0; overflow:hidden; }
+.card.todaycard.off { opacity:.55; }
+.todaycard-main { display:flex; align-items:center; gap:12px; width:100%; padding:12px 14px; background:none; border:none; color:var(--fg); font:inherit; text-align:left; cursor:pointer; }
+.todaycard-main .time { color:var(--gold2); min-width:44px; line-height:1.15; }
+.todaycard-actions { display:flex; flex-wrap:wrap; gap:6px; padding:0 14px 12px; }
+.todaycard-actions .chip { min-height:32px; }
+.chip.rose { background:var(--rose-soft); border-color:rgba(184,72,90,.4); color:var(--fg); }
+.chip.sage { background:var(--sage-soft); border-color:rgba(127,182,134,.4); color:var(--fg); }
+.screen.home .sec[data-testid="admin-todo"] .card.todorow { margin:0; }

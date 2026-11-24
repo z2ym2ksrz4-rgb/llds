@@ -160,7 +160,8 @@
     "noMessagesStaff": "No messages yet. Write the first one to the team.",
     "moreAbout": "More about the team",
     "moreAboutSub": "Description · events · trophies · trainings",
-    "seeDancers": "See dancers"
+    "seeDancers": "See dancers",
+    "assistantHint": "As an assistant you see attendance, the lesson plan and messages. The team's profile, videos and photos are managed by the trainer."
   },
   "home": {
     "hi": "Hi {{name}}",
@@ -199,7 +200,7 @@
     "nextUp": "Next up",
     "yourShelf": "Your trophy shelf",
     "childsShelf": "{{name}}'s trophy shelf",
-    "adminTodo": "For you",
+    "adminTodo": "Waiting for you",
     "openOrders": "open orders",
     "cardsWaiting": "punch cards to activate",
     "overview": "Overview",
@@ -229,7 +230,10 @@
     "nothingToday": "No training today.",
     "shopPayLine_one": "1 purchase awaiting payment",
     "shopPayLine_other": "{{count}} purchases awaiting payment",
-    "payConfirm": "payments to confirm"
+    "payConfirm": "payments to confirm",
+    "absCount_one": "1 absence",
+    "absCount_other": "{{count}} absences",
+    "bookingsToday": "bookings today"
   },
   "admin": {
     "users": "New users",

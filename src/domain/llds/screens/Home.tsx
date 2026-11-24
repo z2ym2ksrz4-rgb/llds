@@ -1,9 +1,10 @@
 import React, { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { HeroMedia, isSitePhoto } from "../components/PhotoHero";
 import { useTranslation } from "react-i18next";
-import { api, type Absence, type Booking, type Event, type Milestone, type PersonBadge, type Order, type PunchCard, type WebSignup, type Session } from "@/core/api";
+import { api, type Absence, type Booking, type Event, type Milestone, type PersonBadge, type Order, type PunchCard, type Session } from "@/core/api";
 import { useAuth } from "@/core/auth";
 import { useNav } from "@/core/nav";
+import { useBadges } from "@/core/badges";
 import { TeamPicker } from "../components/TeamPicker";
 import { SessionSheet } from "../components/SessionSheet";
 import { Toast } from "../components/Sheet";
@@ -39,6 +40,7 @@ export function Home() {
   const appearance = useAppearance((s) => s.a);
   const isAdmin = me.person.is_admin;
   const isStaff = isAdmin || me.memberships.some((m) => m.person_id === me.person.id && m.role !== "dancer");
+  const childLogin = !!me.person.supervised_by;   // a child with its own login: no money anywhere – the parents handle it in their app
   const [sessions, setSessions] = useState<Session[]>([]);
   const [absences, setAbsences] = useState<Absence[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -47,7 +49,7 @@ export function Home() {
   const [badges, setBadges] = useState<PersonBadge[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [cards, setCards] = useState<PunchCard[]>([]);
-  const [adminOpen, setAdminOpen] = useState({ orders: 0, cards: 0, confirm: 0 });
+  const adminCounts = useBadges((b) => b.admin);
   const openAdmin = useNav((n) => n.openAdmin);
   const [open, setOpen] = useState<Session | null>(null);
   const [openEvent, setOpenEvent] = useState<Event | null>(null);
@@ -61,14 +63,16 @@ export function Home() {
     const [s, b, ev, ms, o, c] = await Promise.all([api.listSessions(from.toISOString(), to.toISOString()), api.listBookings(from.toISOString(), addDays(from, isAdmin ? 30 : 7).toISOString()).catch(() => [] as Booking[]), api.listEvents(), api.listMilestones(), api.listOrders(), api.listPunchCards()]);
     void api.settleAttendance().catch(() => 0).then(() => api.listPersonBadges()).then(setBadges).catch(() => setBadges([]));
     setSessions(s); setBookings(b); setEvents(ev); setMilestones(ms); setOrders(o); setCards(c);
-    if (isAdmin) { const [ao, ac, aw] = await Promise.all([api.listOrders(true).catch(() => [] as Order[]), api.listPunchCards(true).catch(() => [] as PunchCard[]), api.listWebSignups().catch(() => [] as WebSignup[])]); const claimed = (x: { status: string; claimed_paid_at: string | null }) => x.status === "awaiting_payment" && !!x.claimed_paid_at; setAdminOpen({ orders: ao.filter((x) => x.status === "awaiting_payment" || x.status === "paid").length, cards: ac.filter((x) => x.status === "awaiting_payment").length, confirm: aw.filter(claimed).length + ao.filter(claimed).length + ac.filter(claimed).length }); } setAbsences(await api.listAbsences(s.map((x) => x.id)));
+    setAbsences(await api.listAbsences(s.map((x) => x.id)));
   }, [isAdmin]);
   useEffect(() => { void load(); }, [load, viewing.personId]);
 
   const teamId = useAuth((s) => s.teamId);
   const teamIds = new Set(me.memberships.filter((m) => m.person_id === viewing.personId).map((m) => m.team_id));
   const today = new Date().toDateString();
-  const staffToday = sessions.filter((s) => (s.trainer_id === me.person.id || s.substitute_id === me.person.id) && new Date(s.starts_at).toDateString() === today);
+  const runsSession = (s: Session) => s.trainer_id === me.person.id || s.substitute_id === me.person.id || s.assistant_id === me.person.id || (!!s.team_id && me.memberships.some((m) => m.person_id === me.person.id && m.team_id === s.team_id && m.role !== "dancer"));
+  const staffTodayAll = sessions.filter((s) => runsSession(s) && new Date(s.starts_at).toDateString() === today).sort((a, b) => a.starts_at.localeCompare(b.starts_at));
+  const trainerCards = isStaff && !isAdmin && !viewing.isChild && staffTodayAll.length > 0;
   const subWanted = sessions.filter((s) => s.substitute_wanted && !s.substitute_id && !s.cancelled);
   const hat = viewing.isChild ? me.children.find((c) => c.id === viewing.personId) : null;
   const todayAbs = absences.filter((a) => sessions.some((s) => s.id === a.session_id && new Date(s.starts_at).toDateString() === today));
@@ -93,6 +97,7 @@ export function Home() {
   const week: WeekItem[] = [];
   for (const s of sessions) {
     if (new Date(s.starts_at) >= weekEnd) continue;
+    if (trainerCards && runsSession(s) && new Date(s.starts_at).toDateString() === today) continue;   // shown as "I dag"-cards above
     // I run this training if I am set on it – or I am trainer/assistant on the team (the session's trainer field is only an override)
     const staffOnTeam = !!s.team_id && me.memberships.some((m) => m.person_id === me.person.id && m.team_id === s.team_id && m.role !== "dancer");
     const mineStaff = !viewing.isChild && (s.trainer_id === me.person.id || s.substitute_id === me.person.id || s.assistant_id === me.person.id || staffOnTeam);
@@ -146,11 +151,7 @@ export function Home() {
       {isAdmin && (() => { const tiles: { n: number; label: string; go: () => void; testId?: string }[] = [
           { n: sessions.filter((s) => new Date(s.starts_at).toDateString() === today && !s.cancelled).length, label: t("home.trainingsToday"), go: () => setTab("rooms") },
           { n: todayAbs.length, label: t("home.absencesToday"), go: () => setTab("rooms") },
-          { n: bookings.filter((b) => b.status === "pending").length, label: t("home.bookingsPending"), go: () => openAdmin("bookings") },
-          ...(subWanted.length > 0 ? [{ n: subWanted.length, label: t("home.subsWanted"), go: () => openAdmin("season") }] : []),
-          { n: adminOpen.confirm, label: t("home.payConfirm"), go: () => openAdmin("payments"), testId: "tile-payconfirm" },
-          { n: adminOpen.orders, label: t("home.openOrders"), go: () => openAdmin("shop"), testId: "tile-orders" },
-          { n: adminOpen.cards, label: t("home.cardsWaiting"), go: () => openAdmin("punch"), testId: "tile-cards" },
+          { n: bookings.filter((b) => b.status === "approved" && new Date(b.starts_at).toDateString() === today).length, label: t("home.bookingsToday"), go: () => setTab("rooms") },
         ]; return (
         <div className="sec" data-testid="statline"><h2>{t("home.overview")}</h2>
           <div className="card tiles6" data-testid="adminline">{tiles.map((x, i) => <button key={i} type="button" className={"tile6" + (x.n ? " hot" : "")} onClick={x.go} data-testid={x.testId}><b>{x.n}</b><span>{x.label}</span></button>)}</div>
@@ -168,9 +169,17 @@ export function Home() {
       )}
     </>),
     yourDay: () => (<>
-      {false && isStaff && !isAdmin && staffToday.length > 0 && (   /* "Din dag" duplicated the rows of "Din uge" (today + tomorrow) */
-        <div className="sec"><h2>{t("home.yourDay")}</h2>
-          <div className="card list">{staffToday.map((s) => <button key={s.id} className="item" onClick={() => setOpen(s)}><span className="time">{hm(s.starts_at)}</span><span className="grow">{s.team_name}<div className="tiny">{s.room_name}{s.lesson_plan ? " · " + t("session.planShort") : ""}</div></span><span className="gold">›</span></button>)}</div>
+      {isStaff && !isAdmin && !viewing.isChild && staffTodayAll.length > 0 && (
+        <div className="sec" data-testid="trainer-today"><h2>{t("home.yourDay")}</h2>
+          <div className="todaycards">{staffTodayAll.map((s) => { const abs = absences.filter((a) => a.session_id === s.id).length; const done = new Date(s.ends_at) < new Date(); return (
+            <div key={s.id} className={"card todaycard" + (s.cancelled ? " off" : "")} data-testid="today-card">
+              <button type="button" className="todaycard-main" onClick={() => setOpen(s)}><span className="time">{hm(s.starts_at)}<br /><span className="tiny">{hm(s.ends_at)}</span></span><span className="grow"><b>{s.title ?? s.team_name}</b><div className="tiny">{s.room_name}{s.substitute_id === me.person.id ? " · " + t("session.sub") : ""}{s.cancelled ? " · " + t("session.cancelled") : ""}</div></span></button>
+              {!s.cancelled && <div className="todaycard-actions">
+                <span className={"chip small" + (abs ? " rose" : "")}>{t("home.absCount", { count: abs })}</span>
+                <button type="button" className={"chip small" + (s.lesson_plan ? " sage" : " gold")} onClick={() => setOpen(s)}>{s.lesson_plan ? t("session.planShort") + " ✓" : t("session.writePlan")}</button>
+                {done && <button type="button" className="chip small" onClick={() => setOpen(s)}>{t("session.attendance")}</button>}
+              </div>}
+            </div>); })}</div>
         </div>
       )}
     </>),
@@ -182,6 +191,12 @@ export function Home() {
           </ScrollList>
         </div>
       )}
+    </>),
+    adminTodo: () => (<>
+      {isAdmin && !viewing.isChild && (() => { const c = adminCounts; const rows: [string, number, string][] = [["users", c.pending, "pending"], ["payments", c.payments, "payments"], ["bookings", c.bookings, "bookings"], ["season", c.subs, "subs"], ["reports", c.reports, "reports"], ["shop", c.orders, "orders"], ["punch", c.cards, "cards"], ["auditions", c.auditions, "auditions"]]; const todos = rows.filter(([, n]) => n > 0); return (
+        <div className="sec" data-testid="admin-todo"><h2>{t("home.adminTodo")}</h2>
+          <div className="card todorow">{todos.length ? todos.map(([page, n, key]) => <button key={page} type="button" className="todochip" onClick={() => openAdmin(page)}><b>{n}</b><span>{t(`todo.${key}`, { count: n }).replace(/^\d+\s*/, "")}</span></button>) : <span className="small muted">{t("admin.nothingTodo")}</span>}</div>
+        </div>); })()}
     </>),
     studioHead: () => (<>
       {isAdmin && <div className="sec studiohead" data-testid="studio-head"><div className="eyebrow gold">{t("home.studioEyebrow")}</div><h2 className="display">{t("home.studioTitle")}</h2><p className="tiny muted" style={{ margin: 0 }}>{t("home.studioSub")}</p></div>}
@@ -252,7 +267,7 @@ export function Home() {
       )}
     </>),
     audition: () => <AuditionCards />,
-    payments: () => (<>
+    payments: () => childLogin ? null : (<>
       <MyPayments embedded />
       {openPay.length > 0 && (
         <button type="button" className="card paysum" data-testid="shop-pay-line" onClick={() => setTab("shop")}>
@@ -271,8 +286,9 @@ export function Home() {
   };
   let order = homeOrder(appearance).filter((k) => !isHidden(appearance, k));
   if (isAdmin) { // the studio block is Line's "what happens today" – it goes right under the next-card instead of at the bottom
-    const studioKeys = ["studioHead", "stats", "studio"]; const rest = order.filter((k) => !studioKeys.includes(k)); const at = (rest.indexOf("messages") + 1) || (rest.indexOf("next") + 1) || 1;
-    order = [...rest.slice(0, at), ...studioKeys.filter((k) => order.includes(k)), ...rest.slice(at)];
+    // Line's day first: to-dos, studio numbers, what happens in the studio – then her personal content
+    const studioKeys = ["studioHead", "adminTodo", "stats", "studio"]; const rest = order.filter((k) => !studioKeys.includes(k)); const at = (rest.indexOf("teampick") + 1) || (rest.indexOf("hero") + 1) || 1;
+    order = [...rest.slice(0, at), ...studioKeys.filter((k) => order.includes(k) || k === "adminTodo"), ...rest.slice(at)];
   }
   const FOLD = new Set(["gallery", "badges", "upcoming"]);   // nice-to-have content lives under one "Mere" fold – the first screen stays about now
   const main = order.filter((k) => !FOLD.has(k)); const folded = order.filter((k) => FOLD.has(k));

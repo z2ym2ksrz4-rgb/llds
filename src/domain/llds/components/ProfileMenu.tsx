@@ -28,7 +28,7 @@ export function TopRight() {
   return (
     <div className="row">
       <LangFlags />
-      <ShopButton />
+      {!me.person.supervised_by && <ShopButton />}
       <Bell />
       <button className={"avatar" + (me.person.photo_url ? " photo" : "")} style={me.person.photo_url ? { backgroundImage: `url(${me.person.photo_url})` } : undefined} aria-label={t("nav.profile")} data-testid="avatar" data-tour="avatar" onClick={() => setOpen(true)}>{me.person.photo_url ? "" : `${me.person.first_name[0]}${me.person.last_name[0] ?? ""}`}</button>
       {open && (
@@ -36,7 +36,7 @@ export function TopRight() {
           <div className="row between sheet-lang"><span className="tiny muted">{t("settings.language")}</span><LangFlags /></div>
           <div className="list menu" data-testid="profile-menu">
             {me.person.is_admin && <button className="item" data-testid="menu-admin" onClick={() => { setOpen(false); setTab("admin"); }}><span className="avatar small">⚙︎</span><span className="grow">{t("nav.admin")}<div className="tiny">{t("more.adminSub")}</div></span><span className="gold">›</span></button>}
-            {MENU.filter((m) => m.key !== "children" || me.children.length > 0).map((m) => <button key={m.key} className="item" data-testid={`menu-${m.key}`} onClick={() => { setOpen(false); openRef("more", { page: m.key }); }}><span className="avatar small">{m.icon}</span><span className="grow">{t(`more.${m.key}`)}<div className="tiny">{t(`more.${m.key}Sub`)}</div></span><span className="gold">›</span></button>)}
+            {MENU.filter((m) => (m.key !== "children" || me.children.length > 0) && (m.key !== "wallet" || !me.person.supervised_by)).map((m) => <button key={m.key} className="item" data-testid={`menu-${m.key}`} onClick={() => { setOpen(false); openRef("more", { page: m.key }); }}><span className="avatar small">{m.icon}</span><span className="grow">{t(`more.${m.key}`)}<div className="tiny">{t(`more.${m.key}Sub`)}</div></span><span className="gold">›</span></button>)}
           </div>
           {realAdmin && (
             <div className="field"><span>{t("view.as")}</span>
