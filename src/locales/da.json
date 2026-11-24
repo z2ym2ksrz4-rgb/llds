@@ -1574,5 +1574,34 @@
     "comms": "Kommunikation",
     "money": "Penge",
     "insight": "Indsigt"
+  },
+  "import": {
+    "title": "Importér medlemmer",
+    "sub": "Dansere, forældre og trænere fra en liste – én invitation pr. familie",
+    "intro": "Kopiér fra Excel/Google Sheets eller upload en CSV. Hver række er én danser (eller træner). Står der en forælder-e-mail, bliver forælderen inviteret og barnet oprettet under forælderen; ellers inviteres personen selv. Alle logger ind med e-mail + engangskode – ingen adgangskoder.",
+    "step1": "1 · Listen",
+    "columns": "Kolonner (overskrifter i første række): Fornavn · Efternavn · Fødselsdato · E-mail · Telefon · Hold (flere adskilt med ;) · Rolle (Danser/Træner/Hjælpetræner) · Forælder · Forælder e-mail · Forælder telefon",
+    "template": "Hent skabelon",
+    "pickFile": "Vælg fil…",
+    "paste": "…eller indsæt listen her (fanebladsadskilt fra Excel virker direkte)",
+    "step2": "2 · Gennemse ({{n}} rækker)",
+    "summary": "{{households}} familier og {{own}} egne logins oprettes og inviteres · {{existing}} findes allerede og får invitation · {{skips}} springes over · {{errors}} fejl",
+    "via": "via {{name}}",
+    "kind": {
+      "new_own": "Ny",
+      "existing": "Findes – invitér",
+      "skip": "Springes over",
+      "error": "Fejl"
+    },
+    "unknownTeam": "Ukendt hold: {{name}} – ret navnet, så det matcher Admin → Hold",
+    "hasLogin": "Har allerede login",
+    "existsNoMail": "Findes allerede – ingen e-mail at invitere på",
+    "noMail": "Ingen e-mail – hverken egen eller forælders",
+    "noBirth": "Børn under forælder skal have fødselsdato",
+    "parentFallback": "Forælder",
+    "run": "Importér og send {{n}} invitationer",
+    "progress": "Sender {{i}} af {{n}}…",
+    "done": "{{ok}} invitationer sendt ✓",
+    "afterwards": "De nye ligger under Admin → Medlemmer. Mailen har et link til appen; de logger ind med den e-mail, de er inviteret på."
   }
 }

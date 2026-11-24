@@ -1022,3 +1022,5 @@ a.btnlink { display:inline-flex; align-items:center; text-decoration:none; }
 .sec.fold > summary { display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; list-style:none; min-height:44px; }
 .sec.fold > summary::-webkit-details-marker { display:none; }
 .sec.fold > summary h2 { margin:0; }
+
+.importlist .item .chip { flex:none; }

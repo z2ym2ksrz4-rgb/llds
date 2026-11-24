@@ -1574,5 +1574,34 @@
     "comms": "Communication",
     "money": "Money",
     "insight": "Insight"
+  },
+  "import": {
+    "title": "Import members",
+    "sub": "Dancers, parents and trainers from a list – one invitation per family",
+    "intro": "Copy from Excel/Google Sheets or upload a CSV. Each row is one dancer (or trainer). With a parent e-mail the parent is invited and the child created under them; otherwise the person is invited directly. Everyone signs in with e-mail + one-time code – no passwords.",
+    "step1": "1 · The list",
+    "columns": "Columns (headers in the first row): First name · Last name · Birth date · E-mail · Phone · Teams (several separated by ;) · Role (Dancer/Trainer/Assistant) · Parent · Parent e-mail · Parent phone",
+    "template": "Download template",
+    "pickFile": "Choose file…",
+    "paste": "…or paste the list here (tab-separated from Excel works as is)",
+    "step2": "2 · Review ({{n}} rows)",
+    "summary": "{{households}} families and {{own}} own logins will be created and invited · {{existing}} already exist and get an invitation · {{skips}} skipped · {{errors}} errors",
+    "via": "via {{name}}",
+    "kind": {
+      "new_own": "New",
+      "existing": "Exists – invite",
+      "skip": "Skipped",
+      "error": "Error"
+    },
+    "unknownTeam": "Unknown team: {{name}} – fix the name so it matches Admin → Teams",
+    "hasLogin": "Already has a login",
+    "existsNoMail": "Already exists – no e-mail to invite",
+    "noMail": "No e-mail – neither own nor parent's",
+    "noBirth": "Children under a parent need a birth date",
+    "parentFallback": "Parent",
+    "run": "Import and send {{n}} invitations",
+    "progress": "Sending {{i}} of {{n}}…",
+    "done": "{{ok}} invitations sent ✓",
+    "afterwards": "The new people are under Admin → Members. The mail links to the app; they sign in with the e-mail they were invited on."
   }
 }

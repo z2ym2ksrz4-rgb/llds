@@ -9,6 +9,7 @@ import { CatalogAdmin } from "./Catalog";
 import { MessageComposer, MessageSheet } from "../components/Messages";
 import { ago, isoDate, loc } from "../lib/time";
 import { AdminUsers } from "./Users";
+import { ImportMembers } from "./ImportMembers";
 import { MemberSheet } from "./MemberSheet";
 import { Sheet, Toast } from "../components/Sheet";
 import { useNav } from "@/core/nav";
@@ -22,7 +23,7 @@ import type { AuditionCandidate } from "@/core/api";
 import { CATALOG } from "../lib/catalog";
 import { addDays, DAY_LONG, hm, mondayOf, startOfDay } from "../lib/time";
 
-type Page = "menu" | "users" | "members" | "teams" | "season" | "bookings" | "messages" | "reports" | "events" | "shop" | "punch" | "import" | "catalog" | "customize" | "payments" | "insights" | "auditions";
+type Page = "menu" | "importmembers" | "users" | "members" | "teams" | "season" | "bookings" | "messages" | "reports" | "events" | "shop" | "punch" | "import" | "catalog" | "customize" | "payments" | "insights" | "auditions";
 const CATS = ["mini", "kids", "junior", "adult", "mixed"] as const;
 
 /** Admin: the one place Line runs the school from. Everything else in the app reads what she sets here. */
@@ -34,6 +35,7 @@ export function Admin() {
   const counts = useBadges((b) => b.admin); const refreshBadges = useBadges((b) => b.refresh);
   useEffect(() => { void refreshBadges(); }, [page, refreshBadges]); // every return to the menu re-counts
   if (page === "users") return <Back onBack={() => setPage("menu")}><AdminUsers /></Back>;
+  if (page === "importmembers") return <Back onBack={() => setPage("menu")}><ImportMembers /></Back>;
   if (page === "members") return <Back onBack={() => setPage("menu")}><Members /></Back>;
   if (page === "teams") return <Back onBack={() => setPage("menu")}><Teams /></Back>;
   if (page === "season") return <Back onBack={() => setPage("menu")}><Season /></Back>;
@@ -52,7 +54,7 @@ export function Admin() {
   const todo = (n: number, key: string, sub: string) => (n ? t(`todo.${key}`, { count: n }) : sub);
   const item = (k: Page, label: string, sub: string, n = 0): [Page, string, string, number] => [k, label, sub, n];
   const groups: { key: string; items: [Page, string, string, number][] }[] = [
-    { key: "people", items: [item("users", t("admin.users"), todo(counts.pending, "pending", t("admin.usersSub")), counts.pending), item("members", t("admin.members"), t("admin.membersSub")), item("teams", t("admin.teams"), t("admin.teamsSub"))] },
+    { key: "people", items: [item("users", t("admin.users"), todo(counts.pending, "pending", t("admin.usersSub")), counts.pending), item("members", t("admin.members"), t("admin.membersSub")), item("importmembers", t("import.title"), t("import.sub")), item("teams", t("admin.teams"), t("admin.teamsSub"))] },
     { key: "program", items: [item("season", t("admin.season"), todo(counts.subs, "subs", t("admin.seasonSub")), counts.subs), item("bookings", t("admin.bookings"), todo(counts.bookings, "bookings", t("admin.bookingsSub")), counts.bookings), item("events", t("events.title"), t("admin.eventsSub")), item("auditions", t("audition.adminTitle"), todo(counts.auditions, "auditions", t("audition.adminSub")), counts.auditions)] },
     { key: "comms", items: [item("messages", t("admin.messages"), t("admin.messagesSub")), item("reports", t("admin.reports"), todo(counts.reports, "reports", t("admin.reportsSub")), counts.reports), item("customize", t("customize.title"), t("customize.sub")), item("catalog", t("catalog.adminTitle"), t("catalog.adminSub"))] },
     { key: "money", items: [item("payments", t("pay.adminTitle"), todo(counts.payments, "payments", t("pay.adminSub")), counts.payments), item("shop", t("admin.shop"), todo(counts.orders, "orders", t("admin.shopSub")), counts.orders), item("punch", t("punch.title"), todo(counts.cards, "cards", t("admin.punchSub")), counts.cards)] },
