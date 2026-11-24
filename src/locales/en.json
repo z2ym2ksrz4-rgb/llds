@@ -632,7 +632,7 @@
     "purposePh": "E.g. Solo – Liva, duo practice, rehearsal",
     "cancelled": "Cancelled",
     "moved": "Moved",
-    "legendShort": "Tap a free slot (+) to book the room for solo/duo. The studio approves bookings.",
+    "legendShort": "Tap a free slot in the calendar – or “Book room” – to book the room for solo/duo. The studio approves bookings.",
     "bookAt": "Book {{room}} at {{h}}:00",
     "weekLabel": "Week {{n}} · {{from}}–{{to}}"
   },

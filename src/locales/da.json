@@ -632,7 +632,7 @@
     "purposePh": "Fx Solo – Liva, duo-træning, prøve",
     "cancelled": "Aflyst",
     "moved": "Flyttet",
-    "legendShort": "Tryk på et ledigt felt (+) for at booke salen til solo/duo. Bookingen godkendes af studiet.",
+    "legendShort": "Tryk på et ledigt felt i kalenderen – eller på “Book sal” – for at booke salen til solo/duo. Studiet godkender bookingen.",
     "bookAt": "Book {{room}} kl. {{h}}",
     "weekLabel": "Uge {{n}} · {{from}}–{{to}}"
   },

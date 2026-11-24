@@ -6,7 +6,7 @@ const p = await b.newPage({ viewport: { width: 390, height: 844 } }); await p.ad
 p.on("pageerror", (e) => out.errors.push(e.message));
 await p.goto(base, { waitUntil: "networkidle" }); await p.evaluate(() => localStorage.clear()); await p.reload({ waitUntil: "networkidle" });
 await p.fill("#email", "admin@demo"); await p.click("form button.cta"); await p.fill("#code", "000000"); await p.click("form button.cta"); await p.waitForSelector("nav.tabbar");
-await p.click("nav.tabbar >> text=Admin"); await p.click(".item:has-text('Billedkatalog')"); await p.waitForSelector("[data-testid=catalog-folder-input]");
+await p.click("nav.tabbar >> text=Admin"); await p.click("[data-testid=admin-catalog]"); await p.waitForSelector("[data-testid=catalog-folder-input]");
 await p.fill("[data-testid=catalog-folder-input]", "Julebal 2026");
 const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFUlEQVR4nGP8z8DwnwEKGGEMEAAATQUDAX7Y1fwAAAAASUVORK5CYII=", "base64");
 await p.setInputFiles("input[type=file]", { name: "scene.png", mimeType: "image/png", buffer: png }); await p.waitForSelector(".toast"); out.toast = await p.textContent(".toast");
