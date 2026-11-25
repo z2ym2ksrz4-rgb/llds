@@ -50,7 +50,8 @@ button.small { padding:7px 12px; font-size:.85rem; }
 .cta { width:100%; padding:15px; font-size:1rem; }
 .field { display:flex; flex-direction:column; gap:6px; margin:4px 0; }
 .field > span { font-size:.75rem; color:var(--muted); letter-spacing:.04em; }
-label.check { display:flex; align-items:center; gap:10px; margin:6px 0; font-size:.95rem; }
+label.check { display:flex; align-items:center; gap:10px; margin:6px 0; font-size:.95rem; width:auto; height:auto; border:0; border-radius:0; color:inherit; place-items:initial; }  /* resets the generic .check box (tick mark) below – same class name */
+label.check input { flex:none; } label.check > span { flex:1; min-width:0; }
 label.check input { width:20px; height:20px; accent-color:var(--gold); }
 .chips { display:flex; flex-wrap:wrap; gap:6px; } .chips.tight { gap:4px; }
 .chip { padding:6px 12px; border-radius:999px; background:transparent; color:var(--muted); border:1px solid var(--line); font-size:.85rem; font-weight:400; letter-spacing:.02em; }
