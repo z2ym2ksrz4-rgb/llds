@@ -53,6 +53,7 @@ export type Appearance = {
   websiteGallery?: string[];  // image refs (catalog key, art/catalog path or URL) for the carousel on the website front page
   website?: { hero?: string | null; videoPoster?: string | null; app?: string | null; band?: string | null; video?: string | null };  // front-page images + video URL (Tilpas appen → Website)
   texts?: Record<string, string>;  // text overrides: "site.<hook>" (website front page) and "app.<key>" (login/registration texts); missing = default
+  pages?: Record<string, { texts?: Record<string, string>; images?: Record<string, string> }>;  // per website page: overrides keyed by data-e / data-ei (see site-manifest.generated.json)
 };
 
 export type Team = {
@@ -339,10 +340,14 @@ export type Event = {
   image_key?: string | null;        // catalogue image (public/art/catalog) chosen by the admin; null = automatic
   focus?: Focus | null;             // focus point of the picture (0–1 × 0–1)
   id: string; title: string; kind: EventKind; starts_at: string; ends_at: string | null; place: string | null; meet_time: string | null;
+  featured?: boolean; featured_until?: string | null;   // boosted on the website front page (optionally until a date)
+  web_signup?: boolean; max_participants?: number | null; guests?: number;   // open for sign-up from the website; capacity; number of website participants
   team_ids: string[]; team_names: string[] | null; person_ids?: string[]; person_names?: string[] | null; plan: { time: string; text: string }[]; pack_list: string[]; info: string | null;
   signup_deadline: string | null; price_dkk: number | null; visibility: "private" | "public"; signups: number; created_at: string; mySignups?: number; myUnpaid?: number; myClaimed?: number;   // my/children's sign-ups: not yet paid / paid but awaiting Line's confirmation
 };
-export type EventInput = Omit<Event, "id" | "signups" | "team_names" | "person_names" | "created_at" | "mySignups" | "myUnpaid" | "myClaimed">;
+export type EventInput = Omit<Event, "id" | "signups" | "guests" | "team_names" | "person_names" | "created_at" | "mySignups" | "myUnpaid" | "myClaimed">;
+/** A participant signed up from the website – not a user. person_id is set when the e-mail belongs to a member (info only). */
+export type EventGuest = { id: string; event_id: string; first_name: string; last_name: string; birth_date: string | null; contact_name: string | null; email: string; phone: string | null; note: string | null; person_id: string | null; amount_dkk: number | null; reference: string; paid: boolean; created_at: string };
 export type EventSignup = { event_id: string; person_id: string; person_name: string; team_name: string | null; paid: boolean; claimed_paid_at?: string | null; created_at: string };
 
 export type Product = { id: string; name: string; price_dkk: number; sizes: string[]; stock: number | null; image_path: string | null; image_url?: string | null; visibility: "private" | "public"; active: boolean; created_at?: string };
@@ -363,6 +368,9 @@ export interface Api {
   listSignups(eventId: string): Promise<EventSignup[]>;
   signUp_(eventId: string, personId: string, on: boolean): Promise<void>;
   setSignupPaid(eventId: string, personId: string, paid: boolean): Promise<void>;
+  listEventGuests(eventId: string): Promise<EventGuest[]>;
+  setGuestPaid(id: string, paid: boolean): Promise<void>;
+  removeEventGuest(id: string): Promise<void>;
   claimSignupPaid(eventId: string, personId: string): Promise<void>;   // "I have paid" – Line confirms
   /* shop */
   listProducts(all?: boolean): Promise<Product[]>;

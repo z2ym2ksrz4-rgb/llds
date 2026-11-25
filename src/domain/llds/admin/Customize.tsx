@@ -8,6 +8,7 @@ import { Sheet } from "../components/Sheet";
 import { CATALOG, catalogUrl, resolveImage } from "../lib/catalog";
 import { api, type CatalogEntry } from "@/core/api";
 import { useAuth } from "@/core/auth";
+import { SitePages } from "./SitePages";
 
 const TABS = ["", "home", "rooms", "team", "social", "events", "more"] as const;
 const newId = () => Math.random().toString(36).slice(2, 8);
@@ -60,6 +61,10 @@ export function Customize() {
         <div className="card"><div className="eyebrow">{t("customize.heroImage")}</div><p className="tiny muted">{t("customize.heroImageSub")}</p>
           <ImagePicker tag="event" value={a.images?.hero ?? null} onChange={(v) => upd({ ...a, images: { ...(a.images ?? {}), hero: v } })} /></div>
       </div>
+
+      <details className="sec fold" data-testid="cz-sitepages"><summary><h2>{t("sitePages.title")}</h2><span className="tiny muted">{t("sitePages.sub")}</span></summary>
+        <SitePages pages={a.pages ?? {}} teamPhotos={teamPhotos} onChange={(pages) => upd({ ...a, pages })} />
+      </details>
 
       <details className="sec fold" data-testid="cz-gallery"><summary><h2>{t("customize.gallery")}</h2><span className="tiny muted">{gallery.length ? t("customize.galleryCount", { count: gallery.length }) : t("customize.galleryAuto")}</span></summary>
         <p className="tiny muted" style={{ marginTop: 0 }}>{t("customize.gallerySub", { n: gallery.length })}</p>

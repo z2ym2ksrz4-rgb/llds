@@ -1026,3 +1026,10 @@ a.btnlink { display:inline-flex; align-items:center; text-decoration:none; }
 .importlist .item .chip { flex:none; }
 
 .login .apply-hint { background:var(--gold-soft); border:1px solid var(--gold3); border-radius:10px; padding:10px 12px; margin:6px 0 0; }
+
+/* ================= Website-redaktør + event på websitet ================= */
+.websiteopts { gap:10px; } .websiteopts .check { align-items:flex-start; } .websiteopts .check input { margin-top:3px; }
+.siteimgs { display:grid; grid-template-columns:1fr; gap:8px; } @media (min-width:640px) { .siteimgs { grid-template-columns:1fr 1fr; } }
+.card.siteimg { margin:0; position:relative; } .siteimg .thumb { height:120px; border-radius:10px; background:#000 center/cover no-repeat; } .siteimg > .chip { position:absolute; top:20px; right:22px; }
+.sitetext { margin-bottom:10px; } .sitetext.changed input, .sitetext.changed textarea { border-color:var(--gold3); }
+.sitetext input::placeholder, .sitetext textarea::placeholder { color:var(--fg3); opacity:1; }

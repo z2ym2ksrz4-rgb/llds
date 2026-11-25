@@ -840,7 +840,7 @@
     "deadlinePassed": "Deadline passed – contact the dance school.",
     "signups": "{{n}} signed up",
     "paidN": "{{n}} paid",
-    "paid": "Paid",
+    "paid": "Paid ✓",
     "markPaid": "Mark paid",
     "payTitle": "Participation fee",
     "paidClaimed": "Thanks! The sign-up shows 'Paid – awaiting confirmation' until the payment has been seen.",
@@ -877,7 +877,21 @@
     "peopleOnly_one": "Only 1 chosen dancer (and parents) sees the event.",
     "peopleOnly_other": "Only the {{count}} chosen dancers (and parents) see the event.",
     "peopleSearch": "Search dancer…",
-    "badTime": "Check the date and time."
+    "badTime": "Check the date and time.",
+    "webTitle": "On the website",
+    "featured": "Feature on the front page",
+    "featuredHint": "The event sits large right under the top picture on the website.",
+    "featuredUntil": "Feature until (optional)",
+    "webSignup": "Open for sign-up from the website",
+    "webSignupHint": "Anyone can sign up on the website – also people from outside. They become participants on the event, not app users. Payment as usual: MobilePay with reference, you mark it paid.",
+    "max": "Max participants (app + website)",
+    "maxNone": "No limit",
+    "guests_one": "1 signed up from the website",
+    "guests_other": "{{count}} signed up from the website",
+    "guestsHint": "Participants without a login. Mark paid when you see the money in MobilePay – the receipt is sent then.",
+    "guestMember": "member",
+    "featuredChip": "featured",
+    "webChip": "web sign-up"
   },
   "shop": {
     "title": "Shop",
@@ -1605,5 +1619,20 @@
     "progress": "Sending {{i}} of {{n}}…",
     "done": "{{ok}} invitations sent ✓",
     "afterwards": "The new people are under Admin → Members. The mail links to the app; they sign in with the e-mail they were invited on."
+  },
+  "sitePages": {
+    "title": "Website pages",
+    "sub": "Texts and pictures on every page",
+    "intro": "Pick a page and edit its texts and pictures. The grey text in a field is the current text – leave the field empty to keep it. Teams, events, prices and shop are edited where they belong in Admin.",
+    "search": "Search page…",
+    "all": "All pages",
+    "view": "View page",
+    "pageHint": "Changes go live on the website once you press Save at the bottom.",
+    "images": "Pictures ({{n}})",
+    "texts": "Texts ({{n}})",
+    "changed": "changed",
+    "counts": "{{texts}} texts · {{images}} pictures",
+    "nChanged_one": "1 change",
+    "nChanged_other": "{{count}} changes"
   }
 }

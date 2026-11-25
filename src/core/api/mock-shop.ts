@@ -1,10 +1,10 @@
-import type { CatalogEntry, PersonBadge, Event, EventInput, EventSignup, Membership, Milestone, Notification, Order, OrderLine, Person, Product, PunchCard, PunchCardType, Team } from "./types";
+import type { CatalogEntry, PersonBadge, Event, EventInput, EventSignup, Membership, Milestone, Notification, Order, OrderLine, Person, Product, PunchCard, PunchCardType, Team, EventGuest } from "./types";
 import { downscaleImage, fileToDataUrl } from "./image";
 import { BADGES, monthKey, totalBadge } from "@/domain/llds/lib/badges";
 
 /** Phase-4 half of the mock: events, shop, punch cards, milestones, notifications. */
 export type ShopState = {
-  events: Event[]; signups: EventSignup[]; products: Product[]; orders: Order[]; orderSeq: number;
+  events: Event[]; signups: EventSignup[]; guests?: EventGuest[]; products: Product[]; orders: Order[]; orderSeq: number;
   cardTypes: PunchCardType[]; cards: PunchCard[]; punches: { card_id: string; session_id: string }[]; milestones: Milestone[]; notifications: Notification[]; badges?: PersonBadge[]; catalog?: CatalogEntry[];
 };
 const id = () => Math.random().toString(36).slice(2, 10);
@@ -47,7 +47,7 @@ export function shopOps(get: () => { Y: ShopState; persons: Person[]; membership
     async listEvents(includePast = false): Promise<Event[]> {
       const g = get(); const cut = new Date(Date.now() - 864e5).toISOString();
       const mine = myPeople();
-      return g.Y.events.filter((e) => includePast || e.starts_at >= cut).map((e) => ({ ...e, mySignups: g.Y.signups.filter((s) => s.event_id === e.id && mine.includes(s.person_id)).length, myUnpaid: e.price_dkk ? g.Y.signups.filter((s) => s.event_id === e.id && mine.includes(s.person_id) && !s.paid && !s.claimed_paid_at).length : 0, myClaimed: e.price_dkk ? g.Y.signups.filter((s) => s.event_id === e.id && mine.includes(s.person_id) && !s.paid && !!s.claimed_paid_at).length : 0, signups: g.Y.signups.filter((s) => s.event_id === e.id).length, team_names: e.team_ids.length ? e.team_ids.map((t) => g.teams.find((x) => x.id === t)?.name ?? "?") : null, person_ids: e.person_ids ?? [], person_names: e.person_ids?.length ? e.person_ids.map((id) => { const p = g.persons.find((x) => x.id === id); return p ? `${p.first_name} ${p.last_name}` : "?"; }) : null })).sort((a, b) => a.starts_at.localeCompare(b.starts_at));
+      return g.Y.events.filter((e) => includePast || e.starts_at >= cut).map((e) => ({ ...e, mySignups: g.Y.signups.filter((s) => s.event_id === e.id && mine.includes(s.person_id)).length, myUnpaid: e.price_dkk ? g.Y.signups.filter((s) => s.event_id === e.id && mine.includes(s.person_id) && !s.paid && !s.claimed_paid_at).length : 0, myClaimed: e.price_dkk ? g.Y.signups.filter((s) => s.event_id === e.id && mine.includes(s.person_id) && !s.paid && !!s.claimed_paid_at).length : 0, signups: g.Y.signups.filter((s) => s.event_id === e.id).length, guests: (g.Y.guests ?? []).filter((s) => s.event_id === e.id).length, team_names: e.team_ids.length ? e.team_ids.map((t) => g.teams.find((x) => x.id === t)?.name ?? "?") : null, person_ids: e.person_ids ?? [], person_names: e.person_ids?.length ? e.person_ids.map((id) => { const p = g.persons.find((x) => x.id === id); return p ? `${p.first_name} ${p.last_name}` : "?"; }) : null })).sort((a, b) => a.starts_at.localeCompare(b.starts_at));
     },
     async saveEvent(i: EventInput, eid?: string) {
       const g = get();
@@ -63,6 +63,9 @@ export function shopOps(get: () => { Y: ShopState; persons: Person[]; membership
       g.save(); g.emit();
     },
     async claimSignupPaid(eventId: string, personId: string) { const g = get(); const s = g.Y.signups.find((x) => x.event_id === eventId && x.person_id === personId); if (s) s.claimed_paid_at = new Date().toISOString(); g.save(); g.emit(); },
+    async listEventGuests(eventId: string): Promise<EventGuest[]> { return (get().Y.guests ?? []).filter((x) => x.event_id === eventId); },
+    async setGuestPaid(id: string, paid: boolean) { const g = get(); const x = (g.Y.guests ?? []).find((q) => q.id === id); if (x) x.paid = paid; g.save(); g.emit(); },
+    async removeEventGuest(id: string) { const g = get(); g.Y.guests = (g.Y.guests ?? []).filter((q) => q.id !== id); g.save(); g.emit(); },
     async setSignupPaid(eventId: string, personId: string, paid: boolean) { const g = get(); const s = g.Y.signups.find((x) => x.event_id === eventId && x.person_id === personId); if (s) s.paid = paid; g.save(); g.emit(); },
 
     async listProducts(all = false): Promise<Product[]> { return get().Y.products.filter((p) => all || p.active).map((p) => ({ ...p, image_url: p.image_path ? (p.image_path.startsWith("http") ? p.image_path : imgs.get(p.image_path) ?? null) : null })); },

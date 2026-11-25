@@ -840,7 +840,7 @@
     "deadlinePassed": "Fristen er overskredet – kontakt danseskolen.",
     "signups": "{{n}} tilmeldte",
     "paidN": "{{n}} betalt",
-    "paid": "Betalt",
+    "paid": "Betalt ✓",
     "markPaid": "Markér betalt",
     "payTitle": "Egenbetaling",
     "paidClaimed": "Tak! Tilmeldingen står som 'Betalt – afventer bekræftelse', til betalingen er set.",
@@ -877,7 +877,21 @@
     "peopleOnly_one": "Kun 1 valgt danser (og forældre) ser eventet.",
     "peopleOnly_other": "Kun de {{count}} valgte dansere (og forældre) ser eventet.",
     "peopleSearch": "Søg danser…",
-    "badTime": "Tjek dato og klokkeslæt."
+    "badTime": "Tjek dato og klokkeslæt.",
+    "webTitle": "På websitet",
+    "featured": "Fremhæv på forsiden",
+    "featuredHint": "Eventet ligger stort lige under topbilledet på websitet.",
+    "featuredUntil": "Fremhæv til og med (valgfrit)",
+    "webSignup": "Åben for tilmelding fra websitet",
+    "webSignupHint": "Alle kan tilmelde sig direkte på websitet – også folk udefra. De bliver deltagere på eventet, ikke brugere i appen. Betaling som ellers: MobilePay med reference, du markerer betalt.",
+    "max": "Maks. antal deltagere (app + website)",
+    "maxNone": "Ingen grænse",
+    "guests_one": "1 tilmeldt fra websitet",
+    "guests_other": "{{count}} tilmeldt fra websitet",
+    "guestsHint": "Deltagere uden login. Markér betalt, når pengene er set i MobilePay – så sendes kvitteringen.",
+    "guestMember": "medlem",
+    "featuredChip": "fremhævet",
+    "webChip": "web-tilmelding"
   },
   "shop": {
     "title": "Shop",
@@ -1605,5 +1619,20 @@
     "progress": "Sender {{i}} af {{n}}…",
     "done": "{{ok}} invitationer sendt ✓",
     "afterwards": "De nye ligger under Admin → Medlemmer. Mailen har et link til appen; de logger ind med den e-mail, de er inviteret på."
+  },
+  "sitePages": {
+    "title": "Websitets sider",
+    "sub": "Tekster og billeder på alle sider",
+    "intro": "Vælg en side og ret dens tekster og billeder. Det, der står i feltet i grå, er den nuværende tekst – lad feltet stå tomt for at beholde den. Hold, events, priser og shop rettes de steder, de hører hjemme i Admin.",
+    "search": "Søg side…",
+    "all": "Alle sider",
+    "view": "Se siden",
+    "pageHint": "Ændringer slår igennem på websitet, når du har trykket Gem nederst.",
+    "images": "Billeder ({{n}})",
+    "texts": "Tekster ({{n}})",
+    "changed": "ændret",
+    "counts": "{{texts}} tekster · {{images}} billeder",
+    "nChanged_one": "1 ændring",
+    "nChanged_other": "{{count}} ændringer"
   }
 }

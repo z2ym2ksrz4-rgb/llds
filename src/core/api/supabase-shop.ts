@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { CatalogEntry, Badge, PersonBadge, Event, EventInput, EventSignup, Milestone, Notification, Order, OrderLine, Product, PunchCard, PunchCardType } from "./types";
+import type { CatalogEntry, Badge, PersonBadge, Event, EventInput, EventSignup, Milestone, Notification, Order, OrderLine, Product, PunchCard, PunchCardType, EventGuest } from "./types";
 import { downscaleImage } from "./image";
 
 type Fail = (e: { message: string } | null) => void;
@@ -15,7 +15,7 @@ export function supabaseShop(sb: SupabaseClient, fail: Fail, schoolId: () => Pro
       const { data: mine } = await sb.from("event_signup").select("event_id,person_id,paid,claimed_paid_at"); // RLS: my people (+ staff: all)
       const pid = await myPersonId(); const { data: kids } = await sb.from("guardian").select("child_id").eq("parent_id", pid);
       const people = new Set([pid, ...(kids ?? []).map((k) => k.child_id as string)]);
-      return (data ?? []).map((e: Record<string, unknown>) => ({ ...(e as Event), signups: Number(e.signups ?? 0), plan: (e.plan ?? []) as Event["plan"], pack_list: (e.pack_list ?? []) as string[], team_ids: (e.team_ids ?? []) as string[], person_ids: (e.person_ids ?? []) as string[], mySignups: (mine ?? []).filter((s) => s.event_id === e.id && people.has(s.person_id as string)).length, myUnpaid: e.price_dkk ? (mine ?? []).filter((s) => s.event_id === e.id && people.has(s.person_id as string) && !s.paid && !s.claimed_paid_at).length : 0, myClaimed: e.price_dkk ? (mine ?? []).filter((s) => s.event_id === e.id && people.has(s.person_id as string) && !s.paid && !!s.claimed_paid_at).length : 0 }));
+      return (data ?? []).map((e: Record<string, unknown>) => ({ ...(e as Event), signups: Number(e.signups ?? 0), guests: Number(e.guests ?? 0), plan: (e.plan ?? []) as Event["plan"], pack_list: (e.pack_list ?? []) as string[], team_ids: (e.team_ids ?? []) as string[], person_ids: (e.person_ids ?? []) as string[], mySignups: (mine ?? []).filter((s) => s.event_id === e.id && people.has(s.person_id as string)).length, myUnpaid: e.price_dkk ? (mine ?? []).filter((s) => s.event_id === e.id && people.has(s.person_id as string) && !s.paid && !s.claimed_paid_at).length : 0, myClaimed: e.price_dkk ? (mine ?? []).filter((s) => s.event_id === e.id && people.has(s.person_id as string) && !s.paid && !!s.claimed_paid_at).length : 0 }));
     },
     async saveEvent(i: EventInput, id?: string) {
       const row = { ...i, school_id: await schoolId() };
@@ -29,6 +29,9 @@ export function supabaseShop(sb: SupabaseClient, fail: Fail, schoolId: () => Pro
       else { const { error } = await sb.from("event_signup").delete().eq("event_id", eventId).eq("person_id", personId); fail(error); }
     },
     async claimSignupPaid(eventId: string, personId: string) { const { error } = await sb.from("event_signup").update({ claimed_paid_at: new Date().toISOString() }).eq("event_id", eventId).eq("person_id", personId); fail(error); },
+    async listEventGuests(eventId: string): Promise<EventGuest[]> { const { data, error } = await sb.from("event_guest").select("*").eq("event_id", eventId).order("created_at"); fail(error); return (data ?? []) as EventGuest[]; },
+    async setGuestPaid(id: string, paid: boolean) { const { error } = await sb.from("event_guest").update({ paid }).eq("id", id); fail(error); },
+    async removeEventGuest(id: string) { const { error } = await sb.from("event_guest").delete().eq("id", id); fail(error); },
     async setSignupPaid(eventId: string, personId: string, paid: boolean) { const { error } = await sb.from("event_signup").update({ paid }).eq("event_id", eventId).eq("person_id", personId); fail(error); },
 
     async listProducts(all = false): Promise<Product[]> {

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { api, type Event, type Focus, type EventInput, type EventSignup, type Result } from "@/core/api";
+import { api, type Event, type Focus, type EventInput, type EventSignup, type Result, type EventGuest } from "@/core/api";
 import { useAuth } from "@/core/auth";
 import { useNav } from "@/core/nav";
 import { ImagePicker } from "../components/ImagePicker";
@@ -87,7 +87,7 @@ function EventsList({ admin }: { admin?: boolean }) {
       {staff && <button className="ghost small" id="event-new" onClick={() => setEdit("new")}>+ {t("events.new")}</button>}
       <div className="evlist stack">{events.map((e) => { const relevant = !e.team_ids.length || e.team_ids.some((id) => mine.has(id)); return (
         <button key={e.id} className="hero tap photo evcard" data-testid="event" onClick={() => setOpen(e)} style={focusStyle(e.focus, { backgroundImage: `url(${catalogUrl(e.image_key) ?? artFor(e.id)})` })}>
-          <div><div className="eyebrow">{dateLabel(e.starts_at)} · {t(`events.kind.${e.kind}`)}</div><h2 className="display">{e.title}</h2>
+          <div><div className="eyebrow">{dateLabel(e.starts_at)} · {t(`events.kind.${e.kind}`)}{staff && e.featured ? ` · ★ ${t("events.featuredChip")}` : ""}{staff && e.web_signup ? ` · ${t("events.webChip")}${e.guests ? ` (${e.guests})` : ""}` : ""}</div><h2 className="display">{e.title}</h2>
             <div className="row between"><span className="small muted">{e.place ?? ""}{e.person_names?.length ? ` · ${e.person_names.join(", ")}` : e.team_names?.length ? ` · ${e.team_names.join(", ")}` : ` · ${t("events.allTeams")}`}</span>
               {e.mySignups && e.mySignups > 0 ? (e.myUnpaid ? <span className="chip warn small" data-testid="ev-awaiting">{t("events.unpaid")}</span> : e.myClaimed ? <span className="chip small pend" data-testid="ev-claimed">{t("events.claimed")}</span> : <span className="chip ok small">{t("events.on")}</span>) : relevant && (e.signup_deadline || e.price_dkk) ? <span className="chip gold small evsign" data-testid="ev-signup">{t("events.signUp")} ›</span> : null}</div></div>
         </button>); })}</div>
@@ -106,7 +106,8 @@ export function EventSheet({ event, staff, onClose, onEdit, onChanged, toast }: 
   const me = useAuth((s) => s.me)!;
   const [signups, setSignups] = useState<EventSignup[]>([]);
   const [pay, setPay] = useState<string | null>(null); // person_id paying
-  const load = useCallback(async () => setSignups(await api.listSignups(event.id)), [event.id]);
+  const [guests, setGuests] = useState<EventGuest[]>([]);
+  const load = useCallback(async () => { setSignups(await api.listSignups(event.id)); if (staff) setGuests(await api.listEventGuests(event.id).catch(() => [])); }, [event.id, staff]);
   useEffect(() => { void load(); }, [load]);
   const hats = [me.person, ...me.children].filter((p) => !event.team_ids.length || me.memberships.some((m) => m.person_id === p.id && event.team_ids.includes(m.team_id)));
   const deadlinePassed = !!event.signup_deadline && event.signup_deadline < isoDate(new Date());
@@ -140,6 +141,16 @@ export function EventSheet({ event, staff, onClose, onEdit, onChanged, toast }: 
           <div className="list">{signups.map((s) => <div key={s.person_id} className="item" style={{ padding: "6px 0" }}><span className="grow">{s.person_name}<span className="tiny"> · {s.team_name ?? ""}</span></span>{event.price_dkk ? <button className={"chip small" + (s.paid ? " ok" : s.claimed_paid_at ? " pend" : " warn")} onClick={async () => { await api.setSignupPaid(event.id, s.person_id, !s.paid); void load(); }}>{s.paid ? t("events.paid") : s.claimed_paid_at ? t("events.claimedShort") : t("events.markPaid")}</button> : null}</div>)}</div>
         </div>
       )}
+      {staff && guests.length > 0 && (
+        <div className="card" style={{ margin: 0 }} data-testid="ev-guests"><div className="eyebrow">{t("events.guests", { count: guests.length })}{event.price_dkk ? ` · ${t("events.paidN", { n: guests.filter((g) => g.paid).length })}` : ""}</div>
+          <p className="tiny muted" style={{ margin: "2px 0 4px" }}>{t("events.guestsHint")}</p>
+          <div className="list">{guests.map((g) => <div key={g.id} className="item" style={{ padding: "6px 0", alignItems: "flex-start" }}><span className="grow">{g.first_name} {g.last_name}{g.person_id && <span className="chip small" style={{ marginLeft: 6 }}>{t("events.guestMember")}</span>}
+            <div className="tiny">{[g.contact_name && g.contact_name !== `${g.first_name} ${g.last_name}` ? g.contact_name : null, g.email, g.phone, g.birth_date ? new Date(g.birth_date).toLocaleDateString(loc()) : null].filter(Boolean).join(" · ")}</div>
+            {event.price_dkk ? <div className="tiny">{t("pay.reference")}: {g.reference}</div> : null}{g.note && <div className="tiny muted">“{g.note}”</div>}</span>
+            {event.price_dkk ? <button className={"chip small" + (g.paid ? " ok" : " warn")} data-testid="guest-paid" onClick={async () => { await api.setGuestPaid(g.id, !g.paid); await load(); onChanged(); }}>{g.paid ? t("events.paid") : t("events.markPaid")}</button> : null}
+            <button className="linklike tiny" aria-label={t("common.delete")} onClick={async () => { await api.removeEventGuest(g.id); await load(); onChanged(); }}>×</button></div>)}</div>
+        </div>
+      )}
       {pay && event.price_dkk && <PaySheet amount={event.price_dkk} reference={`${event.title.slice(0, 20)} ${hats.find((h) => h.id === pay)?.first_name ?? ""}`} title={t("events.payTitle")} onClose={() => setPay(null)} onPaid={async () => { const pid = pay; setPay(null); try { await api.claimSignupPaid(event.id, pid); } catch { /* ignore */ } toast(t("events.paidClaimed")); await load(); onChanged(); }} />}
     </Sheet>
   );
@@ -151,7 +162,7 @@ function EventEditor({ event, onClose, onSaved }: { event: Event | null; onClose
   const d0 = event ? new Date(event.starts_at) : new Date(Date.now() + 14 * 864e5);
   const [image, setImage] = useState<string | null>(event?.image_key ?? null);
   const [focus, setFocus] = useState<Focus | null>(event?.focus ?? null);
-  const [f, setF] = useState({ title: event?.title ?? "", kind: event?.kind ?? "competition", date: isoDate(d0), time: event ? hhmm(event.starts_at) : "10:00", place: event?.place ?? "", meet_time: event?.meet_time ?? "", team_ids: event?.team_ids ?? [], plan: event?.plan.map((p) => `${p.time} ${p.text}`).join("\n") ?? "", pack: event?.pack_list.join("\n") ?? "", info: event?.info ?? "", deadline: event?.signup_deadline ?? "", price: event?.price_dkk?.toString() ?? "", pub: event?.visibility === "public" });
+  const [f, setF] = useState({ title: event?.title ?? "", kind: event?.kind ?? "competition", date: isoDate(d0), time: event ? hhmm(event.starts_at) : "10:00", place: event?.place ?? "", meet_time: event?.meet_time ?? "", team_ids: event?.team_ids ?? [], plan: event?.plan.map((p) => `${p.time} ${p.text}`).join("\n") ?? "", pack: event?.pack_list.join("\n") ?? "", info: event?.info ?? "", deadline: event?.signup_deadline ?? "", price: event?.price_dkk?.toString() ?? "", pub: event?.visibility === "public", featured: !!event?.featured, featuredUntil: event?.featured_until ?? "", web: !!event?.web_signup, max: event?.max_participants?.toString() ?? "" });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const save = async () => {
@@ -161,7 +172,7 @@ function EventEditor({ event, onClose, onSaved }: { event: Event | null; onClose
       if (Number.isNaN(starts.getTime())) { setErr(t("events.badTime")); return; }
       const input: EventInput = { title: f.title.trim(), kind: f.kind as Event["kind"], starts_at: starts.toISOString(), ends_at: null, place: f.place || null, meet_time: f.meet_time || null, team_ids: f.team_ids,
         plan: f.plan.split("\n").map((l) => l.trim()).filter(Boolean).map((l) => { const m = l.match(/^(\d{1,2}[.:]\d{2})\s+(.*)$/); return m ? { time: m[1].replace(".", ":"), text: m[2] } : { time: "", text: l }; }),
-        pack_list: f.pack.split("\n").map((l) => l.trim()).filter(Boolean), person_ids: people, info: f.info || null, signup_deadline: f.deadline || null, price_dkk: f.price ? Number(f.price) : null, visibility: f.pub ? "public" : "private", image_key: image, focus };
+        pack_list: f.pack.split("\n").map((l) => l.trim()).filter(Boolean), person_ids: people, info: f.info || null, signup_deadline: f.deadline || null, price_dkk: f.price ? Number(f.price) : null, visibility: f.pub ? "public" : "private", image_key: image, focus, featured: f.pub && f.featured, featured_until: f.pub && f.featured && f.featuredUntil ? f.featuredUntil : null, web_signup: f.pub && f.web, max_participants: f.max ? Number(f.max) : null };
       await api.saveEvent(input, event?.id); onSaved();
     } catch (e) { setErr(`${t("common.error")}: ${(e as Error).message}`); } finally { setBusy(false); }
   };
@@ -195,6 +206,13 @@ function EventEditor({ event, onClose, onSaved }: { event: Event | null; onClose
       <label className="field"><span>{t("events.info")}</span><textarea rows={3} value={f.info} onChange={(e) => setF({ ...f, info: e.target.value })} /></label>
       <div className="grid2"><label className="field"><span>{t("events.deadline")}</span><input type="date" value={f.deadline} onChange={(e) => setF({ ...f, deadline: e.target.value })} /></label><label className="field"><span>{t("events.price")}</span><input type="number" inputMode="numeric" value={f.price} onChange={(e) => setF({ ...f, price: e.target.value })} placeholder="0" /></label></div>
       <label className="check"><input type="checkbox" checked={f.pub} onChange={(e) => setF({ ...f, pub: e.target.checked })} />{t("events.public")}</label>
+      {f.pub && <div className="card websiteopts" data-testid="ev-webopts">
+        <div className="eyebrow">{t("events.webTitle")}</div>
+        <label className="check"><input type="checkbox" checked={f.featured} data-testid="ev-featured" onChange={(e) => setF({ ...f, featured: e.target.checked })} /><span>{t("events.featured")}<div className="tiny muted">{t("events.featuredHint")}</div></span></label>
+        {f.featured && <label className="field"><span>{t("events.featuredUntil")}</span><input type="date" value={f.featuredUntil} onChange={(e) => setF({ ...f, featuredUntil: e.target.value })} /></label>}
+        <label className="check"><input type="checkbox" checked={f.web} data-testid="ev-web" onChange={(e) => setF({ ...f, web: e.target.checked })} /><span>{t("events.webSignup")}<div className="tiny muted">{t("events.webSignupHint")}</div></span></label>
+        <label className="field"><span>{t("events.max")}</span><input inputMode="numeric" value={f.max} placeholder={t("events.maxNone")} onChange={(e) => setF({ ...f, max: e.target.value.replace(/\D/g, "") })} /></label>
+      </div>}
       {err && <p className="error" role="alert">{err}</p>}
       <div className="row"><button className="cta grow" id="ev-save" disabled={busy || !f.title.trim()} onClick={() => void save()}>{t("common.save")}</button>{event && <button className="ghost danger" onClick={async () => { await api.deleteEvent(event.id); onSaved(); }}>{t("common.delete")}</button>}</div>
     </Sheet>
