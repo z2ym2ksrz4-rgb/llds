@@ -1,14 +1,10 @@
-import appConfig from "../../../../app.config.json";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Appearance, CustomBox } from "@/core/api";
-import { HOME_SECTIONS, SITE_TEXT_DEFAULTS, TEXT_KEYS, homeOrder, useAppearance } from "@/core/appearance";
+import { HOME_SECTIONS, TEXT_KEYS, homeOrder, useAppearance } from "@/core/appearance";
 import { ImagePicker } from "../components/ImagePicker";
 import { Sheet } from "../components/Sheet";
-import { CATALOG, catalogUrl, resolveImage } from "../lib/catalog";
-import { api, type CatalogEntry } from "@/core/api";
-import { useAuth } from "@/core/auth";
-import { SitePages } from "./SitePages";
+import { resolveImage } from "../lib/catalog";
 
 const TABS = ["", "home", "rooms", "team", "social", "events", "more"] as const;
 const newId = () => Math.random().toString(36).slice(2, 8);
@@ -20,23 +16,16 @@ export function Customize() {
   const [a, setA] = useState<Appearance>(() => ({ ...store.a, hidden: [...(store.a.hidden ?? [])], boxes: [...(store.a.boxes ?? [])], images: { ...(store.a.images ?? {}) }, website: { ...(store.a.website ?? {}) }, texts: { ...(store.a.texts ?? {}) } }));
   const [edit, setEdit] = useState<CustomBox | null>(null);
   const [dirty, setDirty] = useState(false); const [saved, setSaved] = useState(false);
-  const me = useAuth((x) => x.me);
-  const [own, setOwn] = useState<CatalogEntry[]>([]);
-  useEffect(() => { void api.listCatalog().then(setOwn).catch(() => setOwn([])); }, []);
-  const gallery = a.websiteGallery ?? [];
-  const teamPhotos = Array.from(new Set((me?.teams ?? []).flatMap((t) => [...(t.photos ?? []), ...(/^https?:/.test(t.cover_url ?? "") ? [t.cover_url!] : [])])));
   const order = homeOrder(a);
   const upd = (n: Appearance) => { setA(n); setDirty(true); setSaved(false); };
-  const toggleG = (ref: string) => upd({ ...a, websiteGallery: gallery.includes(ref) ? gallery.filter((x) => x !== ref) : [...gallery, ref] });
   const move = (k: string, d: -1 | 1) => { const i = order.indexOf(k); const j = i + d; if (j < 0 || j >= order.length) return; const o = [...order]; [o[i], o[j]] = [o[j], o[i]]; upd({ ...a, home: o }); };
   const toggle = (k: string) => { const h = a.hidden ?? []; upd({ ...a, hidden: h.includes(k) ? h.filter((x) => x !== k) : [...h, k] }); };
   const label = (k: string) => k.startsWith("box:") ? (a.boxes?.find((b) => "box:" + b.id === k)?.title || t("customize.untitled")) : t(`customize.sections.${k}`);
   const saveBox = (b: CustomBox) => { const boxes = a.boxes ?? []; const i = boxes.findIndex((x) => x.id === b.id); const nb = i >= 0 ? boxes.map((x) => (x.id === b.id ? b : x)) : [...boxes, b]; upd({ ...a, boxes: nb, home: i >= 0 ? a.home : [...order.filter((k) => k !== "box:" + b.id).slice(0, 1), "box:" + b.id, ...order.slice(1)] }); setEdit(null); };
   const delBox = (id: string) => { upd({ ...a, boxes: (a.boxes ?? []).filter((b) => b.id !== id), home: (a.home ?? []).filter((k) => k !== "box:" + id), hidden: (a.hidden ?? []).filter((k) => k !== "box:" + id) }); setEdit(null); };
   const save = async () => { await store.save(a); setDirty(false); setSaved(true); };
-  const setWeb = (k: NonNullable<Appearance["website"]> extends infer W ? keyof W : never, v: string | null) => upd({ ...a, website: { ...(a.website ?? {}), [k]: v } });
   const setText = (k: string, v: string) => { const texts = { ...(a.texts ?? {}) }; if (v.trim()) texts[k] = v; else delete texts[k]; upd({ ...a, texts }); };
-  const textDefault = (k: string, appKey?: string) => appKey ? t(appKey) : SITE_TEXT_DEFAULTS[k] ?? "";
+  const textDefault = (_k: string, appKey?: string) => appKey ? t(appKey) : "";
   return (
     <section className="screen" data-testid="customize">
       <header className="topbar"><h1 className="display">{t("customize.title")}</h1></header>
@@ -62,36 +51,10 @@ export function Customize() {
           <ImagePicker tag="event" value={a.images?.hero ?? null} onChange={(v) => upd({ ...a, images: { ...(a.images ?? {}), hero: v } })} /></div>
       </div>
 
-      <details className="sec fold" data-testid="cz-sitepages"><summary><h2>{t("sitePages.title")}</h2><span className="tiny muted">{t("sitePages.sub")}</span></summary>
-        <SitePages pages={a.pages ?? {}} teamPhotos={teamPhotos} onChange={(pages) => upd({ ...a, pages })} />
-      </details>
-
-      <details className="sec fold" data-testid="cz-gallery"><summary><h2>{t("customize.gallery")}</h2><span className="tiny muted">{gallery.length ? t("customize.galleryCount", { count: gallery.length }) : t("customize.galleryAuto")}</span></summary>
-        <p className="tiny muted" style={{ marginTop: 0 }}>{t("customize.gallerySub", { n: gallery.length })}</p>
-        {[{ key: "line", title: t("customize.galleryLine"), items: teamPhotos.map((u) => ({ ref: u, url: u })) }, { key: "own", title: t("customize.galleryOwn"), items: own.map((c) => ({ ref: c.url, url: c.url })) }, { key: "cat", title: t("customize.galleryCatalog"), items: CATALOG.map((c) => ({ ref: c.key, url: catalogUrl(c.key)! })) }].filter((g) => g.items.length).map((g) => (
-          <div key={g.key} style={{ marginBottom: 10 }}><div className="eyebrow">{g.title}</div>
-            <div className="galpick" data-testid={`gal-${g.key}`}>{g.items.map((it) => { const i = gallery.indexOf(it.ref); return <button key={it.ref} className={"gthumb" + (i >= 0 ? " on" : "")} style={{ backgroundImage: `url(${it.url})` }} onClick={() => toggleG(it.ref)} aria-pressed={i >= 0}>{i >= 0 && <b>{i + 1}</b>}</button>; })}</div></div>
-        ))}
-        <div className="row" style={{ gap: 8 }}><button className="ghost small" onClick={() => upd({ ...a, websiteGallery: [] })}>{t("customize.galleryClear")}</button><button className="ghost small" onClick={() => upd({ ...a, websiteGallery: [...gallery].sort(() => Math.random() - 0.5) })}>{t("customize.galleryShuffle")}</button></div>
-      </details>
-
-      <div className="sec" data-testid="cz-website"><h2>{t("customize.website")}</h2>
-        <p className="tiny muted" style={{ marginTop: 0 }}>{t("customize.websiteSub", { site: appConfig.siteUrl.replace(/^https?:\/\//, "").replace(/\/$/, "") })}</p>
-        <div className="card"><div className="eyebrow">{t("customize.siteHero")}</div>
-          <ImagePicker tag="event" label=" " own={teamPhotos} value={a.website?.hero ?? null} onChange={(v) => setWeb("hero", v)} /></div>
-        <div className="card"><label className="field"><span>{t("customize.videoUrl")}</span><input type="url" placeholder="https://…/video.mp4" value={a.website?.video ?? ""} data-testid="cz-video" onChange={(e) => setWeb("video", e.target.value.trim() || null)} /></label>
-          <div className="eyebrow" style={{ marginTop: 8 }}>{t("customize.videoPoster")}</div>
-          <ImagePicker tag="event" label=" " own={teamPhotos} value={a.website?.videoPoster ?? null} onChange={(v) => setWeb("videoPoster", v)} /></div>
-        <div className="card"><div className="eyebrow">{t("customize.siteApp")}</div>
-          <ImagePicker tag="post" label=" " own={teamPhotos} value={a.website?.app ?? null} onChange={(v) => setWeb("app", v)} /></div>
-        <div className="card"><div className="eyebrow">{t("customize.siteBand")}</div>
-          <ImagePicker tag="post" label=" " own={teamPhotos} value={a.website?.band ?? null} onChange={(v) => setWeb("band", v)} /></div>
-      </div>
-
-      <div className="sec" data-testid="cz-texts"><h2>{t("customize.texts")}</h2>
-        <p className="tiny muted" style={{ marginTop: 0 }}>{t("customize.textsSub")}</p>
+      <div className="sec" data-testid="cz-texts"><h2>{t("customize.appTexts")}</h2>
+        <p className="tiny muted" style={{ marginTop: 0 }}>{t("customize.appTextsSub")}</p>
         <div className="card list">
-          {TEXT_KEYS.map((x) => { const cur = a.texts?.[x.key] ?? ""; const def = textDefault(x.key, x.appKey); return (
+          {TEXT_KEYS.filter((x) => x.appKey).map((x) => { const cur = a.texts?.[x.key] ?? ""; const def = textDefault(x.key, x.appKey); return (
             <div key={x.key} className="field" style={{ padding: "8px 0" }}><span className="row between">{t(`customize.textKeys.${x.key}`)}{cur && <button type="button" className="linklike small" onClick={() => setText(x.key, "")}>{t("customize.textReset")}</button>}</span>
               {x.multiline ? <textarea rows={3} value={cur} placeholder={def} data-testid={`cz-text-${x.key}`} onChange={(e) => setText(x.key, e.target.value)} /> : <input value={cur} placeholder={def} data-testid={`cz-text-${x.key}`} onChange={(e) => setText(x.key, e.target.value)} />}
             </div>); })}
@@ -100,7 +63,7 @@ export function Customize() {
 
       <div className="row" style={{ gap: 8 }}>
         <button className="cta grow" disabled={!dirty} data-testid="cz-save" onClick={() => void save()}>{t("common.save")}</button>
-        <button className="ghost" onClick={() => upd({})}>{t("customize.reset")}</button>
+        <button className="ghost" onClick={() => upd({ website: a.website, websiteGallery: a.websiteGallery, pages: a.pages, texts: Object.fromEntries(Object.entries(a.texts ?? {}).filter(([k]) => k.startsWith("site."))) })}>{t("customize.reset")}</button>
       </div>
       {saved && <p className="ok small" role="status">{t("customize.saved")}</p>}
 

@@ -1224,7 +1224,7 @@
   },
   "customize": {
     "title": "Customise the app",
-    "sub": "Rearrange Home, new text boxes, images",
+    "sub": "Home sections, custom boxes, login and hero picture, app texts",
     "intro": "Decide what people see on Home and in which order. Make your own boxes with text, image and link, and change the login and home images. Changes apply to everyone when you press Save.",
     "home": "Home screen",
     "newBox": "New box",
@@ -1297,7 +1297,9 @@
     },
     "galleryCount_one": "1 picture chosen",
     "galleryCount_other": "{{count}} pictures chosen",
-    "galleryAuto": "Automatic – the teams' own photos"
+    "galleryAuto": "Automatic – the teams' own photos",
+    "appTexts": "Texts in the app",
+    "appTextsSub": "Empty field = the default text."
   },
   "week": {
     "training": "Training",
@@ -1623,7 +1625,6 @@
   "sitePages": {
     "title": "Website pages",
     "sub": "Texts and pictures on every page",
-    "intro": "Pick a page and edit its texts and pictures. The grey text in a field is the current text – leave the field empty to keep it. Teams, events, prices and shop are edited where they belong in Admin.",
     "search": "Search page…",
     "all": "All pages",
     "view": "View page",
@@ -1633,6 +1634,22 @@
     "changed": "changed",
     "counts": "{{texts}} texts · {{images}} pictures",
     "nChanged_one": "1 change",
-    "nChanged_other": "{{count}} changes"
+    "nChanged_other": "{{count}} changes",
+    "moreImages": "Other pictures ({{n}})",
+    "moreTexts": "Other texts ({{n}})",
+    "home": "Front page"
+  },
+  "website": {
+    "title": "Website",
+    "sub": "Texts and pictures on every page, carousel, featured events",
+    "intro": "Edit everything on the website that does not come from app data. Teams, prices, schedule, events and shop are edited where they belong – and update by themselves. Changes are live once you press Save.",
+    "events": "Events on the website",
+    "eventsEmpty": "No events are featured or open for website sign-up right now.",
+    "eventsHint": "Set on each event: Edit event → Show on website → Feature on front page / Open for website sign-up.",
+    "pages": "Pages",
+    "homeImages": "Front page pictures and video",
+    "homeTexts": "Front page headlines",
+    "homeTextsSub": "Empty field = the default text. Use | to split a headline so the last part is in italics.",
+    "pagesSub": "Pick a page. The grey text in a field is the current text – an empty field keeps it."
   }
 }

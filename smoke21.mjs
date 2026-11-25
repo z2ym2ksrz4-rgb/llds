@@ -1,4 +1,4 @@
-// Website tools: page editor (Tilpas appen → Websitets sider), event boost + web sign-up options, website guests list with paid toggle. Mock.
+// Website tools: page editor (Admin → Website → Sider), event boost + web sign-up options, website guests list with paid toggle. Mock.
 import { chromium } from "playwright";
 const base = process.env.BASE ?? "http://localhost:4173/";
 const b = await chromium.launch({ executablePath: process.env.CHROME ?? "/opt/pw-browsers/chromium" });
@@ -8,11 +8,12 @@ const out = { errors: [] }; p.on("pageerror", e => out.errors.push(e.message));
 const login = async (email) => { await p.goto(base, { waitUntil: "networkidle" }); await p.evaluate(() => sessionStorage.clear()); await p.waitForSelector("#email"); await p.fill("#email", email); await p.click("form button.cta"); await p.fill("#code", "123456"); await p.click("form button.cta"); await p.waitForSelector("nav.tabbar"); await p.waitForTimeout(600); };
 await login("admin@demo");
 // 1. page editor
-await p.click("nav.tabbar >> text=Admin"); await p.click("[data-testid=admin-customize]"); await p.click("[data-testid=cz-sitepages] summary"); await p.waitForSelector("[data-testid=sitepages]");
+await p.click("nav.tabbar >> text=Admin"); out.customizeClean = await (async () => { await p.click("[data-testid=admin-customize]"); await p.waitForSelector("[data-testid=customize]"); const n = await p.locator("[data-testid=cz-gallery], [data-testid=cz-video], [data-testid=sitepages]").count(); const appTexts = await p.locator("[data-testid^=cz-text-]").count(); await p.click("text=‹ Admin").catch(() => p.click("nav.tabbar >> text=Admin")); return { websiteBits: n, appTexts }; })();
+await p.click("[data-testid=admin-website]"); await p.waitForSelector("[data-testid=sitepages]");
 out.pages = await p.locator("[data-testid^=sitepage-]").count();
 await p.click("[data-testid=sitepage-home]"); await p.waitForSelector("[data-testid=sitepage]");
-out.texts = await p.locator("[data-testid=site-text]").count(); out.images = await p.locator("[data-testid=site-img]").count();
-await p.locator("[data-testid=site-text]").first().fill("Ny overskrift fra Line"); await p.click("[data-testid=cz-save]"); await p.waitForTimeout(600);
+out.homeExtra = !!(await p.$("[data-testid=web-home]")); out.homeHeadlines = await p.locator("[data-testid^=cz-text-site]").count(); out.texts = await p.locator("[data-testid=site-text]").count(); out.images = await p.locator("[data-testid=site-img]").count();
+await p.locator("[data-testid=site-text]").first().fill("Ny overskrift fra Line"); await p.waitForSelector("[data-testid=web-save]"); await p.click("[data-testid=web-save]"); await p.waitForTimeout(600);
 out.savedText = await p.evaluate(() => { const a = JSON.parse(localStorage.getItem("llds_mock")).appearance; return Object.values(a?.pages?.home?.texts ?? {})[0] ?? null; });
 // 2. event: boost + web sign-up
 await p.click("nav.tabbar >> text=Events").catch(async () => { await p.click("nav.tabbar >> text=Hjem"); });

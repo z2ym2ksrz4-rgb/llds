@@ -1224,7 +1224,7 @@
   },
   "customize": {
     "title": "Tilpas appen",
-    "sub": "Flyt rundt på forsiden, nye tekstbokse, billeder",
+    "sub": "Hjem-sektioner, egne bokse, login- og forsidebillede, app-tekster",
     "intro": "Her bestemmer du, hvad brugerne ser på Hjem, og i hvilken rækkefølge. Lav egne bokse med tekst, billede og link, og skift login- og forsidebillede. Ændringer gælder for alle, når du trykker Gem.",
     "home": "Forsiden (Hjem)",
     "newBox": "Ny boks",
@@ -1297,7 +1297,9 @@
     },
     "galleryCount_one": "1 billede valgt",
     "galleryCount_other": "{{count}} billeder valgt",
-    "galleryAuto": "Automatisk – holdenes egne fotos"
+    "galleryAuto": "Automatisk – holdenes egne fotos",
+    "appTexts": "Tekster i appen",
+    "appTextsSub": "Tomt felt = standardteksten."
   },
   "week": {
     "training": "Træning",
@@ -1623,16 +1625,31 @@
   "sitePages": {
     "title": "Websitets sider",
     "sub": "Tekster og billeder på alle sider",
-    "intro": "Vælg en side og ret dens tekster og billeder. Det, der står i feltet i grå, er den nuværende tekst – lad feltet stå tomt for at beholde den. Hold, events, priser og shop rettes de steder, de hører hjemme i Admin.",
     "search": "Søg side…",
     "all": "Alle sider",
     "view": "Se siden",
-    "pageHint": "Ændringer slår igennem på websitet, når du har trykket Gem nederst.",
+    "pageHint": "Ændringer slår igennem på websitet, når du har trykket Gem.",
     "images": "Billeder ({{n}})",
     "texts": "Tekster ({{n}})",
     "changed": "ændret",
     "counts": "{{texts}} tekster · {{images}} billeder",
     "nChanged_one": "1 ændring",
-    "nChanged_other": "{{count}} ændringer"
+    "nChanged_other": "{{count}} ændringer",
+    "moreImages": "Øvrige billeder ({{n}})",
+    "moreTexts": "Øvrige tekster ({{n}})",
+    "home": "Forside"
+  },
+  "website": {
+    "title": "Website",
+    "sub": "Tekster og billeder på alle sider, karrusel, fremhævede events",
+    "intro": "Her retter du alt på websitet, som ikke kommer fra appens data. Hold, priser, holdplan, events og shop rettes de steder, de hører til – og slår selv igennem. Ændringer er live, når du har trykket Gem.",
+    "events": "Events på websitet",
+    "eventsEmpty": "Ingen events er fremhævet eller åbne for tilmelding fra websitet lige nu.",
+    "eventsHint": "Vælges på det enkelte event: Redigér event → Vis på website → Fremhæv på forsiden / Åben for tilmelding fra websitet.",
+    "pages": "Sider",
+    "homeImages": "Forsidens faste billeder og video",
+    "homeTexts": "Forsidens overskrifter",
+    "homeTextsSub": "Tomt felt = standardteksten. Brug | for at dele en overskrift, så sidste del står i kursiv.",
+    "pagesSub": "Vælg en side. Det, der står i gråt i et felt, er den nuværende tekst – tomt felt beholder den."
   }
 }

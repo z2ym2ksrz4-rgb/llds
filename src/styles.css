@@ -1033,3 +1033,7 @@ a.btnlink { display:inline-flex; align-items:center; text-decoration:none; }
 .card.siteimg { margin:0; position:relative; } .siteimg .thumb { height:120px; border-radius:10px; background:#000 center/cover no-repeat; } .siteimg > .chip { position:absolute; top:20px; right:22px; }
 .sitetext { margin-bottom:10px; } .sitetext.changed input, .sitetext.changed textarea { border-color:var(--gold3); }
 .sitetext input::placeholder, .sitetext textarea::placeholder { color:var(--fg3); opacity:1; }
+
+/* Admin → Website: Save stays within reach on long pages */
+.savebar { position: sticky; bottom: calc(84px + env(safe-area-inset-bottom)); z-index: 6; display: flex; gap: 10px; align-items: center; padding: 10px; margin-top: 14px; border-radius: 16px; background: color-mix(in srgb, var(--bg, #0a0a0b) 86%, transparent); backdrop-filter: blur(10px); border: 1px solid rgba(201, 162, 75, .25); }
+@media (min-width: 1100px) { .savebar { bottom: 16px; } }
