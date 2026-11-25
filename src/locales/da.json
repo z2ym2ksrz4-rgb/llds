@@ -1128,7 +1128,7 @@
   "tour": {
     "eyebrow": "Velkommen",
     "title": "Hej {{name}} – skal vi vise dig rundt?",
-    "intro": "Det tager et minut. Vi peger på de vigtigste ting i appen – du kan altid finde rundvisningen igen under Indstillinger.",
+    "intro": "Det tager et minut. Vi peger på de vigtigste ting i appen – du finder rundvisningen igen under Hjælp i menuen ved dit profilbillede.",
     "start": "Ja, vis mig rundt",
     "later": "Senere",
     "no": "Nej tak",
@@ -1140,54 +1140,64 @@
     "again": "Vis rundvisningen igen",
     "steps": {
       "hero": {
-        "label": "Næste event",
-        "title": "Det vigtigste øverst",
-        "body": "Hjem viser altid det næste event – tryk for detaljer, tilmelding og pakkeliste."
+        "label": "Hjem",
+        "title": "Dit overblik",
+        "body": "Hjem samler det, der er relevant for dig og dine børn: næste træning, beskeder fra skolen og kommende events."
+      },
+      "next": {
+        "label": "Næste",
+        "title": "Det næste, du skal til",
+        "body": "Kortet viser din næste træning eller dit næste event. Tryk for detaljer – eller meld afbud direkte, så træneren får besked."
       },
       "team": {
         "label": "Holdvælger",
         "title": "Vælg hold og hvem du ser som",
-        "body": "Har du flere hold eller børn, skifter du her. Alt nedenunder følger valget."
+        "body": "Har du flere hold eller børn, skifter du her. Hjem og fanen Hold følger valget."
       },
       "week": {
-        "label": "Ugens træninger",
-        "title": "Træninger og afbud",
-        "body": "Ugens træninger med sal og træner. Meld afbud med ét tryk – træneren får besked."
+        "label": "Din uge",
+        "title": "I dag og i morgen",
+        "body": "De nærmeste træninger og events med sal og træner. Tryk på en træning for at se detaljer eller melde afbud."
       },
       "bell": {
         "label": "Notifikationer",
         "title": "Besked, når noget sker",
-        "body": "Aflysninger, vikarer, beskeder fra skolen, nye emblemer og tilmeldinger lander her."
+        "body": "Aflysninger, flyttede træninger, beskeder, betalinger og nye emblemer lander her. Tryk på en række for at åbne det, den handler om."
+      },
+      "shop": {
+        "label": "Stjerneshoppen",
+        "title": "Shop og klippekort",
+        "body": "Tasken åbner Stjerneshoppen: tøj, merchandise og klippekort. Du betaler med MobilePay, og købet gælder, når betalingen er bekræftet."
       },
       "profile": {
-        "label": "Profil",
-        "title": "Din profil og menu",
-        "body": "Sprog, indstillinger, klippekort, Stjerneshoppen og log ud. Admins finder også Admin her."
+        "label": "Din menu",
+        "title": "Profil, børn og betalinger",
+        "body": "Min profil, Mine børn, Betalinger og klippekort, Notifikationer, Milepæle, Hjælp og log ud. Her tilmelder du også et nyt hold."
       },
       "rooms": {
-        "label": "Sale",
-        "title": "Salkalenderen",
-        "body": "Se alle træninger i Store og Lille Sal, og book en sal til ekstra træning."
+        "label": "Kalender",
+        "title": "Ugen i Store og Lille Sal",
+        "body": "Alle træninger og events uge for uge – aflyste og flyttede er markeret. Book en sal med knappen “Book sal” eller ved at trykke på et tidspunkt."
       },
       "teamtab": {
-        "label": "Mit hold",
+        "label": "Hold",
         "title": "Holdets eget rum",
-        "body": "Koreografi og musik, holdets billeder, dansere, trofæhylde, emblemer og holdets væg."
+        "body": "Beskeder fra træneren, samtaler med træneren, koreografi-videoer, formationer, holdets billeder og dansere."
       },
       "social": {
         "label": "Social",
         "title": "Væggen",
-        "body": "Opslag fra holdet og hele skolen samt officielle beskeder fra skolen – samlet ét sted."
+        "body": "Billeder og opslag fra dine hold og hele skolen. Vigtige beskeder står ikke her – dem finder du på Hjem og under Hold."
       },
       "events": {
         "label": "Events",
-        "title": "Stævner, shows og shop",
-        "body": "Kommende events med tilmelding, resultater og Stjerneshoppen."
+        "title": "Stævner, shows og workshops",
+        "body": "De events, der gælder dig og dine børn, med tilmelding, program og pakkeliste. Koster eventet noget, er du tilmeldt, når betalingen er bekræftet."
       },
       "admin": {
         "label": "Admin",
-        "title": "Alt admin i appen",
-        "body": "Brugere, hold, sæsonplan, bookinger, beskeder, events, shop og billedkatalog – alt styres herfra."
+        "title": "Skolen styres herfra",
+        "body": "Nye brugere og medlemmer, hold og sæsonplan, events, beskeder, betalinger, shop, mediekatalog – og Tilpas appen og Website. Tal på en række betyder, at noget venter på dig."
       }
     }
   },

@@ -8,9 +8,11 @@ import { useNav, type Tab } from "@/core/nav";
 type Step = { key: string; tab?: Tab; target: string; staffOnly?: boolean; adminOnly?: boolean };
 const STEPS: Step[] = [
   { key: "hero", tab: "home", target: "[data-tour=hero]" },
+  { key: "next", tab: "home", target: "[data-testid=next-card]" },
   { key: "team", tab: "home", target: "[data-tour=teampick]" },
   { key: "week", tab: "home", target: "[data-tour=week]" },
   { key: "bell", tab: "home", target: "[data-tour=bell]" },
+  { key: "shop", tab: "home", target: "[data-tour=shop]" },
   { key: "profile", tab: "home", target: "[data-tour=avatar]" },
   { key: "rooms", target: "[data-tour=tab-rooms]" },
   { key: "teamtab", target: "[data-tour=tab-team]" },

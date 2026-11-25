@@ -76,5 +76,5 @@ function ShopButton() {
     };
     void check(); const i = setInterval(() => void check(), 120_000); return () => { alive = false; clearInterval(i); };
   }, []);
-  return <button className="bell" aria-label={t("shop.title")} title={t("shop.title")} data-testid="shop" onClick={() => setTab("shop")}><Icon name="bag" />{dot && <span className="dot" data-testid="shop-dot" />}<span className="icolabel">{t("shop.title")}</span></button>;
+  return <button data-tour="shop" className="bell" aria-label={t("shop.title")} title={t("shop.title")} data-testid="shop" onClick={() => setTab("shop")}><Icon name="bag" />{dot && <span className="dot" data-testid="shop-dot" />}<span className="icolabel">{t("shop.title")}</span></button>;
 }
