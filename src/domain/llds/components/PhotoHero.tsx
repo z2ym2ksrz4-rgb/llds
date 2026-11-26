@@ -4,9 +4,9 @@ import { focusStyle } from "../lib/art";
 import type { Focus } from "@/core/api";
 
 /** A real photo (Line's) vs. catalog art/own uploads: WordPress URLs from the old site. */
-export const isSitePhoto = (url: string | null | undefined) => !!url && /^https?:\/\/[^/]*lldancestudio\.dk\//.test(url);
+export const isSitePhoto = (url: string | null | undefined) => !!url && (/^https?:\/\/[^/]*lldancestudio\.dk\//.test(url) || /\/llds\/media\//.test(url) || /^https?:\/\/[^/]+\/media\/20\d\d\//.test(url));   // the school's own photos: on the old site, or our copies of them
 /** WordPress thumbnails ("…-477x1024.jpg") → the original; the <img> falls back to the thumbnail if the original is missing. */
-export const hiRes = (url: string) => url.replace(/-\d{2,4}x\d{2,4}(?=\.(?:jpe?g|png|webp)(?:$|\?))/i, "");
+export const hiRes = (url: string) => /lldancestudio\.dk\//.test(url) === false ? url : url.replace(/-\d{2,4}x\d{2,4}(?=\.(?:jpe?g|png|webp)(?:$|\?))/i, "");
 
 /**
  * Hero media that never crops a photo away: the sharp image is shown whole (object-fit: contain, anchored at the top),

@@ -7,6 +7,7 @@ week's schedule) is read client-side from Supabase public views. AI illustration
 no real photo fits (app section, fallbacks, menu).
 Usage: python3 scripts/site-gen.py [out_dir] [--base /llds]
 """
+import urllib.parse
 import json, os, shutil, sys, html, re
 from datetime import date
 
@@ -494,7 +495,14 @@ def translate_html(h, rel):
     h = re.sub(r'href="' + re.escape(BASE) + r'/(?!en/|style\.css|site\.js|brand/|icons/|art/|favicon|app/)', f'href="{BASE}/en/', h)
     h = h.replace('class="tiny en-only" hidden', 'class="tiny en-only"')
     return h
+OLD_MEDIA = "https://lldancestudio.dk/wp-content/uploads/"; MEDIA_DIR = os.path.join(ROOT, "site", "media")
+def own_media(text):
+    """Pictures and PDFs that used to be hot-linked from the old WordPress site are served from our own /media/ – only when we really have the file."""
+    def sub(m):
+        rel_ = html.unescape(m.group(1)); return f"{BASE}/media/{m.group(1)}" if os.path.exists(os.path.join(MEDIA_DIR, urllib.parse.unquote(rel_))) else m.group(0)
+    return re.sub(re.escape(OLD_MEDIA) + r"([^\s\"'()<>\\]+)", sub, text)
 def write(rel, content):
+    content = own_media(content)
     d = rel.rsplit("/", 1)[0] + "/" if "/" in rel else ""
     if rel.endswith(".html") and "<body>" in content:
         pg = d.rstrip("/") or "home"; content = content.replace("<body>", f'<body data-pg="{pg}">', 1)
@@ -734,7 +742,7 @@ write("support/index.html", plain("Hjælp – LL Dance Studio", SUPPORTP, "Kom i
 # manifest for the app (main pages first, then team pages alphabetically)
 _MAIN = ["home", "om-os", "medlemsskab", "saeson-26-27", "merchandise", "backstage", "kontakt", "solo-duo", "support", "privacy", "terms"]
 MANIFEST.sort(key=lambda m: (_MAIN.index(m["key"]) if m["key"] in _MAIN else 99, m["title"]))
-json.dump(MANIFEST, open(os.path.join(ROOT, "src", "domain", "llds", "lib", "site-manifest.generated.json"), "w", encoding="utf-8"), ensure_ascii=False)
+open(os.path.join(ROOT, "src", "domain", "llds", "lib", "site-manifest.generated.json"), "w", encoding="utf-8").write(own_media(json.dumps(MANIFEST, ensure_ascii=False)))
 write("style.css", CSS)
 write("site.js", JS % {"url": SB_URL, "key": SB_KEY, "slug": SLUG, "base": BASE, "support": SUPPORT, "icon": ICON_ARROW.replace("%", "%%"), "catmap": json.dumps(CATALOG_MAP), "qrlib": QRLIB})
 shutil.copy(os.path.join(ROOT, "public", "favicon.png"), os.path.join(OUT, "favicon.png"))
@@ -744,3 +752,7 @@ for n in os.listdir(os.path.join(ROOT, "public", "icons")): shutil.copy(os.path.
 os.makedirs(os.path.join(OUT, "art"), exist_ok=True)
 for n in range(1, 7): shutil.copy(os.path.join(ROOT, "public", "art", f"{n}.jpg"), os.path.join(OUT, "art", f"{n}.jpg"))
 print(f"site written to {OUT}: {len(TEAMS)} team pages")
+
+# our own copies of the old site's pictures and calendars (site/media → /media/)
+import shutil
+if os.path.isdir(MEDIA_DIR): shutil.copytree(MEDIA_DIR, os.path.join(OUT, "media"), dirs_exist_ok=True)
