@@ -236,7 +236,12 @@
     "absCount_one": "1 absence",
     "absCount_other": "{{count}} absences",
     "bookingsToday": "bookings today",
-    "forYou": "For you"
+    "forYou": "For you",
+    "welcomeTitle": "Welcome – how to get started",
+    "welcome1": "Sign yourself or your child up for a team.",
+    "welcome2": "Turn on notifications to hear about cancellations and messages.",
+    "welcome3": "See this week's trainings under Calendar.",
+    "stripHint": "Dot = training or event that day. Tap a day to see it."
   },
   "admin": {
     "users": "New users",
@@ -674,7 +679,8 @@
     "commentsTitle": "Comments",
     "noComments": "No comments yet.",
     "writeComment": "Write a comment…",
-    "send": "Send"
+    "send": "Send",
+    "emptyStaff": "No posts yet. Write the first – a welcome to the team and a picture is a good start."
   },
   "msg": {
     "needs": {
@@ -893,7 +899,10 @@
     "guestsHint": "Participants without a login. Mark paid when you see the money in MobilePay – the receipt is sent then.",
     "guestMember": "member",
     "featuredChip": "featured",
-    "webChip": "web sign-up"
+    "webChip": "web sign-up",
+    "deadlineIn_one": "Deadline tomorrow",
+    "deadlineIn_other": "Deadline in {{count}} days",
+    "deadlineToday": "Deadline today"
   },
   "shop": {
     "title": "Shop",
@@ -1045,7 +1054,7 @@
   },
   "milestones": {
     "title": "Milestones",
-    "empty": "No milestones yet – they come from the trainers.",
+    "empty": "No milestones yet. Milestones are the big moments – first show, first competition, 100 trainings – and they are given by the trainers.",
     "by": "by {{name}}",
     "give": "Give milestone",
     "custom": "Or write your own…",
@@ -1232,7 +1241,12 @@
     "pickBody": "Everything is on – untick what you don't want to be disturbed by.",
     "save": "Save",
     "mail": "E-mail for important messages",
-    "mailSub": "Sign-ups, audition requirements and results and payment requests are also sent by e-mail. Receipts are always sent; everything else only in the app."
+    "mailSub": "Sign-ups, audition requirements and results and payment requests are also sent by e-mail. Receipts are always sent; everything else only in the app.",
+    "group": {
+      "training": "Training",
+      "messages": "Messages and news",
+      "money": "Payment and purchases"
+    }
   },
   "customize": {
     "title": "Customise the app",
@@ -1465,7 +1479,10 @@
     "feedbackSub": "What users wrote about the app – newest first, 5 visible, scroll for the rest.",
     "noFeedback": "No feedback yet. Users are asked after 14 days in the app.",
     "anonymous": "Unknown",
-    "markRead": "Seen"
+    "markRead": "Seen",
+    "errors": "App errors",
+    "errorsSub": "Errors the app has caught at users during the last 60 days.",
+    "errorsNone": "No errors recorded."
   },
   "feedback": {
     "eyebrow": "Help us",
@@ -1609,7 +1626,7 @@
   },
   "import": {
     "title": "Import members",
-    "sub": "Dancers, parents and trainers from a list – one invitation per family",
+    "sub": "Create many at once and send invitations per team",
     "intro": "Copy from Excel/Google Sheets or upload a CSV. Each row is one dancer (or trainer). With a parent e-mail the parent is invited and the child created under them; otherwise the person is invited directly. Everyone signs in with e-mail + one-time code – no passwords.",
     "step1": "1 · The list",
     "columns": "Columns (headers in the first row): First name · Last name · Birth date · E-mail · Phone · Teams (several separated by ;) · Role (Dancer/Trainer/Assistant) · Parent · Parent e-mail · Parent phone",
@@ -1634,7 +1651,28 @@
     "run": "Import and send {{n}} invitations",
     "progress": "Sending {{i}} of {{n}}…",
     "done": "{{ok}} invitations sent ✓",
-    "afterwards": "The new people are under Admin → Members. The mail links to the app; they sign in with the e-mail they were invited on."
+    "afterwards": "The new people are under Admin → Members. The mail links to the app; they sign in with the e-mail they were invited on.",
+    "sendNow": "Send the invitation right away",
+    "sendNowHint": "Without the tick everyone is created on their teams, but nobody gets a mail. You send the invitations per team below when the team is ready.",
+    "runQuiet": "Create {{n}} without inviting",
+    "doneSent": "The invitations have been sent.",
+    "doneHeld": "No mails were sent. Send the invitations per team below.",
+    "receiptCreated": "Created ({{n}}):",
+    "receiptUpdated": "Already existed – teams updated ({{n}}):",
+    "receiptFailed": "Failed ({{n}}):",
+    "copyReceipt": "Copy receipt",
+    "statusTitle": "Invitations per team",
+    "statusSub": "Counts those who should have access: team members with an e-mail and the dancers' parents.",
+    "statusLine": "{{people}} people · {{not}} not invited · {{invited}} invited, not logged in · {{logged}} logged in",
+    "inviteN_one": "Send invitation (1)",
+    "inviteN_other": "Send invitations ({{count}})",
+    "againN_one": "Send again to 1",
+    "againN_other": "Send again to {{count}}",
+    "allIn": "Everyone is logged in",
+    "allInvited": "Everyone is invited",
+    "invitedN_one": "1 invitation sent.",
+    "invitedN_other": "{{count}} invitations sent.",
+    "statusEmpty": "No teams have members with an e-mail yet."
   },
   "sitePages": {
     "title": "Website pages",
@@ -1665,5 +1703,28 @@
     "homeTexts": "Front page headlines",
     "homeTextsSub": "Empty field = the default text. Use | to split a headline so the last part is in italics.",
     "pagesSub": "Pick a page. The grey text in a field is the current text – an empty field keeps it."
+  },
+  "errors": {
+    "signups_closed": "Sign-up is closed right now.",
+    "audition_closed": "Auditions are not open for this team yet.",
+    "audition_required": "This team is by audition only.",
+    "not_an_audition_team": "This team has no audition.",
+    "already_member": "Already on the team.",
+    "not_allowed": "You do not have access to that.",
+    "not_your_person": "You can only do this for yourself and your children.",
+    "unknown_team": "The team no longer exists.",
+    "needs_parent": "A parent is needed before access can be given.",
+    "too_young": "Too young for an own login – the parent uses the app.",
+    "needs_birth_date": "Date of birth is missing.",
+    "parent_needs_child": "A parent needs at least one child.",
+    "last_admin": "There must be at least one administrator.",
+    "too_many": "Too many attempts – try again tomorrow.",
+    "bad_email": "The e-mail address does not look right.",
+    "missing_name": "Name is missing.",
+    "not_open": "Sign-up is not open.",
+    "full": "No spots left.",
+    "closed": "The deadline has passed.",
+    "already": "Already signed up.",
+    "offline": "No connection – try again in a moment."
   }
 }

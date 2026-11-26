@@ -1038,3 +1038,16 @@ a.btnlink { display:inline-flex; align-items:center; text-decoration:none; }
 /* Admin → Website: Save stays within reach on long pages */
 .savebar { position: sticky; bottom: calc(84px + env(safe-area-inset-bottom)); z-index: 6; display: flex; gap: 10px; align-items: center; padding: 10px; margin-top: 14px; border-radius: 16px; background: color-mix(in srgb, var(--bg, #0a0a0b) 86%, transparent); backdrop-filter: blur(10px); border: 1px solid rgba(201, 162, 75, .25); }
 @media (min-width: 1100px) { .savebar { bottom: 16px; } }
+
+/* ---- Batch 3a (26 Nov): reachable targets, shorter hero on phones ---- */
+@media (max-width: 639px) { .homehero { min-height: 50dvh; } }
+.item.switch { min-height: 52px; }
+.item.switch input[type=checkbox] { width: 52px; height: 32px; border-radius: 16px; margin: 4px 0; }
+.item.switch input[type=checkbox]::after { top: 4px; left: 4px; width: 24px; height: 24px; }
+.item.switch input[type=checkbox]:checked::after { left: 24px; }
+button.home-join { margin: 8px 0 2px; align-self: flex-start; min-height: 40px; }
+.screen .muted.small a, .screen p.small > a { display: inline-block; padding: 10px 2px; }
+.screen button.ghost.small, .screen button.small { min-height: 40px; }
+.socialintro .linklike { margin-left: 6px; }
+.welcomecard { display:flex; flex-direction:column; gap:10px; margin-top:14px; } .welcomecard .steps3 { margin:0; padding-left:20px; line-height:1.7; }
+.striphint { margin:6px 0 0; }

@@ -54,6 +54,7 @@ export function NotifyPrompt() {
 }
 
 /** Settings section: master switch + one switch per kind. */
+const GROUPS: { id: string; keys: string[]; rest?: boolean }[] = [{ id: "training", keys: ["session", "substitute", "booking"] }, { id: "messages", keys: ["message", "post", "event", "badge", "milestone"], rest: true }, { id: "money", keys: ["payment", "order", "punch", "signup"] }];
 export function NotifySettings() {
   const { t } = useTranslation();
   const me = useAuth((s) => s.me); const refresh = useAuth((s) => s.refresh);
@@ -68,11 +69,13 @@ export function NotifySettings() {
           <input type="checkbox" role="switch" checked={on} disabled={busy} data-testid="notif-master" onChange={(e) => void set({ ...p, on: e.target.checked })} /></label>
         <label className="item switch"><span className="avatar small">✉️</span><span className="grow"><strong>{t("notifPrefs.mail")}</strong><div className="tiny">{t("notifPrefs.mailSub")}</div></span>
           <input type="checkbox" role="switch" checked={p.mail ?? true} disabled={busy} data-testid="notif-mail" onChange={(e) => void set({ ...p, mail: e.target.checked })} /></label>
-        {on && notifyKindsFor(me).map((k) => (
-          <label className="item switch" key={k.key}><span className="avatar small">{k.emoji}</span><span className="grow">{t(`notifPrefs.kinds.${k.key}`)}</span>
-            <input type="checkbox" role="switch" checked={p.kinds?.[k.key] ?? true} disabled={busy} data-testid={`notif-kind-${k.key}`} onChange={(e) => void set({ ...p, kinds: { ...(p.kinds ?? {}), [k.key]: e.target.checked } })} /></label>
-        ))}
       </div>
+      {on && GROUPS.map((g) => { const ks = notifyKindsFor(me).filter((k) => g.keys.includes(k.key) || (g.rest && !GROUPS.some((x) => x.keys.includes(k.key)))); if (!ks.length) return null; return (
+        <div key={g.id} data-testid={`notif-group-${g.id}`}><div className="eyebrow" style={{ margin: "14px 0 6px" }}>{t(`notifPrefs.group.${g.id}`)}</div>
+          <div className="card list">{ks.map((k) => (
+            <label className="item switch" key={k.key}><span className="avatar small">{k.emoji}</span><span className="grow">{t(`notifPrefs.kinds.${k.key}`)}</span>
+              <input type="checkbox" role="switch" checked={p.kinds?.[k.key] ?? true} disabled={busy} data-testid={`notif-kind-${k.key}`} onChange={(e) => void set({ ...p, kinds: { ...(p.kinds ?? {}), [k.key]: e.target.checked } })} /></label>
+          ))}</div></div>); })}
     </div>
   );
 }

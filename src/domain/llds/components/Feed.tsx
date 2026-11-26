@@ -36,7 +36,7 @@ export function Feed({ teamId, channels, toast, limit }: { teamId: string | null
       )}
       {canPost && <Composer teamId={channel === "team" ? teamId : null} channel={channel} isStaff={isStaff} isAdmin={isAdmin} onPosted={() => { void load(); toast(t("feed.posted")); }} />}
       {shown.map((p) => <PostCard key={p.id} post={p} mod={staffHere} onOpen={() => setOpen(p)} onImage={setLightbox} onChanged={() => void load()} toast={toast} />)}
-      {!posts.length && <p className="muted small">{t("feed.empty")}</p>}
+      {!posts.length && <p className="muted small" data-testid="feed-empty">{t(isStaff ? "feed.emptyStaff" : "feed.empty")}</p>}
       {open && <CommentSheet post={open} mod={staffHere} onClose={() => { setOpen(null); void load(); }} toast={toast} />}
       {lightbox && <div className="lightbox" onClick={() => setLightbox(null)}><img src={lightbox} alt="" /></div>}
     </div>

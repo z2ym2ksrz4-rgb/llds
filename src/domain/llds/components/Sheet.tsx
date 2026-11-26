@@ -1,3 +1,4 @@
+import { humanize } from "@/core/errors";
 import type { Focus } from "@/core/api";
 import { focusStyle } from "../lib/art";
 import { useEffect, useRef, useState, type ReactNode } from "react";
@@ -89,4 +90,4 @@ export function Sheet({ onClose, children, title, eyebrow, photo, focus }: { onC
   );
 }
 
-export function Toast({ msg }: { msg: string | null }) { return msg ? <div className="toast" role="status">{msg}</div> : null; }
+export function Toast({ msg }: { msg: string | null }) { return msg ? <div className="toast" role="status">{humanize(msg)}</div> : null; }

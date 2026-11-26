@@ -1,3 +1,4 @@
+import type { ClientError } from "@/core/api";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type Feedback, type Insights } from "@/core/api";
@@ -9,6 +10,8 @@ const MOOD: Record<Feedback["mood"], string> = { love: "😍", ok: "🙂", meh: 
 /** Admin → App insights: who uses the app (live / active / never / inactive), members without a team, social activity, and the feedback list. */
 export function InsightsPage() {
   const { t } = useTranslation();
+  const [errs, setErrs] = useState<ClientError[]>([]);
+  useEffect(() => { void api.listClientErrors().then(setErrs).catch(() => setErrs([])); }, []);
   const [d, setD] = useState<Insights | null>(null);
   const [fb, setFb] = useState<Feedback[]>([]);
   const [err, setErr] = useState<string | null>(null);
@@ -44,6 +47,9 @@ export function InsightsPage() {
           </div>
         </div>
       </>)}
+      <div className="sec" data-testid="insights-errors"><h2>{t("insights.errors")} · {errs.length}</h2><p className="tiny muted" style={{ marginTop: 0 }}>{t("insights.errorsSub")}</p>
+        {errs.length ? <div className="card list">{errs.slice(0, 20).map((e) => <details key={e.id} className="item" style={{ display: "block" }}><summary className="small">{new Date(e.created_at).toLocaleString(loc())} · {e.message}</summary><pre className="tiny" style={{ whiteSpace: "pre-wrap", margin: "6px 0 0" }}>{[e.url, e.app_version, e.ua, e.stack].filter(Boolean).join("\n")}</pre></details>)}</div> : <p className="muted small" style={{ margin: 0 }}>{t("insights.errorsNone")}</p>}
+      </div>
       <div className="sec"><h2>{t("insights.feedback")} · {fb.length}</h2><p className="tiny muted" style={{ marginTop: 0 }}>{t("insights.feedbackSub")}</p>
         {fb.length === 0 ? <p className="muted small">{t("insights.noFeedback")}</p> : (
           <ScrollList testId="insights-feedback" rows={5}>

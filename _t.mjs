@@ -1,0 +1,10 @@
+import { open } from "./_lib.mjs"; const {b,p,tab,errors}=await open({}); const out={};
+await tab("Admin"); await p.click("[data-testid=admin-importmembers]"); await p.waitForSelector("[data-testid=import-text]");
+await p.fill("[data-testid=import-text]", "Fornavn;Efternavn;Fødselsdato;E-mail;Telefon;Hold;Rolle;Forælder;Forælder e-mail;Forælder telefon\nEmma;Jensen;12-03-2014;;;Mini Angels;;Mette Jensen;mette.j@eksempel.dk;12345678\nOliver;Jensen;02-09-2016;;;Mini Cuties;;Mette Jensen;mette.j@eksempel.dk;12345678\nSara;Holm;01-01-2005;sara.h@eksempel.dk;22334455;Empire;;;;");
+await p.waitForSelector("[data-testid=import-preview]"); out.runLabel=await p.textContent("[data-testid=import-run]"); await p.click("[data-testid=import-run]"); await p.waitForSelector("[data-testid=import-receipt]");
+out.receipt=(await p.inputValue("[data-testid=import-receipt] textarea")).split("\n").slice(0,6);
+out.rows=await p.$$eval("[data-testid=invite-row]", els=>els.map(e=>e.innerText.replace(/\n+/g," | ")).filter(x=>/Mini Angels|Mini Cuties|Empire/.test(x)));
+await p.locator("[data-testid=invite-row]", {hasText:"Mini Angels"}).locator("[data-testid=invite-team]").click(); await p.waitForTimeout(500);
+out.after=await p.$$eval("[data-testid=invite-row]", els=>els.map(e=>e.innerText.replace(/\n+/g," | ")).filter(x=>/Mini Angels|Mini Cuties/.test(x))); out.errors=errors;
+await tab("Admin"); 
+console.log(JSON.stringify(out,null,1)); await b.close();

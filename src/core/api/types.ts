@@ -146,6 +146,13 @@ export interface Api {
   /** Admin invites a person (optionally a parent with children); everyone is created approved and the adult gets a welcome mail with the app link. */
   invitePerson(input: InviteInput): Promise<string>;
   resendInvite(personId: string): Promise<void>;
+  /** create the household exactly like invitePerson, but hold the invitation mail (roll-out in waves) */
+  invitePersonQuiet(input: InviteInput): Promise<string>;
+  /** send the invitation to everyone on the team (members with e-mail + dancers' parents) who has not got one; again = also those waiting 7+ days */
+  inviteTeam(teamId: string, again?: boolean): Promise<number>;
+  teamInviteStatus(): Promise<TeamInviteStatus[]>;
+  logClientError(e: { message: string; stack?: string | null; url?: string | null }): Promise<void>;
+  listClientErrors(): Promise<ClientError[]>;
   /** parent confirms a 13–14-year-old's own registration (guardian.confirmed + supervised_by) */
   confirmChild(childId: string): Promise<void>;
   /** admin: give an existing person (imported dancer, child, trainer) an e-mail and send the invitation; <18 becomes a supervised login under the guardian */
@@ -463,3 +470,6 @@ export interface Api {
   /** trainer/admin: take one dancer off one team (membership delete; admin may remove any role) */
   removeMembership(personId: string, teamId: string, role: Role): Promise<void>;
 }
+
+export type TeamInviteStatus = { team_id: string; people: number; not_invited: number; invited: number; logged_in: number; waiting: number };
+export type ClientError = { id: string; created_at: string; message: string; stack: string | null; url: string | null; ua: string | null; app_version: string | null; person_id: string | null };

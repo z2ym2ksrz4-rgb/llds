@@ -21,11 +21,14 @@ const KINDS = ["competition", "show", "workshop", "social"] as const;
 export function Events({ admin }: { admin?: boolean }) {
   const { t } = useTranslation();
   const [tab, setTab] = useState<"upcoming" | "results" | "shop">("upcoming");
+  const staffAny = useAuth((x) => x.isStaff)();
+  const [hasResults, setHasResults] = useState(false);
+  useEffect(() => { void api.listResults().then((r) => setHasResults(r.length > 0)).catch(() => setHasResults(false)); }, []);
   return (
     <section className="screen events">
       <header className="topbar"><h1 className="display">{t("events.title")}</h1>{!admin && <TopRight />}</header>
       {!admin && <TabNews tab="events" />}
-      <div className="subtabs"><button className={tab === "upcoming" ? "on" : ""} onClick={() => setTab("upcoming")}>{t("events.upcoming")}</button><button className={tab === "results" ? "on" : ""} onClick={() => setTab("results")}>{t("events.results")}</button></div>
+      {(hasResults || staffAny) && <div className="subtabs"><button className={tab === "upcoming" ? "on" : ""} onClick={() => setTab("upcoming")}>{t("events.upcoming")}</button><button className={tab === "results" ? "on" : ""} onClick={() => setTab("results")}>{t("events.results")}</button></div>}
       {tab === "upcoming" && <EventsList admin={admin} />}
       {tab === "results" && <Results />}
     </section>
@@ -89,7 +92,7 @@ function EventsList({ admin }: { admin?: boolean }) {
         <button key={e.id} className="hero tap photo evcard" data-testid="event" onClick={() => setOpen(e)} style={focusStyle(e.focus, { backgroundImage: `url(${catalogUrl(e.image_key) ?? artFor(e.id)})` })}>
           <div><div className="eyebrow">{dateLabel(e.starts_at)} · {t(`events.kind.${e.kind}`)}{staff && e.featured ? ` · ★ ${t("events.featuredChip")}` : ""}{staff && e.web_signup ? ` · ${t("events.webChip")}${e.guests ? ` (${e.guests})` : ""}` : ""}</div><h2 className="display">{e.title}</h2>
             <div className="row between"><span className="small muted">{e.place ?? ""}{e.person_names?.length ? ` · ${e.person_names.join(", ")}` : e.team_names?.length ? ` · ${e.team_names.join(", ")}` : ` · ${t("events.allTeams")}`}</span>
-              {e.mySignups && e.mySignups > 0 ? (e.myUnpaid ? <span className="chip warn small" data-testid="ev-awaiting">{t("events.unpaid")}</span> : e.myClaimed ? <span className="chip small pend" data-testid="ev-claimed">{t("events.claimed")}</span> : <span className="chip ok small">{t("events.on")}</span>) : relevant && (e.signup_deadline || e.price_dkk) ? <span className="chip gold small evsign" data-testid="ev-signup">{t("events.signUp")} ›</span> : null}</div></div>
+              {e.mySignups && e.mySignups > 0 ? (e.myUnpaid ? <span className="chip warn small" data-testid="ev-awaiting">{t("events.unpaid")}</span> : e.myClaimed ? <span className="chip small pend" data-testid="ev-claimed">{t("events.claimed")}</span> : <span className="chip ok small">{t("events.on")}</span>) : relevant && (e.signup_deadline || e.price_dkk) ? <span className="chip gold small evsign" data-testid="ev-signup">{(() => { if (!e.signup_deadline) return ""; const n = Math.ceil((new Date(e.signup_deadline + "T23:59:59").getTime() - Date.now()) / 864e5); return n === 0 ? t("events.deadlineToday") + " · " : n > 0 && n <= 7 ? t("events.deadlineIn", { count: n }) + " · " : ""; })()}{t("events.signUp")} ›</span> : null}</div></div>
         </button>); })}</div>
       {!events.length && <Empty text={t("events.empty")} symbol="★" />}
       <button className="linklike small" onClick={() => setPast(!past)}>{past ? t("events.hidePast") : t("events.showPast")}</button>

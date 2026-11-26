@@ -236,7 +236,12 @@
     "absCount_one": "1 afbud",
     "absCount_other": "{{count}} afbud",
     "bookingsToday": "bookinger i dag",
-    "forYou": "Til dig"
+    "forYou": "Til dig",
+    "welcomeTitle": "Velkommen – sådan kommer du i gang",
+    "welcome1": "Tilmeld dig eller dit barn et hold.",
+    "welcome2": "Slå notifikationer til, så du får besked om aflysninger og beskeder.",
+    "welcome3": "Se ugens træninger under Kalender.",
+    "stripHint": "Prik = træning eller event den dag. Tryk på en dag for at se den."
   },
   "admin": {
     "users": "Nye brugere",
@@ -674,7 +679,8 @@
     "commentsTitle": "Kommentarer",
     "noComments": "Ingen kommentarer endnu.",
     "writeComment": "Skriv en kommentar…",
-    "send": "Send"
+    "send": "Send",
+    "emptyStaff": "Ingen opslag endnu. Skriv det første – et velkommen til holdet og et billede er en god start."
   },
   "msg": {
     "needs": {
@@ -893,7 +899,10 @@
     "guestsHint": "Deltagere uden login. Markér betalt, når pengene er set i MobilePay – så sendes kvitteringen.",
     "guestMember": "medlem",
     "featuredChip": "fremhævet",
-    "webChip": "web-tilmelding"
+    "webChip": "web-tilmelding",
+    "deadlineIn_one": "Frist i morgen",
+    "deadlineIn_other": "Frist om {{count}} dage",
+    "deadlineToday": "Frist i dag"
   },
   "shop": {
     "title": "Shop",
@@ -1045,7 +1054,7 @@
   },
   "milestones": {
     "title": "Milepæle",
-    "empty": "Ingen milepæle endnu – de kommer fra trænerne.",
+    "empty": "Ingen milepæle endnu. Milepæle er de store øjeblikke – første show, første konkurrence, 100 træninger – og de gives af trænerne.",
     "by": "af {{name}}",
     "give": "Giv milepæl",
     "custom": "Eller skriv din egen…",
@@ -1232,7 +1241,12 @@
     "pickBody": "Alt er slået til – fravælg det, du ikke vil forstyrres med.",
     "save": "Gem",
     "mail": "E-mail ved vigtige beskeder",
-    "mailSub": "Tilmeldinger, audition-krav og -svar og betalingsanmodninger sendes også på mail. Kvitteringer sendes altid; alt andet kun i appen."
+    "mailSub": "Tilmeldinger, audition-krav og -svar og betalingsanmodninger sendes også på mail. Kvitteringer sendes altid; alt andet kun i appen.",
+    "group": {
+      "training": "Træning",
+      "messages": "Beskeder og nyt",
+      "money": "Betaling og køb"
+    }
   },
   "customize": {
     "title": "Tilpas appen",
@@ -1465,7 +1479,10 @@
     "feedbackSub": "Det brugerne har skrevet om appen – nyeste øverst, 5 synlige, resten ved scroll.",
     "noFeedback": "Ingen feedback endnu. Brugerne bliver spurgt efter 14 dage i appen.",
     "anonymous": "Ukendt",
-    "markRead": "Set"
+    "markRead": "Set",
+    "errors": "Fejl i appen",
+    "errorsSub": "Fejl, som appen selv har opfanget hos brugerne de sidste 60 dage.",
+    "errorsNone": "Ingen fejl registreret."
   },
   "feedback": {
     "eyebrow": "Hjælp os",
@@ -1609,7 +1626,7 @@
   },
   "import": {
     "title": "Importér medlemmer",
-    "sub": "Dansere, forældre og trænere fra en liste – én invitation pr. familie",
+    "sub": "Opret mange på én gang og send invitationer pr. hold",
     "intro": "Kopiér fra Excel/Google Sheets eller upload en CSV. Hver række er én danser (eller træner). Står der en forælder-e-mail, bliver forælderen inviteret og barnet oprettet under forælderen; ellers inviteres personen selv. Alle logger ind med e-mail + engangskode – ingen adgangskoder.",
     "step1": "1 · Listen",
     "columns": "Kolonner (overskrifter i første række): Fornavn · Efternavn · Fødselsdato · E-mail · Telefon · Hold (flere adskilt med ;) · Rolle (Danser/Træner/Hjælpetræner) · Forælder · Forælder e-mail · Forælder telefon",
@@ -1634,7 +1651,28 @@
     "run": "Importér og send {{n}} invitationer",
     "progress": "Sender {{i}} af {{n}}…",
     "done": "{{ok}} invitationer sendt ✓",
-    "afterwards": "De nye ligger under Admin → Medlemmer. Mailen har et link til appen; de logger ind med den e-mail, de er inviteret på."
+    "afterwards": "De nye ligger under Admin → Medlemmer. Mailen har et link til appen; de logger ind med den e-mail, de er inviteret på.",
+    "sendNow": "Send invitationen med det samme",
+    "sendNowHint": "Uden flueben oprettes alle på deres hold, men ingen får en mail. Invitationerne sender du pr. hold nedenfor, når holdet er klar.",
+    "runQuiet": "Opret {{n}} uden at invitere",
+    "doneSent": "Invitationerne er sendt.",
+    "doneHeld": "Ingen mails er sendt. Send invitationerne pr. hold nedenfor.",
+    "receiptCreated": "Oprettet ({{n}}):",
+    "receiptUpdated": "Fandtes i forvejen – hold opdateret ({{n}}):",
+    "receiptFailed": "Fejlede ({{n}}):",
+    "copyReceipt": "Kopiér kvittering",
+    "statusTitle": "Invitationer pr. hold",
+    "statusSub": "Tæller dem, der skal have adgang: holdets medlemmer med e-mail og dansernes forældre.",
+    "statusLine": "{{people}} personer · {{not}} ikke inviteret · {{invited}} inviteret, ikke logget ind · {{logged}} logget ind",
+    "inviteN_one": "Send invitation (1)",
+    "inviteN_other": "Send invitationer ({{count}})",
+    "againN_one": "Send igen til 1",
+    "againN_other": "Send igen til {{count}}",
+    "allIn": "Alle er logget ind",
+    "allInvited": "Alle er inviteret",
+    "invitedN_one": "1 invitation sendt.",
+    "invitedN_other": "{{count}} invitationer sendt.",
+    "statusEmpty": "Ingen hold har medlemmer med e-mail endnu."
   },
   "sitePages": {
     "title": "Websitets sider",
@@ -1665,5 +1703,28 @@
     "homeTexts": "Forsidens overskrifter",
     "homeTextsSub": "Tomt felt = standardteksten. Brug | for at dele en overskrift, så sidste del står i kursiv.",
     "pagesSub": "Vælg en side. Det, der står i gråt i et felt, er den nuværende tekst – tomt felt beholder den."
+  },
+  "errors": {
+    "signups_closed": "Tilmeldingen er lukket lige nu.",
+    "audition_closed": "Der er ikke åbnet for audition på holdet endnu.",
+    "audition_required": "Holdet optager kun via audition.",
+    "not_an_audition_team": "Holdet har ikke audition.",
+    "already_member": "Er allerede på holdet.",
+    "not_allowed": "Det har du ikke adgang til.",
+    "not_your_person": "Du kan kun gøre det for dig selv og dine børn.",
+    "unknown_team": "Holdet findes ikke længere.",
+    "needs_parent": "Mangler en forælder, før der kan gives adgang.",
+    "too_young": "For ung til eget login – forælderen bruger appen.",
+    "needs_birth_date": "Mangler fødselsdato.",
+    "parent_needs_child": "En forælder skal have mindst ét barn tilknyttet.",
+    "last_admin": "Der skal være mindst én administrator.",
+    "too_many": "For mange forsøg – prøv igen i morgen.",
+    "bad_email": "E-mailadressen ser ikke rigtig ud.",
+    "missing_name": "Navn mangler.",
+    "not_open": "Der er ikke åbent for tilmelding.",
+    "full": "Der er ikke flere pladser.",
+    "closed": "Fristen er udløbet.",
+    "already": "Er allerede tilmeldt.",
+    "offline": "Ingen forbindelse – prøv igen om lidt."
   }
 }

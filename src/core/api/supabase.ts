@@ -1,3 +1,5 @@
+import { appVersion } from "@/core/release";
+import type { TeamInviteStatus, ClientError } from "./types";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import appConfig from "../../../app.config.json";
 import type { Api, Appearance, AuditionCandidate, Feedback, Insights, WebSignup, Me, Membership, PendingPerson, Person, Role, Team } from "./types";
@@ -147,6 +149,11 @@ export function supabaseApi(url: string, anonKey: string): Api {
       fail(error); return data as string;
     },
     async confirmChild(childId) { const { error } = await sb.rpc("confirm_child", { p_child: childId }); fail(error); },
+    async invitePersonQuiet(i) { const { data, error } = await sb.rpc("invite_person_quiet", { p_first: i.first_name, p_last: i.last_name, p_email: i.email, p_phone: i.phone, p_is_parent: i.is_parent, p_memberships: i.memberships, p_children: i.children }); fail(error); return data as string; },
+    async inviteTeam(teamId, again = false) { const { data, error } = await sb.rpc("invite_team", { p_team: teamId, p_again: again }); fail(error); return (data as number) ?? 0; },
+    async teamInviteStatus() { const { data, error } = await sb.rpc("team_invite_status"); fail(error); return (data ?? []) as TeamInviteStatus[]; },
+    async logClientError(e) { try { await sb.rpc("log_client_error", { p_message: e.message, p_stack: e.stack ?? null, p_url: e.url ?? null, p_ua: navigator.userAgent, p_version: appVersion }); } catch { /* never throw from the error reporter */ } },
+    async listClientErrors() { const { data } = await sb.from("client_error").select("*").order("created_at", { ascending: false }).limit(50); return (data ?? []) as ClientError[]; },
     async resendInvite(personId) { const { error } = await sb.rpc("resend_invite", { p_id: personId }); fail(error); },
     async inviteExisting(personId, email) { const { error } = await sb.rpc("invite_existing", { p_id: personId, p_email: email }); fail(error); },
     async lastMailStatus(personId) { const { data } = await sb.from("mail_log").select("status").contains("ref", { person_id: personId }).order("created_at", { ascending: false }).limit(1).maybeSingle(); return (data?.status as string | undefined) ?? null; },

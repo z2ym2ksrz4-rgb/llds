@@ -1,3 +1,4 @@
+import { installErrorReporter } from "@/core/report";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./app/App";
@@ -12,6 +13,7 @@ async function boot() {
   await initI18n(useSettings.getState().language);
   void useAuth.getState().boot();
   void useAppearance.getState().load();
+  installErrorReporter();
   ReactDOM.createRoot(document.getElementById("root")!).render(<React.StrictMode><App /></React.StrictMode>);
 }
 void boot();

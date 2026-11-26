@@ -14,6 +14,8 @@ import { artFor } from "../lib/art";
  *  Official messages live on Home, trainer messages and conversations on the team page – not here. */
 export function Social() {
   const { t } = useTranslation();
+  const [introOpen, setIntroOpen] = useState(() => { try { return !localStorage.getItem("llds_social_intro"); } catch { return true; } });
+  const closeIntro = () => { setIntroOpen(false); try { localStorage.setItem("llds_social_intro", "1"); } catch { /* ignore */ } };
   const me = useAuth((s) => s.me)!;
   const isStaff = me.person.is_admin || me.memberships.some((m) => m.person_id === me.person.id && m.role !== "dancer");
   const [filter, setFilter] = useState<string>("all"); // all | trainers | <team id>
@@ -32,7 +34,7 @@ export function Social() {
     <section className="screen social">
       <header className="topbar"><h1 className="display">{t("nav.social")}</h1><div className="row" style={{ gap: 8 }}>{myTeams.length > 0 && <button className="small" data-testid="new-post" onClick={() => { if (filter === "all") setFilter(myTeams[0].id); setTimeout(() => { const el = document.getElementById("post-body"); el?.scrollIntoView({ block: "center", behavior: "smooth" }); el?.focus(); }, 120); }}>+ {t("social.newPost")}</button>}<TopRight /></div></header>
       <TabNews tab="social" />
-      <p className="tiny muted" style={{ margin: "0 0 6px" }}>{t("social.intro")}</p>
+      {introOpen && <p className="tiny muted socialintro" style={{ margin: "0 0 6px" }} data-testid="social-intro">{t("social.intro")} <button type="button" className="linklike" onClick={closeIntro}>{t("common.ok")}</button></p>}
       {(() => { const LIMIT = 3; const shownTeams = moreChips ? myTeams : myTeams.slice(0, LIMIT); const hidden = myTeams.length - shownTeams.length; return (
       <div className="chips" style={{ margin: "6px 0 10px" }}>
         <button className={"chip" + (filter === "all" ? " on" : "")} onClick={() => setFilter("all")}>{t("social.all")}</button>

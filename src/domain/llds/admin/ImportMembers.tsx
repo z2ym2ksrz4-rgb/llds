@@ -1,4 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { humanize } from "@/core/errors";
+import type { TeamInviteStatus } from "@/core/api";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type Member, type Role, type Team } from "@/core/api";
 
@@ -46,7 +48,13 @@ export function ImportMembers() {
   const { t } = useTranslation();
   const [text, setText] = useState("");
   const [teams, setTeams] = useState<Team[]>([]); const [members, setMembers] = useState<Member[]>([]);
-  const [busy, setBusy] = useState(false); const [done, setDone] = useState<{ ok: number; fail: { who: string; why: string }[] } | null>(null); const [progress, setProgress] = useState(0);
+  const [busy, setBusy] = useState(false); const [done, setDone] = useState<{ ok: number; fail: { who: string; why: string }[]; created: string[]; updated: string[] } | null>(null);
+  const [sendNow, setSendNow] = useState(false);
+  const [status, setStatus] = useState<TeamInviteStatus[]>([]); const [inviteMsg, setInviteMsg] = useState<string | null>(null); const [inviting, setInviting] = useState<string | null>(null);
+  const loadStatus = useCallback(async () => setStatus(await api.teamInviteStatus().catch(() => [])), []);
+  useEffect(() => { void loadStatus(); }, [loadStatus]);
+  const receipt = () => done ? [t("import.receiptCreated", { n: done.created.length }), ...done.created.map((x) => "  " + x), "", t("import.receiptUpdated", { n: done.updated.length }), ...done.updated.map((x) => "  " + x), "", t("import.receiptFailed", { n: done.fail.length }), ...done.fail.map((f) => `  ${f.who}: ${humanize(f.why)}`)].join("\n") : "";
+  const inviteTeam = async (teamId: string, again: boolean) => { setInviting(teamId); try { const n = await api.inviteTeam(teamId, again); setInviteMsg(t("import.invitedN", { count: n })); } catch (e) { setInviteMsg(humanize((e as Error).message)); } finally { setInviting(null); void loadStatus(); } }; const [progress, setProgress] = useState(0);
   const file = useRef<HTMLInputElement>(null);
   useEffect(() => { void Promise.all([api.listTeams(), api.listMembers()]).then(([tm, m]) => { setTeams(tm); setMembers(m); }); }, []);
   const { rows } = useMemo(() => parseList(text), [text]);
@@ -68,13 +76,14 @@ export function ImportMembers() {
   const total = households.length + existing.length;
 
   const run = async () => {
-    setBusy(true); setProgress(0); const fail: { who: string; why: string }[] = []; let ok = 0; let i = 0;
+    setBusy(true); setProgress(0); const fail: { who: string; why: string }[] = []; const created: string[] = []; const updated: string[] = []; let ok = 0; let i = 0;
+    const invite = sendNow ? api.invitePerson.bind(api) : api.invitePersonQuiet.bind(api);
     for (const h of households) {
       i++; setProgress(i);
       try {
-        if (h.parent) await api.invitePerson({ first_name: h.parent.first, last_name: h.parent.last, email: h.parent.email, phone: h.parent.phone, is_parent: true, memberships: [], children: h.rows.map(({ row, teamIds }) => ({ first_name: row.first, last_name: row.last, birth_date: row.birth, memberships: teamIds.map((team_id) => ({ team_id, role: "dancer" as Role })) })) });
-        else { const { row, teamIds } = h.rows[0]; await api.invitePerson({ first_name: row.first, last_name: row.last, email: row.email, phone: row.phone, is_parent: false, memberships: teamIds.map((team_id) => ({ team_id, role: row.role })), children: [] }); }
-        ok++;
+        if (h.parent) await invite({ first_name: h.parent.first, last_name: h.parent.last, email: h.parent.email, phone: h.parent.phone, is_parent: true, memberships: [], children: h.rows.map(({ row, teamIds }) => ({ first_name: row.first, last_name: row.last, birth_date: row.birth, memberships: teamIds.map((team_id) => ({ team_id, role: "dancer" as Role })) })) });
+        else { const { row, teamIds } = h.rows[0]; await invite({ first_name: row.first, last_name: row.last, email: row.email, phone: row.phone, is_parent: false, memberships: teamIds.map((team_id) => ({ team_id, role: row.role })), children: [] }); }
+        ok++; created.push(...h.rows.map(({ row }) => `${row.first} ${row.last}`.trim() + (h.parent ? ` (${h.parent.email})` : "")));
       } catch (e) { fail.push({ who: h.parent ? h.parent.email : h.rows[0].row.first + " " + h.rows[0].row.last, why: (e as Error).message }); }
     }
     for (const p of existing) {
@@ -82,11 +91,11 @@ export function ImportMembers() {
       try {
         const have = p.person.memberships.map((m) => ({ team_id: m.team_id, role: m.role as Role })); const add = p.teamIds.filter((team_id) => !have.some((m) => m.team_id === team_id && m.role === p.row.role)).map((team_id) => ({ team_id, role: p.row.role }));
         if (add.length) await api.setMemberships(p.person.id, [...have, ...add]);
-        await api.inviteExisting(p.person.id, p.row.email || p.row.pEmail); ok++;
+        if (sendNow) await api.inviteExisting(p.person.id, p.row.email || p.row.pEmail); ok++; updated.push(`${p.row.first} ${p.row.last}`);
       }
       catch (e) { fail.push({ who: `${p.row.first} ${p.row.last}`, why: (e as Error).message }); }
     }
-    setDone({ ok, fail }); setBusy(false); setMembers(await api.listMembers().catch(() => members));
+    setDone({ ok, fail, created, updated }); setBusy(false); void loadStatus(); setMembers(await api.listMembers().catch(() => members));
   };
   const template = "data:text/csv;charset=utf-8," + encodeURIComponent("Fornavn;Efternavn;Fødselsdato;E-mail;Telefon;Hold;Rolle;Forælder;Forælder e-mail;Forælder telefon\nEmma;Jensen;12-03-2014;;;Mini Angels;Danser;Mette Jensen;mette@eksempel.dk;12345678\nLukas;Nielsen;05-09-2009;lukas@eksempel.dk;87654321;The AXIS; Teknik The AXIS;Danser;;;\nSofie;Dahl;;sofie@eksempel.dk;;Disco;Træner;;;\n");
   return (
@@ -111,10 +120,26 @@ export function ImportMembers() {
             </div>)}
           </div>
           {progress > 0 && busy && <p className="small">{t("import.progress", { i: progress, n: total })}</p>}
-          {done ? <div className="card" style={{ margin: "8px 0 0" }}><b>{t("import.done", { ok: done.ok })}</b>{done.fail.length > 0 && <ul className="small" style={{ margin: "6px 0 0", paddingLeft: 18 }}>{done.fail.map((f, i) => <li key={i}>{f.who}: {f.why}</li>)}</ul>}<p className="tiny muted" style={{ margin: "6px 0 0" }}>{t("import.afterwards")}</p></div>
-            : <button type="button" className="cta" disabled={busy || total === 0} data-testid="import-run" onClick={() => void run()} style={{ marginTop: 10 }}>{t("import.run", { n: total })}</button>}
+          {done ? <div className="card" style={{ margin: "8px 0 0" }} data-testid="import-receipt"><b>{t("import.done", { ok: done.ok })}</b>
+              <p className="tiny muted" style={{ margin: "4px 0 6px" }}>{sendNow ? t("import.doneSent") : t("import.doneHeld")}</p>
+              <textarea readOnly rows={Math.min(12, 6 + done.created.length + done.updated.length + done.fail.length)} value={receipt()} style={{ fontFamily: "ui-monospace, monospace", fontSize: 12 }} />
+              <button type="button" className="ghost small" style={{ marginTop: 6 }} onClick={() => { void navigator.clipboard?.writeText(receipt()); }}>{t("import.copyReceipt")}</button></div>
+            : <><label className="check" style={{ marginTop: 10 }}><input type="checkbox" checked={sendNow} data-testid="import-sendnow" onChange={(e) => setSendNow(e.target.checked)} /><span>{t("import.sendNow")}<div className="tiny muted">{t("import.sendNowHint")}</div></span></label><button type="button" className="cta" disabled={busy || total === 0} data-testid="import-run" onClick={() => void run()} style={{ marginTop: 10 }}>{t(sendNow ? "import.run" : "import.runQuiet", { n: total })}</button></>}
         </div>
       )}
+      <div className="sec" data-testid="invite-status"><h2>{t("import.statusTitle")}</h2>
+        <p className="tiny muted" style={{ marginTop: 0 }}>{t("import.statusSub")}</p>
+        {inviteMsg && <p className="ok small" role="status">{inviteMsg}</p>}
+        <div className="card list">
+          {status.filter((x) => x.people > 0).map((x) => { const tm = teams.find((q) => q.id === x.team_id); if (!tm) return null; return (
+            <div key={x.team_id} className="item" data-testid="invite-row" style={{ flexWrap: "wrap" }}><span className="grow">{tm.name}<div className="tiny">{t("import.statusLine", { people: x.people, not: x.not_invited, invited: x.invited, logged: x.logged_in })}</div></span>
+              {x.not_invited > 0 && <button type="button" className="small" disabled={inviting === x.team_id} data-testid="invite-team" onClick={() => void inviteTeam(x.team_id, false)}>{t("import.inviteN", { count: x.not_invited })}</button>}
+              {x.waiting > 0 && <button type="button" className="ghost small" disabled={inviting === x.team_id} data-testid="invite-again" onClick={() => void inviteTeam(x.team_id, true)}>{t("import.againN", { count: x.waiting })}</button>}
+              {x.not_invited === 0 && x.waiting === 0 && <span className="chip small ok">{x.logged_in === x.people ? t("import.allIn") : t("import.allInvited")}</span>}
+            </div>); })}
+          {!status.some((x) => x.people > 0) && <p className="muted small">{t("import.statusEmpty")}</p>}
+        </div>
+      </div>
     </section>
   );
 }

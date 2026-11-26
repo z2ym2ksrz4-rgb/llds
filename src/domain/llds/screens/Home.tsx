@@ -118,6 +118,7 @@ export function Home() {
 
   /* hero image: the viewed person's own team photo (Line's) → next event's image → school default → art */
   const selTeam = selectedTeamId ? me.teams.find((x) => x.id === selectedTeamId && (teamIds.has(x.id) || me.person.is_admin)) : undefined;   // the team chosen in the picker – follows the hat (own team / child's team)
+  const [stripHint, setStripHint] = useState(() => { try { return !localStorage.getItem("llds_strip_hint"); } catch { return false; } });
   const firstTeam = selTeam ?? me.teams.find((x) => teamIds.has(x.id));
   // the team's chosen top picture wins – whether it is one of Line's photos (http) or a catalogue picture picked in Admin → Hold ("art/catalog/…"); then the team's own photos, then the about-picture
   const ownPhoto = firstTeam?.cover_url || firstTeam?.photos?.[0] || firstTeam?.about_url || null;
@@ -229,11 +230,13 @@ export function Home() {
     </>),
     teampick: () => (<>
       {(!isAdmin || me.teams.length > 0) && <TeamPicker />}
-      {!me.person.supervised_by && signupsOpen && <button type="button" className="linklike small home-join" data-testid="home-join" onClick={() => setJoin(true)}>+ {t("pay.join")}</button>}
+      {!me.person.supervised_by && signupsOpen && <button type="button" className="ghost small home-join" data-testid="home-join" onClick={() => setJoin(true)}>+ {t("pay.join")}</button>}
       {/* week strip: the dots follow the team chosen above – its trainings and events */}
-      {(!isAdmin || teamIds.size > 0) && <div className="weekstrip" data-testid="weekstrip">
+      {!isAdmin && teamIds.size === 0 && <div className="card welcomecard" data-testid="welcome-card"><div className="eyebrow gold">{t("home.welcomeTitle")}</div><ol className="steps3"><li>{t("home.welcome1")}</li><li>{t("home.welcome2")}</li><li>{t("home.welcome3")}</li></ol>{!me.person.supervised_by && signupsOpen && <button type="button" className="cta" onClick={() => setJoin(true)}>{t("pay.join")}</button>}</div>}
+      {(!isAdmin || teamIds.size > 0) && <div className="weekstrip" data-testid="weekstrip" title={t("home.stripHint")}>
         {strip.map((d) => { const key = d.toDateString(); const n = week.filter((w) => new Date(w.at).toDateString() === key).length || sessions.filter((x) => x.team_id === teamId && !x.cancelled && new Date(x.starts_at).toDateString() === key).length; return <button type="button" key={key} className={"d" + (key === today ? " today" : "") + (n ? " has" : "") + (selDay === key ? " sel" : "")} onClick={() => setSelDay(selDay === key ? null : key)} aria-pressed={selDay === key} aria-label={`${DAY_LONG[(d.getDay() + 6) % 7]} ${d.getDate()}. · ${n ? t("home.stripHas", { count: n }) : t("home.stripNone")}`} title={n ? t("home.stripHas", { count: n }) : t("home.stripNone")}><small>{DAY_SHORT[(d.getDay() + 6) % 7]}</small><b>{d.getDate()}</b><i /></button>; })}
       </div>}
+      {stripHint && (!isAdmin || teamIds.size > 0) && <p className="tiny muted striphint" data-testid="strip-hint">{t("home.stripHint")} <button type="button" className="linklike" onClick={() => { setStripHint(false); try { localStorage.setItem("llds_strip_hint", "1"); } catch { /* ignore */ } }}>{t("common.ok")}</button></p>}
       {selDay && (() => { const items = week.filter((w) => new Date(w.at).toDateString() === selDay); return (
         <div className="daypanel list" data-testid="day-panel">
           <div className="eyebrow gold">{dateLabel(items[0]?.at ?? new Date(selDay).toISOString())}</div>
@@ -289,6 +292,7 @@ export function Home() {
     order = [...rest.slice(0, at), ...studioKeys.filter((k) => order.includes(k) || k === "adminTodo"), ...rest.slice(at)];
   }
   const FOLD = new Set(childLogin ? ["gallery", "upcoming"] : ["gallery", "badges", "upcoming"]);   // children see their emblems right away   // nice-to-have content lives under one "Mere" fold – the first screen stays about now
+  if (isAdmin && !viewing.isChild) FOLD.add("studio");   // admin: to-dos and today's numbers stay up, the rest folds
   const main = order.filter((k) => !FOLD.has(k)); const folded = order.filter((k) => FOLD.has(k));
   const renderKey = (k: string) => { const box = boxOf(appearance, k); return <Fragment key={k}>{box ? <CustomBoxCard box={box} onTab={(tab) => setTab(tab as Parameters<typeof setTab>[0])} /> : SECTIONS[k]?.()}</Fragment>; };
 
