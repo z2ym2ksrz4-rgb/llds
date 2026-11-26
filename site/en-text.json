@@ -416,5 +416,13 @@
  "Testudgave: installér først TestFlight fra App Store, scan så koden (eller tryk på knappen på telefonen) og vælg Install.": "Test version: first install TestFlight from the App Store, then scan the code (or tap the button on your phone) and choose Install.",
  "Testudgave: scan koden, tryk Bliv tester og derefter Download i Google Play. Log ind med den Google-konto, du bruger på telefonen.": "Test version: scan the code, tap Become a tester and then Download on Google Play. Sign in with the Google account you use on the phone.",
  "Hent via TestFlight": "Get via TestFlight",
- "Hent via Google Play (test)": "Get via Google Play (test)"
+ "Hent via Google Play (test)": "Get via Google Play (test)",
+ "Ansøg om adgang til Backstage": "Apply for access to Backstage",
+ "– danseskolen godkender dig, og du får en mail.": "– the school approves you, and you get an e-mail.",
+ "I appen: tryk på træningen under Hjem → Din uge (eller i Kalender) og vælg “Meld afbud”. Træneren får besked med det samme.": "In the app: tap the training under Home → Your week (or in Calendar) and choose “Report absence”. The trainer is told right away.",
+ "Mit barn er 13–17 år – kan det få sit eget login?": "My child is 13–17 – can they have their own login?",
+ "Ja: menuen bag dit billede → Mine børn → “Giv login”. Børn under 13 bruger appen gennem en forælder.": "Yes: the menu behind your picture → My children → “Give login”. Children under 13 use the app through a parent.",
+ "Er du allerede danser eller forælder hos LL Dance Studio, men kan ikke logge ind? Så ansøg om adgang her – danseskolen godkender dig, og du får en mail, når du kan logge ind.": "Already a dancer or parent at LL Dance Studio but cannot log in? Apply for access here – the school approves you, and you get an e-mail when you can log in.",
+ "Ansøg om adgang": "Apply for access",
+ ". Log ind med den Google-konto, du bruger på telefonen.": ". Log in with the Google account you use on your phone."
 }
