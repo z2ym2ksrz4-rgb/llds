@@ -478,7 +478,9 @@
       "parents": "Parents",
       "staff": "Trainers",
       "nologin": "No login"
-    }
+    },
+    "auditionOpen": "Audition is open",
+    "auditionOpenHint": "Only when it is open can dancers apply, and only then do trainers and dancers see anything about audition. Close it again when the round is over."
   },
   "settings": {
     "language": "Language",
@@ -1486,7 +1488,7 @@
     "title": "Audition",
     "adminTitle": "Auditions",
     "adminSub": "Applicants, requirements video, scoring and selections",
-    "adminOverviewIntro": "All teams admitting by audition. Tap a team to send requirements, score and select.",
+    "adminOverviewIntro": "Open auditions for a team when you are ready. Until then neither dancers nor trainers see anything about audition in the app.",
     "adminIntro": "Send requirements and video to everyone who applied, score them in the hall, and send the selections – the selected accept and pay in the app.",
     "brief": "Requirements and video",
     "noBrief": "No requirements written yet.",
@@ -1575,7 +1577,9 @@
     "staffLine": "{{applied}} applied · {{invited}} briefed · {{selected}} selected",
     "staffNone": "No applicants yet",
     "staffOpen": "Open audition",
-    "quietLine": "Signed up for {{teams}} – the trainer will be in touch."
+    "quietLine": "Signed up for {{teams}} – the trainer will be in touch.",
+    "open": "Open",
+    "closed": "Closed – tap to open"
   },
   "help": {
     "title": "Help",

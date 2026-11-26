@@ -74,6 +74,7 @@ export type Team = {
   price_full?: number | null; price_half?: number | null; price_signup?: number | null; price_note?: string | null; installments_allowed?: boolean;
   admission?: "open" | "tryout" | "audition";   // how dancers get on the team (badge on website + app)
   admission_note?: string | null;
+  audition_open?: boolean;       // admin has opened auditions for this team – until then nothing about audition is shown
   signup_open?: boolean;         // false = visible but cannot be joined (season break / team not opened yet)
   audition_video_url?: string | null; audition_text?: string | null; audition_event_id?: string | null; audition_sent_at?: string | null; audition_round?: number;
   photos?: string[];            // Line's own photos of the team (website URLs); a second one is shown under "Om holdet"
@@ -202,7 +203,7 @@ export type Absence = { id: string; session_id: string; person_id: string; reaso
 
 export type RosterEntry = { person_id: string; name: string; birth_year: number | null; role: Role; present: boolean | null; absence: Absence | null; via_punch: boolean };
 
-export type TeamInput = Partial<Pick<Team, "name" | "style" | "category" | "level" | "closed" | "parents_see_video" | "punch_card_open" | "color" | "about_url" | "photos" | "signup_open" | "description" | "cover_url" | "focus" | "admission" | "admission_note" | "price_full" | "price_half" | "price_signup" | "price_note" | "installments_allowed" | "price">> & { max_dancers?: number | null; visibility?: "public" | "private"; archived?: boolean };
+export type TeamInput = Partial<Pick<Team, "name" | "style" | "category" | "level" | "closed" | "parents_see_video" | "punch_card_open" | "color" | "about_url" | "photos" | "signup_open" | "audition_open" | "description" | "cover_url" | "focus" | "admission" | "admission_note" | "price_full" | "price_half" | "price_signup" | "price_note" | "installments_allowed" | "price">> & { max_dancers?: number | null; visibility?: "public" | "private"; archived?: boolean };
 
 export type Member = Person & { memberships: Membership[]; children: Person[]; parents: Person[] };
 

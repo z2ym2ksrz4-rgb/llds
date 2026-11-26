@@ -478,7 +478,9 @@
       "parents": "Forældre",
       "staff": "Trænere",
       "nologin": "Uden login"
-    }
+    },
+    "auditionOpen": "Audition er åben",
+    "auditionOpenHint": "Først når den er åben, kan dansere melde sig, og først da ser trænere og dansere noget om audition. Luk igen, når runden er slut."
   },
   "settings": {
     "language": "Sprog",
@@ -1486,7 +1488,7 @@
     "title": "Audition",
     "adminTitle": "Auditions",
     "adminSub": "Tilmeldte, krav-video, scoring og udtagelser",
-    "adminOverviewIntro": "Alle hold med optagelse via audition. Tryk på et hold for at sende krav, score og udtage.",
+    "adminOverviewIntro": "Åbn for audition på et hold, når I er klar. Indtil da ser hverken dansere eller trænere noget om audition i appen.",
     "adminIntro": "Send krav og video til alle tilmeldte, scor dem i salen, og send udtagelserne – de udtagne accepterer og betaler i appen.",
     "brief": "Krav og video",
     "noBrief": "Ingen krav skrevet endnu.",
@@ -1575,7 +1577,9 @@
     "staffLine": "{{applied}} tilmeldt · {{invited}} har fået krav · {{selected}} udtaget",
     "staffNone": "Ingen tilmeldte endnu",
     "staffOpen": "Åbn audition",
-    "quietLine": "Tilmeldt {{teams}} – du hører fra træneren."
+    "quietLine": "Tilmeldt {{teams}} – du hører fra træneren.",
+    "open": "Åben",
+    "closed": "Lukket – tryk for at åbne"
   },
   "help": {
     "title": "Hjælp",

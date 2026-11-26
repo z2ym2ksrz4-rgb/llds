@@ -125,7 +125,7 @@ export function AuditionCards() {
   const [toast, setToast] = useState<string | null>(null); const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
   const [teams, setTeams] = useState<Team[]>([]);
   const mine = useMemo(() => new Set([me.person.id, ...me.children.map((c) => c.id)]), [me]);
-  const staffTeams = useMemo(() => me.teams.filter((x) => (x.admission === "audition" || x.closed) && me.memberships.some((m) => m.person_id === me.person.id && m.team_id === x.id && m.role !== "dancer")), [me]);
+  const staffTeams = useMemo(() => me.teams.filter((x) => x.admission === "audition" && x.audition_open && me.memberships.some((m) => m.person_id === me.person.id && m.team_id === x.id && m.role !== "dancer")), [me]);
   const [all, setAll] = useState<AuditionCandidate[]>([]);
   const load = useCallback(async () => { const rows = (await api.listAuditionCandidates().catch(() => [])) as AuditionCandidate[]; setAll(rows); setCands(rows.filter((c) => mine.has(c.person_id) && c.status !== "withdrawn")); }, [mine]);
   useEffect(() => { void load(); const f = () => void load(); addEventListener("llds:audition", f); return () => removeEventListener("llds:audition", f); }, [load]);
