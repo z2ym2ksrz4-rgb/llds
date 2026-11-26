@@ -30,7 +30,8 @@
     "add": "Add",
     "error": "Error",
     "close": "Close",
-    "help": "Help"
+    "help": "Help",
+    "offline": "You are offline – showing what was last fetched."
   },
   "lang": {
     "da": "Dansk",
@@ -163,7 +164,16 @@
     "moreAbout": "More about the team",
     "moreAboutSub": "Description · events · trophies · trainings",
     "seeDancers": "See dancers",
-    "assistantHint": "As an assistant you see attendance, the lesson plan and messages. The team's profile, videos and photos are managed by the trainer."
+    "assistantHint": "As an assistant you see attendance, the lesson plan and messages. The team's profile, videos and photos are managed by the trainer.",
+    "readyTitle": "Ready for members",
+    "readySub": "The team should have this before dancers and parents are invited.",
+    "readyDone": "The team is ready to welcome members.",
+    "ready": {
+      "msg": "Write a welcome message to the team",
+      "cover": "Choose the team picture",
+      "gallery": "Choose at least three pictures for the front page",
+      "content": "Upload the first video, folder or picture"
+    }
   },
   "home": {
     "hi": "Hi {{name}}",
@@ -796,7 +806,9 @@
     "notes": "Notes for this video",
     "addNotes": "Add notes",
     "notesPh": "Counts, what to practise, who starts where …",
-    "formationsIntro": "Formations belong to the choreography videos. Pick a video to see or edit its formations."
+    "formationsIntro": "Formations belong to the choreography videos. Pick a video to see or edit its formations.",
+    "tooBig": "The video is too large (max {{mb}} MB). Trim it or record at a lower resolution.",
+    "maxSize": "Max {{mb}} MB per video."
   },
   "notes": {
     "title": "Notes",
@@ -910,7 +922,8 @@
     "webChip": "web sign-up",
     "deadlineIn_one": "Deadline tomorrow",
     "deadlineIn_other": "Deadline in {{count}} days",
-    "deadlineToday": "Deadline today"
+    "deadlineToday": "Deadline today",
+    "addToCalendar": "Add to my calendar"
   },
   "shop": {
     "title": "Shop",
@@ -1058,7 +1071,10 @@
     "created": "Created {{when}}",
     "summaryOpen_one": "1 payment outstanding",
     "summaryOpen_other": "{{count}} payments outstanding",
-    "summaryAllPaid": "Everything is paid ✓"
+    "summaryAllPaid": "Everything is paid ✓",
+    "allTeams": "All teams",
+    "olderThan7_one": "1 has waited over 7 days",
+    "olderThan7_other": "{{count}} have waited over 7 days"
   },
   "milestones": {
     "title": "Milestones",
@@ -1697,7 +1713,10 @@
     "nChanged_other": "{{count}} changes",
     "moreImages": "Other pictures ({{n}})",
     "moreTexts": "Other texts ({{n}})",
-    "home": "Front page"
+    "home": "Front page",
+    "groupChanged": "Changed by you",
+    "groupFixed": "Front page and fixed pages",
+    "groupTeams": "Team pages ({{n}})"
   },
   "website": {
     "title": "Website",

@@ -1,3 +1,4 @@
+import { Skeleton } from "../components/Skeleton";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type Event, type Focus, type EventInput, type EventSignup, type Result, type EventGuest } from "@/core/api";
@@ -65,18 +66,25 @@ function Results() {
 }
 
 /** Upcoming events: photo cards with sign-up status, sheet with plan/pack list/sign-up/payment; staff create/edit. */
+/** A calendar file for the family calendar: the event with place and the short info text. */
+function icsHref(e: Event): string {
+  const z = (d: Date) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, ""); const esc = (x: string) => x.replace(/\\/g, "\\\\").replace(/\n/g, "\\n").replace(/([,;])/g, "\\$1");
+  const start = new Date(e.starts_at); const end = e.ends_at ? new Date(e.ends_at) : new Date(start.getTime() + 2 * 3600e3);
+  const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//LL Dance Studio//Backstage//DA", "BEGIN:VEVENT", `UID:${e.id}@llds`, `DTSTAMP:${z(new Date())}`, `DTSTART:${z(start)}`, `DTEND:${z(end)}`, `SUMMARY:${esc(e.title)}`, e.place ? `LOCATION:${esc(e.place)}` : "", e.info ? `DESCRIPTION:${esc(e.info.slice(0, 600))}` : "", "END:VEVENT", "END:VCALENDAR"].filter(Boolean);
+  return "data:text/calendar;charset=utf-8," + encodeURIComponent(lines.join("\r\n"));
+}
 function EventsList({ admin }: { admin?: boolean }) {
   const { t } = useTranslation();
   const me = useAuth((s) => s.me)!;
   const isStaff = useAuth((s) => s.isStaff)();
   const staff = admin || isStaff;
-  const [events, setEvents] = useState<Event[]>([]);
+  const [events, setEvents] = useState<Event[]>([]); const [loaded, setLoaded] = useState(false);
   const [past, setPast] = useState(false);
   const [open, setOpen] = useState<Event | null>(null);
   const [edit, setEdit] = useState<Event | "new" | null>(null);
   const [toast, setToast] = useState<string | null>(null); const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
   const viewing = useAuth((s) => s.viewing);
-  const load = useCallback(async () => { const e = eventsFor(await api.listEvents(past), me, viewing); setEvents(e); setOpen((o) => (o ? e.find((x) => x.id === o.id) ?? null : null)); }, [past, me, viewing]);
+  const load = useCallback(async () => { const e = eventsFor(await api.listEvents(past), me, viewing); setEvents(e); setLoaded(true); setOpen((o) => (o ? e.find((x) => x.id === o.id) ?? null : null)); }, [past, me, viewing]);
   useEffect(() => { void load(); }, [load]);
   const takeRef = useNav((s) => s.takeRef); const pendingRef = useNav((s) => s.pendingRef);
   useEffect(() => { // opened from a notification
@@ -94,7 +102,8 @@ function EventsList({ admin }: { admin?: boolean }) {
             <div className="row between"><span className="small muted">{e.place ?? ""}{e.person_names?.length ? ` · ${e.person_names.join(", ")}` : e.team_names?.length ? ` · ${e.team_names.join(", ")}` : ` · ${t("events.allTeams")}`}</span>
               {e.mySignups && e.mySignups > 0 ? (e.myUnpaid ? <span className="chip warn small" data-testid="ev-awaiting">{t("events.unpaid")}</span> : e.myClaimed ? <span className="chip small pend" data-testid="ev-claimed">{t("events.claimed")}</span> : <span className="chip ok small">{t("events.on")}</span>) : relevant && (e.signup_deadline || e.price_dkk) ? <span className="chip gold small evsign" data-testid="ev-signup">{(() => { if (!e.signup_deadline) return ""; const n = Math.ceil((new Date(e.signup_deadline + "T23:59:59").getTime() - Date.now()) / 864e5); return n === 0 ? t("events.deadlineToday") + " · " : n > 0 && n <= 7 ? t("events.deadlineIn", { count: n }) + " · " : ""; })()}{t("events.signUp")} ›</span> : null}</div></div>
         </button>); })}</div>
-      {!events.length && <Empty text={t("events.empty")} symbol="★" />}
+      {!loaded && <Skeleton rows={3} />}
+      {loaded && !events.length && <Empty text={t("events.empty")} symbol="★" />}
       <button className="linklike small" onClick={() => setPast(!past)}>{past ? t("events.hidePast") : t("events.showPast")}</button>
       {open && <EventSheet event={open} staff={staff} onClose={() => { setOpen(null); void load(); }} onEdit={() => { setEdit(open); setOpen(null); }} onChanged={() => void load()} toast={say} />}
       {edit && <EventEditor event={edit === "new" ? null : edit} onClose={() => setEdit(null)} onSaved={() => { setEdit(null); void load(); say(t("common.saved")); }} />}
@@ -138,6 +147,7 @@ export function EventSheet({ event, staff, onClose, onEdit, onChanged, toast }: 
           {deadlinePassed && <p className="tiny">{t("events.deadlinePassed")}</p>}
         </div>
       )}
+      <a className="linklike small" data-testid="ev-ics" href={icsHref(event)} download={event.title.replace(/[^\wæøåÆØÅ -]/g, "") + ".ics"}>{t("events.addToCalendar")} ↓</a>
       {staff && onEdit && <button type="button" className="ghost small" data-testid="ev-edit" onClick={onEdit}>✎ {t("events.editEvent")}</button>}
       {staff && (
         <div className="card" style={{ margin: 0 }}><div className="row between"><span className="eyebrow">{t("events.signups", { n: signups.length })}{event.price_dkk ? ` · ${t("events.paidN", { n: paid })}` : ""}</span>{onEdit && <button className="linklike small" onClick={onEdit}>{t("common.edit")}</button>}</div>

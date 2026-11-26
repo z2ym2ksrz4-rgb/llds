@@ -158,12 +158,15 @@ export function PaymentsAdmin() {
   const [toast, setToast] = useState<string | null>(null); const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
   const load = useCallback(async () => { const [l, ts] = await Promise.all([api.listWebSignups(), api.listTeams()]); setList(l); setTeams(ts); }, []);
   useEffect(() => { void load(); }, [load]);
-  const shown = filter === "open" ? list.filter((p) => p.status === "awaiting_payment") : list;
+  const [teamF, setTeamF] = useState("");
+  const shown = (filter === "open" ? list.filter((p) => p.status === "awaiting_payment") : list).filter((p) => !teamF || p.team_id === teamF);
+  const old = shown.filter((p) => p.status === "awaiting_payment" && Date.now() - new Date(p.created_at).getTime() > 7 * 864e5).length;
   const sum = shown.reduce((s, p) => s + (p.status !== "cancelled" ? p.amount_dkk ?? 0 : 0), 0);
   return (
     <section className="screen">
       <header className="topbar"><h1 className="display">{t("pay.adminTitle")}</h1><button className="small" onClick={() => setCompose(true)} data-testid="pay-new">+ {t("pay.request")}</button></header>
       <div className="row between"><div className="subtabs" style={{ margin: 0 }}><button className={filter === "open" ? "on" : ""} onClick={() => setFilter("open")}>{t("pay.openFilter")}</button><button className={filter === "all" ? "on" : ""} onClick={() => setFilter("all")}>{t("pay.all")}</button></div><span className="tiny">{shown.length} · {kr(sum)}</span></div>
+      <div className="row" style={{ gap: 8, margin: "8px 0", flexWrap: "wrap", alignItems: "center" }}><select value={teamF} data-testid="pay-teamfilter" onChange={(e) => setTeamF(e.target.value)} style={{ maxWidth: 260 }}><option value="">{t("pay.allTeams")}</option>{teams.filter((x) => list.some((p) => p.team_id === x.id)).map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</select>{old > 0 && <span className="chip small warn" data-testid="pay-old">{t("pay.olderThan7", { count: old })}</span>}</div>
       <div className="card list" data-testid="admin-payments">
         {shown.map((p) => (
           <div key={p.id} className="item" data-testid="admin-payment">

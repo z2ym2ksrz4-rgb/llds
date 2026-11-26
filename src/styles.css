@@ -1056,3 +1056,9 @@ button.home-join { margin: 8px 0 2px; align-self: flex-start; min-height: 40px; 
 .callist .item .when { display:flex; flex-direction:column; min-width:46px; font-variant-numeric:tabular-nums; } .callist .item .when small { color:var(--muted); font-size:.75rem; }
 .callist .item.off { opacity:.55; }
 .screen.rooms .callist { overflow-y:auto; flex:1; min-height:0; }
+.readylist { display:flex; flex-direction:column; gap:6px; } .readylist .checkrow { width:100%; }
+.skel { display:flex; flex-direction:column; gap:10px; padding:14px 0; } .skel-row { height:54px; border-radius:14px; background:linear-gradient(90deg, rgba(255,255,255,.04), rgba(255,255,255,.09), rgba(255,255,255,.04)); background-size:200% 100%; animation:skel 1.4s linear infinite; }
+@keyframes skel { from { background-position:200% 0; } to { background-position:-200% 0; } } @media (prefers-reduced-motion: reduce) { .skel-row { animation:none; } }
+.offlinebar { position:sticky; top:0; z-index:40; text-align:center; font-size:.8rem; padding:calc(6px + env(safe-area-inset-top)) 12px 6px; background:#3a2f17; color:#f1e2b8; grid-column:1 / -1; }
+.chips.tight button.chip.small { min-height:40px; padding:8px 12px; }
+[data-testid=cz-order] .item button.ghost.small { min-width:40px; }

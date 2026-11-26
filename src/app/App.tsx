@@ -1,4 +1,6 @@
-import { useEffect } from "react";
+import { Skeleton } from "@/domain/llds/components/Skeleton";
+import { OfflineBar } from "@/domain/llds/components/OfflineBar";
+import { useEffect , lazy, Suspense } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/core/auth";
 import { useNav, type Tab } from "@/core/nav";
@@ -6,7 +8,8 @@ import { useBadges } from "@/core/badges";
 import { isRelease } from "@/core/release";
 import { initDeepLinks } from "@/core/links";
 import { SceneBg } from "@/domain/llds/components/Scene";
-import { Home, Login, Register, Pending, Rooms, TeamScreen, Admin, More, Social, Events } from "@/domain";
+import { Home, Login, Register, Pending, Rooms, TeamScreen, More, Social, Events } from "@/domain";
+const Admin = lazy(() => import("@/domain/llds/admin/Admin").then((m) => ({ default: m.Admin })));   // members never open Admin – they should not download it
 import { Icon } from "@/domain/llds/components/Icons";
 import { Logo } from "@/domain/llds/components/Logo";
 import { Tour } from "@/domain/llds/components/Tour";
@@ -46,12 +49,13 @@ export default function App() {
   else if (phase === "pending") body = <Pending />;
   else if (phase === "rejected") body = <Pending rejected />;
   else if (blocked) body = <section className="screen centered"><div className="card" style={{ maxWidth: 420 }}><div className="eyebrow">{t("view.blockedEyebrow")}</div><h2 className="display">{blocked.name}</h2><p className="muted">{t("view.blocked", { years: blocked.years ?? "", age: 10 })}</p><div className="row" style={{ gap: 8, marginTop: 12 }}><button className="ghost" onClick={() => setViewAs(null)}>{t("view.exit")}</button></div></div></section>;
-  else body = tab === "home" ? <Home /> : tab === "rooms" ? <Rooms /> : tab === "team" ? <TeamScreen /> : tab === "social" ? <Social /> : tab === "events" ? <Events /> : tab === "admin" && isAdmin ? <Admin /> : tab === "shop" ? <ShopScreen /> : <More />;
+  else body = tab === "home" ? <Home /> : tab === "rooms" ? <Rooms /> : tab === "team" ? <TeamScreen /> : tab === "social" ? <Social /> : tab === "events" ? <Events /> : tab === "admin" && isAdmin ? <Suspense fallback={<Skeleton rows={6} />}><Admin /></Suspense> : tab === "shop" ? <ShopScreen /> : <More />;
 
   const tabs: [Tab, string, string][] = [["home", t("nav.home"), "home"], ["rooms", t("nav.rooms"), "cal"], ...(hasTeams ? [["team", t("nav.team"), "team"] as [Tab, string, string]] : []), ["social", t("nav.social"), "chat"], ["events", t("nav.events"), "star"], ...(isAdmin ? [["admin", t("nav.admin"), "grid"] as [Tab, string, string]] : [])];
   return (
     <div className="app">
       <SceneBg />
+      <OfflineBar />
       {phase === "ready" && viewAs && me && <div className="viewbar" data-testid="viewbar"><span>{t("view.previewing", { role: `${me.person.first_name} ${me.person.last_name}` })}</span><button onClick={() => setViewAs(null)}>{t("view.exit")}</button></div>}
       <main>{body}</main>
       {phase === "ready" && <Welcome />}

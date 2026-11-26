@@ -66,7 +66,7 @@ export function TeamScreen() {
   const lead = canRemove;   // trainer/admin runs the team; an assistant (often 16) gets the light staff view: attendance, lesson plan, messages – no editing of the team's profile, media or messages
   const assistantOnly = staff && !lead;
   const [openBadge, setOpenBadge] = useState<PersonBadge | null>(null);
-  const [galleryOpen, setGalleryOpen] = useState(false); const refreshMe = useAuth((x) => x.refresh);
+  const [galleryOpen, setGalleryOpen] = useState(false); const [readyHidden, setReadyHidden] = useState(() => { try { return !!localStorage.getItem("llds_ready_" + (teamId ?? "")); } catch { return false; } }); const refreshMe = useAuth((x) => x.refresh);
   const [awardTitle, setAwardTitle] = useState("");
   const [toast, setToast] = useState<string | null>(null);
   const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
@@ -146,11 +146,19 @@ export function TeamScreen() {
       </div>
 
       {assistantOnly && <p className="tiny muted" data-testid="assistant-hint" style={{ margin: "0 0 8px" }}>{t("team.assistantHint")}</p>}
-      {lead && stats.videos === 0 && stats.media === 0 && stats.formations === 0 && (
-        <div className="card start" data-testid="team-start"><div className="eyebrow gold">{t("team.startTitle")}</div><p className="small" style={{ margin: "4px 0 10px" }}>{t("team.startSub")}</p>
-          <div className="chips"><button className="chip" onClick={() => setPage("choreo")}>{t("team.startVideo")}</button><button className="chip" onClick={() => setCompose(true)}>{t("team.writeToTeam")}</button><button className="chip" onClick={() => setPage("folders")}>{t("team.startFolder")}</button></div>
-        </div>
-      )}
+      {lead && (() => { // "klar til medlemmer": what a team should have before its members are invited
+        const steps: { key: string; done: boolean; go: () => void }[] = [
+          { key: "msg", done: msgs.some((m) => m.audience.teams?.includes(team.id)), go: () => setCompose(true) },
+          { key: "cover", done: !!(team.cover_url || (team.photos ?? []).length), go: () => setGalleryOpen(true) },
+          { key: "gallery", done: (team.gallery ?? []).length >= 3, go: () => setGalleryOpen(true) },
+          { key: "content", done: stats.videos > 0 || (stats.folders ?? 0) > 0 || stats.media > 0, go: () => setPage("choreo") },
+        ];
+        const left = steps.filter((x) => !x.done).length; if (!left && readyHidden) return null;
+        return (
+          <div className="card start" data-testid="team-start"><div className="row between"><div className="eyebrow gold">{t("team.readyTitle")} · {steps.length - left}/{steps.length}</div>{!left && <button type="button" className="linklike small" onClick={() => { setReadyHidden(true); try { localStorage.setItem("llds_ready_" + team.id, "1"); } catch { /* ignore */ } }}>{t("common.ok")}</button>}</div>
+            <p className="small" style={{ margin: "4px 0 8px" }}>{left ? t("team.readySub") : t("team.readyDone")}</p>
+            <div className="readylist">{steps.map((x) => <button type="button" key={x.key} className={"checkrow" + (x.done ? " on" : "")} data-testid={`ready-${x.key}`} onClick={x.go}><span className="box" aria-hidden>{x.done ? "✓" : ""}</span><span className="lbl">{t(`team.ready.${x.key}`)}</span></button>)}</div>
+          </div>); })()}
       <div className="tilechips" data-testid="team-tiles">
         {(staff ? !(stats.videos === 0 && stats.media === 0 && stats.formations === 0) : (stats.videos > 0 && seesChoreo)) && <button className={"card tap" + (seesChoreo ? "" : " dim") + (stats.videos ? "" : " empty")} disabled={!seesChoreo} onClick={() => setPage("choreo")} data-testid="go-choreo"><div className="eyebrow">{t("team.choreo")}</div><div className="big">{seesChoreo ? t("team.videosN", { n: stats.videos }) : t("team.choreoLocked")}</div></button>}
         {(staff ? !(stats.videos === 0 && stats.media === 0 && stats.formations === 0) : stats.media > 0 || (stats.folders ?? 0) > 0) && <button className={"card tap" + (stats.media ? "" : " empty")} onClick={() => setPage("folders")} data-testid="go-folders"><div className="eyebrow">{t("team.folders")}</div><div className="big">{t("team.mediaN", { n: stats.media })}</div></button>}

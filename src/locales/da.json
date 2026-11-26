@@ -30,7 +30,8 @@
     "add": "Tilføj",
     "error": "Fejl",
     "close": "Luk",
-    "help": "Hjælp"
+    "help": "Hjælp",
+    "offline": "Du er offline – viser det sidst hentede."
   },
   "lang": {
     "da": "Dansk",
@@ -163,7 +164,16 @@
     "moreAbout": "Mere om holdet",
     "moreAboutSub": "Beskrivelse · events · trofæer · træninger",
     "seeDancers": "Se dansere",
-    "assistantHint": "Som hjælpetræner ser du fremmøde, timeplan og beskeder. Holdets profil, videoer og billeder styres af træneren."
+    "assistantHint": "Som hjælpetræner ser du fremmøde, timeplan og beskeder. Holdets profil, videoer og billeder styres af træneren.",
+    "readyTitle": "Klar til medlemmer",
+    "readySub": "Det her bør holdet have, før dansere og forældre inviteres.",
+    "readyDone": "Holdet er klar til at tage imod medlemmer.",
+    "ready": {
+      "msg": "Skriv en velkomstbesked til holdet",
+      "cover": "Vælg holdets billede",
+      "gallery": "Vælg mindst tre billeder til forsiden",
+      "content": "Læg den første video, mappe eller billede op"
+    }
   },
   "home": {
     "hi": "Hej {{name}}",
@@ -796,7 +806,9 @@
     "notes": "Noter til videoen",
     "addNotes": "Skriv noter",
     "notesPh": "Tællinger, hvad der skal øves, hvem der starter hvor …",
-    "formationsIntro": "Formationerne hører til koreografi-videoerne. Vælg en video for at se eller redigere dens formationer."
+    "formationsIntro": "Formationerne hører til koreografi-videoerne. Vælg en video for at se eller redigere dens formationer.",
+    "tooBig": "Videoen er for stor (maks. {{mb}} MB). Klip den kortere eller optag i lavere opløsning.",
+    "maxSize": "Maks. {{mb}} MB pr. video."
   },
   "notes": {
     "title": "Noter",
@@ -910,7 +922,8 @@
     "webChip": "web-tilmelding",
     "deadlineIn_one": "Frist i morgen",
     "deadlineIn_other": "Frist om {{count}} dage",
-    "deadlineToday": "Frist i dag"
+    "deadlineToday": "Frist i dag",
+    "addToCalendar": "Føj til min kalender"
   },
   "shop": {
     "title": "Shop",
@@ -1058,7 +1071,10 @@
     "created": "Oprettet {{when}}",
     "summaryOpen_one": "1 betaling mangler",
     "summaryOpen_other": "{{count}} betalinger mangler",
-    "summaryAllPaid": "Alt er betalt ✓"
+    "summaryAllPaid": "Alt er betalt ✓",
+    "allTeams": "Alle hold",
+    "olderThan7_one": "1 har ventet over 7 dage",
+    "olderThan7_other": "{{count}} har ventet over 7 dage"
   },
   "milestones": {
     "title": "Milepæle",
@@ -1697,7 +1713,10 @@
     "nChanged_other": "{{count}} ændringer",
     "moreImages": "Øvrige billeder ({{n}})",
     "moreTexts": "Øvrige tekster ({{n}})",
-    "home": "Forside"
+    "home": "Forside",
+    "groupChanged": "Ændret af dig",
+    "groupFixed": "Forside og faste sider",
+    "groupTeams": "Holdsider ({{n}})"
   },
   "website": {
     "title": "Website",

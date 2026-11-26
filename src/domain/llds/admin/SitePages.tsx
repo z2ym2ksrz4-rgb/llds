@@ -46,8 +46,15 @@ export function SitePages({ pages, teamPhotos, onChange, homeExtra, homeCount = 
   return (
     <div data-testid="sitepages">
       <input placeholder={t("sitePages.search")} value={q} onChange={(e) => setQ(e.target.value)} />
-      <div className="card list">{list.map((d) => { const n = count(d.key); return (
-        <button key={d.key} type="button" className="item" data-testid={`sitepage-${d.key}`} onClick={() => setOpen(d.key)}><span className="grow">{name(d)}<div className="tiny">{t("sitePages.counts", { texts: d.texts.length, images: d.images.length })}</div></span>{n > 0 && <span className="chip small gold">{t("sitePages.nChanged", { count: n })}</span>}<span className="gold">›</span></button>); })}</div>
+      {(() => { const Row = (d: PageDef) => { const n = count(d.key); return (
+        <button key={d.key} type="button" className="item" data-testid={`sitepage-${d.key}`} onClick={() => setOpen(d.key)}><span className="grow">{name(d)}<div className="tiny">{t("sitePages.counts", { texts: d.texts.length, images: d.images.length })}</div></span>{n > 0 && <span className="chip small gold">{t("sitePages.nChanged", { count: n })}</span>}<span className="gold">›</span></button>); };
+        const FIXED = ["home", "om-os", "medlemsskab", "saeson-26-27", "merchandise", "backstage", "kontakt", "solo-duo", "support"];
+        const changed = list.filter((d) => count(d.key) > 0); const fixed = list.filter((d) => FIXED.includes(d.key)).sort((a, b) => FIXED.indexOf(a.key) - FIXED.indexOf(b.key)); const teamPages = list.filter((d) => !FIXED.includes(d.key));
+        return (<>
+          {changed.length > 0 && !q && <div data-testid="sitepages-changed"><div className="eyebrow" style={{ margin: "12px 0 6px" }}>{t("sitePages.groupChanged")}</div><div className="card list">{changed.map(Row)}</div></div>}
+          {fixed.length > 0 && <div><div className="eyebrow" style={{ margin: "12px 0 6px" }}>{t("sitePages.groupFixed")}</div><div className="card list">{fixed.map(Row)}</div></div>}
+          {teamPages.length > 0 && <details className="fold" open={!!q} data-testid="sitepages-teams"><summary><span className="eyebrow">{t("sitePages.groupTeams", { n: teamPages.length })}</span></summary><div className="card list">{teamPages.map(Row)}</div></details>}
+        </>); })()}
     </div>
   );
 }

@@ -5,6 +5,8 @@ import { Sheet } from "../components/Sheet";
 import { ago } from "../lib/time";
 
 /** Choreography: videos with ½ tempo, mirror and A–B loop, plus formations drawn on a stage. Staff upload and edit. */
+/** One long phone recording can eat the storage plan – keep videos short and say the limit before the upload starts. */
+const MAX_VIDEO_MB = 200;
 export function Choreo({ teamId, staff, onBack, toast, mode = "choreo" }: { teamId: string; staff: boolean; onBack: () => void; toast: (m: string) => void; mode?: "choreo" | "formations" }) {
   const { t } = useTranslation();
   const [videos, setVideos] = useState<Video[]>([]);
@@ -31,11 +33,12 @@ export function Choreo({ teamId, staff, onBack, toast, mode = "choreo" }: { team
 
 function UploadSheet({ teamId, onClose, onDone, toast }: { teamId: string; onClose: () => void; onDone: () => void; toast: (m: string) => void }) {
   const { t } = useTranslation();
-  const [title, setTitle] = useState(""); const [file, setFile] = useState<File | null>(null); const [busy, setBusy] = useState(false); const [notes, setNotes] = useState("");
+  const [title, setTitle] = useState(""); const [file, setFile] = useState<File | null>(null); const [tooBig, setTooBig] = useState(false); const [busy, setBusy] = useState(false); const [notes, setNotes] = useState("");
   return (
     <Sheet onClose={onClose} eyebrow={t("team.choreo")} title={t("choreo.upload")}>
       <label className="field"><span>{t("choreo.title")}</span><input id="video-title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("choreo.titlePh")} /></label>
-      <label className="field"><span>{t("choreo.file")}</span><input id="video-file" type="file" accept="video/*" onChange={(e) => setFile(e.target.files?.[0] ?? null)} /></label>
+      <label className="field"><span>{t("choreo.file")}</span><input id="video-file" type="file" accept="video/*" onChange={(e) => { const f = e.target.files?.[0] ?? null; setTooBig(!!f && f.size > MAX_VIDEO_MB * 1024 * 1024); setFile(f && f.size <= MAX_VIDEO_MB * 1024 * 1024 ? f : null); }} /></label>
+      {tooBig ? <p className="error small" role="alert" data-testid="video-toobig">{t("choreo.tooBig", { mb: MAX_VIDEO_MB })}</p> : <p className="tiny muted" style={{ margin: 0 }}>{t("choreo.maxSize", { mb: MAX_VIDEO_MB })}</p>}
       <label className="field"><span>{t("choreo.notes")}</span><textarea id="video-notes" rows={3} value={notes} placeholder={t("choreo.notesPh")} onChange={(e) => setNotes(e.target.value)} /></label>
       <p className="tiny">{t("choreo.uploadHint")}</p>
       <button className="cta" disabled={busy || !title.trim() || !file} onClick={async () => { setBusy(true); try { await api.uploadVideo(teamId, title.trim(), file!, notes.trim() || null); toast(t("choreo.uploaded")); onDone(); } catch (e) { toast((e as Error).message); } finally { setBusy(false); } }}>{busy ? t("choreo.uploading") : t("choreo.uploadBtn")}</button>
