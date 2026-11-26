@@ -1754,6 +1754,7 @@
     "full": "No spots left.",
     "closed": "The deadline has passed.",
     "already": "Already signed up.",
-    "offline": "No connection – try again in a moment."
+    "offline": "No connection – try again in a moment.",
+    "server_update": "The server needs an update before this works. Tell the administrator."
   }
 }

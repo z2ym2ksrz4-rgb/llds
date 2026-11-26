@@ -1754,6 +1754,7 @@
     "full": "Der er ikke flere pladser.",
     "closed": "Fristen er udløbet.",
     "already": "Er allerede tilmeldt.",
-    "offline": "Ingen forbindelse – prøv igen om lidt."
+    "offline": "Ingen forbindelse – prøv igen om lidt.",
+    "server_update": "Serveren mangler en opdatering, før dette virker. Sig det til Steffen."
   }
 }

@@ -6,6 +6,7 @@ export function humanize(msg: string | null | undefined): string {
   if (!msg) return "";
   const low = msg.toLowerCase();
   for (const c of CODES) if (low === c || low.endsWith(": " + c) || low.includes(c) && c.includes(" ")) { const k = "errors." + c.replace(/ /g, "_"); const tr = i18n.t(k); return tr === k ? msg : msg.toLowerCase() === c ? tr : msg.replace(new RegExp(c, "i"), tr); }
+  if (/could not find the function|schema cache|does not exist/i.test(msg)) return i18n.t("errors.server_update");
   if (/failed to fetch|networkerror|load failed/i.test(msg)) return i18n.t("errors.offline");
   return msg;
 }
