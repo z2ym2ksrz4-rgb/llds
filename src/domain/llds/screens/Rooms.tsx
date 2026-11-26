@@ -42,6 +42,9 @@ export function Rooms() {
   const isStaff = isAdmin || me.memberships.some((m) => m.person_id === me.person.id && m.role !== "dancer");
   const isTrainer = isAdmin || me.memberships.some((m) => m.person_id === me.person.id && m.role === "trainer");
   const [day, setDay] = useState(startOfDay(new Date()));
+  const [view, setViewRaw] = useState<"list" | "grid">(() => { try { const v = localStorage.getItem("llds_cal_view"); if (v === "list" || v === "grid") return v; } catch { /* ignore */ } return typeof window !== "undefined" && window.innerWidth < 640 ? "list" : "grid"; });
+  const setView = (v: "list" | "grid") => { setViewRaw(v); try { localStorage.setItem("llds_cal_view", v); } catch { /* ignore */ } };
+  const [scope, setScope] = useState<"mine" | "all" | null>(null);   // null = not chosen yet → people with teams start on their own, staff/admin on all
   const [rooms, setRooms] = useState<Room[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -75,6 +78,9 @@ export function Rooms() {
 
   const slotTop = (iso: string) => { const d = new Date(iso); return ((d.getHours() - 9) * 60 + d.getMinutes()) / 60 * 48; };
   const slotH = (a: string, b: string) => Math.max(22, (new Date(b).getTime() - new Date(a).getTime()) / 36e5 * 48 - 2);
+  const hasMine = !isAdmin && [...myTeamIds].length > 0; const sc: "mine" | "all" = scope ?? (hasMine && !isStaff ? "mine" : "all");
+  const mineOrChild = (x: Session) => x.team_id != null && (myTeamIds.has(x.team_id) || me.memberships.some((m) => m.team_id === x.team_id && me.children.some((c) => c.id === m.person_id)));
+  const shown = sc === "mine" && hasMine ? sessions.filter(mineOrChild) : sessions;
   const mine = (s: Session) => s.team_id != null && me.memberships.some((m) => m.person_id === viewing.personId && m.team_id === s.team_id);
   const canBook = !me.person.supervised_by;   // everyone approved may book (solo/duo) – bookings by dancers/parents await approval; child logins ask their parents
   const isoWeek = (d: Date) => { const x = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())); const n = x.getUTCDay() || 7; x.setUTCDate(x.getUTCDate() + 4 - n); const y = new Date(Date.UTC(x.getUTCFullYear(), 0, 1)); return Math.ceil(((x.getTime() - y.getTime()) / 864e5 + 1) / 7); };
@@ -95,6 +101,17 @@ export function Rooms() {
 
       <div className="dayhead"><h2 className="display">{DAY_LONG[(day.getDay() + 6) % 7]} {day.getDate()}{loc() === "da-DK" ? "." : ""} {day.toLocaleDateString(loc(), { month: "long" })}</h2><span className="small muted">{t("rooms.countLine", { n: sessions.filter((x) => !x.cancelled).length, b: bookings.filter((x) => x.status !== "rejected").length })}</span></div>
       {dayEvents.length > 0 && <div className="evstrip" data-testid="day-events">{dayEvents.map((e) => <button key={e.id} className="evcard-mini" style={{ backgroundImage: `url(${catUrl(e.image_key) ?? artFor(e.id)})` }} onClick={() => setOpenEvent(e)}><span className="eyebrow">{t(`events.kind.${e.kind}`)} · {hm(e.starts_at)}{e.ends_at ? `–${hm(e.ends_at)}` : ""}</span><b>{e.title}</b>{e.place && <small>{e.place}</small>}</button>)}</div>}
+      <div className="calctl" data-testid="cal-controls">
+        {hasMine && <div className="seg2" role="tablist"><button type="button" className={sc === "mine" ? "on" : ""} data-testid="cal-mine" onClick={() => setScope("mine")}>{t("rooms.scopeMine")}</button><button type="button" className={sc === "all" ? "on" : ""} data-testid="cal-all" onClick={() => setScope("all")}>{t("rooms.scopeAll")}</button></div>}
+        <div className="seg2" role="tablist"><button type="button" className={view === "list" ? "on" : ""} data-testid="cal-list" onClick={() => setView("list")}>{t("rooms.viewList")}</button><button type="button" className={view === "grid" ? "on" : ""} data-testid="cal-grid" onClick={() => setView("grid")}>{t("rooms.viewGrid")}</button></div>
+      </div>
+      {view === "list" && <div className="card list callist" data-testid="cal-listview">
+        {[...shown.map((x) => ({ at: x.starts_at, k: "s" as const, x })), ...bookings.filter((x) => x.status !== "rejected" && (sc === "all" || x.person_id === viewing.personId || x.person_id === me.person.id || me.children.some((c) => c.id === x.person_id))).map((x) => ({ at: x.starts_at, k: "b" as const, x }))].sort((a, b) => a.at.localeCompare(b.at)).map((r) => r.k === "s"
+          ? <button type="button" key={"s" + r.x.id} className={"item" + (r.x.cancelled ? " off" : "")} data-testid="cal-row" onClick={() => setOpen({ kind: "session", s: r.x })}><span className="when"><b>{hm(r.x.starts_at)}</b><small>{hm(r.x.ends_at)}</small></span><span className="grow">{r.x.team_name ?? r.x.title ?? t("rooms.training")}<div className="tiny">{[r.x.room_name, r.x.trainer_name].filter(Boolean).join(" · ")}</div></span>{r.x.cancelled ? <span className="tag cx">{t("rooms.cancelled")}</span> : r.x.moved ? <span className="tag mv">{t("rooms.moved")}</span> : mine(r.x) ? <span className="chip small gold">{t("rooms.yours")}</span> : null}<span className="gold">›</span></button>
+          : <button type="button" key={"b" + r.x.id} className="item" data-testid="cal-row" onClick={() => setOpen({ kind: "booking", b: r.x })}><span className="when"><b>{hm(r.x.starts_at)}</b><small>{hm(r.x.ends_at)}</small></span><span className="grow">{r.x.title}<div className="tiny">{[r.x.room_name, t("rooms.booking")].filter(Boolean).join(" · ")}{r.x.status === "pending" ? " · " + t("rooms.pending") : ""}</div></span><span className="gold">›</span></button>)}
+        {!shown.length && <p className="muted small" style={{ margin: 0 }}>{sc === "mine" ? t("rooms.noneMine") : t("rooms.noneDay")}</p>}
+      </div>}
+      {view === "grid" && <>
       <div className="cal calhead" style={{ gridTemplateColumns: `44px repeat(${rooms.length}, 1fr)` }}>
         <div />{rooms.map((r) => <div key={r.id} className="h">{r.name}</div>)}
       </div>
@@ -106,7 +123,7 @@ export function Rooms() {
             {sameDay(day, new Date()) && nowMin >= 9 * 60 && nowMin <= 23 * 60 && <div className="nowline" style={{ top: (nowMin - 9 * 60) / 60 * 48 }} />}
             {HOURS.map((h) => <button key={h} className={"free" + (canBook ? " can" : "")} style={{ top: (h - 9) * 48 }} aria-label={`${t("rooms.bookAt", { room: r.name, h })}`} title={t("rooms.bookAt", { room: r.name, h })} onClick={() => setOpen({ kind: "book", room_id: r.id, start: `${String(h).padStart(2, "0")}:00` })}>{null}</button>)}
             {(() => { const lane = packLane([
-                ...sessions.filter((s) => s.room_id === r.id).map((s) => ({ id: "s" + s.id, a: s.starts_at, b: s.ends_at, s })),
+                ...shown.filter((s) => s.room_id === r.id).map((s) => ({ id: "s" + s.id, a: s.starts_at, b: s.ends_at, s })),
                 ...bookings.filter((b) => b.room_id === r.id && b.status !== "rejected").map((b) => ({ id: "b" + b.id, a: b.starts_at, b: b.ends_at, bk: b })),
               ]); return lane.map(({ item, col, cols }) => {
                 const pos = { top: slotTop(item.a), height: slotH(item.a, item.b), left: `calc(${(col / cols) * 100}% + 3px)`, width: `calc(${100 / cols}% - 6px)` };
@@ -124,6 +141,7 @@ export function Rooms() {
       <div className="callegend" aria-hidden><span className="lg l0">{rooms[0]?.name}</span>{rooms[1] && <span className="lg l1">{rooms[1].name}</span>}<span className="lg cx">{t("rooms.cancelled")}</span><span className="lg mv">{t("rooms.moved")}</span></div>
       {canBook && <p className="tiny muted" style={{ margin: "6px 0 0" }}>{t("rooms.legendShort")}</p>}
       </div>
+      </>}
 
       {openEvent && <EventSheet event={openEvent} staff={isStaff} onClose={() => setOpenEvent(null)} onChanged={() => void api.listEvents(true).then(setEvents)} toast={say} />}
       {open?.kind === "session" && <SessionSheet session={open.s} absences={absences} onClose={() => setOpen(null)} onChanged={() => void load()} toast={say} />}

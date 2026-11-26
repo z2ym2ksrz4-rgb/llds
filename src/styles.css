@@ -1051,3 +1051,8 @@ button.home-join { margin: 8px 0 2px; align-self: flex-start; min-height: 40px; 
 .socialintro .linklike { margin-left: 6px; }
 .welcomecard { display:flex; flex-direction:column; gap:10px; margin-top:14px; } .welcomecard .steps3 { margin:0; padding-left:20px; line-height:1.7; }
 .striphint { margin:6px 0 0; }
+.calctl { display:flex; gap:8px; flex-wrap:wrap; justify-content:space-between; margin:8px 0; }
+.callist .item { text-align:left; width:100%; background:none; border:0; color:var(--fg); font:inherit; min-height:56px; }
+.callist .item .when { display:flex; flex-direction:column; min-width:46px; font-variant-numeric:tabular-nums; } .callist .item .when small { color:var(--muted); font-size:.75rem; }
+.callist .item.off { opacity:.55; }
+.screen.rooms .callist { overflow-y:auto; flex:1; min-height:0; }

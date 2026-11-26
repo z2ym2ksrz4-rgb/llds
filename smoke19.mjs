@@ -3,7 +3,7 @@ import { chromium } from "playwright";
 const base = process.env.BASE ?? "http://localhost:4173/";
 const b = await chromium.launch({ executablePath: process.env.CHROME ?? "/opt/pw-browsers/chromium" });
 const ctx = await b.newContext({ viewport: { width: 390, height: 844 } });
-const p = await ctx.newPage(); await p.addInitScript(() => { try { localStorage.setItem("llds_tour", JSON.stringify({ state: "done", at: Date.now() })); localStorage.setItem("llds_notif_asked", JSON.stringify({ at: Date.now() })); localStorage.setItem("llds_welcome", new Date().toDateString()); } catch {} });
+const p = await ctx.newPage(); await p.addInitScript(() => { try { localStorage.setItem("llds_tour", JSON.stringify({ state: "done", at: Date.now() })); localStorage.setItem("llds_notif_asked", JSON.stringify({ at: Date.now() })); localStorage.setItem("llds_welcome", new Date().toDateString()); localStorage.setItem("llds_cal_view", "grid"); } catch {} });
 const out = { errors: [] }; p.on("pageerror", e => out.errors.push(e.message));
 const login = async (email) => { await p.goto(base, { waitUntil: "networkidle" }); await p.evaluate(() => sessionStorage.clear()); await p.waitForSelector("#email"); await p.fill("#email", email); await p.click("form button.cta"); await p.fill("#code", "123456"); await p.click("form button.cta"); await p.waitForSelector("nav.tabbar"); await p.waitForTimeout(600); };
 // 1. parent sends feedback from settings

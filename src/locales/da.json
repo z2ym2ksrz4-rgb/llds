@@ -643,7 +643,15 @@
     "moved": "Flyttet",
     "legendShort": "Tryk på et ledigt felt i kalenderen – eller på “Book sal” – for at booke salen til solo/duo. Studiet godkender bookingen.",
     "bookAt": "Book {{room}} kl. {{h}}",
-    "weekLabel": "Uge {{n}} · {{from}}–{{to}}"
+    "weekLabel": "Uge {{n}} · {{from}}–{{to}}",
+    "scopeMine": "Mine",
+    "scopeAll": "Alle",
+    "viewList": "Liste",
+    "viewGrid": "Sale",
+    "yours": "dit hold",
+    "noneMine": "Ingen træninger for dig denne dag. Tryk Alle for at se hele skolen.",
+    "noneDay": "Ingen træninger denne dag.",
+    "training": "Træning"
   },
   "feed": {
     "title": "Opslag",

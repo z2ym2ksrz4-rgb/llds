@@ -643,7 +643,15 @@
     "moved": "Moved",
     "legendShort": "Tap a free slot in the calendar – or “Book room” – to book the room for solo/duo. The studio approves bookings.",
     "bookAt": "Book {{room}} at {{h}}:00",
-    "weekLabel": "Week {{n}} · {{from}}–{{to}}"
+    "weekLabel": "Week {{n}} · {{from}}–{{to}}",
+    "scopeMine": "Mine",
+    "scopeAll": "All",
+    "viewList": "List",
+    "viewGrid": "Rooms",
+    "yours": "your team",
+    "noneMine": "No trainings for you this day. Tap All to see the whole school.",
+    "noneDay": "No trainings this day.",
+    "training": "Training"
   },
   "feed": {
     "title": "Posts",

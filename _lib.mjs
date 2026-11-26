@@ -1,6 +1,6 @@
 import { chromium } from "playwright";
 export const S="/tmp/claude-0/-home-claude/3044d1cf-5408-513b-86aa-778c465d4d10/scratchpad/";
 export async function open({as=null, w=390, h=844, email="admin@demo"}={}) { const b = await chromium.launch({ executablePath: "/opt/pw-browsers/chromium" }); const ctx=await b.newContext({ viewport:{width:w,height:h} }); const p=await ctx.newPage(); const errors=[]; p.on("pageerror", e=>errors.push(e.message));
-  await p.addInitScript((pid) => { localStorage.setItem("llds_tour", JSON.stringify({ state: "done", at: Date.now() })); localStorage.setItem("llds_notif_asked", JSON.stringify({ at: Date.now() })); localStorage.setItem("llds_welcome", new Date().toDateString()); if(pid) sessionStorage.setItem("llds_viewas", pid); }, as);
+  await p.addInitScript((pid) => { localStorage.setItem("llds_tour", JSON.stringify({ state: "done", at: Date.now() })); localStorage.setItem("llds_notif_asked", JSON.stringify({ at: Date.now() })); localStorage.setItem("llds_welcome", new Date().toDateString()); localStorage.setItem("llds_cal_view", "grid"); if(pid) sessionStorage.setItem("llds_viewas", pid); }, as);
   await p.goto("http://localhost:4173/",{waitUntil:"networkidle"}); await p.fill("#email",email); await p.click("form button.cta"); await p.fill("#code","123456"); await p.click("form button.cta"); await p.waitForSelector("nav.tabbar"); await p.waitForTimeout(700);
   const tab=async(t)=>{ await p.locator("nav.tabbar >> text="+t).first().click(); await p.waitForTimeout(600); }; return {b,p,tab,errors}; }

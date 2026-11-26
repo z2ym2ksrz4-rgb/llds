@@ -3,7 +3,7 @@ import { chromium } from "playwright";
 const base = process.env.BASE ?? "http://localhost:4173/";
 const b = await chromium.launch({ executablePath: process.env.CHROME ?? "/opt/pw-browsers/chromium" });
 const ctx = await b.newContext({ viewport: { width: 1100, height: 900 } });
-const p = await ctx.newPage(); await p.addInitScript(() => { localStorage.setItem("llds_tour", JSON.stringify({ state: "done", at: Date.now() })); localStorage.setItem("llds_notif_asked", JSON.stringify({ at: Date.now() })); localStorage.setItem("llds_welcome", new Date().toDateString()); });
+const p = await ctx.newPage(); await p.addInitScript(() => { localStorage.setItem("llds_tour", JSON.stringify({ state: "done", at: Date.now() })); localStorage.setItem("llds_notif_asked", JSON.stringify({ at: Date.now() })); localStorage.setItem("llds_welcome", new Date().toDateString()); localStorage.setItem("llds_cal_view", "grid"); });
 const errors = []; p.on("pageerror", e => errors.push(e.message));
 const out = {};
 await p.goto(base, { waitUntil: "networkidle" }); await p.evaluate(() => localStorage.removeItem("llds")); await p.reload({ waitUntil: "networkidle" });
