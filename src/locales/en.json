@@ -173,7 +173,8 @@
       "cover": "Choose the team picture",
       "gallery": "Choose at least three pictures for the front page",
       "content": "Upload the first video, folder or picture"
-    }
+    },
+    "trainerRowSub": "{{name}} is the trainer of this team"
   },
   "home": {
     "hi": "Hi {{name}}",
@@ -1362,7 +1363,10 @@
     "galleryCount_other": "{{count}} pictures chosen",
     "galleryAuto": "Automatic – the teams' own photos",
     "appTexts": "Texts in the app",
-    "appTextsSub": "Empty field = the default text."
+    "appTextsSub": "Empty field = the default text.",
+    "drag": "Drag to move",
+    "dragHint": "Drag ⠿ to change the order. Use the switch to turn a section off.",
+    "visible": "Show {{name}}"
   },
   "week": {
     "training": "Training",
@@ -1390,7 +1394,8 @@
       "assistant": "Assistant",
       "admin": "Admin"
     },
-    "newConversationShort": "Chat"
+    "newConversationShort": "Chat",
+    "writeToName": "Write to {{name}}"
   },
   "form": {
     "title": "Formations",

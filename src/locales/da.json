@@ -173,7 +173,8 @@
       "cover": "Vælg holdets billede",
       "gallery": "Vælg mindst tre billeder til forsiden",
       "content": "Læg den første video, mappe eller billede op"
-    }
+    },
+    "trainerRowSub": "{{name}} er træner på holdet"
   },
   "home": {
     "hi": "Hej {{name}}",
@@ -1362,7 +1363,10 @@
     "galleryCount_other": "{{count}} billeder valgt",
     "galleryAuto": "Automatisk – holdenes egne fotos",
     "appTexts": "Tekster i appen",
-    "appTextsSub": "Tomt felt = standardteksten."
+    "appTextsSub": "Tomt felt = standardteksten.",
+    "drag": "Træk for at flytte",
+    "dragHint": "Træk i ⠿ for at ændre rækkefølgen. Slå en sektion fra på kontakten.",
+    "visible": "Vis {{name}}"
   },
   "week": {
     "training": "Træning",
@@ -1390,7 +1394,8 @@
       "assistant": "Hjælpetræner",
       "admin": "Admin"
     },
-    "newConversationShort": "Samtale"
+    "newConversationShort": "Samtale",
+    "writeToName": "Skriv til {{name}}"
   },
   "form": {
     "title": "Formationer",

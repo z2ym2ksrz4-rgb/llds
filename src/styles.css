@@ -1062,3 +1062,18 @@ button.home-join { margin: 8px 0 2px; align-self: flex-start; min-height: 40px; 
 .offlinebar { position:sticky; top:0; z-index:40; text-align:center; font-size:.8rem; padding:calc(6px + env(safe-area-inset-top)) 12px 6px; background:#3a2f17; color:#f1e2b8; grid-column:1 / -1; }
 .chips.tight button.chip.small { min-height:40px; padding:8px 12px; }
 [data-testid=cz-order] .item button.ghost.small { min-width:40px; }
+
+/* Tilpas appen: drag handle + visibility switch (A14) */
+.czrow { gap: 8px; }
+.czrow.dragging { background: color-mix(in srgb, var(--gold) 14%, transparent); }
+.czgrip { flex: none; width: 40px; height: 44px; padding: 0; border: 0; background: none; color: var(--muted); font-size: 1.3rem; line-height: 1; cursor: grab; touch-action: none; }
+.czgrip:active { cursor: grabbing; }
+.czarrow { min-width: 36px; padding-inline: 8px; }
+@media (pointer: coarse) { .czarrow { display: none; } }
+input.czvis { appearance: none; flex: none; width: 46px; height: 28px; border-radius: 14px; background: var(--line); position: relative; cursor: pointer; transition: background .2s; }
+input.czvis::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; transition: left .2s; }
+input.czvis:checked { background: var(--gold2); }
+input.czvis:checked::after { left: 21px; }
+/* Team page: the trainer as a tappable row (B4) */
+.trainerrow { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; padding: 10px 12px; margin: 8px 0; border: 1px solid var(--line); border-radius: 14px; background: none; color: inherit; min-height: 56px; }
+.trainerrow strong { font-weight: 500; }

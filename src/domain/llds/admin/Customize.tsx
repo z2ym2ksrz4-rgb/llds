@@ -19,6 +19,9 @@ export function Customize() {
   const order = homeOrder(a);
   const upd = (n: Appearance) => { setA(n); setDirty(true); setSaved(false); };
   const move = (k: string, d: -1 | 1) => { const i = order.indexOf(k); const j = i + d; if (j < 0 || j >= order.length) return; const o = [...order]; [o[i], o[j]] = [o[j], o[i]]; upd({ ...a, home: o }); };
+  const [drag, setDrag] = useState<string | null>(null);
+  /** Drag a row by its handle: the row swaps place with whichever row the finger is over. */
+  const dragOver = (x: number, y: number) => { if (!drag) return; const over = (document.elementFromPoint(x, y) as HTMLElement | null)?.closest<HTMLElement>("[data-k]")?.dataset.k; if (!over || over === drag) return; const o = order.filter((k) => k !== drag); o.splice(order.indexOf(over), 0, drag); upd({ ...a, home: o }); };
   const toggle = (k: string) => { const h = a.hidden ?? []; upd({ ...a, hidden: h.includes(k) ? h.filter((x) => x !== k) : [...h, k] }); };
   const label = (k: string) => k.startsWith("box:") ? (a.boxes?.find((b) => "box:" + b.id === k)?.title || t("customize.untitled")) : t(`customize.sections.${k}`);
   const saveBox = (b: CustomBox) => { const boxes = a.boxes ?? []; const i = boxes.findIndex((x) => x.id === b.id); const nb = i >= 0 ? boxes.map((x) => (x.id === b.id ? b : x)) : [...boxes, b]; upd({ ...a, boxes: nb, home: i >= 0 ? a.home : [...order.filter((k) => k !== "box:" + b.id).slice(0, 1), "box:" + b.id, ...order.slice(1)] }); setEdit(null); };
@@ -32,13 +35,17 @@ export function Customize() {
       <p className="muted small">{t("customize.intro")}</p>
 
       <div className="sec"><div className="row between"><h2>{t("customize.home")}</h2><button className="small" data-testid="cz-newbox" onClick={() => setEdit({ id: newId(), title: "", body: "", image: null, link: null, linkLabel: null, tab: null })}>{t("customize.newBox")}</button></div>
+        <p className="tiny muted" style={{ margin: "0 0 6px" }}>{t("customize.dragHint")}</p>
         <div className="card list" data-testid="cz-order">
           {order.map((k, i) => { const hidden = (a.hidden ?? []).includes(k); const isBox = k.startsWith("box:"); return (
-            <div key={k} className={"item" + (hidden ? " off" : "")} data-testid={`cz-row-${k}`}>
+            <div key={k} data-k={k} className={"item czrow" + (hidden ? " off" : "") + (drag === k ? " dragging" : "")} data-testid={`cz-row-${k}`}>
+              <button type="button" className="czgrip" aria-label={t("customize.drag")} data-testid={`cz-grip-${k}`}
+                onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); setDrag(k); }} onPointerMove={(e) => dragOver(e.clientX, e.clientY)} onPointerUp={() => setDrag(null)} onPointerCancel={() => setDrag(null)}
+                onKeyDown={(e) => { if (e.key === "ArrowUp") { e.preventDefault(); move(k, -1); } if (e.key === "ArrowDown") { e.preventDefault(); move(k, 1); } }}>⠿</button>
               <span className="grow">{isBox ? "▣ " : ""}{label(k)}{isBox && <div className="tiny">{t("customize.customBox")}</div>}</span>
-              <button className="ghost small" aria-label={t("customize.up")} disabled={i === 0} onClick={() => move(k, -1)}>↑</button>
-              <button className="ghost small" aria-label={t("customize.down")} disabled={i === order.length - 1} onClick={() => move(k, 1)}>↓</button>
-              <button className="ghost small" onClick={() => toggle(k)}>{hidden ? t("customize.show") : t("customize.hide")}</button>
+              <button className="ghost small czarrow" aria-label={t("customize.up")} disabled={i === 0} onClick={() => move(k, -1)}>↑</button>
+              <button className="ghost small czarrow" aria-label={t("customize.down")} disabled={i === order.length - 1} onClick={() => move(k, 1)}>↓</button>
+              <input type="checkbox" className="czvis" checked={!hidden} aria-label={t("customize.visible", { name: label(k) })} data-testid={`cz-vis-${k}`} onChange={() => toggle(k)} />
               {isBox && <button className="ghost small" onClick={() => setEdit(a.boxes!.find((b) => "box:" + b.id === k)!)}>{t("common.edit")}</button>}
             </div>); })}
         </div>

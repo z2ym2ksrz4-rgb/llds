@@ -31,7 +31,7 @@ out.adminNotifs = notifs.slice(-4);
 await p.evaluate(() => { localStorage.setItem("llds_notif_asked", JSON.stringify({ at: Date.now() })); });
 await p.click("[data-testid=avatar]"); await p.click("[data-testid=menu-signout]"); await p.waitForSelector("#email"); await login("admin@demo");
 await p.click("nav.tabbar >> text=Admin"); await p.click("text=Tilpas appen"); await p.waitForSelector("[data-testid=customize]");
-await p.click("[data-testid=cz-row-hero] button[aria-label='Flyt ned']"); await p.click("[data-testid=cz-row-stats] >> text=Skjul");
+await p.click("[data-testid=cz-row-hero] button[aria-label='Flyt ned']"); await p.click("[data-testid=cz-vis-stats]");
 await p.click("[data-testid=cz-newbox]"); await p.fill("[data-testid=cz-box-title]", "Velkommen til sæsonen"); await p.fill("[data-testid=cz-box-body]", "Husk drikkedunk og godt humør."); await p.click("[data-testid=cz-box-save]"); await p.waitForTimeout(200);
 out.rows = await p.$$eval("[data-testid=cz-order] .item", (els) => els.map((e) => e.getAttribute("data-testid")));
 await p.click("[data-testid=cz-save]"); await p.waitForSelector("text=Gemt");
