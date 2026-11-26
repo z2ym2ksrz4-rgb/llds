@@ -1061,7 +1061,7 @@
   "social": {
     "feed": "Feed",
     "all": "Alle",
-    "intro": "Holdets eget rum – alle på holdet kan slå op og kommentere. Beskeder til dig og dit hold finder du under Hjem og Mit hold.",
+    "intro": "Holdets eget rum – alle på holdet kan slå op og kommentere. Beskeder til dig og dit hold finder du under Hjem og Hold.",
     "newPost": "Nyt opslag",
     "moreTeams_one": "1 hold mere",
     "moreTeams_other": "{{count}} hold mere"

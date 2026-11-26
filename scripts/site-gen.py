@@ -472,7 +472,11 @@ def translate_text(txt):
     out = re.sub(r"\bkl\. ?", "", out).replace("angivet som", "listed as").replace("angivet på siden", "as listed")
     return out
 def translate_html(h, rel):
+    keep = []   # slugs inside inline JSON are URLs, not text – "voksen" → "adult" in a slug gave six dead links on /en/
+    def hold(m): keep.append(m.group(0)); return f"\x00{len(keep) - 1}\x00"
+    h = re.sub(r'"(?:slug|db)": "[^"]*"', hold, h)
     h = re.sub(r">([^<>]+)<", lambda m: ">" + translate_text(m.group(1)) + "<", h)
+    h = re.sub(r"\x00(\d+)\x00", lambda m: keep[int(m.group(1))], h)
     h = re.sub(r'(placeholder|alt|title|aria-label|content|data-price|data-note)="([^"]*)"', lambda m: f'{m.group(1)}="{translate_text(m.group(2))}"', h)
     h = h.replace('<html lang="da">', '<html lang="en">')
     h = re.sub(r'href="' + re.escape(BASE) + r'/(?!en/|style\.css|site\.js|brand/|icons/|art/|favicon|app/)', f'href="{BASE}/en/', h)

@@ -1061,7 +1061,7 @@
   "social": {
     "feed": "Feed",
     "all": "All",
-    "intro": "The team's own room – everyone on the team can post and comment. Messages for you and your team are under Home and My team.",
+    "intro": "The team's own room – everyone on the team can post and comment. Messages for you and your team are under Home and Team.",
     "newPost": "New post",
     "moreTeams_one": "1 more team",
     "moreTeams_other": "{{count}} more teams"
