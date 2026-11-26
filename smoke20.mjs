@@ -12,7 +12,7 @@ await login("parent@demo");
 await p.click("[data-testid=home-join]"); await p.waitForSelector("[data-testid=join-team]"); await p.click(".sheet .chips .chip:has-text('Freja')");
 const audBtn = p.locator("[data-testid=join-team]", { hasText: "Audition" }).first(); out.auditionTeam = (await audBtn.textContent()).slice(0, 30); await audBtn.click();
 await p.waitForSelector("[data-testid=audition-apply]"); await p.click("[data-testid=audition-apply]"); await p.waitForTimeout(400); out.appliedThanks = !!(await p.$("text=meldt til audition"));
-await p.click("[data-testid=sheet-close]"); await p.waitForTimeout(300); out.homeCard = !!(await p.$("[data-testid=audition-card]"));
+await p.click("[data-testid=sheet-close]"); await p.waitForTimeout(300); out.homeCard = !!(await p.$("[data-testid=audition-card], [data-testid=audition-line]"));   // a fresh application is a quiet line until the brief is sent
 await logout();
 // 2. admin: brief + results
 await login("admin@demo");

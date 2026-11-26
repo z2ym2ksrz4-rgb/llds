@@ -30,5 +30,5 @@ await pick("Camilla"); out.tabsCamilla = await tabs();
 // exit
 await p.click("[data-testid=viewbar] button"); await p.waitForTimeout(300); out.viewbarGone = !(await p.$("[data-testid=viewbar]")); out.tabsBack = await tabs();
 console.log(JSON.stringify(out, null, 1)); await b.close();
-const ok = !out.errors.length && out.personas.length >= 8 && out.viewbar.includes("Rasmus Testperson") && !out.tabsTrainer.includes("Admin") && out.tabsTrainer.includes("Mit hold") && /Hip Hop|Empire/.test(out.trainerTeam) && out.dancerTeam.includes("The AXIS") && !out.tabsDancer.includes("Admin") && out.kidsPhotoButtonHidden && /Milos|Idas/.test(out.parentEyebrow) && out.tabsCamilla.includes("Admin") && out.viewbarGone && out.tabsBack.includes("Admin");
+const ok = !out.errors.length && out.personas.length >= 8 && out.viewbar.includes("Rasmus Testperson") && !out.tabsTrainer.includes("Admin") && out.tabsTrainer.includes("Hold") && /Hip Hop|Empire/.test(out.trainerTeam) && out.dancerTeam.includes("The AXIS") && !out.tabsDancer.includes("Admin") && out.kidsPhotoButtonHidden && /Milos|Idas/.test(out.parentEyebrow) && out.tabsCamilla.includes("Admin") && out.viewbarGone && out.tabsBack.includes("Admin");
 process.exit(ok ? 0 : 1);
