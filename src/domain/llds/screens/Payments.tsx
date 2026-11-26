@@ -38,7 +38,8 @@ export function MyPayments({ onBack, embedded, inline }: { onBack?: () => void; 
   const load = useCallback(async () => setList((await api.listMyPayments().catch(() => [])).filter((p) => familyIds.includes(p.dancer_id) || familyIds.includes(p.contact_id))), [familyIds.join(",")]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { void load(); }, [load]);
   const openOnes = list.filter((p) => p.status === "awaiting_payment");
-  const shown = embedded ? openOnes : list;
+  const rank = (p: WebSignup) => (p.status === "awaiting_payment" ? (p.claimed_paid_at ? 1 : 0) : 2);   // what you still have to pay first, then "waiting for confirmation", then history
+  const shown = embedded ? openOnes : [...list].sort((x, y) => rank(x) - rank(y) || y.created_at.localeCompare(x.created_at));
   const [expanded, setExpanded] = useState(false);
   if (embedded && !shown.length) return null;
   const dueNow = openOnes.reduce((sum, p) => sum + ((p.installments ?? 1) > 1 ? (p.per_rate_dkk ?? 0) : (p.amount_dkk ?? 0)), 0);
