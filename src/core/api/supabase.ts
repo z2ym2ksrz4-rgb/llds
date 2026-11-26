@@ -150,6 +150,7 @@ export function supabaseApi(url: string, anonKey: string): Api {
     },
     async confirmChild(childId) { const { error } = await sb.rpc("confirm_child", { p_child: childId }); fail(error); },
     async invitePersonQuiet(i) { const { data, error } = await sb.rpc("invite_person_quiet", { p_first: i.first_name, p_last: i.last_name, p_email: i.email, p_phone: i.phone, p_is_parent: i.is_parent, p_memberships: i.memberships, p_children: i.children }); fail(error); return data as string; },
+    async remindUnpaid(teamId = null) { const { data, error } = await sb.rpc("remind_unpaid", { p_team: teamId }); fail(error); return (data as number) ?? 0; },
     async inviteTeam(teamId, again = false) { const { data, error } = await sb.rpc("invite_team", { p_team: teamId, p_again: again }); fail(error); return (data as number) ?? 0; },
     async teamInviteStatus() { const { data, error } = await sb.rpc("team_invite_status"); fail(error); return (data ?? []) as TeamInviteStatus[]; },
     async logClientError(e) { try { await sb.rpc("log_client_error", { p_message: e.message, p_stack: e.stack ?? null, p_url: e.url ?? null, p_ua: navigator.userAgent, p_version: appVersion }); } catch { /* never throw from the error reporter */ } },

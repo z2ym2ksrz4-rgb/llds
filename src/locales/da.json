@@ -495,7 +495,12 @@
       "nologin": "Uden login"
     },
     "auditionOpen": "Audition er åben",
-    "auditionOpenHint": "Først når den er åben, kan dansere melde sig, og først da ser trænere og dansere noget om audition. Luk igen, når runden er slut."
+    "auditionOpenHint": "Først når den er åben, kan dansere melde sig, og først da ser trænere og dansere noget om audition. Luk igen, når runden er slut.",
+    "searchPh": "Søg person, hold eller side…",
+    "searchNone": "Ingen fundet.",
+    "searchPage": "Side i Admin",
+    "searchPerson": "Medlem",
+    "searchTeam": "Hold"
   },
   "settings": {
     "language": "Sprog",
@@ -1075,7 +1080,11 @@
     "allTeams": "Alle hold",
     "olderThan7_one": "1 har ventet over 7 dage",
     "olderThan7_other": "{{count}} har ventet over 7 dage",
-    "firstRate": "Rate"
+    "firstRate": "Rate",
+    "remind": "Send påmindelse",
+    "reminded_one": "1 påmindelse sendt.",
+    "reminded_other": "{{count}} påmindelser sendt.",
+    "remindedNone": "Ingen at minde – alle er mindet inden for den sidste uge."
   },
   "milestones": {
     "title": "Milepæle",

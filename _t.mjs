@@ -1,4 +1,0 @@
-import { open, S } from "./_lib.mjs"; const {b,p,tab,errors}=await open({as:"t-pia"}); await tab("Kalender"); await p.click("[data-testid=cal-list]"); await p.waitForTimeout(300);
-const out={}; out.view=!!(await p.$("[data-testid=cal-listview]")); out.rowsMine=await p.locator("[data-testid=cal-row]").count(); await p.click("[data-testid=cal-all]"); await p.waitForTimeout(300); out.rowsAll=await p.locator("[data-testid=cal-row]").count(); await p.screenshot({path:S+"cal-list.png"});
-if(out.rowsAll){ await p.locator("[data-testid=cal-row]").first().click(); await p.waitForTimeout(400); out.sheet=!!(await p.$(".sheet")); await p.click("[data-testid=sheet-close]"); }
-await p.click("[data-testid=cal-grid]"); await p.waitForTimeout(300); out.grid=!!(await p.$("[data-testid=calwrap]")); out.errors=errors; console.log(JSON.stringify(out)); await b.close();

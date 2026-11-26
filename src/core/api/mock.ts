@@ -247,6 +247,7 @@ export const mockApi: Api = {
   async invitePersonQuiet(i) { const id = await this.invitePerson(i); const p = S.persons.find((x) => x.id === id) as (Person & { invited_at?: string | null }) | undefined; if (p) p.invited_at = null; save(); return id; },
   async inviteTeam(teamId, again = false) { let n = 0; for (const p of mockLoginPeople(teamId) as (Person & { invited_at?: string | null })[]) { if (p.user_id) continue; if (!p.invited_at || again) { p.invited_at = new Date().toISOString(); n++; } } save(); return n; },
   async teamInviteStatus() { return S.teams.filter((t) => !(t as Team & { archived?: boolean }).archived).map((t) => { const ps = mockLoginPeople(t.id) as (Person & { invited_at?: string | null })[]; return { team_id: t.id, people: ps.length, not_invited: ps.filter((p) => !p.user_id && !p.invited_at).length, invited: ps.filter((p) => !p.user_id && !!p.invited_at).length, logged_in: ps.filter((p) => !!p.user_id).length, waiting: ps.filter((p) => !p.user_id && !!p.invited_at && Date.now() - new Date(p.invited_at).getTime() > 7 * 864e5).length }; }); },
+  async remindUnpaid() { return (S.payments ?? []).filter((p) => p.status === "awaiting_payment" && Date.now() - new Date(p.created_at).getTime() > 7 * 864e5).length; },
   async logClientError() { /* nothing to log in the mock */ },
   async listClientErrors() { return []; },
   async confirmChild(childId: string) { const p = S.persons.find((x) => x.id === childId); const me = meRow(); if (p && me) p.supervised_by = me.id; save(); emit(); },

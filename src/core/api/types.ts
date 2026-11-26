@@ -150,6 +150,8 @@ export interface Api {
   invitePersonQuiet(input: InviteInput): Promise<string>;
   /** send the invitation to everyone on the team (members with e-mail + dancers' parents) who has not got one; again = also those waiting 7+ days */
   inviteTeam(teamId: string, again?: boolean): Promise<number>;
+  /** remind everyone whose payment has waited 7+ days (once a week at most per payment); returns how many were reminded */
+  remindUnpaid(teamId?: string | null): Promise<number>;
   teamInviteStatus(): Promise<TeamInviteStatus[]>;
   logClientError(e: { message: string; stack?: string | null; url?: string | null }): Promise<void>;
   listClientErrors(): Promise<ClientError[]>;

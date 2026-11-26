@@ -495,7 +495,12 @@
       "nologin": "No login"
     },
     "auditionOpen": "Audition is open",
-    "auditionOpenHint": "Only when it is open can dancers apply, and only then do trainers and dancers see anything about audition. Close it again when the round is over."
+    "auditionOpenHint": "Only when it is open can dancers apply, and only then do trainers and dancers see anything about audition. Close it again when the round is over.",
+    "searchPh": "Search person, team or page…",
+    "searchNone": "Nothing found.",
+    "searchPage": "Admin page",
+    "searchPerson": "Member",
+    "searchTeam": "Team"
   },
   "settings": {
     "language": "Language",
@@ -1075,7 +1080,11 @@
     "allTeams": "All teams",
     "olderThan7_one": "1 has waited over 7 days",
     "olderThan7_other": "{{count}} have waited over 7 days",
-    "firstRate": "Instalment"
+    "firstRate": "Instalment",
+    "remind": "Send reminder",
+    "reminded_one": "1 reminder sent.",
+    "reminded_other": "{{count}} reminders sent.",
+    "remindedNone": "Nobody to remind – everyone was reminded within the last week."
   },
   "milestones": {
     "title": "Milestones",

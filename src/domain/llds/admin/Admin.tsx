@@ -27,12 +27,31 @@ import { addDays, DAY_LONG, hm, mondayOf, startOfDay } from "../lib/time";
 type Page = "menu" | "importmembers" | "users" | "members" | "teams" | "season" | "bookings" | "messages" | "reports" | "events" | "shop" | "punch" | "import" | "catalog" | "customize" | "website" | "payments" | "insights" | "auditions";
 const CATS = ["mini", "kids", "junior", "adult", "mixed"] as const;
 
+/** what the search on the Admin menu hands to the page it opens (Members reads it once as its starting filter) */
+const adminQuery = { q: "" };
+/** Admin menu search: menu items, people and teams by name – a tap opens the right page with the name filled in. */
+function AdminSearch({ q, menu, onPage }: { q: string; menu: { k: Page; label: string }[]; onPage: (p: Page, query?: string) => void }) {
+  const { t } = useTranslation();
+  const [members, setMembers] = useState<Member[]>([]); const [teams, setTeams] = useState<Team[]>([]);
+  useEffect(() => { void api.listMembers().then(setMembers).catch(() => setMembers([])); void api.listTeams().then(setTeams).catch(() => setTeams([])); }, []);
+  const low = q.toLowerCase(); const has = (x: string) => x.toLowerCase().includes(low);
+  const pages = menu.filter((m) => has(m.label)); const people = members.filter((m) => has(`${m.first_name} ${m.last_name}`) || has(m.email ?? "")).slice(0, 8); const tms = teams.filter((x) => has(x.name)).slice(0, 6);
+  if (!pages.length && !people.length && !tms.length) return <p className="muted small" data-testid="admin-search-none">{t("admin.searchNone")}</p>;
+  return (
+    <div className="card list" data-testid="admin-search-results" style={{ marginBottom: 12 }}>
+      {pages.map((m) => <button key={"p" + m.k} type="button" className="item" onClick={() => onPage(m.k)}><span className="grow">{m.label}<div className="tiny">{t("admin.searchPage")}</div></span><span className="gold">›</span></button>)}
+      {people.map((m) => <button key={m.id} type="button" className="item" data-testid="admin-search-person" onClick={() => onPage("members", `${m.first_name} ${m.last_name}`.trim())}><span className="grow">{m.first_name} {m.last_name}<div className="tiny">{t("admin.searchPerson")}{m.email ? ` · ${m.email}` : ""}</div></span><span className="gold">›</span></button>)}
+      {tms.map((x) => <button key={x.id} type="button" className="item" onClick={() => onPage("teams")}><span className="grow">{x.name}<div className="tiny">{t("admin.searchTeam")}</div></span><span className="gold">›</span></button>)}
+    </div>);
+}
+
 /** Admin: the one place Line runs the school from. Everything else in the app reads what she sets here. */
 export function Admin() {
   const { t } = useTranslation();
   const [page, setPage] = useState<Page>(() => (useNav.getState().takeAdminPage() as Page | null) ?? "menu");
   const adminPage = useNav((n) => n.adminPage);
   useEffect(() => { const p = useNav.getState().takeAdminPage(); if (p) setPage(p as Page); }, [adminPage]);
+  const [find, setFind] = useState("");
   const counts = useBadges((b) => b.admin); const refreshBadges = useBadges((b) => b.refresh);
   useEffect(() => { void refreshBadges(); }, [page, refreshBadges]); // every return to the menu re-counts
   if (page === "users") return <Back onBack={() => setPage("menu")}><AdminUsers /></Back>;
@@ -66,6 +85,8 @@ export function Admin() {
   return (
     <section className="screen adminhome">
       <header className="topbar"><h1 className="display">{t("nav.admin")}</h1></header>
+      <input type="search" value={find} placeholder={t("admin.searchPh")} data-testid="admin-search" onChange={(e) => setFind(e.target.value)} style={{ marginBottom: 10 }} />
+      {find.trim().length >= 2 && <AdminSearch q={find.trim()} onPage={(pg, query) => { adminQuery.q = query ?? ""; setPage(pg); }} menu={groups.flatMap((g) => g.items).map(([k, label]) => ({ k, label }))} />}
       {/* to-dos first: what needs Line right now, one row of chips */}
       <div className="card todorow" data-testid="admin-todos">
         {todos.length ? todos.map(([k, , sub, n]) => <button key={k} type="button" className="todochip" onClick={() => setPage(k)}><b>{n}</b><span>{sub.replace(/^\d+\s*/, "")}</span></button>) : <span className="small muted">{t("admin.nothingTodo")}</span>}
@@ -87,7 +108,7 @@ function Back({ onBack, children }: { onBack: () => void; children: React.ReactN
 /* ---------------- Members: everyone approved, their teams/roles, child logins, deactivate ---------------- */
 function Members() {
   const { t } = useTranslation();
-  const [all, setAll] = useState<Member[]>([]); const [teams, setTeams] = useState<Team[]>([]); const [q, setQ] = useState(""); const [open, setOpen] = useState<Member | null>(null);
+  const [all, setAll] = useState<Member[]>([]); const [teams, setTeams] = useState<Team[]>([]); const [q, setQ] = useState(() => { const x = adminQuery.q; adminQuery.q = ""; return x; }); const [open, setOpen] = useState<Member | null>(null);
   const [toast, setToast] = useState<string | null>(null); const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
   const load = useCallback(async () => { const [m, tm] = await Promise.all([api.listMembers(), api.listTeams()]); setAll(m.filter((p) => p.status === "approved")); setTeams(tm); }, []);
   useEffect(() => { void load(); }, [load]);
