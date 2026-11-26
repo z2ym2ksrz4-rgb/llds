@@ -1074,7 +1074,8 @@
     "summaryAllPaid": "Alt er betalt ✓",
     "allTeams": "Alle hold",
     "olderThan7_one": "1 har ventet over 7 dage",
-    "olderThan7_other": "{{count}} har ventet over 7 dage"
+    "olderThan7_other": "{{count}} har ventet over 7 dage",
+    "firstRate": "Rate"
   },
   "milestones": {
     "title": "Milepæle",
@@ -1620,7 +1621,8 @@
     "staffOpen": "Åbn audition",
     "quietLine": "Tilmeldt {{teams}} – du hører fra træneren.",
     "open": "Åben",
-    "closed": "Lukket – tryk for at åbne"
+    "closed": "Lukket – tryk for at åbne",
+    "noTeams": "Ingen hold optager via audition endnu."
   },
   "help": {
     "title": "Hjælp",

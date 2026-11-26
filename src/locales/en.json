@@ -1074,7 +1074,8 @@
     "summaryAllPaid": "Everything is paid ✓",
     "allTeams": "All teams",
     "olderThan7_one": "1 has waited over 7 days",
-    "olderThan7_other": "{{count}} have waited over 7 days"
+    "olderThan7_other": "{{count}} have waited over 7 days",
+    "firstRate": "Instalment"
   },
   "milestones": {
     "title": "Milestones",
@@ -1620,7 +1621,8 @@
     "staffOpen": "Open audition",
     "quietLine": "Signed up for {{teams}} – the trainer will be in touch.",
     "open": "Open",
-    "closed": "Closed – tap to open"
+    "closed": "Closed – tap to open",
+    "noTeams": "No teams admit by audition yet."
   },
   "help": {
     "title": "Help",

@@ -83,3 +83,10 @@ begin
   delete from client_error where created_at < now() - interval '60 days';
 end $$;
 grant execute on function log_client_error(text, text, text, text, text) to authenticated;
+
+-- which migrations has this database seen? (from 0068 on – earlier ones are verified by their objects)
+create table if not exists schema_migration (name text primary key, applied_at timestamptz not null default now());
+alter table schema_migration enable row level security;
+drop policy if exists schema_migration_admin on schema_migration;
+create policy schema_migration_admin on schema_migration for select using (i_am_admin());
+insert into schema_migration(name) values ('0068_quiet_import_invites_errors') on conflict do nothing;
