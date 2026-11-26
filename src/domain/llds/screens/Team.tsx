@@ -1,3 +1,4 @@
+import { Skeleton } from "../components/Skeleton";
 import { useCallback, useEffect, useState, type ReactElement } from "react";
 import { HeroMedia, isSitePhoto } from "../components/PhotoHero";
 import { useTranslation } from "react-i18next";
@@ -55,7 +56,7 @@ export function TeamScreen() {
   const [compose, setCompose] = useState(false);
   const [write, setWrite] = useState(false);
   const [threads, setThreads] = useState<Thread[]>([]); const [openThread, setOpenThread] = useState<Thread | null>(null);
-  const [msgs, setMsgs] = useState<Message[]>([]);
+  const [msgs, setMsgs] = useState<Message[]>([]); const [msgsLoaded, setMsgsLoaded] = useState(false);
   const [openMsg, setOpenMsg] = useState<Message | null>(null);
   const [award, setAward] = useState<Member | null>(null);
   const setTab = useNav((s) => s.setTab);
@@ -78,7 +79,7 @@ export function TeamScreen() {
     const mine = s.filter((x) => x.team_id === teamId);
     setSessions(mine); setEvents(ev.filter((e) => !e.team_ids.length || e.team_ids.includes(teamId))); setResults(rs); setStats(st); setBadges(bd);
     setAbsences(await api.listAbsences(mine.map((x) => x.id)));
-    void api.listMessages().then(setMsgs).catch(() => setMsgs([]));
+    void api.listMessages().then(setMsgs).catch(() => setMsgs([])).finally(() => setMsgsLoaded(true));
     void api.listThreads().then((th) => setThreads(th.filter((x) => x.team_id === teamId))).catch(() => setThreads([]));
     if (staff) setMembers((await api.listMembers()).filter((p) => p.memberships.some((m) => m.team_id === teamId)));
     else { const [st, dn] = await Promise.all([api.teamStaff(teamId).catch(() => []), api.teamDancers(teamId).catch(() => [])]); setRoster({ staff: st, dancers: dn }); }
@@ -182,7 +183,7 @@ export function TeamScreen() {
         {(teamMsgs.length > 0 || threads.length > 0) ? (<>
           {teamMsgs.length > 0 && <MsgGroup label={t("team.fromTrainer", { team: team.name })} list={teamMsgs} Row={Row} empty={t("team.noTeamMessages")} cls="team" />}
           {threads.length > 0 && <ThreadGroup label={staff ? t("team.conversationsStaff") : t("team.conversationsMine")} threads={threads} onOpen={(th) => setOpenThread(th)} empty={staff ? t("team.noConversationsStaff") : t("team.noConversationsMine")} />}
-        </>) : <p className="tiny muted" style={{ margin: "4px 0 0" }}>{lead ? t("team.noMessagesStaff") : t("team.noMessagesYet")}</p>}
+        </>) : !msgsLoaded ? <Skeleton rows={1} /> : <p className="tiny muted" style={{ margin: "4px 0 0" }}>{lead ? t("team.noMessagesStaff") : t("team.noMessagesYet")}</p>}
       </div>); })()}
       {openMsg && <MessageSheet message={openMsg} onClose={() => { setOpenMsg(null); void load(); }} toast={say} />}
       {write && <ThreadComposer teamId={team.id} teamName={team.name} onClose={() => setWrite(false)} onSent={() => void load()} toast={say} />}

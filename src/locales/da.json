@@ -500,7 +500,9 @@
     "searchNone": "Ingen fundet.",
     "searchPage": "Side i Admin",
     "searchPerson": "Medlem",
-    "searchTeam": "Hold"
+    "searchTeam": "Hold",
+    "addOtherTeam": "+ Tilføj andet hold ({{n}})",
+    "hideOtherTeams": "Skjul øvrige hold"
   },
   "settings": {
     "language": "Sprog",
@@ -1084,7 +1086,8 @@
     "remind": "Send påmindelse",
     "reminded_one": "1 påmindelse sendt.",
     "reminded_other": "{{count}} påmindelser sendt.",
-    "remindedNone": "Ingen at minde – alle er mindet inden for den sidste uge."
+    "remindedNone": "Ingen at minde – alle er mindet inden for den sidste uge.",
+    "backHint": "Velkommen tilbage. Gik betalingen igennem, så tryk “Jeg har betalt”."
   },
   "milestones": {
     "title": "Milepæle",

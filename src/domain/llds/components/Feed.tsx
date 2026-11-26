@@ -1,3 +1,4 @@
+import { Skeleton } from "./Skeleton";
 import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type Channel, type Comment, type Post } from "@/core/api";
@@ -14,13 +15,13 @@ export function Feed({ teamId, channels, toast, limit }: { teamId: string | null
   const isAdmin = me.person.is_admin;
   const isStaff = isAdmin || me.memberships.some((m) => m.person_id === me.person.id && m.role !== "dancer");
   const [channel, setChannel] = useState<Channel>(channels[0]);
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]); const [loaded, setLoaded] = useState(false);
   const [open, setOpen] = useState<Post | null>(null);
   const [lightbox, setLightbox] = useState<string | null>(null);
   const myTeams = useMemo(() => new Set(me.memberships.map((m) => m.team_id)), [me]);
   // RLS already limits a real user; in "Vis appen som" the real account reads, so apply the viewed person's rights here too
   const visible = useCallback((p: Post) => isAdmin || p.channel === "school" || (p.channel === "trainers" ? isStaff : !p.team_id || myTeams.has(p.team_id)), [isAdmin, isStaff, myTeams]);
-  const load = useCallback(async () => { setPosts((await api.listPosts(channel, teamId)).filter(visible)); }, [channel, teamId, visible]);
+  const load = useCallback(async () => { setPosts((await api.listPosts(channel, teamId)).filter(visible)); setLoaded(true); }, [channel, teamId, visible]);
   useEffect(() => { void load(); }, [load]);
   useEffect(() => { if (!channels.includes(channel)) setChannel(channels[0]); }, [channels, channel]);
   const canPost = channel === "team" ? !!teamId : channel === "school" ? isAdmin : isStaff;
@@ -36,7 +37,8 @@ export function Feed({ teamId, channels, toast, limit }: { teamId: string | null
       )}
       {canPost && <Composer teamId={channel === "team" ? teamId : null} channel={channel} isStaff={isStaff} isAdmin={isAdmin} onPosted={() => { void load(); toast(t("feed.posted")); }} />}
       {shown.map((p) => <PostCard key={p.id} post={p} mod={staffHere} onOpen={() => setOpen(p)} onImage={setLightbox} onChanged={() => void load()} toast={toast} />)}
-      {!posts.length && <p className="muted small" data-testid="feed-empty">{t(isStaff ? "feed.emptyStaff" : "feed.empty")}</p>}
+      {!loaded && <Skeleton rows={2} />}
+      {loaded && !posts.length && <p className="muted small" data-testid="feed-empty">{t(isStaff ? "feed.emptyStaff" : "feed.empty")}</p>}
       {open && <CommentSheet post={open} mod={staffHere} onClose={() => { setOpen(null); void load(); }} toast={toast} />}
       {lightbox && <div className="lightbox" onClick={() => setLightbox(null)}><img src={lightbox} alt="" /></div>}
     </div>

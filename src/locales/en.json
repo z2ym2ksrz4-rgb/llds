@@ -500,7 +500,9 @@
     "searchNone": "Nothing found.",
     "searchPage": "Admin page",
     "searchPerson": "Member",
-    "searchTeam": "Team"
+    "searchTeam": "Team",
+    "addOtherTeam": "+ Add another team ({{n}})",
+    "hideOtherTeams": "Hide other teams"
   },
   "settings": {
     "language": "Language",
@@ -1084,7 +1086,8 @@
     "remind": "Send reminder",
     "reminded_one": "1 reminder sent.",
     "reminded_other": "{{count}} reminders sent.",
-    "remindedNone": "Nobody to remind – everyone was reminded within the last week."
+    "remindedNone": "Nobody to remind – everyone was reminded within the last week.",
+    "backHint": "Welcome back. If the payment went through, tap “I have paid”."
   },
   "milestones": {
     "title": "Milestones",

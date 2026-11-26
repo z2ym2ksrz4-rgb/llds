@@ -8,6 +8,7 @@ type Draft = Record<string, { team_id: string; role: Role }[]>; // personId -> m
 /** Admin → Brugere: approve self-registered people and put each (adult + children) on teams with a role. */
 export function AdminUsers() {
   const { t } = useTranslation();
+  const [allOpen, setAllOpen] = useState<Record<string, boolean>>({});
   const refresh = useAuth((s) => s.refresh);
   const [pending, setPending] = useState<PendingPerson[]>([]);
   const [web, setWeb] = useState<WebSignup[]>([]);
@@ -64,10 +65,8 @@ export function AdminUsers() {
             <div key={person.id} className="assign">
               <div className="eyebrow">{isChild ? t("admin.child", { name: person.first_name, year: person.birth_year }) : t("admin.adult", { name: person.first_name })}</div>
               {!isChild && p.wished_roles.includes("parent") && !p.wished_roles.some((r) => r !== "parent") && <p className="tiny">{t("admin.parentOnly")}</p>}
-              <div className="teamgrid">
-                {teams.map((tm) => {
-                  const r = roleOf(person.id, tm.id);
-                  return (
+              {(() => { const chosen = teams.filter((tm) => roleOf(person.id, tm.id)); const rest = teams.filter((tm) => !roleOf(person.id, tm.id)); const key = person.id; const openAll = allOpen[key] ?? chosen.length === 0;
+                const row = (tm: Team) => { const r = roleOf(person.id, tm.id); return (
                     <div key={tm.id} className={"teamrow" + (r ? " on" : "")}>
                       <span className="grow">{tm.name}<span className="tiny"> · {tm.level}</span></span>
                       <div className="chips tight">
@@ -76,9 +75,13 @@ export function AdminUsers() {
                         ))}
                       </div>
                     </div>
-                  );
-                })}
-              </div>
+                  ); };
+                // the teams already chosen (the ones the person asked for) first; every other team behind one fold – not 30 rows of chips per person
+                return (<div className="teamgrid" data-testid="assign-teams">
+                  {chosen.map(row)}
+                  {rest.length > 0 && <button type="button" className="linklike small" style={{ justifySelf: "start", minHeight: 40 }} data-testid="assign-more" onClick={() => setAllOpen({ ...allOpen, [key]: !openAll })}>{openAll ? t("admin.hideOtherTeams") : t("admin.addOtherTeam", { n: rest.length })}</button>}
+                  {openAll && rest.map(row)}
+                </div>); })()}
             </div>
           ))}
           {!p.children.length && <label className="check"><input type="checkbox" checked={!!admin[p.id]} onChange={(e) => setAdmin({ ...admin, [p.id]: e.target.checked })} /> {t("admin.makeAdmin")}</label>}
