@@ -33,6 +33,7 @@ begin
     array[app||'group-stage.jpg', app||'showdance-gold-solo.jpg', app||'light-trails.jpg', app||'solo-spotlight.jpg'],
     array[app||'group-stage.jpg', app||'showdance-gold-solo.jpg', app||'light-trails.jpg'], '{"x":0.5,"y":0.35}'::jsonb)
   returning id into tid;
+  update team set is_test = true where id = tid;   -- 0071: hidden from everyone but admins and its own members
 
   -- personas move: out of the real teams, into Testholdet
   delete from membership where person_id = any(testp);
