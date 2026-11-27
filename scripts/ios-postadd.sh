@@ -8,6 +8,12 @@ set_key() { $PB -c "Set :$1 '$2'" "$PLIST" 2>/dev/null || $PB -c "Add :$1 string
 set_key NSCameraUsageDescription "Kameraet bruges til at tage billeder og video til holdets mapper."
 set_key NSPhotoLibraryUsageDescription "Vælg billeder og video fra dit bibliotek til holdets mapper og opslag."
 set_key NSPhotoLibraryAddUsageDescription "Gem billeder fra holdets mapper i dit bibliotek."
+# Calendar: the app only opens the phone's own "new event" sheet (write-only). The other strings exist because the calendar plugin also contains APIs we never call.
+set_key NSCalendarsWriteOnlyAccessUsageDescription "Bruges kun, når du selv vælger at lægge et event eller holdets træninger i din kalender."
+set_key NSCalendarsUsageDescription "Bruges kun, når du selv vælger at lægge et event eller holdets træninger i din kalender."
+set_key NSCalendarsFullAccessUsageDescription "Appen læser ikke din kalender. Bruges kun, når du selv lægger et event eller holdets træninger i den."
+set_key NSRemindersUsageDescription "Appen bruger ikke dine påmindelser."
+set_key NSRemindersFullAccessUsageDescription "Appen bruger ikke dine påmindelser."
 $PB -c "Add :ITSAppUsesNonExemptEncryption bool false" "$PLIST" 2>/dev/null || $PB -c "Set :ITSAppUsesNonExemptEncryption false" "$PLIST"
 # Deployment target 14.0 -> 15.0 (Xcode project + Podfile)
 # Deployment target -> 15.5 everywhere (WidgetKit bridge / ML Kit pods require >= 15.5)

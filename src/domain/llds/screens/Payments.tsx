@@ -1,5 +1,5 @@
 import { CalendarAdd } from "../components/CalendarAdd";
-import { teamCalItems, type CalItem } from "../lib/calendar";
+import { teamCalItems, type CalEntry } from "../lib/calendar";
 import { SEASON_END } from "../lib/time";
 import { useNav } from "@/core/nav";
 import { humanize } from "@/core/errors";
@@ -112,7 +112,7 @@ export function JoinTeam({ onClose, toast, initialTeam }: { onClose: () => void;
   useEffect(() => { if (!team) { setQ(null); return; } let on = true; api.myQuote(team.id, plan).then((r) => { if (on) setQ(r); }).catch(() => setQ(null)); return () => { on = false; }; }, [team, plan]);
   const memberOf = new Set(me.memberships.filter((m) => m.person_id === who).map((m) => m.team_id));
   const state = (x: Team) => (!openAll || x.signup_open === false ? "closed" : x.admission === "audition" ? (x.audition_open ? "audition" : "closed") : "open");   // the window also closes auditions
-  const [calItems, setCalItems] = useState<CalItem[]>([]);   // offered right after sign-up: the team's weekly trainings for the family calendar
+  const [calItems, setCalItems] = useState<CalEntry[]>([]);   // offered right after sign-up: the team's weekly trainings for the family calendar
   useEffect(() => { if (!done || !team) return; void api.listSessions(new Date().toISOString(), new Date(SEASON_END + "T23:59:59").toISOString()).then((ss) => setCalItems(teamCalItems(team.name, ss.filter((x) => x.team_id === team.id), "LL Dance Studio"))).catch(() => setCalItems([])); }, [done, team]);
   const [err, setErr] = useState<string | null>(null);   // shown inside the sheet – a toast alone was easy to miss
   const submit = async () => { if (!team) return; setBusy(true); setErr(null); try { const r = await api.appSignupTeam(team.id, who, plan); setDone(r); } catch (e) { const m = (e as Error).message; setErr(m.includes("already") ? t("pay.already") : m.includes("closed") ? t("pay.closedToast") : m.includes("audition") ? t("pay.auditionToast") : humanize(m)); toast(m.includes("already") ? t("pay.already") : m.includes("closed") ? t("pay.closedToast") : m.includes("audition") ? t("pay.auditionToast") : m); } finally { setBusy(false); } };

@@ -1,0 +1,9 @@
+<!doctype html><html lang="da"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>LL Dance Studio</title>
+<style>body{margin:0;background:#0a0a0b;color:#f2efe8;font:16px/1.5 system-ui,sans-serif;display:grid;place-items:center;min-height:100dvh;text-align:center;padding:24px}a{color:#e2c77a}</style></head>
+<body><p>Åbner LL Dance Studio …<br><a id="l" href="../../backstage/">Fortsæt</a></p>
+<script>
+// "Åbn appen" in e-mails points here. With the app installed the phone opens the app instead of this page (the address is one of the app's own links).
+// Without it: phones go to the page where the app is fetched, computers go to the app in the browser.
+var phone=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+var to=phone?"../../backstage/":"../";document.getElementById("l").href=to;location.replace(to);
+</script></body></html>

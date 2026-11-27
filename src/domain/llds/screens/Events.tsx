@@ -1,5 +1,5 @@
 import { CalendarAdd } from "../components/CalendarAdd";
-import { wall } from "../lib/calendar";
+import { oneCalEntry } from "../lib/calendar";
 import { Skeleton } from "../components/Skeleton";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -142,7 +142,7 @@ export function EventSheet({ event, staff, onClose, onEdit, onChanged, toast }: 
           {deadlinePassed && <p className="tiny">{t("events.deadlinePassed")}</p>}
         </div>
       )}
-      <CalendarAdd testid="ev-ics" label={t("events.addToCalendar")} items={[{ t: event.title, s: wall(event.starts_at), e: wall(event.ends_at ?? new Date(new Date(event.starts_at).getTime() + 2 * 3600e3).toISOString()), p: event.place ?? undefined, d: event.info ? event.info.slice(0, 400) : undefined }]} />
+      <CalendarAdd testid="ev-ics" label={t("events.addToCalendar")} items={[oneCalEntry(event.title, event.starts_at, event.ends_at ?? null, event.place, event.info)]} />
       {staff && onEdit && <button type="button" className="ghost small" data-testid="ev-edit" onClick={onEdit}>✎ {t("events.editEvent")}</button>}
       {staff && (
         <div className="card" style={{ margin: 0 }}><div className="row between"><span className="eyebrow">{t("events.signups", { n: signups.length })}{event.price_dkk ? ` · ${t("events.paidN", { n: paid })}` : ""}</span>{onEdit && <button className="linklike small" onClick={onEdit}>{t("common.edit")}</button>}</div>

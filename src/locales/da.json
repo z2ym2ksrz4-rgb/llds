@@ -1786,6 +1786,14 @@
     "noteSeries": "Træningerne lægges ind som en fast ugentlig aftale. Bliver en træning flyttet eller aflyst, eller er der ferie, ændres det ikke i din kalender – du får besked i appen, og det er appen, der gælder.",
     "go": "Åbn kalender",
     "skip": "Ikke nu",
-    "teamOffer": "Læg holdets træninger i min kalender"
+    "teamOffer": "Læg holdets træninger i min kalender",
+    "loading": "Henter træningerne …",
+    "none": "Holdet har ingen faste træninger at lægge i kalenderen lige nu.",
+    "several_one": "Holdet har {{count}} fast træningstid.",
+    "several_other": "Holdet har {{count}} faste træningstider. Din kalender åbner én ad gangen – tryk Tilføj på hver.",
+    "saved_one": "Lagt i din kalender.",
+    "saved_other": "{{count}} aftaler lagt i din kalender.",
+    "failed": "Kalenderen kunne ikke åbnes. Giv appen lov til at tilføje til kalenderen under telefonens indstillinger, og prøv igen.",
+    "teamLink": "Læg træningerne i min kalender"
   }
 }

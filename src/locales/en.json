@@ -1786,6 +1786,14 @@
     "noteSeries": "The classes are added as a fixed weekly entry. If a class is moved or cancelled, or there is a holiday, your calendar does not change – you get a message in the app, and the app is what counts.",
     "go": "Open calendar",
     "skip": "Not now",
-    "teamOffer": "Put the team's classes in my calendar"
+    "teamOffer": "Put the team's classes in my calendar",
+    "loading": "Loading the classes …",
+    "none": "The team has no fixed classes to add right now.",
+    "several_one": "The team has {{count}} fixed class time.",
+    "several_other": "The team has {{count}} fixed class times. Your calendar opens one at a time – press Add on each.",
+    "saved_one": "Added to your calendar.",
+    "saved_other": "{{count}} entries added to your calendar.",
+    "failed": "The calendar could not be opened. Allow the app to add to your calendar in the phone settings and try again.",
+    "teamLink": "Put the classes in my calendar"
   }
 }
