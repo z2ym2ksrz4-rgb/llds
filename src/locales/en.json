@@ -1776,5 +1776,16 @@
     "already": "Already signed up.",
     "offline": "No connection – try again in a moment.",
     "server_update": "The server needs an update before this works. Tell the administrator."
+  },
+  "cal": {
+    "eyebrow": "Calendar",
+    "titleOne": "Add to your calendar",
+    "titleSeries": "Put the classes in your calendar",
+    "noteTitle": "Your calendar does not update itself",
+    "noteOne": "What you add to your own calendar is a copy. If the event is moved or cancelled, your calendar does not change – you get a message in the app, and the app is what counts.",
+    "noteSeries": "The classes are added as a fixed weekly entry. If a class is moved or cancelled, or there is a holiday, your calendar does not change – you get a message in the app, and the app is what counts.",
+    "go": "Open calendar",
+    "skip": "Not now",
+    "teamOffer": "Put the team's classes in my calendar"
   }
 }

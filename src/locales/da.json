@@ -1776,5 +1776,16 @@
     "already": "Er allerede tilmeldt.",
     "offline": "Ingen forbindelse – prøv igen om lidt.",
     "server_update": "Serveren mangler en opdatering, før dette virker. Sig det til Steffen."
+  },
+  "cal": {
+    "eyebrow": "Kalender",
+    "titleOne": "Føj til din kalender",
+    "titleSeries": "Læg træningerne i din kalender",
+    "noteTitle": "Din kalender opdaterer ikke sig selv",
+    "noteOne": "Det, du lægger i din egen kalender, er en kopi. Bliver eventet flyttet eller aflyst, ændres det ikke i din kalender – du får besked i appen, og det er appen, der gælder.",
+    "noteSeries": "Træningerne lægges ind som en fast ugentlig aftale. Bliver en træning flyttet eller aflyst, eller er der ferie, ændres det ikke i din kalender – du får besked i appen, og det er appen, der gælder.",
+    "go": "Åbn kalender",
+    "skip": "Ikke nu",
+    "teamOffer": "Læg holdets træninger i min kalender"
   }
 }

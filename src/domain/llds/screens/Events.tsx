@@ -1,3 +1,5 @@
+import { CalendarAdd } from "../components/CalendarAdd";
+import { wall } from "../lib/calendar";
 import { Skeleton } from "../components/Skeleton";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -66,13 +68,6 @@ function Results() {
 }
 
 /** Upcoming events: photo cards with sign-up status, sheet with plan/pack list/sign-up/payment; staff create/edit. */
-/** A calendar file for the family calendar: the event with place and the short info text. */
-function icsHref(e: Event): string {
-  const z = (d: Date) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, ""); const esc = (x: string) => x.replace(/\\/g, "\\\\").replace(/\n/g, "\\n").replace(/([,;])/g, "\\$1");
-  const start = new Date(e.starts_at); const end = e.ends_at ? new Date(e.ends_at) : new Date(start.getTime() + 2 * 3600e3);
-  const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//LL Dance Studio//Backstage//DA", "BEGIN:VEVENT", `UID:${e.id}@llds`, `DTSTAMP:${z(new Date())}`, `DTSTART:${z(start)}`, `DTEND:${z(end)}`, `SUMMARY:${esc(e.title)}`, e.place ? `LOCATION:${esc(e.place)}` : "", e.info ? `DESCRIPTION:${esc(e.info.slice(0, 600))}` : "", "END:VEVENT", "END:VCALENDAR"].filter(Boolean);
-  return "data:text/calendar;charset=utf-8," + encodeURIComponent(lines.join("\r\n"));
-}
 function EventsList({ admin }: { admin?: boolean }) {
   const { t } = useTranslation();
   const me = useAuth((s) => s.me)!;
@@ -147,7 +142,7 @@ export function EventSheet({ event, staff, onClose, onEdit, onChanged, toast }: 
           {deadlinePassed && <p className="tiny">{t("events.deadlinePassed")}</p>}
         </div>
       )}
-      <a className="linklike small" data-testid="ev-ics" href={icsHref(event)} download={event.title.replace(/[^\wæøåÆØÅ -]/g, "") + ".ics"}>{t("events.addToCalendar")} ↓</a>
+      <CalendarAdd testid="ev-ics" label={t("events.addToCalendar")} items={[{ t: event.title, s: wall(event.starts_at), e: wall(event.ends_at ?? new Date(new Date(event.starts_at).getTime() + 2 * 3600e3).toISOString()), p: event.place ?? undefined, d: event.info ? event.info.slice(0, 400) : undefined }]} />
       {staff && onEdit && <button type="button" className="ghost small" data-testid="ev-edit" onClick={onEdit}>✎ {t("events.editEvent")}</button>}
       {staff && (
         <div className="card" style={{ margin: 0 }}><div className="row between"><span className="eyebrow">{t("events.signups", { n: signups.length })}{event.price_dkk ? ` · ${t("events.paidN", { n: paid })}` : ""}</span>{onEdit && <button className="linklike small" onClick={onEdit}>{t("common.edit")}</button>}</div>

@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import QRCode from "qrcode";
@@ -5,7 +6,7 @@ import { Sheet } from "./Sheet";
 import appConfig from "../../../../app.config.json";
 
 /** MobilePay payment: deep link on the phone, QR on a bigger screen, then "I have paid" → Line confirms in Admin. */
-export function PaySheet({ amount, reference, onPaid, onClose, title }: { amount: number; reference: string; onPaid: () => Promise<void>; onClose: () => void; title: string }) {
+export function PaySheet({ amount, reference, onPaid, onClose, title, extra }: { amount: number; reference: string; onPaid: () => Promise<void>; onClose: () => void; title: string; extra?: ReactNode }) {
   const { t } = useTranslation();
   const mp = appConfig.mobilepay;
   const link = `mobilepay://send?phone=${mp.number}&amount=${amount}&comment=${encodeURIComponent(reference)}`;
@@ -26,6 +27,7 @@ export function PaySheet({ amount, reference, onPaid, onClose, title }: { amount
         {back && <p className="small ok" role="status" data-testid="pay-back" style={{ margin: "4px 0 0" }}>{t("pay.backHint")}</p>}
         <button className={back ? "cta" : "ghost"} id="pay-claim" disabled={busy} onClick={async () => { setBusy(true); try { await onPaid(); } finally { setBusy(false); } }}>{t("pay.claim")}</button>
       </div>
+      {extra}
     </Sheet>
   );
 }

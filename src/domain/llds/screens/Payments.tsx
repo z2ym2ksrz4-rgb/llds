@@ -1,3 +1,6 @@
+import { CalendarAdd } from "../components/CalendarAdd";
+import { teamCalItems, type CalItem } from "../lib/calendar";
+import { SEASON_END } from "../lib/time";
 import { useNav } from "@/core/nav";
 import { humanize } from "@/core/errors";
 import { useCallback, useEffect, useState } from "react";
@@ -109,10 +112,12 @@ export function JoinTeam({ onClose, toast, initialTeam }: { onClose: () => void;
   useEffect(() => { if (!team) { setQ(null); return; } let on = true; api.myQuote(team.id, plan).then((r) => { if (on) setQ(r); }).catch(() => setQ(null)); return () => { on = false; }; }, [team, plan]);
   const memberOf = new Set(me.memberships.filter((m) => m.person_id === who).map((m) => m.team_id));
   const state = (x: Team) => (!openAll || x.signup_open === false ? "closed" : x.admission === "audition" ? (x.audition_open ? "audition" : "closed") : "open");   // the window also closes auditions
+  const [calItems, setCalItems] = useState<CalItem[]>([]);   // offered right after sign-up: the team's weekly trainings for the family calendar
+  useEffect(() => { if (!done || !team) return; void api.listSessions(new Date().toISOString(), new Date(SEASON_END + "T23:59:59").toISOString()).then((ss) => setCalItems(teamCalItems(team.name, ss.filter((x) => x.team_id === team.id), "LL Dance Studio"))).catch(() => setCalItems([])); }, [done, team]);
   const [err, setErr] = useState<string | null>(null);   // shown inside the sheet – a toast alone was easy to miss
   const submit = async () => { if (!team) return; setBusy(true); setErr(null); try { const r = await api.appSignupTeam(team.id, who, plan); setDone(r); } catch (e) { const m = (e as Error).message; setErr(m.includes("already") ? t("pay.already") : m.includes("closed") ? t("pay.closedToast") : m.includes("audition") ? t("pay.auditionToast") : humanize(m)); toast(m.includes("already") ? t("pay.already") : m.includes("closed") ? t("pay.closedToast") : m.includes("audition") ? t("pay.auditionToast") : m); } finally { setBusy(false); } };
   if (done && done.amount_dkk == null) return <Sheet onClose={onClose} eyebrow={done.team} title={t("pay.requested")}><p className="small">{done.note ?? t("pay.ratesText")}</p><button className="cta" onClick={onClose}>{t("common.ok")}</button></Sheet>;
-  if (done) return <PaySheet amount={(done.installments ?? 1) > 1 ? done.per_rate_dkk ?? done.amount_dkk ?? 0 : done.amount_dkk ?? 0} reference={(done.installments ?? 1) > 1 ? `${done.reference} rate 1/${done.installments}` : done.reference} title={`${done.team}${(done.installments ?? 1) > 1 ? ` · ${t("pay.firstRate")} 1/${done.installments}` : ""}`} onClose={onClose} onPaid={async () => { await api.claimPaymentPaid(done.id); toast(t("pay.claimed")); onClose(); }} />;
+  if (done) return <PaySheet amount={(done.installments ?? 1) > 1 ? done.per_rate_dkk ?? done.amount_dkk ?? 0 : done.amount_dkk ?? 0} reference={(done.installments ?? 1) > 1 ? `${done.reference} rate 1/${done.installments}` : done.reference} title={`${done.team}${(done.installments ?? 1) > 1 ? ` · ${t("pay.firstRate")} 1/${done.installments}` : ""}`} onClose={onClose} onPaid={async () => { await api.claimPaymentPaid(done.id); toast(t("pay.claimed")); onClose(); }}  extra={<div className="caloffer" data-testid="join-cal"><CalendarAdd series className="ghost" testid="join-cal-add" label={t("cal.teamOffer")} items={calItems} /></div>} />;
   if (childLogin) return <Sheet onClose={onClose} eyebrow={t("pay.joinEyebrow")} title={t("pay.join")}><p className="small">{t("pay.childCannot")}</p><button className="cta" onClick={onClose}>{t("common.ok")}</button></Sheet>;
   const st = team ? state(team) : "open";
   const audAt = team?.audition_event_id ? events.find((e) => e.id === team.audition_event_id) ?? null : null;
