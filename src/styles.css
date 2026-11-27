@@ -1088,3 +1088,13 @@ a.cta.calgo { display:block; text-align:center; text-decoration:none; color:#141
 
 .teamcal { margin: 2px 0 6px; }
 .teamcal .linklike { min-height: 40px; }
+
+/* Admin → Betalinger: on phones the actions sit on their own line under the text (a long status button used to squeeze the text into a 100 px column) */
+.item.payrow { flex-wrap: wrap; align-items: flex-start; }
+.item.payrow > .grow { flex: 1 1 100%; min-width: 0; overflow-wrap: anywhere; }
+.item.payrow > .payacts, .item.payrow > .chip { margin-left: auto; }
+.payacts { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+@media (min-width: 700px) { .item.payrow { flex-wrap: nowrap; align-items: center; } .item.payrow > .grow { flex: 1 1 0; } }
+
+/* rows with a time column: text keeps its width, the buttons drop to their own line on phones */
+@media (max-width: 699px) { .item.actrow { flex-wrap: wrap; } .item.actrow > .grow { flex: 1 1 55%; min-width: 55%; } .item.actrow > .payacts { flex: 1 1 100%; } }

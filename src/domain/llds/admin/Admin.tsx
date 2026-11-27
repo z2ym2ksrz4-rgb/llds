@@ -241,8 +241,8 @@ function Bookings() {
     <section className="screen">
       <header className="topbar"><h1 className="display">{t("admin.bookings")}</h1></header>
       <div className="card list">
-        {list.map((b) => <div key={b.id} className="item"><span className="time">{new Date(b.starts_at).toLocaleDateString(loc(), { weekday: "short", day: "numeric", month: "short" })}<br />{hm(b.starts_at)}</span><span className="grow">{b.title}<div className="tiny">{b.room_name} · {b.person_name}</div></span>
-          {b.status === "pending" ? <div className="row"><button className="small" onClick={async () => { await api.setBookingStatus(b.id, "approved"); void load(); }}>{t("admin.approve")}</button><button className="ghost small danger" onClick={async () => { await api.setBookingStatus(b.id, "rejected"); void load(); }}>{t("admin.reject")}</button></div> : <span className="chip ok small">{t("rooms.status.approved")}</span>}</div>)}
+        {list.map((b) => <div key={b.id} className="item actrow"><span className="time">{new Date(b.starts_at).toLocaleDateString(loc(), { weekday: "short", day: "numeric", month: "short" })}<br />{hm(b.starts_at)}</span><span className="grow">{b.title}<div className="tiny">{b.room_name} · {b.person_name}</div></span>
+          {b.status === "pending" ? <div className="payacts"><button className="small" onClick={async () => { await api.setBookingStatus(b.id, "approved"); void load(); }}>{t("admin.approve")}</button><button className="ghost small danger" onClick={async () => { await api.setBookingStatus(b.id, "rejected"); void load(); }}>{t("admin.reject")}</button></div> : <span className="chip ok small">{t("rooms.status.approved")}</span>}</div>)}
         {!list.length && <p className="muted">{t("admin.noBookings")}</p>}
       </div>
     </section>
