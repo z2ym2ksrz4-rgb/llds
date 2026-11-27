@@ -1098,3 +1098,5 @@ a.cta.calgo { display:block; text-align:center; text-decoration:none; color:#141
 
 /* rows with a time column: text keeps its width, the buttons drop to their own line on phones */
 @media (max-width: 699px) { .item.actrow { flex-wrap: wrap; } .item.actrow > .grow { flex: 1 1 55%; min-width: 55%; } .item.actrow > .payacts { flex: 1 1 100%; } }
+
+.closurebar { margin: 6px 0; padding: 10px 14px; border-radius: 12px; border: 1px solid rgba(127,179,213,.45); background: var(--sky-soft); color: var(--fg); font-size: .92rem; }

@@ -214,6 +214,7 @@ export type RosterEntry = { person_id: string; name: string; birth_year: number 
 
 export type TeamInput = Partial<Pick<Team, "name" | "style" | "category" | "level" | "closed" | "parents_see_video" | "punch_card_open" | "color" | "about_url" | "photos" | "signup_open" | "audition_open" | "description" | "cover_url" | "focus" | "admission" | "admission_note" | "price_full" | "price_half" | "price_signup" | "price_note" | "installments_allowed" | "price">> & { max_dancers?: number | null; visibility?: "public" | "private"; archived?: boolean };
 
+export type Closure = { id: string; name: string; from_date: string; to_date: string; team_ids: string[] | null; removed_count: number };
 export type Member = Person & { memberships: Membership[]; children: Person[]; parents: Person[] };
 
 export interface Api {
@@ -224,6 +225,12 @@ export interface Api {
   createSession(input: SessionInput): Promise<void>;
   updateSession(id: string, patch: Partial<SessionInput> & { lesson_plan?: string | null; cancelled?: boolean; cancel_note?: string | null; substitute_wanted?: boolean; substitute_id?: string | null; lesson_plan_read_at?: string | null }, scope?: "one" | "future", opts?: { skipIds?: string[] }): Promise<void>;
   deleteSession(id: string, scope?: "one" | "future"): Promise<void>;
+  /* ferier og fridage: periods without fixed trainings (whole school or chosen teams) */
+  listClosures(): Promise<Closure[]>;
+  /** How many coming fixed trainings the period would remove. */
+  closurePreview(from: string, to: string, teamIds: string[] | null): Promise<{ sessions: number; teams: number }>;
+  saveClosure(input: { id?: string | null; name: string; from_date: string; to_date: string; team_ids: string[] | null }): Promise<{ id: string; removed: number }>;
+  deleteClosure(id: string, restore: boolean): Promise<{ restored: number }>;
   /* bookings */
   listBookings(fromIso: string, toIso: string): Promise<Booking[]>;
   /** Approval follows the person the room is booked FOR: admin/trainer/assistant → approved at once, everyone else → pending. force_pending (preview as dancer/parent) always queues it. */

@@ -1,3 +1,5 @@
+import type { Closure } from "@/core/api";
+import { isoDate } from "../lib/time";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { eventsFor } from "../lib/events";
@@ -42,6 +44,9 @@ export function Rooms() {
   const isStaff = isAdmin || me.memberships.some((m) => m.person_id === me.person.id && m.role !== "dancer");
   const isTrainer = isAdmin || me.memberships.some((m) => m.person_id === me.person.id && m.role === "trainer");
   const [day, setDay] = useState(startOfDay(new Date()));
+  const [closureList, setClosureList] = useState<Closure[]>([]);
+  useEffect(() => { void api.listClosures().then(setClosureList).catch(() => setClosureList([])); }, []);
+  const dayClosures = closureList.filter((c) => isoDate(day) >= c.from_date && isoDate(day) <= c.to_date);
   const [view, setViewRaw] = useState<"list" | "grid">(() => { try { const v = localStorage.getItem("llds_cal_view"); if (v === "list" || v === "grid") return v; } catch { /* ignore */ } return typeof window !== "undefined" && window.innerWidth < 640 ? "list" : "grid"; });
   const setView = (v: "list" | "grid") => { setViewRaw(v); try { localStorage.setItem("llds_cal_view", v); } catch { /* ignore */ } };
   const [scope, setScope] = useState<"mine" | "all" | null>(null);   // null = not chosen yet → people with teams start on their own, staff/admin on all
@@ -100,6 +105,7 @@ export function Rooms() {
       </div>
 
       <div className="dayhead"><h2 className="display">{DAY_LONG[(day.getDay() + 6) % 7]} {day.getDate()}{loc() === "da-DK" ? "." : ""} {day.toLocaleDateString(loc(), { month: "long" })}</h2><span className="small muted">{t("rooms.countLine", { n: sessions.filter((x) => !x.cancelled).length, b: bookings.filter((x) => x.status !== "rejected").length })}</span></div>
+      {dayClosures.length > 0 && <div className="closurebar" data-testid="day-closure">☼ {dayClosures.map((c) => c.name).join(" · ")}<span className="tiny"> – {t(dayClosures.some((c) => !c.team_ids) ? "closures.dayAll" : "closures.daySome")}</span></div>}
       {dayEvents.length > 0 && <div className="evstrip" data-testid="day-events">{dayEvents.map((e) => <button key={e.id} className="evcard-mini" style={{ backgroundImage: `url(${catUrl(e.image_key) ?? artFor(e.id)})` }} onClick={() => setOpenEvent(e)}><span className="eyebrow">{t(`events.kind.${e.kind}`)} · {hm(e.starts_at)}{e.ends_at ? `–${hm(e.ends_at)}` : ""}</span><b>{e.title}</b>{e.place && <small>{e.place}</small>}</button>)}</div>}
       <div className="calctl" data-testid="cal-controls">
         {hasMine && <div className="seg2" role="tablist"><button type="button" className={sc === "mine" ? "on" : ""} data-testid="cal-mine" onClick={() => setScope("mine")}>{t("rooms.scopeMine")}</button><button type="button" className={sc === "all" ? "on" : ""} data-testid="cal-all" onClick={() => setScope("all")}>{t("rooms.scopeAll")}</button></div>}

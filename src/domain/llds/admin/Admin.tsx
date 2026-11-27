@@ -1,3 +1,4 @@
+import { Closures } from "./Closures";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type Booking, type Member, type Message, type Order, type Product, type PunchCard, type PunchCardType, type Report, type Session, type Team, type TeamInput } from "@/core/api";
@@ -202,7 +203,7 @@ function Season() {
   const { t } = useTranslation();
   const [week, setWeek] = useState(mondayOf(new Date()));
   const [sessions, setSessions] = useState<Session[]>([]); const [open, setOpen] = useState<Session | "new" | null>(null);
-  const [hint, setHint] = useState(false);
+  const [hint, setHint] = useState(false); const [closures, setClosures] = useState(false);
   const [moveTo, setMoveTo] = useState<{ date: string } | null>(null); const [dragId, setDragId] = useState<string | null>(null); const [over, setOver] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null); const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2600); };
   const load = useCallback(async () => setSessions(await api.listSessions(week.toISOString(), addDays(week, 7).toISOString())), [week]);
@@ -210,7 +211,8 @@ function Season() {
   const rooms = Array.from(new Set(sessions.map((s) => s.room_name ?? "?")));
   return (
     <section className="screen">
-      <header className="topbar"><h1 className="display">{t("admin.season")}</h1><div className="row" style={{ gap: 6 }}><button type="button" className={"ghost small info" + (hint ? " on" : "")} aria-label={t("common.help")} aria-expanded={hint} onClick={() => setHint((v) => !v)}>ⓘ</button><button className="ghost small" onClick={() => setOpen("new")}>+ {t("session.training")}</button></div></header>
+      <header className="topbar"><h1 className="display">{t("admin.season")}</h1><div className="row" style={{ gap: 6 }}><button type="button" className={"ghost small info" + (hint ? " on" : "")} aria-label={t("common.help")} aria-expanded={hint} onClick={() => setHint((v) => !v)}>ⓘ</button><button className="ghost small" data-testid="season-closures" onClick={() => setClosures(true)}>{t("closures.title")}</button><button className="ghost small" onClick={() => setOpen("new")}>+ {t("session.training")}</button></div></header>
+      {closures && <Closures onClose={() => setClosures(false)} onChanged={() => void load()} />}
       <div className="row between small muted"><button className="linklike" onClick={() => setWeek(addDays(week, -7))}>‹</button><span>{t("admin.week")} {weekNo(week)} · {week.toLocaleDateString(loc(), { day: "numeric", month: "short" })}</span><button className="linklike" onClick={() => setWeek(addDays(week, 7))}>›</button></div>
       {hint && <p className="small muted hintbox">{t("admin.seasonHint")} {t("admin.seasonDragHint")}</p>}
       {rooms.map((room) => (

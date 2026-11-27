@@ -1,7 +1,7 @@
 import i18n from "@/core/i18n";
 
 /** Server errors come back as short English codes ("signups closed"). Shown to people they must read as a sentence in their own language. */
-const CODES = ["signups closed", "audition closed", "audition required", "not an audition team", "already member", "not allowed", "not your person", "unknown team", "needs parent", "too young", "needs birth date", "parent needs child", "last admin", "too many", "bad email", "missing name", "not open", "full", "closed", "already"] as const;
+const CODES = ["signups closed", "audition closed", "audition required", "not an audition team", "already member", "not allowed", "not your person", "unknown team", "needs parent", "too young", "needs birth date", "parent needs child", "last admin", "too many", "bad email", "missing name", "bad dates", "too long", "not open", "full", "closed", "already"] as const;
 export function humanize(msg: string | null | undefined): string {
   if (!msg) return "";
   const low = msg.toLowerCase();

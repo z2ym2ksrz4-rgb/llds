@@ -1,7 +1,7 @@
 import { shiftOccurrence } from "./schedule-util";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { downscaleImage } from "./image";
-import type { Absence, Booking, Member, Membership, Person, PersonStatus, Role, Room, RosterEntry, Session, SessionInput, Team, TeamInput } from "./types";
+import type { Closure, Absence, Booking, Member, Membership, Person, PersonStatus, Role, Room, RosterEntry, Session, SessionInput, Team, TeamInput } from "./types";
 
 type Fail = (e: { message: string } | null) => void;
 
@@ -41,6 +41,10 @@ export function supabaseSchedule(sb: SupabaseClient, fail: Fail, schoolId: () =>
       }
     },
 
+    async listClosures(): Promise<Closure[]> { const { data, error } = await sb.from("closure_view").select("id,name,from_date,to_date,team_ids,removed_count").order("from_date"); fail(error); return (data ?? []) as Closure[]; },
+    async closurePreview(from: string, to: string, teamIds: string[] | null) { const { data, error } = await sb.rpc("closure_preview", { p_from: from, p_to: to, p_team_ids: teamIds && teamIds.length ? teamIds : null }); fail(error); return (data ?? { sessions: 0, teams: 0 }) as { sessions: number; teams: number }; },
+    async saveClosure(i: { id?: string | null; name: string; from_date: string; to_date: string; team_ids: string[] | null }) { const { data, error } = await sb.rpc("save_closure", { p_id: i.id ?? null, p_name: i.name, p_from: i.from_date, p_to: i.to_date, p_team_ids: i.team_ids && i.team_ids.length ? i.team_ids : null }); fail(error); return data as { id: string; removed: number }; },
+    async deleteClosure(id: string, restore: boolean) { const { data, error } = await sb.rpc("delete_closure", { p_id: id, p_restore: restore }); fail(error); return (data ?? { restored: 0 }) as { restored: number }; },
     async deleteSession(id: string, scope: "one" | "future" = "one") {
       if (scope === "future") {
         const { data: s0 } = await sb.from("session").select("weekly_rule_id,starts_at").eq("id", id).single();

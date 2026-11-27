@@ -1775,7 +1775,9 @@
     "closed": "The deadline has passed.",
     "already": "Already signed up.",
     "offline": "No connection – try again in a moment.",
-    "server_update": "The server needs an update before this works. Tell the administrator."
+    "server_update": "The server needs an update before this works. Tell the administrator.",
+    "bad_dates": "The end date is before the start date.",
+    "too_long": "The period can be at most 120 days."
   },
   "cal": {
     "eyebrow": "Calendar",
@@ -1795,5 +1797,39 @@
     "saved_other": "{{count}} entries added to your calendar.",
     "failed": "The calendar could not be opened. Allow the app to add to your calendar in the phone settings and try again.",
     "teamLink": "Put the classes in my calendar"
+  },
+  "closures": {
+    "title": "Holidays and days off",
+    "intro": "Periods without fixed classes – for the whole school or for chosen teams, e.g. around a competition. New weekly classes skip the periods.",
+    "none": "No holidays or days off yet.",
+    "add": "New holiday or day off",
+    "name": "Name",
+    "namePh": "E.g. Christmas break or competition weekend",
+    "from": "From",
+    "to": "Until",
+    "who": "Who it applies to",
+    "wholeSchool": "The whole school",
+    "someTeams": "Chosen teams",
+    "effectTitle": "What happens when you save",
+    "effectFill": "Fill in name and dates and I will show how many classes it affects.",
+    "effect_one": "{{count}} fixed class in the period is removed from the calendar ({{teams}} teams).",
+    "effect_other": "{{count}} fixed classes in the period are removed from the calendar ({{teams}} teams).",
+    "effectNone": "There are no fixed classes in the period. New weekly classes will skip it.",
+    "effectNote": "Single classes such as camps are left alone. Members are not told automatically – send a message if they need to know. If you delete the period again, the classes can be put back.",
+    "saved_one": "Saved. {{count}} class removed.",
+    "saved_other": "Saved. {{count}} classes removed.",
+    "removedCount_one": "{{count}} class removed",
+    "removedCount_other": "{{count}} classes removed",
+    "deleteTitle": "Delete \"{{name}}\"?",
+    "deleteBody_one": "The period removed {{count}} fixed class. Put it back in the calendar?",
+    "deleteBody_other": "The period removed {{count}} fixed classes. Put them back in the calendar?",
+    "deleteBodyNone": "The period has not removed any classes.",
+    "deleteRestore": "Delete and put the classes back",
+    "deleteKeep": "Delete without putting back",
+    "deleted": "The period is deleted.",
+    "deletedRestored_one": "The period is deleted and {{count}} class is back.",
+    "deletedRestored_other": "The period is deleted and {{count}} classes are back.",
+    "dayAll": "no fixed classes",
+    "daySome": "no fixed classes for some teams"
   }
 }

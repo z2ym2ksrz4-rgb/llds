@@ -1775,7 +1775,9 @@
     "closed": "Fristen er udløbet.",
     "already": "Er allerede tilmeldt.",
     "offline": "Ingen forbindelse – prøv igen om lidt.",
-    "server_update": "Serveren mangler en opdatering, før dette virker. Sig det til Steffen."
+    "server_update": "Serveren mangler en opdatering, før dette virker. Sig det til Steffen.",
+    "bad_dates": "Slutdatoen ligger før startdatoen.",
+    "too_long": "Perioden må højst være 120 dage."
   },
   "cal": {
     "eyebrow": "Kalender",
@@ -1795,5 +1797,39 @@
     "saved_other": "{{count}} aftaler lagt i din kalender.",
     "failed": "Kalenderen kunne ikke åbnes. Giv appen lov til at tilføje til kalenderen under telefonens indstillinger, og prøv igen.",
     "teamLink": "Læg træningerne i min kalender"
+  },
+  "closures": {
+    "title": "Ferier og fridage",
+    "intro": "Perioder uden faste træninger – for hele skolen eller for bestemte hold, fx ved et stævne. Nye ugentlige træninger springer perioderne over.",
+    "none": "Ingen ferier eller fridage endnu.",
+    "add": "Ny ferie eller fridag",
+    "name": "Navn",
+    "namePh": "Fx Juleferie eller DM-weekend",
+    "from": "Fra og med",
+    "to": "Til og med",
+    "who": "Hvem gælder det",
+    "wholeSchool": "Hele skolen",
+    "someTeams": "Bestemte hold",
+    "effectTitle": "Det sker, når du gemmer",
+    "effectFill": "Udfyld navn og datoer, så viser jeg, hvor mange træninger det berører.",
+    "effect_one": "{{count}} fast træning i perioden fjernes fra kalenderen ({{teams}} hold).",
+    "effect_other": "{{count}} faste træninger i perioden fjernes fra kalenderen ({{teams}} hold).",
+    "effectNone": "Der ligger ingen faste træninger i perioden. Nye ugentlige træninger springer den over.",
+    "effectNote": "Enkeltstående træninger som lejre røres ikke. Medlemmerne får ikke automatisk besked – send en besked, hvis de skal vide det. Sletter du perioden igen, kan træningerne lægges tilbage.",
+    "saved_one": "Gemt. {{count}} træning er fjernet.",
+    "saved_other": "Gemt. {{count}} træninger er fjernet.",
+    "removedCount_one": "{{count}} træning fjernet",
+    "removedCount_other": "{{count}} træninger fjernet",
+    "deleteTitle": "Slet \"{{name}}\"?",
+    "deleteBody_one": "Perioden fjernede {{count}} fast træning. Skal den lægges tilbage i kalenderen?",
+    "deleteBody_other": "Perioden fjernede {{count}} faste træninger. Skal de lægges tilbage i kalenderen?",
+    "deleteBodyNone": "Perioden har ikke fjernet nogen træninger.",
+    "deleteRestore": "Slet og læg træningerne tilbage",
+    "deleteKeep": "Slet uden at lægge tilbage",
+    "deleted": "Perioden er slettet.",
+    "deletedRestored_one": "Perioden er slettet, og {{count}} træning er lagt tilbage.",
+    "deletedRestored_other": "Perioden er slettet, og {{count}} træninger er lagt tilbage.",
+    "dayAll": "ingen faste træninger",
+    "daySome": "ingen faste træninger for nogle hold"
   }
 }

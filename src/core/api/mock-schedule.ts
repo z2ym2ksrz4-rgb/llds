@@ -45,6 +45,13 @@ export function seedSchedule(teams: Team[], staff: Person[]): SchedState {
   return { rooms: ROOMS, sessions, bookings, absences: [], attendance: [] };
 }
 
+type MockClosure = { id: string; name: string; from_date: string; to_date: string; team_ids: string[] | null; removed: Session[] };
+const localDay = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+/** periods live on the schedule state; older saved mock states have none */
+const closures = (S: SchedState): MockClosure[] => { const x = S as SchedState & { closures?: MockClosure[] }; if (!x.closures) x.closures = []; return x.closures; };
+/** coming fixed trainings inside the period (single trainings such as camps are left alone) */
+const closureHits = (S: SchedState, from: string, to: string, teamIds: string[] | null) => S.sessions.filter((x) => { const day = localDay(new Date(x.starts_at)); return !!x.team_id && !!x.weekly_rule_id && new Date(x.starts_at).getTime() >= Date.now() && day >= from && day <= to && (!teamIds || !teamIds.length || teamIds.includes(x.team_id)); });
+
 export function scheduleOps(get: () => { S: SchedState; persons: Person[]; memberships: Membership[]; guardians: { parent_id: string; child_id: string }[]; teams: Team[]; me: () => Person | null; save: () => void; emit: () => void; notify: (pid: string, kind: string, title: string, body: string | null, ref?: Record<string, string>) => void; punchFor: (teamId: string | null, personId: string, sessionId: string) => boolean; awardAuto: (pid: string) => void }) {
   const family = (pid: string) => [pid, ...get().guardians.filter((x) => x.child_id === pid).map((x) => x.parent_id)];
   const names = (pid: string | null) => { const p = get().persons.find((x) => x.id === pid); return p ? `${p.first_name} ${p.last_name}` : null; };
@@ -56,8 +63,9 @@ export function scheduleOps(get: () => { S: SchedState; persons: Person[]; membe
       const g = get(); const team = g.teams.find((t) => t.id === i.team_id); const room = g.S.rooms.find((r) => r.id === i.room_id);
       const rule = i.repeatWeeklyUntil ? "rule-" + id() : null; let s = new Date(i.starts_at), e = new Date(i.ends_at);
       const until = i.repeatWeeklyUntil ? new Date(i.repeatWeeklyUntil) : s;
+      const shut = (d: Date) => { const day = localDay(d); return !!i.team_id && closures(g.S).some((c) => day >= c.from_date && day <= c.to_date && (!c.team_ids || c.team_ids.includes(i.team_id!))); };
       while (s <= until) {
-        g.S.sessions.push({ id: "s-" + id(), team_id: i.team_id, team_name: team?.name ?? null, room_id: i.room_id, room_name: room?.name ?? null, title: i.title ?? null, starts_at: s.toISOString(), ends_at: e.toISOString(),
+        if (!(rule && shut(s))) g.S.sessions.push({ id: "s-" + id(), team_id: i.team_id, team_name: team?.name ?? null, room_id: i.room_id, room_name: room?.name ?? null, title: i.title ?? null, starts_at: s.toISOString(), ends_at: e.toISOString(),
           trainer_id: i.trainer_id ?? null, trainer_name: names(i.trainer_id ?? null)?.split(" ")[0] ?? null, assistant_id: i.assistant_id ?? null, assistant_name: names(i.assistant_id ?? null)?.split(" ")[0] ?? null, substitute_id: null, substitute_name: null, lesson_plan: null, lesson_plan_read_at: null, cancelled: false, cancel_note: null, weekly_rule_id: rule, substitute_wanted: false });
         s = new Date(s.getTime() + 7 * 864e5); e = new Date(e.getTime() + 7 * 864e5);
       }
@@ -82,6 +90,22 @@ export function scheduleOps(get: () => { S: SchedState; persons: Person[]; membe
         if ("substitute_id" in patch) s.substitute_name = names(patch.substitute_id as string | null)?.split(" ")[0] ?? null;
       }
       g.save(); g.emit();
+    },
+    async listClosures() { return closures(get().S).map(({ removed, ...c }) => ({ ...c, removed_count: removed.length })).sort((a, b) => a.from_date.localeCompare(b.from_date)); },
+    async closurePreview(from: string, to: string, teamIds: string[] | null) { const hit = closureHits(get().S, from, to, teamIds); return { sessions: hit.length, teams: new Set(hit.map((x) => x.team_id)).size }; },
+    async saveClosure(i: { id?: string | null; name: string; from_date: string; to_date: string; team_ids: string[] | null }) {
+      const g = get(); const list = closures(g.S); const tids = i.team_ids && i.team_ids.length ? i.team_ids : null;
+      let c = i.id ? list.find((x) => x.id === i.id) : undefined;
+      if (c) { g.S.sessions.push(...c.removed); c.removed = []; Object.assign(c, { name: i.name.trim(), from_date: i.from_date, to_date: i.to_date, team_ids: tids }); }
+      else { c = { id: "cl-" + id(), name: i.name.trim(), from_date: i.from_date, to_date: i.to_date, team_ids: tids, removed: [] }; list.push(c); }
+      const hit = closureHits(g.S, i.from_date, i.to_date, tids); const ids = new Set(hit.map((x) => x.id));
+      g.S.sessions = g.S.sessions.filter((x) => !ids.has(x.id)); c.removed = hit; g.save(); g.emit();
+      return { id: c.id, removed: hit.length };
+    },
+    async deleteClosure(cid: string, restore: boolean) {
+      const g = get(); const list = closures(g.S); const c = list.find((x) => x.id === cid); if (!c) return { restored: 0 };
+      const n = restore ? c.removed.length : 0; if (restore) g.S.sessions.push(...c.removed);
+      list.splice(list.indexOf(c), 1); g.save(); g.emit(); return { restored: n };
     },
     async deleteSession(sid: string, scope: "one" | "future" = "one") {
       const g = get(); const s0 = g.S.sessions.find((s) => s.id === sid); if (!s0) return;
