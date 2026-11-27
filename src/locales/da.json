@@ -503,7 +503,23 @@
     "searchPerson": "Medlem",
     "searchTeam": "Hold",
     "addOtherTeam": "+ Tilføj andet hold ({{n}})",
-    "hideOtherTeams": "Skjul øvrige hold"
+    "hideOtherTeams": "Skjul øvrige hold",
+    "theme": "Farvetema",
+    "themeAuto": "Automatisk",
+    "themeHint": "Farven på holdets side: overskrifter, linjer og kanten om billedet. Automatisk giver holdet en af de fem gyldne toner.",
+    "themes": {
+      "gold": "Guld",
+      "champagne": "Champagne",
+      "copper": "Kobber",
+      "rosegold": "Rosaguld",
+      "bronze": "Bronze",
+      "brown": "Brun",
+      "bordeaux": "Bordeaux",
+      "plum": "Blomme",
+      "dustyblue": "Støvet blå",
+      "sage": "Salvie",
+      "silver": "Sølv"
+    }
   },
   "settings": {
     "language": "Sprog",

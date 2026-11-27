@@ -1,3 +1,4 @@
+import { TEAM_THEMES } from "../lib/art";
 import { Closures } from "./Closures";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -154,7 +155,7 @@ function Teams() {
 }
 function TeamEditor({ team, onClose, onSaved }: { team: Team | null; onClose: () => void; onSaved: () => void }) {
   const { t } = useTranslation();
-  const [f, setF] = useState<TeamInput & { name: string }>({ name: team?.name ?? "", style: team?.style ?? "Showdance", category: team?.category ?? "junior", level: team?.level ?? "", audition_open: team?.audition_open ?? false, closed: team?.closed ?? false, parents_see_video: team?.parents_see_video ?? false, punch_card_open: team?.punch_card_open ?? false, visibility: team?.visibility ?? "public", description: team?.description ?? "", cover_url: team?.cover_url && !/supabase|token=/.test(team.cover_url) ? team.cover_url : null, about_url: team?.about_url ?? null, focus: team?.focus ?? null, admission: team?.admission ?? (team?.closed ? "audition" : "open"), admission_note: team?.admission_note ?? "", price_full: team?.price_full ?? null, price_half: team?.price_half ?? null, price_signup: team?.price_signup ?? null, price_note: team?.price_note ?? "", installments_allowed: team?.installments_allowed ?? true, signup_open: team?.signup_open ?? true });
+  const [f, setF] = useState<TeamInput & { name: string }>({ name: team?.name ?? "", style: team?.style ?? "Showdance", category: team?.category ?? "junior", level: team?.level ?? "", audition_open: team?.audition_open ?? false, color: team?.color ?? null, closed: team?.closed ?? false, parents_see_video: team?.parents_see_video ?? false, punch_card_open: team?.punch_card_open ?? false, visibility: team?.visibility ?? "public", description: team?.description ?? "", cover_url: team?.cover_url && !/supabase|token=/.test(team.cover_url) ? team.cover_url : null, about_url: team?.about_url ?? null, focus: team?.focus ?? null, admission: team?.admission ?? (team?.closed ? "audition" : "open"), admission_note: team?.admission_note ?? "", price_full: team?.price_full ?? null, price_half: team?.price_half ?? null, price_signup: team?.price_signup ?? null, price_note: team?.price_note ?? "", installments_allowed: team?.installments_allowed ?? true, signup_open: team?.signup_open ?? true });
   const toRef = (v: string | null | undefined) => v?.startsWith("art/catalog/") ? v.replace("art/catalog/", "").replace(/\.\w+$/, "") : v?.startsWith("http") ? v : null;
   const fromRef = (k: string | null) => !k ? null : k.startsWith("http") ? k : `art/catalog/${CATALOG.find((c) => c.key === k)?.file}`;
   const ownPhotos = [...new Set([team?.cover_url, team?.alt_url, ...(team?.photos ?? [])].filter((u): u is string => !!u && u.startsWith("http") && !/supabase|token=/.test(u)))];
@@ -176,6 +177,13 @@ function TeamEditor({ team, onClose, onSaved }: { team: Team | null; onClose: ()
         </div>
         <input value={f.price_note ?? ""} placeholder={t("admin.priceNotePh")} onChange={(e) => setF({ ...f, price_note: e.target.value })} />
         <div className="tiny">{t("admin.pricesHint")}</div>
+      </div>
+      <div className="field"><span>{t("admin.theme")}</span>
+        <div className="themes" data-testid="team-theme">
+          <button type="button" className={"theme auto" + (!f.color ? " on" : "")} data-testid="theme-auto" onClick={() => setF({ ...f, color: null })}><i />{t("admin.themeAuto")}</button>
+          {TEAM_THEMES.map((th) => <button type="button" key={th.key} className={"theme" + (f.color?.toLowerCase() === th.accent ? " on" : "")} data-testid={`theme-${th.key}`} style={{ "--sw": th.accent, "--sw2": th.text } as React.CSSProperties} onClick={() => setF({ ...f, color: th.accent })}><i />{t(`admin.themes.${th.key}`)}</button>)}
+        </div>
+        <div className="tiny">{t("admin.themeHint")}</div>
       </div>
       <div className="field"><span>{t("admin.admission")}</span>
         <div className="chips" data-testid="admission">{(["open", "tryout", "audition"] as const).map((a) => <button key={a} className={"chip" + (f.admission === a ? " on" : "")} onClick={() => setF({ ...f, admission: a, closed: a === "audition" })}>{t(`admin.admissionKind.${a}`)}</button>)}</div>

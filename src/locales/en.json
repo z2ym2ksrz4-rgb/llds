@@ -503,7 +503,23 @@
     "searchPerson": "Member",
     "searchTeam": "Team",
     "addOtherTeam": "+ Add another team ({{n}})",
-    "hideOtherTeams": "Hide other teams"
+    "hideOtherTeams": "Hide other teams",
+    "theme": "Colour theme",
+    "themeAuto": "Automatic",
+    "themeHint": "The colour on the team's page: headings, lines and the frame around the picture. Automatic gives the team one of the five golden tones.",
+    "themes": {
+      "gold": "Gold",
+      "champagne": "Champagne",
+      "copper": "Copper",
+      "rosegold": "Rose gold",
+      "bronze": "Bronze",
+      "brown": "Brown",
+      "bordeaux": "Bordeaux",
+      "plum": "Plum",
+      "dustyblue": "Dusty blue",
+      "sage": "Sage",
+      "silver": "Silver"
+    }
   },
   "settings": {
     "language": "Language",

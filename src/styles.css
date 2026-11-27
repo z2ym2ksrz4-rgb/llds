@@ -1100,3 +1100,12 @@ a.cta.calgo { display:block; text-align:center; text-decoration:none; color:#141
 @media (max-width: 699px) { .item.actrow { flex-wrap: wrap; } .item.actrow > .grow { flex: 1 1 55%; min-width: 55%; } .item.actrow > .payacts { flex: 1 1 100%; } }
 
 .closurebar { margin: 6px 0; padding: 10px 14px; border-radius: 12px; border: 1px solid rgba(127,179,213,.45); background: var(--sky-soft); color: var(--fg); font-size: .92rem; }
+
+/* Admin → Hold: colour theme swatches */
+.themes { display: flex; flex-wrap: wrap; gap: 8px; }
+.themes .theme { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 6px 12px 6px 8px; border-radius: 999px; border: 1px solid var(--line); background: none; color: var(--fg); font-size: .9rem; font-weight: 400; }
+.themes .theme i { width: 22px; height: 22px; border-radius: 50%; flex: none; background: linear-gradient(135deg, var(--sw2, #e6c87a), var(--sw, #c9a24a)); }
+.themes .theme.auto i { background: conic-gradient(#c9a24a, #d9c58a, #c0804a, #c99082, #a8843a, #c9a24a); }
+.themes .theme.on { border-color: var(--sw2, var(--gold2)); box-shadow: 0 0 0 1px var(--sw2, var(--gold2)) inset; }
+/* text in the team's tone must stay readable on the hero photo */
+.screen[style*="--accent"] .hero.photo .eyebrow { text-shadow: 0 1px 6px rgba(0,0,0,.7); }
