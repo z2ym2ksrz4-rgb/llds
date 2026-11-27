@@ -1,0 +1,20 @@
+// Website trainers: admin shows a staff member on the website, gives title + text, adds a brand-new trainer, reorders and hides. Mock.
+import { open, S } from "./_lib.mjs";
+const { b, p, tab, errors } = await open({ w: 390, h: 900 }); const out = { errors };
+await tab("Admin"); await p.click("[data-testid=admin-website]"); await p.waitForSelector("[data-testid=site-trainers]");
+out.shown0 = await p.locator("[data-testid=st-card]").count();
+await p.click("[data-testid=st-hidden] summary"); out.candidates = await p.locator("[data-testid=st-show]").count();
+await p.locator("[data-testid=st-show]").first().click(); await p.waitForSelector("[data-testid=st-card]");
+await p.click("[data-testid=st-edit]"); await p.fill("[data-testid=st-title]", "Træner"); await p.fill("[data-testid=st-bio]", "Har danset i ti år."); await p.click("[data-testid=st-save]");
+await p.waitForFunction(() => /Har danset i ti år/.test(document.querySelector("[data-testid=st-card]")?.textContent ?? ""));
+await p.click("[data-testid=st-add]"); await p.fill("[data-testid=st-first]", "Nora"); await p.fill("[data-testid=st-last]", "Ny"); await p.click("[data-testid=st-add-save]");
+await p.waitForSelector("[data-testid=st-bio]"); await p.fill("[data-testid=st-title]", "Juniortræner"); await p.click("[data-testid=st-save]");
+await p.waitForFunction(() => document.querySelectorAll("[data-testid=st-card]").length === 2);
+out.order1 = await p.locator("[data-testid=st-card] strong").allInnerTexts();
+await p.locator("[data-testid=st-card]").nth(1).locator("button[aria-label='Flyt op']").click(); await p.waitForTimeout(500);
+out.order2 = await p.locator("[data-testid=st-card] strong").allInnerTexts();
+await p.locator("[data-testid=st-card]").first().scrollIntoViewIfNeeded(); await p.screenshot({ path: S + "st1.png" });
+await p.locator("[data-testid=st-hide]").first().click(); await p.waitForFunction(() => document.querySelectorAll("[data-testid=st-card]").length === 1);
+out.afterHide = await p.locator("[data-testid=st-card] strong").allInnerTexts();
+const ok = out.shown0 === 0 && out.candidates > 0 && out.order1.length === 2 && out.order1[1] === "Nora Ny" && out.order2[0] === "Nora Ny" && out.afterHide.length === 1 && !errors.length;
+console.log(JSON.stringify(out)); await b.close(); process.exit(ok ? 0 : 1);

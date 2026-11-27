@@ -1116,3 +1116,9 @@ a.cta.calgo { display:block; text-align:center; text-decoration:none; color:#141
 .siteimg-texts { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
 .siteimg-texts .sitetext:last-child { margin-bottom: 0; }
 .sitetexts { margin: 0 0 14px; }
+
+/* Admin → Website → Trænere: one card per trainer – photo, then name, title, teams and text, then the actions */
+.trainercards { display: grid; gap: 12px; } @media (min-width: 760px) { .trainercards { grid-template-columns: 1fr 1fr; } }
+.card.trainercard { margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.trainercard .thumb { height: 170px; border-radius: 10px; background: #000 center/contain no-repeat; display: grid; place-items: center; }
+.trainercard .tc-bio { margin: 6px 0 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }

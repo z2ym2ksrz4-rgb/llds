@@ -404,6 +404,27 @@ catch(x){const m=String(x.message||"");err.textContent=m.includes("email")?W.err
 const ab=document.querySelector("[data-app]");if(ab){let has=false;try{has=Object.keys(localStorage).some(k=>k.startsWith("sb-"))}catch{}const open=has||os==="desktop";ab.classList.add(open?"is-open":"is-get");if(open)ab.href=ab.href.replace(/backstage\/$/,"app/")}
 document.querySelectorAll(".qrcard").forEach(hq=>{try{const qr=qrcode(0,"M");qr.addData(hq.dataset.url);qr.make();hq.querySelector(".qr").innerHTML=qr.createSvgTag({cellSize:4,margin:0,scalable:true})}catch{hq.remove()}});}
 // page overrides from Tilpas appen → Websitets sider: texts (Danish pages) and pictures per page, keyed by data-e / data-ei
+/* trainers are the app's own people (public_trainers): who is shown, order, title, photo and text come live. A built card whose title and text are unchanged is kept as it is (so the English page keeps its translation); everything else is drawn from the data. */
+{const cards=document.querySelector("[data-trainers=cards]"),wheel=document.querySelector("[data-trainers=wheel]");
+if(cards||wheel)q("public_trainers",`&school_id=not.is.null&order=sort,name`).then(rows=>{if(!rows.length)return;const CM=%(catmap)s;
+const res=r=>!r?null:/^https?:|^data:/.test(r)?r:r.startsWith("art/")?`${BASE}/${r}`:CM[r]?`${BASE}/app/art/catalog/${CM[r]}`:null;
+const hh=x=>{let h=5381;for(let i=0;i<x.length;i++)h=((h*33)^x.charCodeAt(i))>>>0;return h.toString(16)};
+const slug=x=>x.toLowerCase().replace(/æ/g,"ae").replace(/ø/g,"oe").replace(/å/g,"aa").normalize("NFKD").replace(/[^\x00-\x7f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
+const mk=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e};
+const more=EN?"Read more":"Læs mere";
+if(cards){const old=new Map([...cards.children].map(c=>[c.dataset.n,c]));const frag=document.createDocumentFragment();
+for(const r of rows){let c=old.get(r.name);const same=c&&c.dataset.h===hh((r.title||"")+"|"+(r.bio||""));const ph=res(r.photo);
+if(!same){c=mk("div","card");c.id=slug(r.name);c.dataset.n=r.name;if(ph){const im=mk("img");im.alt=r.name;im.loading="lazy";c.appendChild(im)}const inn=mk("div","in");inn.appendChild(mk("h3","",r.name));
+if(r.title){const tt=mk("div","tiny ttl",r.title);tt.style.color="var(--gold)";inn.appendChild(tt)}const te=mk("div","tiny teaches");te.style.marginTop="4px";inn.appendChild(te);
+if(r.bio){const b=mk("p","small muted bio",r.bio);b.style.margin="10px 0 0";inn.appendChild(b);const m=mk("button","more",more);m.type="button";m.onclick=()=>c.classList.add("open");inn.appendChild(m)}c.appendChild(inn)}
+const im=c.querySelector("img");if(im&&ph&&im.getAttribute("src")!==ph)im.src=ph;const te=c.querySelector(".teaches");if(te){te.textContent=r.teaches||"";te.style.display=r.teaches?"":"none"}
+c.classList.remove("rv");frag.appendChild(c)}
+cards.replaceChildren(frag);const n=document.querySelector("[data-trainers-count]");if(n)n.textContent=rows.length;
+if(location.hash){const t=document.getElementById(decodeURIComponent(location.hash.slice(1)));if(t)t.scrollIntoView()}}
+if(wheel){const old=new Map([...wheel.children].map(c=>[c.dataset.n,c]));const frag=document.createDocumentFragment();
+for(const r of rows){let a=old.get(r.name);const ph=res(r.photo);if(!a){if(!ph)continue;a=mk("a","tr");a.dataset.n=r.name;a.href=`${BASE}${EN?"/en":""}/om-os/#${slug(r.name)}`;const im=mk("img");im.alt=r.name;im.loading="lazy";a.appendChild(im);const inn=mk("div","in");inn.appendChild(mk("h4","",r.name));inn.appendChild(mk("div","tiny",r.title||""));a.appendChild(inn)}
+const im=a.querySelector("img");if(im&&ph&&im.getAttribute("src")!==ph)im.src=ph;frag.appendChild(a)}
+if(frag.childNodes.length)wheel.replaceChildren(frag)}})}
 {const pg=document.body.dataset.pg;if(pg&&document.querySelector("[data-e],[data-ei]"))q("school",`&slug=eq.${SLUG}`).then(rows=>{const p=((rows[0]&&rows[0].appearance||{}).pages||{})[pg];if(!p)return;const CM=%(catmap)s;const res=r=>/^https?:|^data:/.test(r)?r:r.startsWith("art/")?`${BASE}/${r}`:CM[r]?`${BASE}/app/art/catalog/${CM[r]}`:null;
 if(!EN)document.querySelectorAll("[data-e]").forEach(el=>{const v=(p.texts||{})[el.dataset.e];if(typeof v==="string"&&v.trim())el.textContent=v});
 document.querySelectorAll("[data-ei]").forEach(el=>{const v=(p.images||{})[el.dataset.ei];const u=v?res(v):null;if(!u)return;if(el.tagName==="IMG")el.src=u;else el.style.backgroundImage=`url(${u})`})})}
@@ -596,7 +617,7 @@ home = f"""
 <section class="tight"><div class="wrap"><div class="head rv"><div><div class="eyebrow">Kalender</div><h2>Events, shows <em>&amp; workshops</em></h2></div><span class="tiny muted">Tilmelding sker i Backstage-appen</span></div><div class="grid rv" id="events"><p class="empty">Henter…</p></div></div></section>
 <section class="tight"><div class="wrap"><div class="eyebrow">Fra studiet</div><h2>Nyt</h2><div id="news"></div></div></section>
 <section class="tight"><div class="wrap"><div class="head rv"><div><div class="eyebrow">Om os</div><h2>Trænerne bag <em>holdene</em></h2></div><a class="btn ghost" href="{BASE}/om-os/#traenere">Mød os alle {ICON_ARROW}</a></div>
-<div class="scroller rv">{"".join(f'<a class="tr" href="{BASE}/om-os/#{slugify(s["name"])}"><img src="{s["image"]}" alt="{E(s["name"])}" loading="lazy"><div class="in"><h4>{E(s["name"])}</h4><div class="tiny">{E(s["role"])}</div></div></a>' for s in P["staff"])}</div></div></section>
+<div class="scroller rv" data-trainers="wheel">{"".join(f'<a class="tr" data-n="{E(s["name"])}" href="{BASE}/om-os/#{slugify(s["name"])}"><img src="{s["image"]}" alt="{E(s["name"])}" loading="lazy" data-ei=""><div class="in"><h4 data-e="">{E(s["name"])}</h4><div class="tiny">{E(s["role"])}</div></div></a>' for s in P["staff"])}</div></div></section>
 <section class="tight"><div class="wrap"><div class="app rv"><div class="txt"><div class="eyebrow">LL Dance Studio-appen</div><h2 data-txt="appTitle">Alt det praktiske – <em>i lommen</em></h2><p class="muted" data-txt="appLead">Dansere, forældre og trænere har hvert deres rum. Tilmelding, afbud, koreografi-videoer, holdets billeder, beskeder fra træneren, events og Stjerneshoppen – ét sted.</p>
 <ul class="feat"><li>Ugens træninger og afbud med ét tryk</li><li>Koreografi og musik til øvning hjemme</li><li>Holdets billeder og videoer – kun for holdet</li><li>Beskeder, aflysninger og vikarer</li><li>Tilmelding og betaling til events</li><li>Klippekort og Stjerneshoppen</li></ul>
 <div class="btns"><a class="btn" href="{BASE}/backstage/">{ICON_LOCK} Backstage – sådan får du adgang</a></div></div><div class="pic" data-cz="app" style="background-image:url({ART(5)})"></div></div></div></section>
@@ -680,10 +701,17 @@ shop = f"""<section class="tight"><div class="wrap"><div class="head rv"><p clas
 write("merchandise/index.html", page("Stjerneshoppen – LL Dance Studio", shop, "Merchandise fra LL Dance Studio: tøj, tasker, drikkedunke – bestil i appen.", "/merchandise/", hero=S["image"], hero_title="Stjerne<em>shoppen</em>", hero_sub="Merchandise"))
 
 # ---------------- om os: the people and the story (trainers used to live under /backstage/, which is now the app)
-staff = "".join(f'<div class="card rv" id="{slugify(s["name"])}"><img src="{s["image"]}" alt="{E(s["name"])}" loading="lazy"><div class="in"><h3>{E(s["name"])}</h3><div class="tiny" style="color:var(--gold)">{E(s["role"])}</div>{("<div class=tiny style=margin-top:4px>" + E(s["teaches"]) + "</div>") if s.get("teaches") else ""}<p class="small muted bio" style="margin:10px 0 0">{E(s["bio"])}</p><button type="button" class="more" onclick="this.closest(\'.card\').classList.add(\'open\')">Læs mere</button></div></div>' for s in P["staff"])
+def _th(x):
+    """Same small hash as site.js: tells whether a trainer's title and text are still the ones this page was built with (then the built – and translated – card is kept)."""
+    h = 5381
+    for ch in x: h = ((h * 33) ^ ord(ch)) & 0xFFFFFFFF
+    return format(h, "x")
+# Trainers are data now (public_trainers): the cards below are the built-in version for search engines and for when the database cannot be reached;
+# site.js replaces them with the live list. They are deliberately NOT editable page content (data-e="" / data-ei="" keep them out of the page editor) – they are edited under Website → Trænere.
+staff = "".join(f'<div class="card rv" id="{slugify(s["name"])}" data-n="{E(s["name"])}" data-h="{_th(s["role"] + "|" + s["bio"])}"><img src="{s["image"]}" alt="{E(s["name"])}" loading="lazy" data-ei=""><div class="in"><h3 data-e="">{E(s["name"])}</h3><div class="tiny ttl" style="color:var(--gold)">{E(s["role"])}</div><div class="tiny teaches" style="margin-top:4px">{E(s.get("teaches") or "")}</div><p class="small muted bio" style="margin:10px 0 0" data-e="">{E(s["bio"])}</p><button type="button" class="more" onclick="this.closest(\'.card\').classList.add(\'open\')">Læs mere</button></div></div>' for s in P["staff"])
 about = f"""<section class="tight"><div class="wrap split"><div class="rv"><div class="eyebrow">Historien</div><h2>{E(H["welcome_title"]).replace("LL Dance Studio", "<em>LL Dance Studio</em>")}</h2><p class="lead">{E(H["welcome"])}</p><div class="btns"><a class="btn" href="{BASE}/medlemsskab/">Bliv medlem {ICON_ARROW}</a><a class="btn ghost" href="{BASE}/kontakt/">Kom forbi</a></div></div>
 <div class="tiles rv" style="grid-template-columns:1fr"><div class="tile" style="pointer-events:none;min-height:360px"><div class="bg" style="background-image:url({H["tiles"][0]["image"]})"></div></div></div></div></section>
-<section class="tight" id="traenere"><div class="wrap"><div class="head rv"><div><div class="eyebrow">Trænerne</div><h2>Menneskene bag <em>holdene</em></h2></div><span class="tiny muted">{len(P["staff"])} trænere · dansere med erfaring fra konkurrencer, shows og mange års undervisning</span></div><div class="staff">{staff}</div></div></section>
+<section class="tight" id="traenere"><div class="wrap"><div class="head rv"><div><div class="eyebrow">Trænerne</div><h2>Menneskene bag <em>holdene</em></h2></div><span class="tiny muted"><span data-trainers-count>{len(P["staff"])}</span> trænere · dansere med erfaring fra konkurrencer, shows og mange års undervisning</span></div><div class="staff" data-trainers="cards">{staff}</div></div></section>
 <section class="tight"><div class="wrap"><div class="band rv"><div class="bg" style="background-image:url({H["welcome_band_image"]})"></div><div><div class="eyebrow">Kom forbi</div><h2>{E(H["welcome_band_title"])}</h2><p class="muted small">{E(H["welcome_band"])}</p><a class="btn ghost" href="{BASE}/kontakt/">Find os {ICON_ARROW}</a></div></div></div></section>"""
 write("om-os/index.html", page("Om os – LL Dance Studio", about, "Historien bag LL Dance Studio og de trænere, der står for holdene i Ulstrup.", "/om-os/", hero=P["staff"][0]["image"], hero_title="Mød <em>os</em>", hero_sub="Om os", hero_lead="Et danseunivers i Ulstrup – bygget af dansere, drevet af hjerte og med hold for alle aldre."))
 

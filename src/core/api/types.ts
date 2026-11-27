@@ -214,6 +214,7 @@ export type RosterEntry = { person_id: string; name: string; birth_year: number 
 
 export type TeamInput = Partial<Pick<Team, "name" | "style" | "category" | "level" | "closed" | "parents_see_video" | "punch_card_open" | "color" | "about_url" | "photos" | "signup_open" | "audition_open" | "description" | "cover_url" | "focus" | "admission" | "admission_note" | "price_full" | "price_half" | "price_signup" | "price_note" | "installments_allowed" | "price">> & { max_dancers?: number | null; visibility?: "public" | "private"; archived?: boolean };
 
+export type SiteTrainer = { id: string; name: string; show: boolean; title: string | null; bio: string | null; app_bio: string | null; photo: string | null; sort: number; has_login: boolean; teaches: string | null };
 export type Closure = { id: string; name: string; from_date: string; to_date: string; team_ids: string[] | null; removed_count: number };
 export type Member = Person & { memberships: Membership[]; children: Person[]; parents: Person[] };
 
@@ -459,6 +460,11 @@ export interface Api {
   // sign-up window (0055)
   signupsOpen(): Promise<boolean>;
   setSignupsOpen(open: boolean): Promise<void>;
+  /* trainers on the website: who is shown, order, title, photo and text – the same people as in the app */
+  listSiteTrainers(): Promise<SiteTrainer[]>;
+  saveSiteTrainer(id: string, patch: { show: boolean; title: string | null; bio: string | null; photo: string | null }): Promise<void>;
+  orderSiteTrainers(ids: string[]): Promise<void>;
+  addSiteTrainer(first: string, last: string): Promise<string>;
   myQuote(teamId: string, plan: string): Promise<{ before: number | null; discount_pct: number; amount: number | null; installments: number; fee: number; per_rate: number | null; note: string | null }>;
   // auditions (0056)
   applyAudition(teamId: string, personId: string): Promise<void>;

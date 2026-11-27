@@ -1,5 +1,5 @@
 import { appVersion } from "@/core/release";
-import type { TeamInviteStatus, ClientError } from "./types";
+import type { SiteTrainer, TeamInviteStatus, ClientError } from "./types";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import appConfig from "../../../app.config.json";
 import type { Api, Appearance, AuditionCandidate, Feedback, Insights, WebSignup, Me, Membership, PendingPerson, Person, Role, Team } from "./types";
@@ -94,6 +94,10 @@ export function supabaseApi(url: string, anonKey: string): Api {
     async auditionNewRound(teamId) { const { data, error } = await sb.rpc("audition_new_round", { p_team: teamId }); fail(error); return (data as number) ?? 0; },
     async uploadAuditionVideo(teamId, file) { const path = `${schoolSlug}/auditions/${teamId}/${crypto.randomUUID()}.${(file.name.split(".").pop() || "mp4").toLowerCase()}`; const { error } = await sb.storage.from("public").upload(path, file, { contentType: file.type || "video/mp4" }); fail(error); return sb.storage.from("public").getPublicUrl(path).data.publicUrl; },
     async signupsOpen() { const { data } = await sb.rpc("signups_open"); return data !== false; },
+    async listSiteTrainers() { const { data, error } = await sb.rpc("site_trainers_admin"); fail(error); return (data ?? []) as SiteTrainer[]; },
+    async saveSiteTrainer(id, patch) { const { error } = await sb.rpc("site_trainer_save", { p_id: id, p_show: patch.show, p_title: patch.title, p_bio: patch.bio, p_photo: patch.photo }); fail(error); },
+    async orderSiteTrainers(ids) { const { error } = await sb.rpc("site_trainer_order", { p_ids: ids }); fail(error); },
+    async addSiteTrainer(first, last) { const { data, error } = await sb.rpc("site_trainer_add", { p_first: first, p_last: last }); fail(error); return data as string; },
     async setSignupsOpen(open) { const { error } = await sb.rpc("set_signups_open", { p_open: open }); fail(error); },
     async myQuote(teamId, plan) { const { data, error } = await sb.rpc("my_quote", { p_team: teamId, p_plan: plan }); fail(error); return data as { before: number | null; discount_pct: number; amount: number | null; installments: number; fee: number; per_rate: number | null; note: string | null }; },
     async appInsights() { const { data, error } = await sb.rpc("app_insights"); fail(error); return data as Insights; },

@@ -1848,5 +1848,29 @@
     "deletedRestored_other": "The period is deleted and {{count}} classes are back.",
     "dayAll": "no fixed classes",
     "daySome": "no fixed classes for some teams"
+  },
+  "siteTrainers": {
+    "title": "Trainers",
+    "intro": "The people shown under \"About us\" and in the trainer row on the front page. They are the same people as in the app. Changes show on the website at once.",
+    "noPhoto": "No picture",
+    "noBio": "No text yet.",
+    "none": "No trainers are shown on the website yet.",
+    "hide": "Hide",
+    "show": "Show on website",
+    "hidden": "{{name}} is no longer shown on the website.",
+    "shownMsg": "{{name}} is now shown on the website. Add picture and text under Edit.",
+    "notShown_one": "{{count}} trainer not shown",
+    "notShown_other": "{{count}} trainers not shown",
+    "add": "New trainer",
+    "addHint": "For a trainer who is not in the app yet. If the person already trains a team, they are listed under \"not shown\" – press \"Show on website\" there instead.",
+    "addGo": "Create and add picture and text",
+    "photo": "Picture",
+    "titleField": "Title",
+    "titlePh": "E.g. Trainer or Junior trainer",
+    "bio": "About the trainer",
+    "bioPh": "A few lines about background and what the trainer loves.",
+    "teachesHint": "The teams come from the app: {{teams}}. Change them under Members.",
+    "teachesNone": "The trainer is not on any team in the app yet. Teams are added under Members.",
+    "saved": "Saved. It shows on the website at once."
   }
 }

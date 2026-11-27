@@ -1848,5 +1848,29 @@
     "deletedRestored_other": "Perioden er slettet, og {{count}} træninger er lagt tilbage.",
     "dayAll": "ingen faste træninger",
     "daySome": "ingen faste træninger for nogle hold"
+  },
+  "siteTrainers": {
+    "title": "Trænere",
+    "intro": "Dem, der vises under \"Om os\" og i trænerrækken på forsiden. Det er de samme personer som i appen. Ændringer ses på websitet med det samme.",
+    "noPhoto": "Intet billede",
+    "noBio": "Ingen tekst endnu.",
+    "none": "Ingen trænere vises på websitet endnu.",
+    "hide": "Skjul",
+    "show": "Vis på websitet",
+    "hidden": "{{name}} vises ikke længere på websitet.",
+    "shownMsg": "{{name}} vises nu på websitet. Tilføj billede og tekst under Redigér.",
+    "notShown_one": "{{count}} træner vises ikke",
+    "notShown_other": "{{count}} trænere vises ikke",
+    "add": "Ny træner",
+    "addHint": "Til en træner, der ikke findes i appen endnu. Er personen allerede træner på et hold, står vedkommende under \"vises ikke\" – tryk \"Vis på websitet\" dér i stedet.",
+    "addGo": "Opret og tilføj billede og tekst",
+    "photo": "Billede",
+    "titleField": "Titel",
+    "titlePh": "Fx Træner eller Juniortræner",
+    "bio": "Tekst om træneren",
+    "bioPh": "Et par linjer om baggrund og hvad træneren brænder for.",
+    "teachesHint": "Holdene hentes fra appen: {{teams}}. De rettes under Medlemmer.",
+    "teachesNone": "Træneren står ikke på nogen hold i appen endnu. Hold tilføjes under Medlemmer.",
+    "saved": "Gemt. Det ses på websitet med det samme."
   }
 }
