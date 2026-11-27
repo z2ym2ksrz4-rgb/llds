@@ -1,3 +1,5 @@
+import { useNav } from "@/core/nav";
+import { humanize } from "@/core/errors";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type Event, type Team, type WebSignup } from "@/core/api";
@@ -86,6 +88,7 @@ function PaymentRow({ p, onPay }: { p: WebSignup; onPay: () => void }) {
 export function JoinTeam({ onClose, toast, initialTeam }: { onClose: () => void; toast: (m: string) => void; initialTeam?: string | null }) {
   const { t } = useTranslation();
   const me = useAuth((s) => s.me)!;
+  const setTab = useNav((n) => n.setTab);
   const [teams, setTeams] = useState<Team[]>([]);
   const [openAll, setOpenAll] = useState(true);
   // who may be signed up: me (unless I am a child account – parents sign children up) + my children
@@ -101,12 +104,13 @@ export function JoinTeam({ onClose, toast, initialTeam }: { onClose: () => void;
   const [events, setEvents] = useState<Event[]>([]);
   const [done, setDone] = useState<{ id: string; reference: string; amount_dkk: number | null; discount_pct: number; team: string; installments?: number; per_rate_dkk?: number | null; note?: string | null } | null>(null);
   useEffect(() => { void api.listTeams().then((ts) => { const vis = ts.filter((x) => x.visibility !== "private"); setTeams(vis); if (initialTeam) setTeam(vis.find((x) => x.id === initialTeam) ?? null); }); void api.signupsOpen().then(setOpenAll).catch(() => setOpenAll(true)); }, [initialTeam]);
-  useEffect(() => { setApplied(false); setCanCome(false); }, [team?.id, who]);
+  useEffect(() => { setApplied(false); setCanCome(false); setErr(null); }, [team?.id, who]);
   useEffect(() => { void api.listEvents().then(setEvents).catch(() => setEvents([])); }, []);
   useEffect(() => { if (!team) { setQ(null); return; } let on = true; api.myQuote(team.id, plan).then((r) => { if (on) setQ(r); }).catch(() => setQ(null)); return () => { on = false; }; }, [team, plan]);
   const memberOf = new Set(me.memberships.filter((m) => m.person_id === who).map((m) => m.team_id));
   const state = (x: Team) => (!openAll || x.signup_open === false ? "closed" : x.admission === "audition" ? (x.audition_open ? "audition" : "closed") : "open");   // the window also closes auditions
-  const submit = async () => { if (!team) return; setBusy(true); try { const r = await api.appSignupTeam(team.id, who, plan); setDone(r); } catch (e) { const m = (e as Error).message; toast(m.includes("already") ? t("pay.already") : m.includes("closed") ? t("pay.closedToast") : m.includes("audition") ? t("pay.auditionToast") : m); } finally { setBusy(false); } };
+  const [err, setErr] = useState<string | null>(null);   // shown inside the sheet – a toast alone was easy to miss
+  const submit = async () => { if (!team) return; setBusy(true); setErr(null); try { const r = await api.appSignupTeam(team.id, who, plan); setDone(r); } catch (e) { const m = (e as Error).message; setErr(m.includes("already") ? t("pay.already") : m.includes("closed") ? t("pay.closedToast") : m.includes("audition") ? t("pay.auditionToast") : humanize(m)); toast(m.includes("already") ? t("pay.already") : m.includes("closed") ? t("pay.closedToast") : m.includes("audition") ? t("pay.auditionToast") : m); } finally { setBusy(false); } };
   if (done && done.amount_dkk == null) return <Sheet onClose={onClose} eyebrow={done.team} title={t("pay.requested")}><p className="small">{done.note ?? t("pay.ratesText")}</p><button className="cta" onClick={onClose}>{t("common.ok")}</button></Sheet>;
   if (done) return <PaySheet amount={(done.installments ?? 1) > 1 ? done.per_rate_dkk ?? done.amount_dkk ?? 0 : done.amount_dkk ?? 0} reference={(done.installments ?? 1) > 1 ? `${done.reference} rate 1/${done.installments}` : done.reference} title={`${done.team}${(done.installments ?? 1) > 1 ? ` · ${t("pay.firstRate")} 1/${done.installments}` : ""}`} onClose={onClose} onPaid={async () => { await api.claimPaymentPaid(done.id); toast(t("pay.claimed")); onClose(); }} />;
   if (childLogin) return <Sheet onClose={onClose} eyebrow={t("pay.joinEyebrow")} title={t("pay.join")}><p className="small">{t("pay.childCannot")}</p><button className="cta" onClick={onClose}>{t("common.ok")}</button></Sheet>;
@@ -132,6 +136,10 @@ export function JoinTeam({ onClose, toast, initialTeam }: { onClose: () => void;
           <div className="field"><span>{t("pay.planLabel")}</span>
             {team.price_full ? <PlanChips team={team} plan={plan} setPlan={setPlan} /> : <p className="small muted">{team.price_note}</p>}
           </div>
+          {!team.price_full ? (<>
+            <p className="tiny muted" style={{ margin: 0 }}>{t(team.punch_card_open ? "pay.punchNext" : "pay.noPriceNext")}</p>
+            {team.punch_card_open && <button className="cta" data-testid="join-punch" onClick={() => { onClose(); setTab("shop"); }}>{t("pay.punchBuy")}</button>}
+          </>) : (<>
           <div className="card" data-testid="join-quote">
             <div className="eyebrow">{t("pay.quoteTitle", { name: people.find((p) => p.id === who)?.first_name })}</div>
             {q && q.amount != null ? (<>
@@ -142,7 +150,9 @@ export function JoinTeam({ onClose, toast, initialTeam }: { onClose: () => void;
             </>) : <div className="tiny">{q?.note ?? team.price_note ?? t("pay.quoteLoading")}</div>}
             <p className="tiny muted" style={{ margin: "6px 0 0" }}>{t("pay.quoteNext")}</p>
           </div>
+          {err && <p className="small" role="alert" data-testid="join-error" style={{ margin: 0, color: "#e08a8a" }}>{err}</p>}
           <button className="cta" disabled={busy || !who} onClick={() => void submit()} data-testid="join-send">{t("pay.joinConfirm")}</button>
+          </>)}
         </>)}
       </>)}
     </Sheet>

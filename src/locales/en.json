@@ -1088,7 +1088,10 @@
     "reminded_one": "1 reminder sent.",
     "reminded_other": "{{count}} reminders sent.",
     "remindedNone": "Nobody to remind – everyone was reminded within the last week.",
-    "backHint": "Welcome back. If the payment went through, tap “I have paid”."
+    "backHint": "Welcome back. If the payment went through, tap “I have paid”.",
+    "punchNext": "No sign-up needed. Buy a punch card and show up – one punch per class.",
+    "noPriceNext": "This team has no season price, so there is no sign-up here. Ask the dance school if in doubt.",
+    "punchBuy": "Buy a punch card"
   },
   "milestones": {
     "title": "Milestones",

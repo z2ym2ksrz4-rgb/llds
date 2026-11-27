@@ -1077,3 +1077,7 @@ input.czvis:checked::after { left: 21px; }
 /* Team page: the trainer as a tappable row (B4) */
 .trainerrow { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; padding: 10px 12px; margin: 8px 0; border: 1px solid var(--line); border-radius: 14px; background: none; color: inherit; min-height: 56px; }
 .trainerrow strong { font-weight: 500; }
+
+/* sheets: nothing inside may be squeezed (the last button was cut in half on long forms); messages show above sheets */
+.sheet-body > * { flex-shrink: 0; }
+.toast { z-index: 60; }
