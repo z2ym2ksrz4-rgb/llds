@@ -1754,7 +1754,8 @@
     "home": "Forside",
     "groupChanged": "Ændret af dig",
     "groupFixed": "Forside og faste sider",
-    "groupTeams": "Holdsider ({{n}})"
+    "groupTeams": "Holdsider ({{n}})",
+    "content": "Indhold i sidens rækkefølge · {{images}} billeder · {{texts}} tekster"
   },
   "website": {
     "title": "Website",

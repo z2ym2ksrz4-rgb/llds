@@ -517,7 +517,9 @@ def write(rel, content):
         if (tk or ik) and pg not in ("privacy", "terms", "hent"):
             tt = re.search(r"<title>([^<]*)</title>", content)
             MANIFEST.append({"key": pg, "title": html.unescape(tt.group(1)).replace(" – LL Dance Studio", "") if tt else pg, "path": d,
-                             "texts": [{"k": k, "d": EDIT_T[k]} for k in tk if k in EDIT_T], "images": [{"k": k, "src": EDIT_I[k]} for k in ik if k in EDIT_I]})
+                             "texts": [{"k": k, "d": EDIT_T[k]} for k in tk if k in EDIT_T], "images": [{"k": k, "src": EDIT_I[k]} for k in ik if k in EDIT_I],
+                             # the order things come in on the page ("i:<key>" / "t:<key>") – the editor uses it to show each picture with the texts that follow it
+                             "order": list(dict.fromkeys(("i:" if m.group(1) else "t:") + m.group(2) for m in re.finditer(r'data-e(i)?="([0-9a-f]{8})"', content)))})
     if rel.endswith(".html") and "</head>" in content:
         def head(lang_prefix):
             url = f"{SITE}{BASE}/{lang_prefix}{d}"

@@ -1754,7 +1754,8 @@
     "home": "Front page",
     "groupChanged": "Changed by you",
     "groupFixed": "Front page and fixed pages",
-    "groupTeams": "Team pages ({{n}})"
+    "groupTeams": "Team pages ({{n}})",
+    "content": "Content in page order · {{images}} pictures · {{texts}} texts"
   },
   "website": {
     "title": "Website",

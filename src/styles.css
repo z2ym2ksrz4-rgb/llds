@@ -1109,3 +1109,10 @@ a.cta.calgo { display:block; text-align:center; text-decoration:none; color:#141
 .themes .theme.on { border-color: var(--sw2, var(--gold2)); box-shadow: 0 0 0 1px var(--sw2, var(--gold2)) inset; }
 /* text in the team's tone must stay readable on the hero photo */
 .screen[style*="--accent"] .hero.photo .eyebrow { text-shadow: 0 1px 6px rgba(0,0,0,.7); }
+
+/* Website editor: a picture with the texts that belong to it underneath; groups follow the page from top to bottom */
+[data-testid=site-blocks] > .card.siteimg { margin: 0 0 12px; }
+[data-testid=site-blocks] .siteimg .thumb { height: 160px; background-size: contain; }
+.siteimg-texts { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+.siteimg-texts .sitetext:last-child { margin-bottom: 0; }
+.sitetexts { margin: 0 0 14px; }

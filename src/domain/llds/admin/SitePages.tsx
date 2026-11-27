@@ -5,7 +5,7 @@ import { ImagePicker } from "../components/ImagePicker";
 import { catalogUrl } from "../lib/catalog";
 import appConfig from "../../../../app.config.json";
 
-type PageDef = { key: string; title: string; path: string; texts: { k: string; d: string }[]; images: { k: string; src: string }[] };
+type PageDef = { key: string; title: string; path: string; texts: { k: string; d: string }[]; images: { k: string; src: string }[]; order?: string[] };
 type Pages = NonNullable<Appearance["pages"]>;
 
 /** Admin → Website → Sider: every text block and picture on every website page, with the current text as the default.
@@ -31,16 +31,28 @@ export function SitePages({ pages, teamPhotos, onChange, homeExtra, homeCount = 
       <h3 className="display" style={{ margin: "6px 0 2px" }}>{name(cur)}</h3>
       <p className="tiny muted" style={{ marginTop: 0 }}>{t("sitePages.pageHint")}</p>
       {cur.key === "home" && homeExtra}
-      {cur.images.length > 0 && <div className="sec"><h2>{t(cur.key === "home" && homeExtra ? "sitePages.moreImages" : "sitePages.images", { n: cur.images.length })}</h2>
-        <div className="siteimgs">{cur.images.map((im) => { const v = o.images?.[im.k] ?? null; const shown = v ? (catalogUrl(v) ?? v) : im.src.startsWith("http") ? im.src : `${site.replace(/\/llds\/$/, "")}${im.src}`; return (
+      {(() => {
+        const imgCard = (im: { k: string; src: string }, texts: { k: string; d: string }[]) => { const v = o.images?.[im.k] ?? null; const shown = v ? (catalogUrl(v) ?? v) : im.src.startsWith("http") ? im.src : `${site.replace(/\/llds\/$/, "")}${im.src}`; return (
           <div key={im.k} className="card siteimg" data-testid="site-img"><div className="thumb" style={{ backgroundImage: `url(${shown})` }} />{v && <span className="chip small gold">{t("sitePages.changed")}</span>}
-            <ImagePicker tag="event" label=" " own={teamPhotos} value={v} onChange={(nv) => setImage(cur.key, im.k, nv)} /></div>); })}</div></div>}
-      {cur.texts.length > 0 && <div className="sec"><h2>{t(cur.key === "home" && homeExtra ? "sitePages.moreTexts" : "sitePages.texts", { n: cur.texts.length })}</h2>
-        {cur.texts.map((tx) => { const v = o.texts?.[tx.k] ?? ""; const long = tx.d.length > 70; return (
+            <ImagePicker tag="event" label=" " own={teamPhotos} value={v} onChange={(nv) => setImage(cur.key, im.k, nv)} />
+            {texts.length > 0 && <div className="siteimg-texts" data-testid="site-img-texts">{texts.map(textField)}</div>}</div>); };
+        const textField = (tx: { k: string; d: string }) => { const v = o.texts?.[tx.k] ?? ""; const long = tx.d.length > 70; return (
           <label key={tx.k} className={"field sitetext" + (v ? " changed" : "")}><span className="tiny muted">{tx.d.length > 60 ? tx.d.slice(0, 60) + "…" : tx.d}</span>
             {long ? <textarea rows={Math.min(8, Math.ceil(tx.d.length / 60))} value={v} placeholder={tx.d} onChange={(e) => setText(cur.key, tx.k, e.target.value)} data-testid="site-text" />
               : <input value={v} placeholder={tx.d} onChange={(e) => setText(cur.key, tx.k, e.target.value)} data-testid="site-text" />}
-          </label>); })}</div>}
+          </label>); };
+        // In page order: every picture gets the texts that follow it (a trainer's photo with the name and bio under it); texts before the first picture come first.
+        const T = new Map(cur.texts.map((x) => [x.k, x])); const I = new Map(cur.images.map((x) => [x.k, x]));
+        const order = cur.order?.length ? cur.order : [...cur.images.map((x) => "i:" + x.k), ...cur.texts.map((x) => "t:" + x.k)];
+        const lead: { k: string; d: string }[] = []; const blocks: { im: { k: string; src: string }; texts: { k: string; d: string }[] }[] = [];
+        for (const id of order) { const k = id.slice(2); if (id[0] === "i") { const im = I.get(k); if (im) blocks.push({ im, texts: [] }); } else { const tx = T.get(k); if (!tx) continue; if (blocks.length && blocks[blocks.length - 1].texts.length < 6) blocks[blocks.length - 1].texts.push(tx); else if (!blocks.length) lead.push(tx); else blocks.push({ im: null as unknown as { k: string; src: string }, texts: [tx] }); } }
+        // a long run of text after a picture (more than six pieces) is page text, not a caption: it continues as its own group
+        const groups: ({ kind: "texts"; texts: { k: string; d: string }[] } | { kind: "img"; im: { k: string; src: string }; texts: { k: string; d: string }[] })[] = [];
+        if (lead.length) groups.push({ kind: "texts", texts: lead });
+        for (const b of blocks) { if (b.im) groups.push({ kind: "img", im: b.im, texts: b.texts }); else { const last = groups[groups.length - 1]; if (last && last.kind === "texts") last.texts.push(...b.texts); else groups.push({ kind: "texts", texts: b.texts }); } }
+        return (<div className="sec" data-testid="site-blocks"><h2>{t("sitePages.content", { images: cur.images.length, texts: cur.texts.length })}</h2>
+          {groups.map((g, gi) => g.kind === "img" ? imgCard(g.im, g.texts) : <div key={"g" + gi} className="sitetexts">{g.texts.map(textField)}</div>)}</div>);
+      })()}
     </div>); }
   const list = defs.filter((d) => name(d).toLowerCase().includes(q.toLowerCase()));
   return (
