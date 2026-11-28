@@ -1086,7 +1086,7 @@ input.czvis:checked::after { left: 21px; }
 .caloffer .ghost { width:100%; }
 a.cta.calgo { display:block; text-align:center; text-decoration:none; color:#141210; font-weight:500; border-radius:var(--r-sm); background:linear-gradient(135deg, var(--gold2, #e2c77a), var(--gold, #c9a24a)); box-shadow:0 10px 26px -12px rgba(201,162,74,.7); }
 
-.teamcal { margin: 2px 0 6px; }
+.teamcal { margin: 14px 0 4px; text-align:center; }
 .teamcal .linklike { min-height: 40px; }
 
 /* Admin → Betalinger: on phones the actions sit on their own line under the text (a long status button used to squeeze the text into a 100 px column) */

@@ -204,7 +204,6 @@ export function TeamScreen() {
         </ScrollList>
       </div>}
 
-      <div className="teamcal"><CalendarAdd series testid="team-cal" label={"📅 " + t("cal.teamLink")} load={async () => teamCalItems(team.name, (await api.listSessions(new Date().toISOString(), new Date(SEASON_END + "T23:59:59").toISOString())).filter((x) => x.team_id === team.id), "LL Dance Studio")} /></div>
       <details className="sec fold team-more" data-testid="team-more-fold"><summary><h2>{t("team.moreAbout")}</h2><span className="tiny muted">{t("team.moreAboutSub")}</span><span className="caret">⌄</span></summary>
       {(team.description || team.price || team.day_time) && (
         <div className="sec" data-testid="team-about-fold"><h2>{t("team.about")}</h2><div className="card" data-testid="team-about">
@@ -240,6 +239,7 @@ export function TeamScreen() {
           {!sessions.length && <Empty symbol="◷" text={t("home.noTrainings")} />}
         </ScrollList>
       </div>}
+      <div className="teamcal"><CalendarAdd series testid="team-cal" label={t("cal.teamLink")} className="linklike tiny muted" load={async () => teamCalItems(team.name, (await api.listSessions(new Date().toISOString(), new Date(SEASON_END + "T23:59:59").toISOString())).filter((x) => x.team_id === team.id), "LL Dance Studio")} /></div>
       </details>
 
       {open && <SessionSheet session={open} absences={absences} onClose={() => setOpen(null)} onChanged={() => void load()} toast={say} />}
