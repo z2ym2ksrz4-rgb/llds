@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type SiteTrainer } from "@/core/api";
+import { useAuth } from "@/core/auth";
 import { humanize } from "@/core/errors";
 import { ImagePicker } from "../components/ImagePicker";
 import { Sheet } from "../components/Sheet";
@@ -8,8 +9,10 @@ import { resolveImage } from "../lib/catalog";
 
 /** Admin → Website → Trænere: the people on the website's "Om os" and in the trainer row on the front page.
  *  They are the app's own people – shown or hidden, ordered, each with title, photo and text. Changes are live on the website at once. */
-export function SiteTrainers({ teamPhotos }: { teamPhotos: string[] }) {
+export function SiteTrainers() {
   const { t } = useTranslation();
+  const me = useAuth((x) => x.me);
+  const teamPhotos = Array.from(new Set((me?.teams ?? []).flatMap((x) => [...(x.photos ?? []), ...(/^https?:/.test(x.cover_url ?? "") ? [x.cover_url!] : [])])));
   const [list, setList] = useState<SiteTrainer[] | null>(null);
   const [edit, setEdit] = useState<SiteTrainer | null>(null);
   const [adding, setAdding] = useState(false); const [nf, setNf] = useState(""); const [nl, setNl] = useState("");
@@ -23,8 +26,8 @@ export function SiteTrainers({ teamPhotos }: { teamPhotos: string[] }) {
   const add = () => void run(async () => { const id = await api.addSiteTrainer(nf.trim(), nl.trim()); setAdding(false); setNf(""); setNl(""); const fresh = await api.listSiteTrainers(); setList(fresh); const p = fresh.find((x) => x.id === id); if (p) setEdit(p); });
   const img = (ref: string | null) => (ref ? resolveImage(ref) ?? ref : null);
   return (
-    <div className="sec" data-testid="site-trainers">
-      <h2>{t("siteTrainers.title")}</h2>
+    <section className="screen" data-testid="site-trainers">
+      <header className="topbar"><h1 className="display">{t("siteTrainers.menu")}</h1></header>
       <p className="tiny muted" style={{ marginTop: 0 }}>{t("siteTrainers.intro")}</p>
       {msg && <p className="small ok" role="status" style={{ margin: "0 0 8px" }}>{msg}</p>}
       {err && <p className="small" role="alert" style={{ margin: "0 0 8px", color: "#e08a8a" }}>{err}</p>}
@@ -34,7 +37,7 @@ export function SiteTrainers({ teamPhotos }: { teamPhotos: string[] }) {
             <div key={p.id} className="card trainercard" data-testid="st-card">
               <div className="thumb" style={img(p.photo) ? { backgroundImage: `url(${img(p.photo)})` } : undefined}>{!p.photo && <span className="tiny muted">{t("siteTrainers.noPhoto")}</span>}</div>
               <div className="tc-body"><strong>{p.name}</strong>{p.title && <div className="tiny" style={{ color: "var(--gold2)" }}>{p.title}</div>}{p.teaches && <div className="tiny">{p.teaches}</div>}
-                <p className="small muted tc-bio">{p.bio ?? p.app_bio ?? t("siteTrainers.noBio")}</p></div>
+                <p className="small muted tc-bio">{p.bio ?? t("siteTrainers.noBio")}</p></div>
               <div className="payacts"><button type="button" className="chip small" aria-label={t("customize.up")} disabled={busy || i === 0} onClick={() => move(p.id, -1)}>↑</button><button type="button" className="chip small" aria-label={t("customize.down")} disabled={busy || i === shown.length - 1} onClick={() => move(p.id, 1)}>↓</button>
                 <button type="button" className="chip small" data-testid="st-edit" onClick={() => { setMsg(null); setEdit({ ...p }); }}>{t("common.edit")}</button><button type="button" className="chip small" data-testid="st-hide" disabled={busy} onClick={() => void run(() => api.saveSiteTrainer(p.id, { show: false, title: p.title, bio: p.bio, photo: p.photo }), t("siteTrainers.hidden", { name: p.name }))}>{t("siteTrainers.hide")}</button></div>
             </div>))}
@@ -55,11 +58,12 @@ export function SiteTrainers({ teamPhotos }: { teamPhotos: string[] }) {
         <Sheet onClose={() => setEdit(null)} eyebrow={t("siteTrainers.title")} title={edit.name}>
           <div className="field"><span>{t("siteTrainers.photo")}</span><ImagePicker tag="post" label=" " own={teamPhotos} value={edit.photo} onChange={(v) => setEdit({ ...edit, photo: v })} /></div>
           <label className="field"><span>{t("siteTrainers.titleField")}</span><input value={edit.title ?? ""} placeholder={t("siteTrainers.titlePh")} data-testid="st-title" onChange={(e) => setEdit({ ...edit, title: e.target.value })} /></label>
-          <label className="field"><span>{t("siteTrainers.bio")}</span><textarea rows={7} value={edit.bio ?? ""} placeholder={edit.app_bio ?? t("siteTrainers.bioPh")} data-testid="st-bio" onChange={(e) => setEdit({ ...edit, bio: e.target.value })} /></label>
+          <label className="field"><span>{t("siteTrainers.bio")}</span><textarea rows={7} value={edit.bio ?? ""} placeholder={t("siteTrainers.bioPh")} data-testid="st-bio" onChange={(e) => setEdit({ ...edit, bio: e.target.value })} /></label>
+          <p className="tiny muted" style={{ margin: 0 }}>{t("siteTrainers.twoProfiles")}</p>
           <p className="tiny muted" style={{ margin: 0 }}>{edit.teaches ? t("siteTrainers.teachesHint", { teams: edit.teaches }) : t("siteTrainers.teachesNone")}</p>
           {err && <p className="small" role="alert" style={{ margin: 0, color: "#e08a8a" }}>{err}</p>}
           <button type="button" className="cta" disabled={busy} data-testid="st-save" onClick={save}>{t("common.save")}</button>
         </Sheet>)}
-    </div>
+    </section>
   );
 }

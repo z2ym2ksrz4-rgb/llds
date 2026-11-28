@@ -1,4 +1,3 @@
-import { SiteTrainers } from "./SiteTrainers";
 import appConfig from "../../../../app.config.json";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -70,8 +69,6 @@ export function Website() {
           : <p className="muted small" style={{ margin: 0 }}>{t("website.eventsEmpty")}</p>}
         <p className="tiny muted">{t("website.eventsHint")}</p>
       </div>}
-
-      {!openPage && <SiteTrainers teamPhotos={teamPhotos} />}
 
       <div className="sec" data-testid="web-pages">{!openPage && <><h2>{t("website.pages")}</h2><p className="tiny muted" style={{ marginTop: 0 }}>{t("website.pagesSub")}</p></>}
         <SitePages pages={a.pages ?? {}} teamPhotos={teamPhotos} onChange={(pages) => upd({ ...a, pages })} homeExtra={homeExtra} homeCount={homeCount} onOpen={setOpenPage} />

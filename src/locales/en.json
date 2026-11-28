@@ -1851,7 +1851,7 @@
   },
   "siteTrainers": {
     "title": "Trainers",
-    "intro": "The people shown under \"About us\" and in the trainer row on the front page. They are the same people as in the app. Changes show on the website at once.",
+    "intro": "The trainers' public profile on the website: \"About us\" and the trainer row on the front page. You decide who is shown, the order, picture, title and text. Changes show on the website at once.",
     "noPhoto": "No picture",
     "noBio": "No text yet.",
     "none": "No trainers are shown on the website yet.",
@@ -1871,6 +1871,9 @@
     "bioPh": "A few lines about background and what the trainer loves.",
     "teachesHint": "The teams come from the app: {{teams}}. Change them under Members.",
     "teachesNone": "The trainer is not on any team in the app yet. Teams are added under Members.",
-    "saved": "Saved. It shows on the website at once."
+    "saved": "Saved. It shows on the website at once.",
+    "menu": "Trainers on the website",
+    "menuSub": "The public profile: picture, title and text",
+    "twoProfiles": "This is the public profile on the website. The trainer's own profile in the app (profile picture and \"About me\") is set up by the trainer and is only shown inside the app."
   }
 }

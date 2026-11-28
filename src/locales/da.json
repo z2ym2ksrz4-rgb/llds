@@ -1851,7 +1851,7 @@
   },
   "siteTrainers": {
     "title": "Trænere",
-    "intro": "Dem, der vises under \"Om os\" og i trænerrækken på forsiden. Det er de samme personer som i appen. Ændringer ses på websitet med det samme.",
+    "intro": "Trænernes offentlige profil på websitet: \"Om os\" og trænerrækken på forsiden. Du bestemmer, hvem der vises, rækkefølgen, billede, titel og tekst. Ændringer ses på websitet med det samme.",
     "noPhoto": "Intet billede",
     "noBio": "Ingen tekst endnu.",
     "none": "Ingen trænere vises på websitet endnu.",
@@ -1871,6 +1871,9 @@
     "bioPh": "Et par linjer om baggrund og hvad træneren brænder for.",
     "teachesHint": "Holdene hentes fra appen: {{teams}}. De rettes under Medlemmer.",
     "teachesNone": "Træneren står ikke på nogen hold i appen endnu. Hold tilføjes under Medlemmer.",
-    "saved": "Gemt. Det ses på websitet med det samme."
+    "saved": "Gemt. Det ses på websitet med det samme.",
+    "menu": "Trænere på websitet",
+    "menuSub": "Den offentlige profil: billede, titel og tekst",
+    "twoProfiles": "Det her er den offentlige profil på websitet. Trænerens egen profil i appen (profilbillede og \"Om mig\") sætter træneren selv op, og den vises kun inde i appen."
   }
 }

@@ -1,7 +1,7 @@
 // Website trainers: admin shows a staff member on the website, gives title + text, adds a brand-new trainer, reorders and hides. Mock.
 import { open, S } from "./_lib.mjs";
 const { b, p, tab, errors } = await open({ w: 390, h: 900 }); const out = { errors };
-await tab("Admin"); await p.click("[data-testid=admin-website]"); await p.waitForSelector("[data-testid=site-trainers]");
+await tab("Admin"); await p.click("[data-testid=admin-trainers]"); await p.waitForSelector("[data-testid=site-trainers]");
 out.shown0 = await p.locator("[data-testid=st-card]").count();
 await p.click("[data-testid=st-hidden] summary"); out.candidates = await p.locator("[data-testid=st-show]").count();
 await p.locator("[data-testid=st-show]").first().click(); await p.waitForSelector("[data-testid=st-card]");
