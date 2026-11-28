@@ -88,7 +88,6 @@ export function Home() {
   const nextDay = sessions.find((s) => new Date(s.starts_at) > new Date())?.starts_at;
   const studioToday = todaysAll.length > 0;
   const studio = (studioToday ? todaysAll : nextDay ? sessions.filter((s) => new Date(s.starts_at).toDateString() === new Date(nextDay).toDateString()) : []).slice(0, 12);
-  const upcoming = events;
 
   /* "Din uge": everything the viewed person (or I, as staff) has the next 7 days – trainings, teams I train, competitions/events, my room bookings. */
   type WeekItem = { key: string; at: string; end?: string | null; kind: "training" | "staff" | "event" | "booking"; title: string; sub: string; who?: string; off?: boolean; session?: Session; event?: Event };
@@ -200,20 +199,7 @@ export function Home() {
     studioHead: () => (<>
       {isAdmin && <div className="sec studiohead" data-testid="studio-head"><h2 className="display">{t("home.studioTitle")}</h2><p className="tiny muted" style={{ margin: 0 }}>{t("home.studioSub")}</p></div>}
     </>),
-    upcoming: () => (<>
-      {upcoming.length > 0 && (
-        <div className="sec"><h2>{t("home.upcoming")}</h2>
-          <div className="evgrid" data-testid="upcoming">{upcoming.slice(0, 4).map((e) => { const d = new Date(e.starts_at); return (
-            <button key={e.id} className="evtile" onClick={() => setOpenEvent(e)} style={focusStyle(e.focus, { backgroundImage: `url(${catalogUrl(e.image_key) ?? artFor(e.id)})` })}>
-              <span className="stamp"><b>{d.getDate()}</b><small>{d.toLocaleDateString(loc(), { month: "short" }).replace(".", "")}</small></span>
-              <span className="evtile-text"><span className="eyebrow">{t(`events.kind.${e.kind}`)}{e.team_names?.length ? ` · ${e.team_names.slice(0, 2).join(", ")}${e.team_names.length > 2 ? " …" : ""}` : ""}</span><b className="display">{e.title}</b><span className="tiny">{e.place ?? ""}</span></span>
-              {e.mySignups ? <span className="chip small ok">{t("events.signedUp")}</span> : null}
-            </button>); })}</div>
-          {upcoming.length > 4 && <button className="linklike small" onClick={() => setTab("events")}>{t("home.allEvents")} ›</button>}
-        </div>
-      )}
-    </>),
-    next: () => (<>
+next: () => (<>
       {nextItem && nextImg && (
         <div className="nextcard" data-testid="next-card" role="button" tabIndex={0} onClick={() => (nextItem.session ? setOpen(nextItem.session) : nextItem.event ? setOpenEvent(nextItem.event) : setTab("rooms"))} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); (nextItem.session ? setOpen(nextItem.session) : nextItem.event ? setOpenEvent(nextItem.event) : setTab("rooms")); } }}>
           <span className="bg" style={focusStyle(nextFocus, { backgroundImage: `url(${nextImg})` })} />
@@ -291,7 +277,7 @@ export function Home() {
     const studioKeys = ["studioHead", "adminTodo", "stats", "studio"]; const rest = order.filter((k) => !studioKeys.includes(k)); const at = (rest.indexOf("teampick") + 1) || (rest.indexOf("hero") + 1) || 1;
     order = [...rest.slice(0, at), ...studioKeys.filter((k) => order.includes(k) || k === "adminTodo"), ...rest.slice(at)];
   }
-  const FOLD = new Set(childLogin ? ["gallery", "upcoming"] : ["gallery", "badges", "upcoming"]);   // children see their emblems right away   // nice-to-have content lives under one "Mere" fold – the first screen stays about now
+  const FOLD = new Set(childLogin ? ["gallery"] : ["gallery", "badges"]);   // children see their emblems right away   // nice-to-have content lives under one "Mere" fold – the first screen stays about now
   if (isAdmin && !viewing.isChild) FOLD.add("studio");   // admin: to-dos and today's numbers stay up, the rest folds
   const main = order.filter((k) => !FOLD.has(k)); const folded = order.filter((k) => FOLD.has(k));
   const renderKey = (k: string) => { const box = boxOf(appearance, k); return <Fragment key={k}>{box ? <CustomBoxCard box={box} onTab={(tab) => setTab(tab as Parameters<typeof setTab>[0])} /> : SECTIONS[k]?.()}</Fragment>; };

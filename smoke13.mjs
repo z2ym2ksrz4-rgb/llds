@@ -22,8 +22,9 @@ await p.click("[data-testid=shop]"); await p.waitForSelector("[data-testid=shop-
 if (hasPunch) { await p.waitForSelector("[data-testid=buy-card]"); await p.click("[data-testid=buy-card] >> nth=0"); await p.waitForTimeout(500); await p.click("[data-testid=sheet-close]"); await p.waitForTimeout(400); }
 out.hasPunch = !!hasPunch;
 // event overlay from Home: open + close in place
-await p.click("nav.tabbar >> text=Hjem"); if (!(await p.$("[data-testid=upcoming]"))) { await p.click("[data-testid=home-more] .home-more-head"); await p.waitForTimeout(300); } await p.click("[data-testid=upcoming] .evtile >> nth=0"); await p.waitForSelector("[data-testid=event-facts]"); out.eventOverlay = (await p.textContent(".sheet h2")).length > 0; out.eventPhoto = !!(await p.$(".sheet-photo"));
-await p.click("[data-testid=sheet-close]"); await p.waitForTimeout(400); out.stillHome = !!(await p.$("[data-testid=upcoming]")) && !(await p.$(".sheet"));
+await p.click("nav.tabbar >> text=Events"); await p.waitForSelector("[data-testid=event]"); await p.click("[data-testid=event] >> nth=0"); await p.waitForSelector("[data-testid=event-facts]"); out.eventOverlay = (await p.textContent(".sheet h2")).length > 0; out.eventPhoto = !!(await p.$(".sheet-photo"));
+await p.click("[data-testid=sheet-close]"); await p.waitForTimeout(400); out.stillHome = !!(await p.$("[data-testid=event]")) && !(await p.$(".sheet"));
+await p.click("nav.tabbar >> text=Hjem"); await p.waitForTimeout(300); out.noEventsOnHome = !(await p.$("[data-testid=upcoming]"));
 const notifs = await p.evaluate(() => JSON.parse(localStorage.getItem("llds_mock")).Y.notifications.filter((n) => n.person_id === "p-line").map((n) => n.kind + ":" + n.title));
 out.adminPunchNotif = notifs.some((n) => n.startsWith("punch:Nyt klippekort"));
 out.adminNotifs = notifs.slice(-4);
