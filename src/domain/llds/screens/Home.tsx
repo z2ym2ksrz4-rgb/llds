@@ -204,7 +204,7 @@ next: () => (<>
         <div className="nextcard" data-testid="next-card" role="button" tabIndex={0} onClick={() => (nextItem.session ? setOpen(nextItem.session) : nextItem.event ? setOpenEvent(nextItem.event) : setTab("rooms"))} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); (nextItem.session ? setOpen(nextItem.session) : nextItem.event ? setOpenEvent(nextItem.event) : setTab("rooms")); } }}>
           <span className="bg" style={focusStyle(nextFocus, { backgroundImage: `url(${nextImg})` })} />
           <span className="nextcard-top"><span className="eyebrow gold">{nextItem.kind === "training" ? (nextItem.who ? t("home.nextFor", { name: nextItem.who }) : t("home.nextYours")) : nextItem.kind === "staff" ? t("home.nextYouTrain") : `${t("home.nextUp")} · ${t(KIND_CHIP[nextItem.kind])}`}</span><span className="chip small glass">{rel(nextItem.at)}</span></span>
-          <span className="nextcard-text"><b className="display">{nextItem.title}</b><span className="small">{hm(nextItem.at)}{nextItem.end ? `–${hm(nextItem.end)}` : ""} · {nextItem.sub}{nextItem.session?.substitute_name || nextItem.session?.trainer_name ? ` · ${nextItem.session.substitute_name ?? nextItem.session.trainer_name}` : ""}{nextItem.who ? ` · ${nextItem.who}` : ""}</span></span>
+          <span className="nextcard-text"><b className="display">{nextItem.title}</b><span className="small">{hm(nextItem.at)}{nextItem.end ? `–${hm(nextItem.end)}` : ""} · {nextItem.sub}{(() => { const tr = nextItem.session?.substitute_name ?? nextItem.session?.trainer_name; return tr && !nextItem.sub.includes(tr) ? ` · ${tr}` : ""; })()}{nextItem.who ? ` · ${nextItem.who}` : ""}</span></span>
           {/* one visible action: what the person most likely wants to do with this training/event */}
           <span className="nextcard-actions">
             {nextItem.kind === "training" && nextItem.session && <button type="button" className="ghost small" data-testid="next-action" onClick={(e) => { e.stopPropagation(); setOpen(nextItem.session!); }}>{nextItem.who ? t("session.reportAbsenceFor", { name: nextItem.who }) : t("session.reportAbsence")}</button>}
@@ -216,6 +216,8 @@ next: () => (<>
     </>),
     teampick: () => (<>
       {(!isAdmin || me.teams.length > 0) && <TeamPicker />}
+    </>),
+    strip: () => (<>
       {!me.person.supervised_by && signupsOpen && <button type="button" className="ghost small home-join" data-testid="home-join" onClick={() => setJoin(true)}>+ {t("pay.join")}</button>}
       {/* week strip: the dots follow the team chosen above – its trainings and events */}
       {!isAdmin && teamIds.size === 0 && <div className="card welcomecard" data-testid="welcome-card"><div className="eyebrow gold">{t("home.welcomeTitle")}</div><ol className="steps3"><li>{t("home.welcome1")}</li><li>{t("home.welcome2")}</li><li>{t("home.welcome3")}</li></ol>{!me.person.supervised_by && signupsOpen && <button type="button" className="cta" onClick={() => setJoin(true)}>{t("pay.join")}</button>}</div>}
@@ -248,7 +250,6 @@ next: () => (<>
             {!week.length && <Empty symbol="◷" text={t("home.noTrainings")} />}
             {!weekAll && week.some((w) => { const d = new Date(w.at).toDateString(); return d !== today && d !== tomorrow; }) && (
               <button type="button" className="linklike small" data-testid="week-more" onClick={() => setWeekAll(true)}>{t("home.restOfWeek", { count: week.filter((w) => { const d = new Date(w.at).toDateString(); return d !== today && d !== tomorrow; }).length })} ›</button>)}
-            {week.length > 0 && !week.some((w) => w.at.slice(0, 10) === new Date().toISOString().slice(0, 10)) && !weekAll && <p className="tiny muted" style={{ margin: "6px 0 0" }}>{t("home.nothingToday")}</p>}
           </ScrollList>
         </div>
       )}
@@ -276,6 +277,10 @@ next: () => (<>
     // Line's day first: to-dos, studio numbers, what happens in the studio – then her personal content
     const studioKeys = ["studioHead", "adminTodo", "stats", "studio"]; const rest = order.filter((k) => !studioKeys.includes(k)); const at = (rest.indexOf("teampick") + 1) || (rest.indexOf("hero") + 1) || 1;
     order = [...rest.slice(0, at), ...studioKeys.filter((k) => order.includes(k) || k === "adminTodo"), ...rest.slice(at)];
+  }
+  { // what needs the viewer (messages to read/accept, a substitute wanted, audition answers, payments) sits right under the team picker – above everything else
+    const pinned = ["messages", "subs", "audition", "payments"].filter((k) => order.includes(k)); const rest = order.filter((k) => !pinned.includes(k)); const at = (rest.indexOf("teampick") + 1) || (rest.indexOf("hero") + 1) || 0;
+    order = [...rest.slice(0, at), ...pinned, ...(rest.includes("teampick") ? ["strip"] : []), ...rest.slice(at)];
   }
   const FOLD = new Set(["gallery"]);   // children see their emblems right away   // nice-to-have content lives under one "Mere" fold – the first screen stays about now
   if (isAdmin && !viewing.isChild) FOLD.add("studio");   // admin: to-dos and today's numbers stay up, the rest folds

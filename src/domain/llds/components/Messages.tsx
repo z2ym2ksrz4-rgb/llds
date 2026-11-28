@@ -23,7 +23,7 @@ export function MessageBanner({ toast }: { toast: (m: string) => void }) {
           <div className="msgcards" data-testid="msg-list">{due.map((m) => <button key={m.id} className="msgcard item due" onClick={() => setOpen(m)}><span className="avatar">{m.author_name[0]}</span><span className="grow"><span className="msgcard-head"><b>{m.author_name}</b><span className="tiny muted">· {ago(m.created_at)}</span></span><span className="msgcard-title">{m.title}</span>{m.body && <span className="msgcard-body tiny">{m.body.length > 110 ? m.body.slice(0, 110).replace(/\s+\S*$/, "") + "…" : m.body}</span>}</span><span className={"chip small " + (m.needs === "accept" ? "gold" : "")}>{m.needs === "accept" ? t("msg.acceptBtn") : t("msg.open")}</span></button>)}</div>
         </div>
       )}
-      {due.length === 0 && (
+      {due.length === 0 && done.length > 0 && (
         <button type="button" className={"msg-none" + (history ? " open" : "")} data-testid="msg-none" onClick={() => setHistory((h) => !h)} aria-expanded={history}>
           <span className="dot" aria-hidden /><span className="grow">{t("msg.noneNew")}</span>{done.length > 0 && <span className="tiny">{t("msg.history", { n: done.length })} <i className="caret">{history ? "⌃" : "⌄"}</i></span>}
         </button>
