@@ -45,7 +45,7 @@ export function Feed({ teamId, channels, toast, limit }: { teamId: string | null
   );
 }
 
-function Composer({ teamId, channel, isStaff, isAdmin, onPosted }: { teamId: string | null; channel: Channel; isStaff: boolean; isAdmin: boolean; onPosted: () => void }) {
+export function Composer({ teamId, channel, isStaff, isAdmin, onPosted }: { teamId: string | null; channel: Channel; isStaff: boolean; isAdmin: boolean; onPosted: () => void }) {
   const { t } = useTranslation();
   const me = useAuth((s) => s.me)!;
   const [body, setBody] = useState("");

@@ -17,20 +17,20 @@ await p.goto(base, { waitUntil: "networkidle" }); await p.evaluate(() => localSt
 await login("parent@demo");
 await p.waitForSelector("[data-testid=msg-banner]"); out.bannerCount = await p.$$eval("[data-testid=msg-banner] .item", e => e.length);   // Home: only the school-wide message
 // the trainer's team message (accept) lives on the team page – with comments
-await p.click("nav.tabbar >> text=Hold"); await p.waitForSelector("[data-testid=msggroup-team]"); await p.click("[data-testid=msggroup-team] .item >> nth=0"); await p.waitForSelector("#msg-ack"); await p.click("#msg-ack");
+await p.click("nav.tabbar >> text=Hold"); await p.waitForSelector("[data-testid=stream-trainer]"); await p.click("[data-testid=stream-trainer] [data-testid=team-msg] >> nth=0"); await p.waitForSelector("#msg-ack"); await p.click("#msg-ack");
 await p.waitForSelector(".toast"); out.accepted = await p.textContent(".toast"); await shot(1);
 await p.fill("[data-testid=msg-comment-input]", "Vi kommer – Freja glæder sig!"); await p.click("[data-testid=msg-comment-send]"); await p.waitForTimeout(300); out.comments = await p.$$eval("[data-testid=msg-comments] .comment", e => e.length);
 await p.click(".sheet-bg", { position: { x: 5, y: 5 } }); await p.waitForTimeout(200);
-out.officialHint = !!(await p.$("[data-testid=official-hint]"));
+out.officialHint = !!(await p.$("[data-testid=stream-school]"));
 // Home: a "read" message is marked read just by opening it – no button
 await p.click("nav.tabbar >> text=Hjem"); await p.waitForSelector("[data-testid=msg-banner]");
 out.bannerAfter = await p.$$eval("[data-testid=msg-banner] .item", e => e.length);
 if (out.bannerAfter > 0) { await p.click("[data-testid=msg-banner] .item >> nth=0"); await p.waitForSelector(".sheet .chip.ok"); out.readAuto = await p.textContent(".sheet .chip.ok"); out.noReadButton = !(await p.$("#msg-ack")); await p.click(".sheet-bg", { position: { x: 5, y: 5 } }); await p.waitForTimeout(200); }
 out.homeNews = await p.$$eval("[data-testid=feed] [data-testid=post]", e => e.length);
 // 1b. team room: post with photo, then comment on Line's post
-await p.click("nav.tabbar >> text=Social"); await p.click(".chips .chip:has-text('The AXIS')"); await p.waitForSelector("[data-testid=feed]");
+await p.click("nav.tabbar >> text=Hold"); await p.waitForSelector("[data-testid=team-stream] .sitem"); if (await p.$("[data-testid=stream-all]")) { await p.click("[data-testid=stream-all]"); await p.waitForTimeout(200); } 
 out.teamPostsBefore = await p.$$eval("[data-testid=post]", e => e.length);
-await p.fill("#post-body", "Freja har fået nye dansesko 👟"); await p.setInputFiles("input[type=file]", IMG); await p.click("#post-send");
+await p.click("[data-testid=stream-write]"); await p.click("[data-testid=new-post]"); await p.waitForSelector("#post-body"); await p.fill("#post-body", "Freja har fået nye dansesko 👟"); await p.setInputFiles("input[type=file]", IMG); await p.click("#post-send");
 await p.waitForSelector(".toast"); await p.waitForTimeout(300); out.teamPostsAfter = await p.$$eval("[data-testid=post]", e => e.length);
 out.hasImage = await p.$$eval("[data-testid=post] .media img", e => e.length);
 await p.click("[data-testid=post] >> nth=1 >> text=/kommentar/i"); await p.waitForSelector("#comment-body");
@@ -58,7 +58,7 @@ await p.waitForSelector(".toast"); out.sent = await p.textContent(".toast"); awa
 await p.click("[data-testid=admin-msg] >> nth=1"); await p.waitForSelector(".sheet"); await p.click("text=Hvem mangler?"); await p.waitForSelector(".sheet .chips .chip"); out.status = await p.textContent(".sheet .eyebrow >> nth=1"); await shot(4);
 await p.click(".sheet-bg", { position: { x: 5, y: 5 } });
 // team: hidden post visible to admin as hidden; notes; formations
-await p.click("nav.tabbar >> text=Social"); await p.click(".chips .chip:has-text('The AXIS')"); await p.waitForSelector("[data-testid=feed]");
+await p.click("nav.tabbar >> text=Hold"); await p.waitForSelector("[data-testid=team-stream] .sitem"); if (await p.$("[data-testid=stream-all]")) { await p.click("[data-testid=stream-all]"); await p.waitForTimeout(200); } 
 out.hiddenVisibleToAdmin = await p.$$eval("[data-testid=post].hidden-post", e => e.length);
 await p.click("nav.tabbar >> text=Hold"); await p.waitForSelector("[data-testid=go-choreo]"); out.noNotesBtn = !(await p.$("[data-testid=go-notes]"));
 await p.click("[data-testid=go-choreo]"); await p.waitForSelector("[data-testid=video]"); await p.click("[data-testid=video]");
@@ -68,9 +68,9 @@ await p.waitForSelector("[data-testid=video-notes]"); await p.click("[data-testi
 await p.click("text=‹ Koreografi"); await logout();
 
 // 3. trainer (Maja): trainers channel visible, post there
-await login("maja@demo"); await p.click("nav.tabbar >> text=Social"); await p.waitForSelector(".chips");
-await p.click(".chips .chip:has-text('Trænere')"); await p.waitForSelector("[data-testid=feed]"); await p.waitForTimeout(200); out.trainerPosts = await p.$$eval("[data-testid=post]", e => e.length);
-await p.fill("#post-body", "Jeg tager Hip Hop Mini mandag"); await p.click("#post-send"); await p.waitForSelector(".toast"); await p.waitForTimeout(200); out.trainerPostsAfter = await p.$$eval("[data-testid=post]", e => e.length);
+await login("maja@demo"); await p.click("nav.tabbar >> text=Hold"); await p.waitForSelector("[data-testid=stream-trainers]");
+await p.click("[data-testid=stream-trainers]"); await p.waitForSelector(".sheet [data-testid=feed]"); await p.waitForTimeout(300); out.trainerPosts = await p.$$eval(".sheet [data-testid=post]", e => e.length);
+await p.fill("#post-body", "Jeg tager Hip Hop Mini mandag"); await p.click("#post-send"); await p.waitForSelector(".toast"); await p.waitForTimeout(200); out.trainerPostsAfter = await p.$$eval(".sheet [data-testid=post]", e => e.length); await p.click("[data-testid=sheet-close]"); await p.waitForTimeout(300);
 // desktop layout check
 await p.setViewportSize({ width: 1280, height: 900 }); await p.click("nav.tabbar >> text=Hjem"); await p.waitForTimeout(300); await shot(6);
 

@@ -1250,7 +1250,7 @@
       "teamtab": {
         "label": "Team",
         "title": "The team's own room",
-        "body": "Messages from the trainer, conversations with the trainer, choreography videos, formations, the team's pictures and dancers."
+        "body": "Everything on the team in one place: messages from the school and the trainer, the team's posts and your private conversations with the trainer – colour coded so you can see who writes to whom. Plus videos, formations and photos."
       },
       "social": {
         "label": "Social",
@@ -1675,7 +1675,7 @@
       "absence": "Tap the training under Home → Your week (or in Calendar) and choose “Report absence”. Pick a reason, add a note if you like, and the trainer is told right away.",
       "pay": "Teams, punch cards and the shop are paid with Vipps MobilePay to the studio's number with the reference the app shows. Open Payments and punch cards in the menu behind your picture and tap “Pay” – on a phone MobilePay opens directly. Once the school has seen the payment you get a receipt by e-mail.",
       "video": "Under Team → Choreography. On mini and kids teams parents see the videos; on junior and adult teams they are for the dancers only.",
-      "write": "Messages from the school are under Home. Under Team you find the trainer's messages and “Write to the trainer”. Social is the team's own feed.",
+      "write": "Everything is under Team → The team: messages from the school (gold), from the trainer (copper), the team's posts (grey) and your private conversations with the trainer (blue). Tap Write and choose the team or only the trainer. Anything that needs you is also on Home.",
       "child": "Yes, from age 13. Open My children in the menu behind your picture and tap “Grant login” – the child signs in with their own e-mail and sees only their own team. Under 13 you share your profile."
     }
   },
@@ -1875,5 +1875,42 @@
     "menu": "Trainers on the website",
     "menuSub": "The public profile: picture, title and text",
     "twoProfiles": "This is the public profile on the website. The trainer's own profile in the app (profile picture and \"About me\") is set up by the trainer and is only shown inside the app."
+  },
+  "stream": {
+    "title": "The team",
+    "write": "Write",
+    "writeTitle": "Who are you writing to?",
+    "new": "New",
+    "trainer": "the trainer",
+    "key": {
+      "school": "School",
+      "trainer": "Trainer",
+      "team": "Team",
+      "private": "Private"
+    },
+    "who": {
+      "school": "From the school · to everyone",
+      "trainer": "From {{name}} · to {{team}}",
+      "team": "Post · to all of {{team}}",
+      "private": "Private · you and {{names}}"
+    },
+    "to": {
+      "team": "To the team",
+      "teamSub": "A post everyone on {{team}} can see and comment on.",
+      "private": "Only to the trainer",
+      "privateSub": "Private – only you and the trainers you choose.",
+      "privateStaff": "Private conversation",
+      "privateStaffSub": "Only you and the people you choose.",
+      "message": "Message to the team",
+      "messageSub": "From the trainer – can require everyone to read or accept.",
+      "school": "To the whole school",
+      "schoolSub": "A post for all members – can also be shown on the website."
+    },
+    "showAll_one": "Show all ({{count}})",
+    "showAll_other": "Show all ({{count}})",
+    "empty": "Quiet here so far. Tap Write to write to the team or to the trainer.",
+    "emptyStaff": "No messages yet. Tap Write and welcome the team.",
+    "trainerRoom": "Trainers' room",
+    "trainerRoomSub": "Trainers and admin only"
   }
 }

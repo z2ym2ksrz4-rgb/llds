@@ -22,7 +22,7 @@ await pick("Tilde"); await p.click("nav.tabbar >> text=Hjem"); await p.waitForTi
 await p.click("nav.tabbar >> text=Hold"); await p.waitForSelector(".teampick"); out.dancerTeam = await p.textContent(".teampick strong");
 out.tabsDancer = await tabs();
 // child login 11: no photo upload in Social
-await pick("Milo"); await p.click("nav.tabbar >> text=Social"); await p.waitForTimeout(400); out.kidsPhotoButtonHidden = !(await p.$("button:has-text('Tilføj billede')"));
+await pick("Milo"); await p.click("nav.tabbar >> text=Hold"); await p.click("[data-testid=stream-write]"); await p.click("[data-testid=new-post]"); await p.waitForSelector("#post-body"); out.noSocialTab = !(await p.$("nav.tabbar >> text=Social")); out.kidsPhotoButtonHidden = !(await p.$("button:has-text('Tilføj billede')")); await p.click("[data-testid=sheet-close]"); await p.waitForTimeout(300);
 // parent: wears the child's hat
 await pick("Pia"); await p.click("nav.tabbar >> text=Hold"); await p.waitForSelector(".teampick"); out.parentEyebrow = await p.textContent(".teampick .eyebrow"); out.parentTeam = await p.textContent(".teampick strong");
 // admin + trainer + parent persona keeps Admin tab

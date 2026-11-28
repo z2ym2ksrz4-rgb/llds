@@ -262,7 +262,7 @@ next: () => (<>
         </button>
       )}
     </>),
-    badges: () => (<>
+    badges: () => !childLogin ? null : (<>
       {(badges.some((b) => b.person_id === viewing.personId) || myMilestones.length > 0) && (
         <div className="sec"><h2>{hat ? t("home.childsShelf", { name: hat.first_name }) : t("home.yourShelf")}</h2>
           <TrophyShelf badges={badges.filter((b) => b.person_id === viewing.personId)} milestones={myMilestones} />
@@ -277,7 +277,7 @@ next: () => (<>
     const studioKeys = ["studioHead", "adminTodo", "stats", "studio"]; const rest = order.filter((k) => !studioKeys.includes(k)); const at = (rest.indexOf("teampick") + 1) || (rest.indexOf("hero") + 1) || 1;
     order = [...rest.slice(0, at), ...studioKeys.filter((k) => order.includes(k) || k === "adminTodo"), ...rest.slice(at)];
   }
-  const FOLD = new Set(childLogin ? ["gallery"] : ["gallery", "badges"]);   // children see their emblems right away   // nice-to-have content lives under one "Mere" fold – the first screen stays about now
+  const FOLD = new Set(["gallery"]);   // children see their emblems right away   // nice-to-have content lives under one "Mere" fold – the first screen stays about now
   if (isAdmin && !viewing.isChild) FOLD.add("studio");   // admin: to-dos and today's numbers stay up, the rest folds
   const main = order.filter((k) => !FOLD.has(k)); const folded = order.filter((k) => FOLD.has(k));
   const renderKey = (k: string) => { const box = boxOf(appearance, k); return <Fragment key={k}>{box ? <CustomBoxCard box={box} onTab={(tab) => setTab(tab as Parameters<typeof setTab>[0])} /> : SECTIONS[k]?.()}</Fragment>; };

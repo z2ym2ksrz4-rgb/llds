@@ -1250,7 +1250,7 @@
       "teamtab": {
         "label": "Hold",
         "title": "Holdets eget rum",
-        "body": "Beskeder fra træneren, samtaler med træneren, koreografi-videoer, formationer, holdets billeder og dansere."
+        "body": "Alt på holdet ét sted: beskeder fra skolen og træneren, holdets opslag og dine private samtaler med træneren – farvekodet, så du kan se, hvem der skriver til hvem. Plus videoer, formationer og billeder."
       },
       "social": {
         "label": "Social",
@@ -1675,7 +1675,7 @@
       "absence": "Tryk på træningen under Hjem → Din uge (eller i Kalender) og vælg “Meld afbud”. Vælg årsag, skriv evt. en note, og træneren får besked med det samme.",
       "pay": "Hold, klippekort og shop betales med Vipps MobilePay til studiets nummer med den reference, appen viser. Åbn Betalinger og klippekort i menuen bag dit billede, tryk “Betal” – på telefonen åbner MobilePay direkte. Når danseskolen har set betalingen, får du en kvittering på mail.",
       "video": "Under Hold → Koreografi. På mini- og børnehold ser forældre videoerne; på junior- og voksenhold er de kun for danserne selv.",
-      "write": "Beskeder fra danseskolen ligger under Hjem. Under Hold finder du trænerens beskeder og “Skriv til træneren”. Social er holdets eget opslag-rum.",
+      "write": "Alt ligger under Hold → Holdet: beskeder fra skolen (guld), fra træneren (kobber), holdets opslag (grå) og dine private samtaler med træneren (blå). Tryk Skriv og vælg, om det er til holdet eller kun til træneren. Det, der kræver dig, står også på Hjem.",
       "child": "Ja, fra 13 år. Åbn Mine børn i menuen bag dit billede og tryk “Giv login” – barnet logger ind med sin egen e-mail og ser kun sit eget hold. Under 13 bruger I din profil sammen."
     }
   },
@@ -1875,5 +1875,42 @@
     "menu": "Trænere på websitet",
     "menuSub": "Den offentlige profil: billede, titel og tekst",
     "twoProfiles": "Det her er den offentlige profil på websitet. Trænerens egen profil i appen (profilbillede og \"Om mig\") sætter træneren selv op, og den vises kun inde i appen."
+  },
+  "stream": {
+    "title": "Holdet",
+    "write": "Skriv",
+    "writeTitle": "Hvem skriver du til?",
+    "new": "Nyt",
+    "trainer": "træneren",
+    "key": {
+      "school": "Skolen",
+      "trainer": "Træneren",
+      "team": "Holdet",
+      "private": "Privat"
+    },
+    "who": {
+      "school": "Fra skolen · til alle",
+      "trainer": "Fra {{name}} · til {{team}}",
+      "team": "Opslag · til hele {{team}}",
+      "private": "Privat · dig og {{names}}"
+    },
+    "to": {
+      "team": "Til holdet",
+      "teamSub": "Opslag, som alle på {{team}} kan se og kommentere.",
+      "private": "Kun til træneren",
+      "privateSub": "Privat – kun dig og de trænere, du vælger.",
+      "privateStaff": "Privat samtale",
+      "privateStaffSub": "Kun dig og dem, du vælger.",
+      "message": "Besked til holdet",
+      "messageSub": "Fra træneren – kan kræve, at alle læser eller accepterer.",
+      "school": "Til hele skolen",
+      "schoolSub": "Opslag til alle medlemmer – kan også vises på websitet."
+    },
+    "showAll_one": "Vis alle ({{count}})",
+    "showAll_other": "Vis alle ({{count}})",
+    "empty": "Her er stille endnu. Tryk Skriv for at skrive til holdet eller til træneren.",
+    "emptyStaff": "Ingen beskeder endnu. Tryk Skriv og byd holdet velkommen.",
+    "trainerRoom": "Trænerrummet",
+    "trainerRoomSub": "Kun trænere og administrator"
   }
 }

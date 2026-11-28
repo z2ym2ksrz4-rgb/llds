@@ -1122,3 +1122,21 @@ a.cta.calgo { display:block; text-align:center; text-decoration:none; color:#141
 .card.trainercard { margin: 0; display: flex; flex-direction: column; gap: 10px; }
 .trainercard .thumb { height: 170px; border-radius: 10px; background: #000 center/contain no-repeat; display: grid; place-items: center; }
 .trainercard .tc-bio { margin: 6px 0 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* ---- team stream: one colour-coded list of everything said on the team (school / trainer / team / private) ---- */
+.stream .k-school { --kc: var(--gold2, #e2c77a); } .stream .k-trainer { --kc: #e0936a; } .stream .k-team { --kc: #8c8880; } .stream .k-private { --kc: var(--sky, #7fb3d5); }
+.sheet .k-school { --kc: var(--gold2, #e2c77a); } .sheet .k-trainer { --kc: #e0936a; } .sheet .k-team { --kc: #8c8880; } .sheet .k-private { --kc: var(--sky, #7fb3d5); }
+.streamkey { display:flex; flex-wrap:wrap; gap:4px 14px; margin:2px 0 10px; color:var(--fg3); }
+.streamkey span { display:inline-flex; align-items:center; gap:6px; } .streamkey i, .swho i, .writepick .wp i { width:8px; height:8px; border-radius:50%; background:var(--kc); flex:none; display:inline-block; }
+.streamlist { display:grid; gap:10px; }
+.sitem { border-left:3px solid var(--kc); border-radius:4px var(--r-sm) var(--r-sm) 4px; background:color-mix(in srgb, var(--kc) 6%, var(--card, #17171a)); padding:10px 12px 10px 13px; min-width:0; }
+.sitem.due { background:color-mix(in srgb, var(--kc) 13%, var(--card, #17171a)); }
+.swho { display:flex; align-items:center; gap:7px; color:var(--kc); letter-spacing:.04em; margin-bottom:6px; }
+.swho .sdot { width:7px; height:7px; border-radius:50%; background:var(--rose, #b8485a); margin-left:auto; }
+.sitem .sbody { display:flex; align-items:center; gap:10px; width:100%; text-align:left; background:none; border:0; padding:0; color:var(--fg); font:inherit; cursor:pointer; min-height:40px; }
+.sitem .sbody .grow { display:grid; gap:2px; min-width:0; } .sitem .sbody strong { font-weight:500; }
+.sitem .sline { color:var(--fg2, #b9b4aa); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.sitem .feed { margin:0; } .sitem .feed .card.post { background:none; border:0; box-shadow:none; padding:0; margin:0; } .sitem .feed .card.post::before { display:none; }
+.writepick { display:grid; gap:10px; }
+.writepick .wp { display:flex; align-items:center; gap:12px; text-align:left; width:100%; padding:14px; border-radius:var(--r-sm); border:1px solid var(--line); border-left:3px solid var(--kc); background:color-mix(in srgb, var(--kc) 7%, transparent); color:var(--fg); font:inherit; cursor:pointer; }
+.writepick .wp span { display:grid; gap:2px; } .writepick .wp .tiny { color:var(--fg2, #b9b4aa); }

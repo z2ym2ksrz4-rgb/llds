@@ -16,7 +16,6 @@ const STEPS: Step[] = [
   { key: "profile", tab: "home", target: "[data-tour=avatar]" },
   { key: "rooms", target: "[data-tour=tab-rooms]" },
   { key: "teamtab", target: "[data-tour=tab-team]" },
-  { key: "social", target: "[data-tour=tab-social]" },
   { key: "events", target: "[data-tour=tab-events]" },
   { key: "admin", target: "[data-tour=tab-admin]", adminOnly: true },
 ];

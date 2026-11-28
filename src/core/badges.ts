@@ -9,8 +9,7 @@ import type { Tab } from "./nav";
  *  Admin: real to-do counts (pending users, bookings to approve, open orders …) – they only go away when the task is done. */
 export const TAB_KINDS: Record<Exclude<Tab, "home" | "more" | "admin">, string[]> = {
   rooms: ["booking", "session", "substitute"],
-  team: ["message", "badge", "milestone"],   // trainer messages, comments on them, conversations
-  social: ["post"],                           // the teams' own feed
+  team: ["message", "badge", "milestone", "post"],   // everything said on the team: trainer messages, the team's own posts, comments, private conversations
   events: ["event"],
   shop: ["order", "punch", "payment"],
 };
@@ -36,7 +35,7 @@ export const useBadges = create<Badges>((set, get) => ({
     const unread = notifs.filter((n) => !n.read_at);
     const tabs: Partial<Record<Tab, number>> = {};
     for (const [tab, kinds] of Object.entries(TAB_KINDS) as [Tab, string[]][]) { const n = unread.filter((x) => kinds.includes(x.kind)).length; if (n) tabs[tab] = n; }
-    const unreadThreads = threads.filter((x) => x.unread).length; if (unreadThreads) tabs.social = (tabs.social ?? 0) + unreadThreads;
+    const unreadThreads = threads.filter((x) => x.unread).length; if (unreadThreads) tabs.team = (tabs.team ?? 0) + unreadThreads;
     let admin = EMPTY;
     if (isAdmin) {
       const from = new Date(); from.setHours(0, 0, 0, 0); const to = new Date(from); to.setDate(to.getDate() + 60); const to14 = new Date(from); to14.setDate(to14.getDate() + 14);

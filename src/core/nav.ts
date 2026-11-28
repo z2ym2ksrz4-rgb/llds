@@ -1,5 +1,5 @@
 import { create } from "zustand";
-export type Tab = "home" | "rooms" | "team" | "social" | "events" | "admin" | "more" | "shop";
+export type Tab = "home" | "rooms" | "team" | "events" | "admin" | "more" | "shop";
 export type NavRef = Record<string, string>;
 type Nav = { tab: Tab; prev: Tab; adminPage: string | null; pendingRef: NavRef | null; setTab: (t: Tab) => void; back: () => void; openAdmin: (page: string) => void; takeAdminPage: () => string | null; openRef: (tab: Tab, ref: NavRef) => void; takeRef: (key: string) => string | null };
 export const useNav = create<Nav>((set, get) => ({ tab: "home", prev: "home", adminPage: null, pendingRef: null,

@@ -6,5 +6,4 @@ export { Rooms } from "./llds/screens/Rooms";
 export { TeamScreen } from "./llds/screens/Team";
 export { Admin } from "./llds/admin/Admin";
 export { More } from "./llds/screens/More";
-export { Social } from "./llds/screens/Social";
 export { Events } from "./llds/screens/Events";

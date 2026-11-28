@@ -18,7 +18,7 @@ export function targetOf(n: Notification): { tab: Tab; ref: Record<string, strin
   if (r.event_id) return { tab: "events", ref: { event_id: r.event_id } };
   if (r.message_id) return { tab: "team", ref: { message_id: r.message_id } };
   if (r.thread_id) return { tab: "team", ref: { thread_id: r.thread_id } };
-  if (r.post_id) return { tab: "social", ref: { post_id: r.post_id } };
+  if (r.post_id) return { tab: "team", ref: { post_id: r.post_id } };
   if (r.order_id || n.kind === "punch" || n.kind === "payment") return { tab: "shop", ref: r.order_id ? { order_id: r.order_id } : {} };
   for (const [tab, kinds] of Object.entries(TAB_KINDS) as [Tab, string[]][]) if (kinds.includes(n.kind)) return { tab, ref: {} };
   return null;
