@@ -20,6 +20,14 @@ import { UpdateBanner } from "./UpdateBanner";
 import { ShopScreen } from "@/domain/llds/screens/ShopScreen";
 import { TestMenu } from "./TestMenu";
 
+/** Tapping the tab you are already on takes you back to the top of it (and, in Admin, back to the Admin menu) – the way phone apps do. */
+function againTab(k: string) {
+  window.dispatchEvent(new CustomEvent("llds:tab-again", { detail: k }));
+  const smooth: ScrollBehavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+  window.scrollTo({ top: 0, behavior: smooth });
+  document.querySelectorAll<HTMLElement>("main .calwrap, main .callist").forEach((el) => el.scrollTo({ top: 0, behavior: smooth }));
+}
+
 export default function App() {
   const { t } = useTranslation();
   const phase = useAuth((s) => s.phase);
@@ -65,7 +73,7 @@ export default function App() {
       <UpdateBanner />
       {phase === "ready" && (
         <nav className="tabbar">
-          {tabs.map(([k, label, icon]) => <button key={k} className={tab === k ? "active" : ""} data-tour={`tab-${k}`} onClick={() => setTab(k)}><Icon name={icon} />{(badges[k] ?? 0) > 0 && <em className="tabbadge" data-testid={`tabbadge-${k}`}>{badges[k]! > 99 ? "99+" : badges[k]}</em>}<span>{label}</span></button>)}
+          {tabs.map(([k, label, icon]) => <button key={k} className={tab === k ? "active" : ""} data-tour={`tab-${k}`} onClick={() => { if (tab === k) againTab(k); else setTab(k); }}><Icon name={icon} />{(badges[k] ?? 0) > 0 && <em className="tabbadge" data-testid={`tabbadge-${k}`}>{badges[k]! > 99 ? "99+" : badges[k]}</em>}<span>{label}</span></button>)}
         </nav>
       )}
       {!isRelease && <TestMenu />}

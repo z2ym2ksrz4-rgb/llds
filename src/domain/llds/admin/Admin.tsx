@@ -52,6 +52,7 @@ function AdminSearch({ q, menu, onPage }: { q: string; menu: { k: Page; label: s
 export function Admin() {
   const { t } = useTranslation();
   const [page, setPage] = useState<Page>(() => (useNav.getState().takeAdminPage() as Page | null) ?? "menu");
+  useEffect(() => { const f = (e: Event) => { if ((e as CustomEvent).detail === "admin") setPage("menu"); }; window.addEventListener("llds:tab-again", f); return () => window.removeEventListener("llds:tab-again", f); }, []);   // tapping Admin again = back to the Admin menu
   const adminPage = useNav((n) => n.adminPage);
   useEffect(() => { const p = useNav.getState().takeAdminPage(); if (p) setPage(p as Page); }, [adminPage]);
   const [find, setFind] = useState("");
