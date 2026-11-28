@@ -417,7 +417,7 @@ for(const r of rows){let c=old.get(r.name);const same=c&&c.dataset.h===hh((r.tit
 if(!same){c=mk("div","card");c.id=slug(r.name);c.dataset.n=r.name;if(ph){const im=mk("img");im.alt=r.name;im.loading="lazy";c.appendChild(im)}const inn=mk("div","in");inn.appendChild(mk("h3","",r.name));
 if(r.title){const tt=mk("div","tiny ttl",r.title);tt.style.color="var(--gold)";inn.appendChild(tt)}const te=mk("div","tiny teaches");te.style.marginTop="4px";inn.appendChild(te);
 if(r.bio){const b=mk("p","small muted bio",r.bio);b.style.margin="10px 0 0";inn.appendChild(b);const m=mk("button","more",more);m.type="button";m.onclick=()=>c.classList.add("open");inn.appendChild(m)}c.appendChild(inn)}
-const im=c.querySelector("img");if(im&&ph&&im.getAttribute("src")!==ph)im.src=ph;const te=c.querySelector(".teaches");if(te){te.textContent=r.teaches||"";te.style.display=r.teaches?"":"none"}
+const im=c.querySelector("img");if(im&&ph&&im.getAttribute("src")!==ph)im.src=ph;const te=c.querySelector(".teaches");if(te){const tm=(r.teaches||"").split(" · ").filter(Boolean);te.textContent=tm.length>6?tm.slice(0,6).join(" · ")+(EN?` · +${tm.length-6} more`:` · +${tm.length-6} hold`):tm.join(" · ");te.title=tm.join(" · ");te.style.display=tm.length?"":"none"}
 c.classList.remove("rv");frag.appendChild(c)}
 cards.replaceChildren(frag);const n=document.querySelector("[data-trainers-count]");if(n)n.textContent=rows.length;
 if(location.hash){const t=document.getElementById(decodeURIComponent(location.hash.slice(1)));if(t)t.scrollIntoView()}}
